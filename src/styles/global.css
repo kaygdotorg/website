@@ -657,9 +657,9 @@ html[data-theme="light"] body {
 
 /* Content Card - High Contrast for Readability */
 .md-card-body.grainy-card {
-  background: rgba(13, 9, 16, 0.85);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
+  background: rgba(13, 9, 16, 0.55);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
 }
 
 [data-theme="light"] .md-card-body.grainy-card {
