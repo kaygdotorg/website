@@ -85,9 +85,24 @@ const photos = defineCollection({
   }),
 });
 
+// Schema for writing/blog posts (from Ghost)
+const writing = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    date: z.coerce.date(),
+    "last edited": z.coerce.date().optional(),
+    tags: z.array(z.string()).optional(),
+    image: z.string().optional(), // Feature image
+    draft: z.boolean().optional().default(false),
+  }),
+});
+
 export const collections = {
   pages,
   photos,
   now,
   uses,
+  writing,
 };

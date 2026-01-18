@@ -1,0 +1,86 @@
+---
+import MarkdownLayout from "../../layouts/MarkdownLayout.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+    const posts = await getCollection("writing");
+    return posts.map((post) => ({
+        params: { slug: post.slug },
+        props: { post },
+    }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+// Calculate reading time
+const wordCount = post.body?.split(/\s+/).length || 0;
+const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+// Get dates
+const createdDate = post.data.date;
+const lastEdited = post.data["last edited"];
+
+// Get all posts for prev/next navigation
+const allPosts = await getCollection("writing", ({ data }) => !data.draft);
+const sortedPosts = allPosts.sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const currentIndex = sortedPosts.findIndex((p) => p.slug === post.slug);
+const prevPost =
+    currentIndex < sortedPosts.length - 1
+        ? sortedPosts[currentIndex + 1]
+        : null;
+const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
+
+// Create backlinks
+const backlinks = [{ title: "← All Writing", href: "/writing" }];
+if (prevPost) {
+    backlinks.push({
+        title: `← ${prevPost.data.title}`,
+        href: `/writing/${prevPost.slug}`,
+    });
+}
+if (nextPost) {
+    backlinks.push({
+        title: `${nextPost.data.title} →`,
+        href: `/writing/${nextPost.slug}`,
+    });
+}
+---
+
+<MarkdownLayout
+    title={post.data.title}
+    description={post.data.description}
+    createdDate={createdDate}
+    lastEdited={lastEdited}
+    readingTime={readingTime}
+    backlinks={backlinks}
+>
+    {
+        post.data.image && (
+            <div class="mb-8 -mx-4 md:-mx-8 rounded-xl overflow-hidden">
+                <img
+                    src={post.data.image}
+                    alt={post.data.title}
+                    class="w-full h-48 md:h-64 object-cover"
+                />
+            </div>
+        )
+    }
+
+    {
+        post.data.tags && post.data.tags.length > 0 && (
+            <div class="flex flex-wrap gap-2 mb-6">
+                {post.data.tags.map((tag) => (
+                    <span class="px-3 py-1 text-xs rounded-full bg-accent/10 text-accent">
+                        {tag}
+                    </span>
+                ))}
+            </div>
+        )
+    }
+
+    <Content />
+</MarkdownLayout>
