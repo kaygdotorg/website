@@ -591,11 +591,12 @@ html[data-theme="light"] body {
 
 .md-card-header h2 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: 1.35rem;
-  font-weight: 600;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--color-accent-500);
   margin: 0;
-  letter-spacing: -0.02em;
 }
 
 .md-card-toggle {
