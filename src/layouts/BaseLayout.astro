@@ -32,15 +32,7 @@ const navLinks = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
-    <!-- Font preloading for better LCP -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Pagefind UI CSS (loaded on-demand) -->
-    <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+    <!-- Fonts are now self-hosted via fontsource -->
     <!-- Theme detection: respects system preference, allows override -->
     <script is:inline>
       (function () {

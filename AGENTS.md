@@ -1,0 +1,4 @@
+- Always thoroughly describe changes as comments/documentation within the file.
+- With every change made, include a commit that has a conventional commit conforming title and descriptive message.
+- Always prefer simplicity over clever tricks in code.
+- Performance is always a priority.

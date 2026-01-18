@@ -27,148 +27,168 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
 
 <BaseLayout title={title} description={description}>
   <div class="md-page-container">
-    <!-- Title Card - Always visible -->
-    <div class="grainy-card md-card-title">
-      <h1>{title}</h1>
-      <div class="md-card-metadata">
-        {/* Reading time */}
-        {
-          readingTime && (
-            <span title="Estimated reading time">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
-              {readingTime} min read
-            </span>
-          )
-        }
+    <!-- Unified Single Card for entire page -->
+    <div class="grainy-card md-unified-card">
+      <!-- Title Section -->
+      <div class="md-card-title">
+        <h1>{title}</h1>
+        <div class="md-card-metadata">
+          {/* Reading time */}
+          {
+            readingTime && (
+              <span title="Estimated reading time">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+                {readingTime} min read
+              </span>
+            )
+          }
 
-        {/* Created date */}
-        {
-          formattedCreatedDate && (
-            <span title="Published">
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              {formattedCreatedDate}
-            </span>
-          )
-        }
+          {/* Created date */}
+          {
+            formattedCreatedDate && (
+              <span title="Published">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                {formattedCreatedDate}
+              </span>
+            )
+          }
 
-        {/* Last edited - tappable to show full date */}
-        {
-          relativeLastEdited && (
-            <span
-              class="last-edited-toggle cursor-pointer"
-              data-relative={`Updated ${relativeLastEdited}`}
-              data-absolute={`Updated ${formattedLastEdited}`}
-            >
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              <span class="last-edited-text">Updated {relativeLastEdited}</span>
-            </span>
-          )
-        }
-      </div>
-    </div>
-
-    <!-- Table of Contents Card - Collapsible -->
-    <div class="grainy-card md-card-collapsible md-card-toc" id="toc-card">
-      <div class="md-card-header" onclick="toggleCard('toc-card')">
-        <h2>Table of Contents</h2>
-        <svg
-          class="md-card-toggle"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </div>
-      <div class="md-card-content">
-        <ul id="toc-list">
-          <!-- Populated by JS -->
-        </ul>
-      </div>
-    </div>
-
-    <!-- Content Card - Collapsible -->
-    <div class="grainy-card md-card-collapsible md-card-body" id="content-card">
-      <div class="md-card-header" onclick="toggleCard('content-card')">
-        <h2>Content</h2>
-        <svg
-          class="md-card-toggle"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </div>
-      <div class="md-card-content" id="markdown-content">
-        <slot />
-      </div>
-    </div>
-
-    <!-- Backlinks Card - Collapsible -->
-    {
-      backlinks.length > 0 && (
-        <div
-          class="grainy-card md-card-collapsible md-card-backlinks collapsed"
-          id="backlinks-card"
-        >
-          <div class="md-card-header" onclick="toggleCard('backlinks-card')">
-            <h2>Backlinks ({backlinks.length})</h2>
-            <svg
-              class="md-card-toggle"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </div>
-          <div class="md-card-content">
-            <ul>
-              {backlinks.map((link) => (
-                <li>
-                  <a href={link.href}>{link.title}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Last edited - tappable to show full date */}
+          {
+            relativeLastEdited && (
+              <span
+                class="last-edited-toggle cursor-pointer"
+                data-relative={`Updated ${relativeLastEdited}`}
+                data-absolute={`Updated ${formattedLastEdited}`}
+              >
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span class="last-edited-text">
+                  Updated {relativeLastEdited}
+                </span>
+              </span>
+            )
+          }
         </div>
-      )
-    }
+      </div>
+
+      <!-- Divider -->
+      <hr class="md-section-divider" />
+
+      <!-- Table of Contents Section - Collapsible -->
+      <div class="md-section md-card-collapsible md-card-toc" id="toc-card">
+        <div class="md-card-header" onclick="toggleCard('toc-card')">
+          <h2>Table of contents</h2>
+          <svg
+            class="md-card-toggle"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+        <div class="md-card-content">
+          <ul id="toc-list">
+            <!-- Populated by JS -->
+          </ul>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <hr class="md-section-divider" />
+
+      <!-- Content Section - Collapsible -->
+      <div
+        class="md-section md-card-collapsible md-card-body"
+        id="content-card"
+      >
+        <div class="md-card-header" onclick="toggleCard('content-card')">
+          <h2>Content</h2>
+          <svg
+            class="md-card-toggle"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+        <div class="md-card-content" id="markdown-content">
+          <slot />
+        </div>
+      </div>
+
+      <!-- Backlinks Section - Collapsible -->
+      {
+        backlinks.length > 0 && (
+          <>
+            <hr class="md-section-divider" />
+            <div
+              class="md-section md-card-collapsible md-card-backlinks collapsed"
+              id="backlinks-card"
+            >
+              <div
+                class="md-card-header"
+                onclick="toggleCard('backlinks-card')"
+              >
+                <h2>Backlinks ({backlinks.length})</h2>
+                <svg
+                  class="md-card-toggle"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+              <div class="md-card-content">
+                <ul>
+                  {backlinks.map((link) => (
+                    <li>
+                      <a href={link.href}>{link.title}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </>
+        )
+      }
+    </div>
   </div>
 
   <script is:inline>
@@ -322,7 +342,51 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
       window.addEventListener("scroll", handleTocScroll, { passive: true });
       initScrollProgress();
       initLastEditedToggle();
+
+      // Initialize Clipboard Links
+      const content = document.getElementById("markdown-content");
+      if (content) {
+        content.addEventListener("click", (e) => {
+          // Check if we clicked the link or any children of the link (like the SVG)
+          const link = e.target.closest(".heading-link");
+          if (link) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Find the closest heading (the link is usually inside the heading)
+            const heading = link.closest("h1, h2, h3, h4, h5, h6");
+            if (heading && heading.id) {
+              const url = `${window.location.origin}${window.location.pathname}#${heading.id}`;
+              navigator.clipboard
+                .writeText(url)
+                .then(() => {
+                  showToast("Link copied to clipboard!");
+                })
+                .catch((err) => {
+                  console.error("Could not copy text: ", err);
+                });
+            }
+          }
+        });
+      }
     });
+
+    function showToast(message) {
+      let toast = document.getElementById("toast-notification");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast-notification";
+        toast.className = "toast-notification";
+        document.body.appendChild(toast);
+      }
+
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
 
     // Make toggleCard available globally (safer assignment)
     if (typeof window.toggleCard === "undefined") {

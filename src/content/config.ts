@@ -94,7 +94,7 @@ const writing = defineCollection({
     description: z.string().optional(),
     date: z.coerce.date(),
     "last edited": z.coerce.date().optional(),
-    tags: z.array(z.string()).optional(),
+    tags: z.array(z.string()).nullable().optional(),
     image: z.string().optional(), // Feature image
     draft: z.boolean().optional().default(false),
   }),

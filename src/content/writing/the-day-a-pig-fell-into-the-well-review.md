@@ -1,0 +1,20 @@
+---
+title: The Day a Pig Fell into the Well (1996), dir. Hong Sang-soo
+date: 2017-07-11 00:00
+last edited: 2025-04-10 15:10
+tags:
+  - wordpress
+  - medium
+---
+![the-day-a-pig-fell-into-the-well-review-cover](<./the-day-a-pig-fell-into-the-well-review/the-day-a-pig-fell-into-the-well-review-cover.png>)
+Disappointment as surrealism. Change as bizarre. Love as a temporal function. A twisted crossroad welcomes the eminent boiling down of every human concoction — four poets amidst the ephemeral satisfaction of a seraph thrown into the same cubicle as a strident and idiosyncratic heart — not as thirsty but certainly as callous and indulgent. The question of rightful yearning is not a candid inquisition; the depth of its interrogation asks a what if and a what then. If we all covet intimacy, where is our patience to bear its weight when it reeks of fallacy? If we pen forevers as postscripts to our letters of fervour then why does it feel lonesome after a day of delayed response? All of us go through vacations of radical affection yet loyalty barks attenuation as strings tire of circumstance. A variable need of warmth haunts us and as necessity translates into desperation, our radar points towards inequalities with the destined other, and we fall in and out of love as we please, turning to self-anointed labels and badly published edits of insecurity.
+
+![the-day-a-pig-fell-into-the-well-review-1](<./the-day-a-pig-fell-into-the-well-review/the-day-a-pig-fell-into-the-well-review-1.jpeg>)
+
+Hyo-sup is a writer with little money to get by. His affair with a married woman compels their relationship to occur in chaotic intervals. Although both of them contribute to the relationship, none of them can break through the intricacy of it. The constraints bring out their worst and although, one stays faithful, the other succumbs to mediocrity. I call it the KoC syndrome — to be loved and to be loved every passing moment, impotent of reciprocation and yet in demand of more. The illusory effect of lasting together Hong casts upon his characters is one, which we suffer from regularly. Not per se that the characters are drawn to volatility, the circumstance is a test too heavy for the resistance to withhold. So it (they) breaks, looks for second opinions, chases the baseless something and hurts every string (person) in consequence.
+
+I would argue that Hong’s debut is a dynamic triumph in areas where it flows smooth. The whine here is definitely the abrupt pacing and non-directional flow of the plot. The course feels calculated yet crookedly arrayed in climactic highs. The resulting stretch is apparent and it seeps through the cracks of the dated image. The lack of music is an annoyance too as the light background that once fueled romance is non-existent as a sincere alternative through the later parts where only a tight string is habitually reverberated. Hong seems to be adept at relaying rapport yet inert at delivering its very loss. He fancies a double bill and proceeds with an ambiguous action of loathe. The course of the latter action is a thought of high order but its initiation has a lot to show in the way he ignores certain characterizations.
+
+![the-day-a-pig-fell-into-the-well-review-2](<./the-day-a-pig-fell-into-the-well-review/the-day-a-pig-fell-into-the-well-review-2.jpeg>)
+
+Hong insists that mediocrity is not just a marker to draw pity, it crystallizes when the worst is to come out. His initial momentum carries a gauzy portrait of a pair of hearts dipped into the fiery bubble of conversation and as one puts the other in arms; it is essentially the most exclusive moment, closer than what the bed or a couple of drinks hold. Judgement does not birth this privacy, no amount of verbal brawls can make it local; only the visceral traction can make it so — however, it is in the human condition to speak when it is not necessary, to betray out of fugitive solitude, to pit senseless battles for pride and ultimately destroy what is beautiful.

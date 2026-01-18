@@ -1,6 +1,14 @@
-/* Google Fonts - Nunito + Cascadia Code */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&display=swap');
-@import url('https://cdn.jsdelivr.net/npm/@fontsource/cascadia-code@4.2.1/index.min.css');
+/* Local fonts via fontsource */
+@import "@fontsource/nunito/latin-300.css";
+@import "@fontsource/nunito/latin-400.css";
+@import "@fontsource/nunito/latin-500.css";
+@import "@fontsource/nunito/latin-600.css";
+@import "@fontsource/nunito/latin-700.css";
+@import "@fontsource/playfair-display/latin-400.css";
+@import "@fontsource/playfair-display/latin-500.css";
+@import "@fontsource/playfair-display/latin-600.css";
+@import "@fontsource/playfair-display/latin-700.css";
+@import "@fontsource/cascadia-code/latin-400.css";
 
 @import "tailwindcss";
 
@@ -102,6 +110,21 @@ html[data-theme="light"] body {
 [data-theme="light"] .film-grain {
   opacity: 0.08;
   mix-blend-mode: multiply;
+}
+
+/* Respect user preference for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .film-grain {
+    animation: none;
+  }
+
+  .film-flare {
+    animation: none;
+  }
+
+  .film-tint {
+    animation: none;
+  }
 }
 
 /* Color tint layer for warmth */
@@ -518,6 +541,33 @@ html[data-theme="light"] body {
   }
 }
 
+/* Unified Card - contains all sections as one card */
+.md-unified-card {
+  padding: 0;
+}
+
+/* Section divider between card sections */
+.md-section-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 20%,
+      rgba(255, 255, 255, 0.1) 80%,
+      transparent 100%);
+  margin: 0;
+}
+
+[data-theme="light"] .md-section-divider {
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.08) 20%,
+      rgba(0, 0, 0, 0.08) 80%,
+      transparent 100%);
+}
+
+/* Section classes inherit from md-card-collapsible */
+
 /* Title Card - Always visible, not collapsible */
 .md-card-title {
   text-align: center;
@@ -593,8 +643,7 @@ html[data-theme="light"] body {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 1.25rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.01em;
   color: var(--color-accent-500);
   margin: 0;
 }
@@ -776,6 +825,62 @@ html[data-theme="light"] body {
 
 [data-theme="light"] .md-card-body .md-card-content code {
   background: rgba(0, 0, 0, 0.06);
+}
+
+/* ========================================
+   Heading Links (Clipboard)
+   ======================================== */
+
+.heading-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  color: var(--color-accent-500);
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+h2:hover .heading-link,
+h3:hover .heading-link,
+h4:hover .heading-link {
+  opacity: 0.5;
+}
+
+.heading-link:hover {
+  opacity: 1 !important;
+  transform: scale(1.1);
+}
+
+.heading-link svg {
+  width: 1em;
+  height: 1em;
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--color-accent-500);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-family: var(--font-display, "Nunito", sans-serif);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.toast-notification.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
 }
 
 /* ========================================
