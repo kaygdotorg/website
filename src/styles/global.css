@@ -9,6 +9,7 @@
 }
 
 @theme {
+  --font-heading: "Playfair Display", Georgia, serif;
   --font-display: "IBM Plex Sans", system-ui, sans-serif;
   --font-body: "IBM Plex Sans", system-ui, sans-serif;
 
@@ -343,11 +344,12 @@ html[data-theme="light"] body {
 }
 
 .page-card-title {
-  font-family: var(--font-display);
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 1.75rem;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--color-accent-500);
   margin-bottom: 1.25rem;
+  letter-spacing: -0.03em;
 }
 
 @media (min-width: 768px) {
@@ -523,11 +525,13 @@ html[data-theme="light"] body {
 }
 
 .md-card-title h1 {
-  font-family: var(--font-display);
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 2rem;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--color-accent-500);
   margin-bottom: 0.75rem;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 @media (min-width: 768px) {
@@ -580,11 +584,12 @@ html[data-theme="light"] body {
 }
 
 .md-card-header h2 {
-  font-family: var(--font-display);
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 1.125rem;
   font-weight: 500;
   color: var(--color-accent-500);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .md-card-toggle {
@@ -673,10 +678,13 @@ html[data-theme="light"] body {
 }
 
 .md-card-body .md-card-content h2 {
-  font-family: var(--font-display);
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 1.5rem;
+  font-weight: 500;
   color: var(--color-accent-500);
   margin: 2rem 0 1rem;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 
 .md-card-body .md-card-content h2:first-child {
@@ -684,10 +692,13 @@ html[data-theme="light"] body {
 }
 
 .md-card-body .md-card-content h3 {
-  font-family: var(--font-display);
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 1.25rem;
+  font-weight: 500;
   color: var(--color-accent-400);
   margin: 1.5rem 0 0.75rem;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 
 .md-card-body .md-card-content p {
