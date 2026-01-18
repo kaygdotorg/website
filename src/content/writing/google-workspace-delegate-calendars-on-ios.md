@@ -6,7 +6,7 @@ last edited: "2025-09-04T17:06:47.000+05:30"
 tags:
   - "Blog"
   - "iOS"
-draft: true
+draft: false
 image: "/images/ghost/google-workspace-delegate-calendars-on-ios-1768729026072.jpg"
 ---
 

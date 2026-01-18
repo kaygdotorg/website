@@ -14,7 +14,7 @@ tags:
   - "Blog"
   - "MacOS"
   - "BetterTouchTool"
-draft: true
+draft: false
 ---
 
 ## ❓ What?

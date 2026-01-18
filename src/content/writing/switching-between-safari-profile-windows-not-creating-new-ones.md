@@ -7,7 +7,7 @@ tags:
   - "Blog"
   - "MacOS"
   - "Safari"
-draft: true
+draft: false
 image: "/images/ghost/switching-between-safari-profile-windows-not-creating-new-ones-1768729024675.jpg"
 ---
 

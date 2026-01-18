@@ -18,7 +18,7 @@ last edited: "2025-09-04T17:04:05.000+05:30"
 tags:
   - "Blog"
   - "MacOS"
-draft: true
+draft: false
 image: "/images/ghost/lmp-version-and-bluetooth-information-on-macos-1768729026678.jpg"
 ---
 

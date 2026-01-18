@@ -5,7 +5,7 @@ date: "2025-08-23T18:47:00.000+05:30"
 last edited: "2025-09-07T16:06:37.000+05:30"
 tags:
   - "Talks"
-draft: true
+draft: false
 image: "/images/ghost/introduction-to-proxmox-9-whats-new-and-why-virtualize-your-projects-1768729024966.jpeg"
 ---
 

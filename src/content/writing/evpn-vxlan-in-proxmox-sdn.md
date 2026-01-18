@@ -16,7 +16,7 @@ last edited: "2025-09-01T21:17:11.000+05:30"
 tags:
   - "Blog"
   - "Proxmox"
-draft: true
+draft: false
 ---
 
 ## ❓ What?

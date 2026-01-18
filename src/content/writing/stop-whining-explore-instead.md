@@ -7,7 +7,7 @@ date: "2024-09-09T16:10:00.000+05:30"
 last edited: "2025-08-27T14:43:47.000+05:30"
 tags:
   - "Blog"
-draft: true
+draft: false
 ---
 
 It's in trend, especially as you browse X, to come across statements like, "How do people use software A? It doesn't even let you do B. It literally gives me a migraine everyday to do C," and a community notes entry that gets appended as more and more people lay eyes on the post that goes, "ackshually..."

@@ -5,7 +5,7 @@ date: "2025-01-25T14:30:00.000+05:30"
 last edited: "2025-09-08T14:42:30.000+05:30"
 tags:
   - "Talks"
-draft: true
+draft: false
 image: "/images/ghost/migrating-vms-between-proxmox-nodes-backed-by-zfs-native-encryption-1768729025536.jpeg"
 ---
 

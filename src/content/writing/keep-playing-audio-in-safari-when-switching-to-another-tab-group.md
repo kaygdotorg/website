@@ -14,7 +14,7 @@ tags:
   - "Blog"
   - "MacOS"
   - "Safari"
-draft: true
+draft: false
 ---
 
 ## ❓ What?

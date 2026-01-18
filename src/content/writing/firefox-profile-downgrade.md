@@ -8,7 +8,7 @@ last edited: "2025-09-03T11:59:27.000+05:30"
 tags:
   - "Blog"
   - "MacOS"
-draft: true
+draft: false
 ---
 
 ## ❓ What?

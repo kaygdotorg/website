@@ -6,7 +6,7 @@ last edited: "2025-09-04T16:53:22.000+05:30"
 tags:
   - "Blog"
   - "Cinema"
-draft: true
+draft: false
 image: "/images/ghost/following-1998-dir-christopher-nolan-1768729030290.png"
 ---
 

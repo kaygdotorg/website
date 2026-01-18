@@ -5,7 +5,7 @@ date: "2025-04-02T16:03:00.000+05:30"
 last edited: "2025-09-04T17:06:14.000+05:30"
 tags:
   - "Blog"
-draft: true
+draft: false
 image: "/images/ghost/obsidian-vs-calendar-reminders-and-obsidian-1768729025158.jpg"
 ---
 

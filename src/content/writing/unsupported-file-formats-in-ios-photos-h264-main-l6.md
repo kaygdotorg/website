@@ -5,7 +5,7 @@ date: "2025-01-05T19:08:00.000+05:30"
 last edited: "2025-09-04T17:06:30.000+05:30"
 tags:
   - "Blog"
-draft: true
+draft: false
 image: "/images/ghost/unsupported-file-formats-in-ios-photos-h264-main-l6-1768729025566.jpg"
 ---
 

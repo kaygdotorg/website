@@ -13,7 +13,7 @@ date: "2024-01-27T12:18:00.000+05:30"
 last edited: "2025-09-01T21:16:59.000+05:30"
 tags:
   - "Talks"
-draft: true
+draft: false
 image: "/images/ghost/vlans-in-proxmox-1768729029480.jpg"
 ---
 

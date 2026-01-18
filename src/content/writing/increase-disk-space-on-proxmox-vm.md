@@ -40,7 +40,7 @@ last edited: "2025-09-03T11:57:14.000+05:30"
 tags:
   - "Blog"
   - "Proxmox"
-draft: true
+draft: false
 ---
 
 ## Overview

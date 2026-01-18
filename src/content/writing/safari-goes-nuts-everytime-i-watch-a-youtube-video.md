@@ -7,7 +7,7 @@ tags:
   - "Blog"
   - "MacOS"
   - "Safari"
-draft: true
+draft: false
 image: "/images/ghost/safari-goes-nuts-everytime-i-watch-a-youtube-video-1768729025002.jpg"
 ---
 

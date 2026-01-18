@@ -6,7 +6,7 @@ last edited: "2025-09-04T10:20:45.000+05:30"
 tags:
   - "Blog"
   - "Cinema"
-draft: true
+draft: false
 image: "/images/ghost/the-power-of-kangwon-province-1998-dir-hong-sang-soo-1768729030893.png"
 ---
 

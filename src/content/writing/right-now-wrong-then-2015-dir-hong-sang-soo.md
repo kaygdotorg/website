@@ -6,7 +6,7 @@ last edited: "2025-09-04T10:15:41.000+05:30"
 tags:
   - "Blog"
   - "Cinema"
-draft: true
+draft: false
 image: "/images/ghost/right-now-wrong-then-2015-dir-hong-sang-soo-1768729030316.png"
 ---
 

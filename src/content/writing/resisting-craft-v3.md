@@ -9,7 +9,7 @@ date: "2024-12-02T10:34:00.000+05:30"
 last edited: "2025-09-04T17:03:13.000+05:30"
 tags:
   - "Blog"
-draft: true
+draft: false
 image: "/images/ghost/resisting-craft-v3-1768729026309.jpg"
 ---
 

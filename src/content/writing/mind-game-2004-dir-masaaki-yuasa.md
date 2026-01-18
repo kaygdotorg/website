@@ -6,7 +6,7 @@ last edited: "2025-09-04T16:57:49.000+05:30"
 tags:
   - "Blog"
   - "Cinema"
-draft: true
+draft: false
 image: "/images/ghost/mind-game-2004-dir-masaaki-yuasa-1768729030234.png"
 ---
 

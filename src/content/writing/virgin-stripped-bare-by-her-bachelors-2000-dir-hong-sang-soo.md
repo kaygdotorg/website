@@ -3,7 +3,7 @@ title: "Virgin Stripped Bare by Her Bachelors (2000), dir. Hong Sang-Soo"
 description: "The score is 16 to 9. The frigid winter pilots attire and the monochrome condenses two sides to a story. Title card fades to a classical symphony — three people exit an art exhibit; the producer derides the stagnant linearity of art while the apprentice disagrees, goes on to praise the general idea in the static picture. A small Kyongbokgoong Palace stands before them; the apprentice dispenses an idea of visit but her intent is picayune to the wealth that tries to abuse or the ambition that trie"
 date: "2017-07-16T00:00:00.000+05:30"
 last edited: "2025-09-04T10:17:37.000+05:30"
-draft: true
+draft: false
 image: "/images/ghost/virgin-stripped-bare-by-her-bachelors-2000-dir-hong-sang-soo-1768729030700.png"
 ---
 

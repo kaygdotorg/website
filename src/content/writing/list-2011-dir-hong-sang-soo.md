@@ -6,7 +6,7 @@ last edited: "2025-09-04T16:56:57.000+05:30"
 tags:
   - "Blog"
   - "Cinema"
-draft: true
+draft: false
 image: "/images/ghost/list-2011-dir-hong-sang-soo-1768729030151.png"
 ---
 

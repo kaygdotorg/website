@@ -17,7 +17,7 @@ date: "2024-06-02T21:40:00.000+05:30"
 last edited: "2025-09-01T20:38:55.000+05:30"
 tags:
   - "Blog"
-draft: true
+draft: false
 ---
 
 ANOTHER EDIT: Apparently the hookscript section is what causes me the most headache and is not needed. Since the tap interface is bridged with `vmbr0`, it should not be configured to get an IP. The correct way to do it is to configure an IP and gateway on the bridge `vmbr0` itself like so:

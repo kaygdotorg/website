@@ -5,7 +5,7 @@ date: "2025-03-23T13:31:00.000+05:30"
 last edited: "2025-09-08T14:33:44.000+05:30"
 tags:
   - "Talks"
-draft: true
+draft: false
 image: "/images/ghost/learning-the-tools-we-already-possess-bash-1768729025398.png"
 ---
 

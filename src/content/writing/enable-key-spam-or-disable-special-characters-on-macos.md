@@ -62,7 +62,7 @@ last edited: "2025-09-03T12:02:52.000+05:30"
 tags:
   - "Blog"
   - "MacOS"
-draft: true
+draft: false
 ---
 
 ## ❓ What?
