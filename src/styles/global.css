@@ -500,18 +500,19 @@ html[data-theme="light"] body {
    ======================================== */
 
 .md-page-container {
-  max-width: 750px;
+  max-width: 720px;
+  /* Ghost-style reading width */
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 @media (min-width: 768px) {
   .md-page-container {
-    padding: 3rem 1.5rem;
-    gap: 1.25rem;
+    padding: 3rem 2rem;
+    gap: 1.75rem;
   }
 }
 
@@ -656,18 +657,19 @@ html[data-theme="light"] body {
   font-size: 0.85em;
 }
 
-/* Content Card - Keep same styling as other cards */
+/* Content Card - Enhanced readability for long-form content */
 .md-card-body .md-card-content {
-  line-height: 2;
-  font-size: 1.0625rem;
-  /* 17px */
+  line-height: 1.9;
+  font-size: 1.125rem;
+  /* 18px for comfortable reading */
   color: rgba(255, 255, 255, 0.92);
-  padding: 1.5rem 2rem;
-  /* Proper side padding */
+  padding: 2rem 2.5rem;
+  letter-spacing: 0.01em;
+  /* Slight letter-spacing for clarity */
 }
 
 [data-theme="light"] .md-card-body .md-card-content {
-  color: rgba(0, 0, 0, 0.85);
+  color: rgba(0, 0, 0, 0.88);
 }
 
 .md-card-body .md-card-content h2 {
@@ -689,8 +691,9 @@ html[data-theme="light"] body {
 }
 
 .md-card-body .md-card-content p {
-  margin: 1.5rem 0;
-  opacity: 0.9;
+  margin: 1.75rem 0;
+  /* More breathing room between paragraphs */
+  opacity: 0.92;
 }
 
 .md-card-body .md-card-content ul,
@@ -1958,27 +1961,26 @@ html.theme-transitioning *::after {
     0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-/* Animated Nav Underline */
-.nav-underline {
-  position: relative;
-  text-decoration: none;
+/* Nav Hover Effect: blur siblings, bold hovered */
+.nav-link-container {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
-.nav-underline::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #f472b6, #a855f7);
-  transition: width 0.3s ease, left 0.3s ease;
-  border-radius: 2px;
+.nav-link-container:hover .nav-link {
+  filter: blur(2px);
+  opacity: 0.5;
 }
 
-.nav-underline:hover::after {
-  width: 100%;
-  left: 0;
+.nav-link-container:hover .nav-link:hover {
+  filter: none;
+  opacity: 1;
+  font-weight: 600;
+}
+
+.nav-link {
+  transition: filter 0.25s ease, opacity 0.25s ease, font-weight 0.15s ease;
 }
 
 /* Staggered Animation Utilities */

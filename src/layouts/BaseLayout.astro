@@ -90,14 +90,14 @@ const navLinks = [
 
           <!-- Center pill: Nav links -->
           <div class="glass-pill px-2 py-1">
-            <ul class="flex items-center gap-1 text-sm">
+            <ul class="nav-link-container flex items-center gap-1 text-sm">
               {
                 navLinks.map((link) => (
                   <li>
                     <a
                       href={link.href}
                       class:list={[
-                        "block px-3 py-1.5 rounded-full transition-all nav-underline",
+                        "nav-link block px-3 py-1.5 rounded-full transition-all",
                         currentPath === link.href
                           ? "bg-base-content/10 text-accent"
                           : "text-base-content/70 hover:text-base-content hover:bg-base-content/5",
