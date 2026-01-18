@@ -598,7 +598,8 @@ html[data-theme="light"] body {
 }
 
 .md-card-content {
-  padding: 0 1.5rem 1.5rem;
+  padding: 1rem 1.5rem 1.5rem;
+  /* Added top padding */
   max-height: none;
   /* Allow full content to display */
   transition: padding 0.3s ease, opacity 0.3s ease;
@@ -655,15 +656,14 @@ html[data-theme="light"] body {
   font-size: 0.85em;
 }
 
-/* Content Card - High Contrast for Readability */
-.md-card-body.grainy-card {
-  background: rgba(13, 9, 16, 0.55);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-}
-
-[data-theme="light"] .md-card-body.grainy-card {
-  background: rgba(255, 255, 255, 0.9);
+/* Content Card - Keep same styling as other cards */
+.md-card-body .md-card-content {
+  line-height: 2;
+  font-size: 1.0625rem;
+  /* 17px */
+  color: rgba(255, 255, 255, 0.92);
+  padding: 1rem 1.5rem 1.5rem;
+  /* Match card padding */
 }
 
 .md-card-body .md-card-content {
