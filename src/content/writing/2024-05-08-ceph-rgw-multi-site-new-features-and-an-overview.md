@@ -1,7 +1,7 @@
 ---
 title: "Ceph RGW Multi-Site - New Features and An Overview"
 slug: "ceph-rgw-multi-site-new-features-and-an-overview"
-description: "Intro Formally described as \\"devops and a storage engineer,\\" but I would say I am the devops who's not very keen on the cloud, and is more interested in makin"
+description: "A talk about Ceph RGW multi-site architecture, synchronisation modes, and new features in Reef."
 date: "2024-05-08T17:37:00.000+05:30"
 last edited: "2025-09-01T20:15:12.000+05:30"
 tags:
