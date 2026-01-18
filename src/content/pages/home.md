@@ -65,15 +65,6 @@ pageCards:
   - title: Now
     summary: What I'm currently focused on — the projects, books, and ideas occupying my mind right now.
     href: /now
-  - title: Uses
-    summary: The tools, software, and gear that power my daily workflow and creative process.
-    href: /uses
-  - title: Writing
-    summary: Thoughts on technology, creativity, fitness, and the intersection of all three.
-    href: /writing
-  - title: Contact
-    summary: Want to collaborate, chat, or just say hello? I'd love to hear from you.
-    href: /contact
 ---
 
 I'm a curious person who enjoys building software, capturing moments through photography, and thinking about how tools shape our minds.

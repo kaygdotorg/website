@@ -54,54 +54,41 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 });
 ---
 
-<BaseLayout
-  title="Home"
-  description="Personal website and digital garden"
-  hideNavInitially={true}
->
-  <div class="page-cards-container" id="page-cards-container">
+<BaseLayout title="Home" description="Personal website and digital garden">
+  <main class="homepage">
     <!-- Hero Section -->
-    <section class="page-card-section" id="hero-section">
-      <div class="grainy-card p-8 md:p-12 max-w-2xl w-full">
-        <div class="text-center space-y-6 mb-8">
+    <section class="hero-section">
+      <div class="grainy-card hero-card">
+        <div class="hero-content">
           <!-- Profile Picture -->
           {
             profileImage && (
-              <div class="opacity-0 animate-fade-in">
-                <div class="w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full overflow-hidden border-2 border-pink-400/30">
-                  <img
-                    src={profileImage}
-                    alt={`${name || "Profile"} photo`}
-                    class="w-full h-full object-cover"
-                    fetchpriority="high"
-                  />
-                </div>
+              <div class="hero-profile">
+                <img
+                  src={profileImage}
+                  alt={`${name || "Profile"} photo`}
+                  class="hero-profile-img"
+                  fetchpriority="high"
+                />
               </div>
             )
           }
 
           <!-- Name -->
-          <h1
-            class="font-display text-4xl md:text-5xl leading-tight opacity-0 animate-fade-in animation-delay-100"
-          >
-            <span class="text-accent font-medium">{name}</span>
+          <h1 class="hero-name">
+            <span class="text-accent">{name}</span>
           </h1>
 
           <!-- Tagline -->
-          <p
-            class="text-lg md:text-xl text-base-content/80 max-w-md mx-auto leading-relaxed opacity-0 animate-fade-in animation-delay-200"
-          >
+          <p class="hero-tagline">
             {tagline}
           </p>
         </div>
 
-        <!-- Card Hand -->
+        <!-- Card Hand (Polaroids) -->
         {
           cardPhotos && cardPhotos.length > 0 && (
-            <div
-              class="w-full opacity-0 animate-fade-in animation-delay-300"
-              id="hero-photo-section"
-            >
+            <div class="hero-cards-section" id="hero-photo-section">
               <div class="card-hand" id="card-hand">
                 <div class="card-hand-inner" id="card-hand-inner">
                   {cardPhotos.map((item, index) => (
@@ -128,74 +115,26 @@ const cardPhotos = rawCardPhotos?.map((card) => {
                   ))}
                 </div>
               </div>
-              <p class="text-center text-sm text-base-content/60 mt-4">
-                swipe to shuffle · scroll to explore · tap to navigate
-              </p>
+              <p class="hero-cards-hint">swipe to shuffle · tap to navigate</p>
             </div>
           )
         }
-
-        <!-- Scroll hint inside card -->
-        <div class="page-card-scroll-hint-inline">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-          </svg>
-        </div>
       </div>
     </section>
 
-    <!-- Page Cards -->
-    {
-      pageCards &&
-        pageCards.map((card, index) => (
-          <section class="page-card-section" data-card-index={index}>
-            <div class="grainy-card page-card">
-              <h2 class="page-card-title">{card.title}</h2>
-              <p class="page-card-summary">{card.summary}</p>
-              <a href={card.href} class="page-card-arrow">
-                <span>explore</span>
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </a>
+    <!-- Bento Grid Section (placeholder for future implementation) -->
+    <section class="bento-section">
+      <p class="bento-placeholder">Bento grid coming soon...</p>
+    </section>
 
-              {/* Show scroll hint inside card on all but last */}
-              {index < (pageCards?.length || 0) - 1 && (
-                <div class="page-card-scroll-hint-inline">
-                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                    />
-                  </svg>
-                </div>
-              )}
-            </div>
-          </section>
-        ))
-    }
-
-    <!-- Quote Card (Final) -->
+    <!-- Footer Message -->
     {
       quote && (
-        <section class="page-card-section">
-          <div class="grainy-card page-card">
-            <p class="font-display text-2xl md:text-3xl italic text-base-content/80 text-center leading-relaxed">
-              "{quote}"
-            </p>
+        <section class="footer-section">
+          <div class="grainy-card footer-card">
+            <p class="footer-quote">"{quote}"</p>
             {email && (
-              <a href={`mailto:${email}`} class="page-card-arrow mt-8">
+              <a href={`mailto:${email}`} class="footer-cta">
                 <span>get in touch</span>
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -211,111 +150,10 @@ const cardPhotos = rawCardPhotos?.map((card) => {
         </section>
       )
     }
-  </div>
+  </main>
 
-  <!-- Page Indicator Dots -->
-  <div class="page-indicator" id="page-indicator"></div>
-
-  <!-- Scripts -->
+  <!-- Card Hand Swipe Script -->
   <script>
-    // ========================================
-    // Scroll Snap with Intersection Observer
-    // ========================================
-
-    const container = document.getElementById("page-cards-container");
-    const pageSections = document.querySelectorAll(
-      ".page-card-section",
-    ) as NodeListOf<HTMLElement>;
-    const pageIndicator = document.getElementById("page-indicator");
-    const navContainer = document.getElementById("nav-container");
-
-    let currentPage = 0;
-
-    // Initialize pages and indicators
-    function initializePages() {
-      pageSections.forEach((section, index) => {
-        // First section starts active
-        if (index === 0) {
-          section.classList.add("active");
-        }
-
-        // Create indicator dot
-        if (pageIndicator) {
-          const dot = document.createElement("button");
-          dot.className = "page-indicator-dot" + (index === 0 ? " active" : "");
-          dot.setAttribute("aria-label", `Go to page ${index + 1}`);
-          dot.addEventListener("click", () => scrollToPage(index));
-          pageIndicator.appendChild(dot);
-        }
-      });
-    }
-
-    // Scroll to specific page
-    function scrollToPage(pageIndex: number) {
-      const target = pageSections[pageIndex];
-      if (target && container) {
-        target.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-
-    // Update page indicator
-    function updateIndicator(index: number) {
-      const dots = pageIndicator?.querySelectorAll(".page-indicator-dot");
-      dots?.forEach((dot, i) => {
-        dot.classList.toggle("active", i === index);
-      });
-    }
-
-    // Update navbar visibility
-    function updateNavbar(index: number) {
-      if (!navContainer) return;
-      if (index > 0) {
-        navContainer.classList.remove("nav-hidden");
-        navContainer.classList.add("nav-visible");
-      } else {
-        navContainer.classList.add("nav-hidden");
-        navContainer.classList.remove("nav-visible");
-      }
-    }
-
-    // Intersection Observer to detect visible section
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // Add active class for fade-in animation
-            entry.target.classList.add("active");
-
-            // Find the index of this section
-            const index = Array.from(pageSections).indexOf(
-              entry.target as HTMLElement,
-            );
-            if (index !== -1 && index !== currentPage) {
-              currentPage = index;
-              updateIndicator(index);
-              updateNavbar(index);
-            }
-          }
-        });
-      },
-      {
-        root: container,
-        threshold: 0.6, // Trigger when 60% visible
-      },
-    );
-
-    // Observe all sections
-    pageSections.forEach((section) => {
-      observer.observe(section);
-    });
-
-    // Initialize
-    initializePages();
-
-    // ========================================
-    // Card Hand Swipe Logic (Polaroid cards)
-    // ========================================
-
     const cardHand = document.getElementById("card-hand");
     const cards = document.querySelectorAll(
       ".card-in-hand",
@@ -343,7 +181,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
         hasMoved = false;
         startX = "touches" in e ? e.touches[0].clientX : e.clientX;
         currentX = startX;
-        e.stopPropagation(); // Prevent triggering page flip
+        e.stopPropagation();
       }
 
       function handleCardMove(e: MouseEvent | TouchEvent) {
@@ -404,20 +242,14 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       cardHand.addEventListener(
         "wheel",
         (e: WheelEvent) => {
-          // Use deltaX for horizontal scroll, or deltaY if no horizontal
           const delta =
             Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
 
-          // Prevent page flip when scrolling on cards
           e.stopPropagation();
-
-          // Accumulate delta for smoother response
           accumulatedDelta += delta;
 
-          // Clear previous timeout
           if (wheelTimeout) clearTimeout(wheelTimeout);
 
-          // Check if we've scrolled enough to shuffle
           if (Math.abs(accumulatedDelta) > wheelThreshold) {
             if (accumulatedDelta > 0) {
               currentOffset = (currentOffset + 1) % numCards;
@@ -428,7 +260,6 @@ const cardPhotos = rawCardPhotos?.map((card) => {
             accumulatedDelta = 0;
           }
 
-          // Reset accumulated delta after a pause
           wheelTimeout = setTimeout(() => {
             accumulatedDelta = 0;
           }, 150);
@@ -439,4 +270,167 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       updateCardPositions();
     }
   </script>
+
+  <style>
+    /* Homepage Layout - No scroll snap */
+    .homepage {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 4rem;
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 4rem;
+    }
+
+    .hero-card {
+      padding: 3rem;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero-profile {
+      width: 8rem;
+      height: 8rem;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--color-pink-400, #f472b6);
+      opacity: 0.3;
+    }
+
+    .hero-profile-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-name {
+      font-family: var(--font-display), serif;
+      font-size: 2.5rem;
+      font-weight: 500;
+      line-height: 1.2;
+    }
+
+    .hero-tagline {
+      font-size: 1.125rem;
+      color: var(--color-base-content, inherit);
+      opacity: 0.8;
+      max-width: 400px;
+      line-height: 1.6;
+    }
+
+    .hero-cards-section {
+      margin-top: 1rem;
+    }
+
+    .hero-cards-hint {
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--color-base-content, inherit);
+      opacity: 0.6;
+      margin-top: 1rem;
+    }
+
+    /* Bento Section Placeholder */
+    .bento-section {
+      padding: 4rem 0;
+    }
+
+    .bento-placeholder {
+      text-align: center;
+      font-size: 1.25rem;
+      color: var(--color-base-content, inherit);
+      opacity: 0.5;
+      padding: 4rem;
+      border: 2px dashed var(--color-base-content, inherit);
+      opacity: 0.2;
+      border-radius: 1.5rem;
+    }
+
+    /* Footer Section */
+    .footer-section {
+      padding: 4rem 0 8rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer-card {
+      padding: 3rem;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .footer-quote {
+      font-family: var(--font-display), serif;
+      font-size: 1.5rem;
+      font-style: italic;
+      color: var(--color-base-content, inherit);
+      opacity: 0.8;
+      line-height: 1.6;
+    }
+
+    .footer-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+      color: var(--color-accent, #ec4899);
+      font-size: 1rem;
+      text-decoration: none;
+      transition: gap 0.3s ease;
+    }
+
+    .footer-cta:hover {
+      gap: 1rem;
+    }
+
+    .footer-cta svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .homepage {
+        padding: 1rem;
+        gap: 3rem;
+      }
+
+      .hero-section {
+        min-height: 70vh;
+        padding-top: 2rem;
+      }
+
+      .hero-card {
+        padding: 2rem;
+      }
+
+      .hero-name {
+        font-size: 2rem;
+      }
+
+      .hero-profile {
+        width: 6rem;
+        height: 6rem;
+      }
+    }
+  </style>
 </BaseLayout>
