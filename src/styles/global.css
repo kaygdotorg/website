@@ -1,4 +1,4 @@
-/* Google Fonts - IBM Plex Sans + Cascadia Code */
+/* Google Fonts - Nunito + Cascadia Code */
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/@fontsource/cascadia-code@4.2.1/index.min.css');
 
@@ -10,8 +10,8 @@
 
 @theme {
   --font-heading: "Playfair Display", Georgia, serif;
-  --font-display: "IBM Plex Sans", system-ui, sans-serif;
-  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-display: "Nunito", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
 
   /* Hot Pink accent palette */
   --color-accent-50: #fdf2f8;
