@@ -500,12 +500,12 @@ html[data-theme="light"] body {
    ======================================== */
 
 .md-page-container {
-  max-width: 700px;
+  max-width: 750px;
   margin: 0 auto;
   padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 @media (min-width: 768px) {
@@ -667,8 +667,12 @@ html[data-theme="light"] body {
 }
 
 .md-card-body .md-card-content {
-  line-height: 1.8;
+  line-height: 2;
+  font-size: 1.0625rem;
+  /* 17px */
   color: rgba(255, 255, 255, 0.92);
+  padding: 0 0.5rem;
+  /* Extra side padding */
 }
 
 [data-theme="light"] .md-card-body .md-card-content {
@@ -694,14 +698,14 @@ html[data-theme="light"] body {
 }
 
 .md-card-body .md-card-content p {
-  margin: 1rem 0;
-  opacity: 0.85;
+  margin: 1.5rem 0;
+  opacity: 0.9;
 }
 
 .md-card-body .md-card-content ul,
 .md-card-body .md-card-content ol {
-  margin: 1rem 0;
-  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+  padding-left: 1.75rem;
 }
 
 .md-card-body .md-card-content ul {
@@ -713,8 +717,8 @@ html[data-theme="light"] body {
 }
 
 .md-card-body .md-card-content li {
-  margin: 0.5rem 0;
-  opacity: 0.85;
+  margin: 0.75rem 0;
+  opacity: 0.9;
 }
 
 /* Blockquote / Callout styling */
