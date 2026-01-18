@@ -778,37 +778,173 @@ html[data-theme="light"] body {
   background: rgba(0, 0, 0, 0.06);
 }
 
-/* Backlinks Card */
-.md-card-backlinks .md-card-content ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* ========================================
+   Bento Grid Layout (New Homepage)
+   ======================================== */
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .bento-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .bento-grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 280px;
+    gap: 2rem;
+  }
+}
+
+.bento-card {
+  position: relative;
+  border-radius: 2rem;
+  background: var(--color-surface, rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column;
 }
 
-.md-card-backlinks .md-card-content li a {
-  display: inline-block;
-  padding: 0.4rem 0.8rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 9999px;
+[data-theme="light"] .bento-card {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.bento-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+[data-theme="light"] .bento-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+}
+
+/* Card Sizes */
+.bento-card-large {
+  grid-column: span 1;
+  grid-row: span 1;
+  min-height: 400px;
+}
+
+.bento-card-hero {
+  min-height: 500px;
+}
+
+@media (min-width: 1024px) {
+  .bento-card-hero {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .bento-card-medium {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+
+  .bento-card-wide {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+
+  .bento-card-tall {
+    grid-column: span 1;
+    grid-row: span 2;
+  }
+}
+
+/* Card Content Styling */
+.bento-content {
+  padding: 2rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.bento-title {
+  font-family: var(--font-heading, "Playfair Display", serif);
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+}
+
+.bento-subtitle {
+  font-family: var(--font-body, "Nunito", sans-serif);
   font-size: 0.875rem;
-  color: inherit;
-  opacity: 0.7;
-  text-decoration: none;
-  transition: background 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
-[data-theme="light"] .md-card-backlinks .md-card-content li a {
-  background: rgba(0, 0, 0, 0.04);
+.bento-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.8;
 }
 
-.md-card-backlinks .md-card-content li a:hover {
-  background: rgba(244, 114, 182, 0.15);
-  opacity: 1;
-  color: var(--color-accent-500);
+/* Specific Card Layouts */
+.hero-bento {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: radial-gradient(circle at 50% 30%, rgba(236, 72, 153, 0.1), transparent 70%);
 }
+
+.photography-bento {
+  padding: 0;
+}
+
+.photography-bento img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.photography-bento:hover img {
+  transform: scale(1.05);
+}
+
+.now-bento {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.05), transparent);
+}
+
+.writing-bento {
+  justify-content: flex-start;
+}
+
+.bento-date {
+  font-family: "Cascadia Code", monospace;
+  font-size: 0.75rem;
+  opacity: 0.5;
+  margin-top: auto;
+}
+
+/* Remove old scroll snap styles */
+/*.page-cards-container, .page-card-section, .page-card, .page-indicator, .page-card-scroll-hint-inline {
+  display: none;
+}*/
 
 /* ========================================
    Scroll Progress Button
