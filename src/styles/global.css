@@ -598,7 +598,7 @@ html[data-theme="light"] body {
 }
 
 .md-card-content {
-  padding: 1rem 1.5rem 1.5rem;
+  padding: 1.5rem 1.5rem 1.5rem;
   /* Added top padding */
   max-height: none;
   /* Allow full content to display */
@@ -662,17 +662,8 @@ html[data-theme="light"] body {
   font-size: 1.0625rem;
   /* 17px */
   color: rgba(255, 255, 255, 0.92);
-  padding: 1rem 1.5rem 1.5rem;
-  /* Match card padding */
-}
-
-.md-card-body .md-card-content {
-  line-height: 2;
-  font-size: 1.0625rem;
-  /* 17px */
-  color: rgba(255, 255, 255, 0.92);
-  padding: 0 0.5rem;
-  /* Extra side padding */
+  padding: 1.5rem 2rem;
+  /* Proper side padding */
 }
 
 [data-theme="light"] .md-card-body .md-card-content {
