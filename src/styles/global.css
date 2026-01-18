@@ -525,10 +525,10 @@ html[data-theme="light"] body {
    ======================================== */
 
 .md-page-container {
-  max-width: 720px;
-  /* Ghost-style reading width */
+  width: 100%;
+  max-width: none;
   margin: 0 auto;
-  padding: 2rem 1.25rem;
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -538,6 +538,12 @@ html[data-theme="light"] body {
   .md-page-container {
     padding: 3rem 2rem;
     gap: 1.75rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .md-page-container {
+    padding: 3rem 4rem;
   }
 }
 
@@ -572,15 +578,17 @@ html[data-theme="light"] body {
 .md-card-title {
   text-align: center;
   padding: 2rem 1.5rem;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .md-card-title h1 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 2rem;
   font-weight: 400;
-  color: var(--color-accent-500);
+  color: inherit;
   margin-bottom: 1.5rem;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.08em;
   line-height: 1.1;
 }
 
@@ -643,8 +651,8 @@ html[data-theme="light"] body {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 1.25rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
-  color: var(--color-accent-500);
+  letter-spacing: -0.08em;
+  color: inherit;
   margin: 0;
 }
 
@@ -680,7 +688,8 @@ html[data-theme="light"] body {
 .md-card-toc .md-card-content ul {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
+  max-width: 720px;
 }
 
 .md-card-toc .md-card-content li {
@@ -727,6 +736,9 @@ html[data-theme="light"] body {
   padding: 2rem 2.5rem;
   letter-spacing: 0.01em;
   /* Slight letter-spacing for clarity */
+  max-width: 720px;
+  /* Constrain text width for readability */
+  margin: 0 auto;
 }
 
 [data-theme="light"] .md-card-body .md-card-content {
@@ -737,9 +749,9 @@ html[data-theme="light"] body {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 1.75rem;
   font-weight: 500;
-  color: var(--color-accent-500);
+  color: inherit;
   margin: 2.5rem 0 1rem;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.08em;
   line-height: 1.2;
 }
 
@@ -751,9 +763,10 @@ html[data-theme="light"] body {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 1.4rem;
   font-weight: 500;
-  color: var(--color-accent-400);
+  color: inherit;
+  opacity: 0.9;
   margin: 2rem 0 0.75rem;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.08em;
   line-height: 1.25;
 }
 
