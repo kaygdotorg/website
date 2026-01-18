@@ -1,58 +1,266 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from "../layouts/BaseLayout.astro";
 
-// Placeholder images - replace with your actual photos
+// Photos with more variety for the gallery
 const photos = [
-  { src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", alt: "Mountain landscape", category: "Landscape" },
-  { src: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80", alt: "City skyline", category: "Urban" },
-  { src: "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=800&q=80", alt: "Night sky", category: "Landscape" },
-  { src: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80", alt: "Snowy mountain", category: "Landscape" },
-  { src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80", alt: "City at night", category: "Urban" },
-  { src: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=800&q=80", alt: "Bird in flight", category: "Nature" },
+  {
+    src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
+    thumb:
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
+    alt: "Mountain landscape at golden hour",
+    category: "Landscape",
+    location: "Swiss Alps",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&q=80",
+    thumb:
+      "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80",
+    alt: "City skyline at dusk",
+    category: "Urban",
+    location: "New York",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=1200&q=80",
+    thumb:
+      "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=600&q=80",
+    alt: "Night sky with stars",
+    category: "Landscape",
+    location: "Death Valley",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&q=80",
+    thumb:
+      "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&q=80",
+    alt: "Snowy mountain peak",
+    category: "Landscape",
+    location: "Mont Blanc",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
+    thumb:
+      "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600&q=80",
+    alt: "City streets at night",
+    category: "Urban",
+    location: "Tokyo",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=1200&q=80",
+    thumb:
+      "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=600&q=80",
+    alt: "Bird in flight over ocean",
+    category: "Nature",
+    location: "California Coast",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
+    thumb:
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80",
+    alt: "Misty forest sunrise",
+    category: "Landscape",
+    location: "Pacific Northwest",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
+    thumb:
+      "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&q=80",
+    alt: "Urban architecture",
+    category: "Urban",
+    location: "London",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
+    thumb:
+      "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&q=80",
+    alt: "Rolling green hills",
+    category: "Landscape",
+    location: "Tuscany",
+  },
 ];
+
+const categories = [...new Set(photos.map((p) => p.category))];
 ---
 
 <BaseLayout title="Photography" description="A collection of moments captured">
-  <section class="max-w-5xl mx-auto px-6 py-24">
-    <header class="mb-12 max-w-2xl">
-      <h1 class="font-display text-4xl md:text-5xl mb-4 opacity-0 animate-fade-in">Photography</h1>
-      <p class="text-base-content/60 opacity-0 animate-fade-in animation-delay-100">
-        Moments I've captured. I shoot mostly landscapes and urban scenes, 
-        finding beauty in both nature and the built environment.
+  <section class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
+    <!-- Header -->
+    <header class="mb-12 max-w-2xl animate-fade-up">
+      <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
+        Photography
+      </h1>
+      <p class="text-base-content/70 text-lg leading-relaxed">
+        Moments I've captured through my lens. I shoot mostly landscapes and
+        urban scenes, finding beauty in both nature and the built environment.
       </p>
     </header>
 
-    <!-- Photo Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {photos.map((photo, index) => (
-        <div 
-          class="group relative aspect-[4/3] overflow-hidden rounded-lg opacity-0 animate-fade-in"
-          style={`animation-delay: ${200 + index * 100}ms`}
-        >
-          <img 
-            src={photo.src} 
-            alt={photo.alt}
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div class="absolute bottom-0 left-0 right-0 p-4">
-              <p class="text-white text-sm">{photo.alt}</p>
-              <p class="text-white/60 text-xs">{photo.category}</p>
+    <!-- Category Filters -->
+    <div class="flex flex-wrap gap-2 mb-8 animate-fade-up stagger-1">
+      <button
+        class="filter-btn active px-4 py-2 rounded-full text-sm transition-all"
+        data-category="all"
+      >
+        All
+      </button>
+      {
+        categories.map((category) => (
+          <button
+            class="filter-btn px-4 py-2 rounded-full text-sm transition-all"
+            data-category={category}
+          >
+            {category}
+          </button>
+        ))
+      }
+    </div>
+
+    <!-- Photo Gallery -->
+    <div class="photo-gallery animate-fade-up stagger-2">
+      {
+        photos.map((photo, index) => (
+          <div
+            class="photo-item grainy-card"
+            data-category={photo.category}
+            data-src={photo.src}
+            data-alt={photo.alt}
+            style={`animation-delay: ${index * 0.1}s`}
+          >
+            <img src={photo.thumb} alt={photo.alt} loading="lazy" />
+            <div class="photo-overlay">
+              <p class="font-medium text-lg">{photo.alt}</p>
+              <p class="text-sm opacity-70 mt-1">
+                {photo.location} · {photo.category}
+              </p>
             </div>
           </div>
-        </div>
-      ))}
+        ))
+      }
     </div>
 
     <!-- Note about replacing photos -->
-    <div class="mt-16 p-6 rounded-lg border border-base-300/50 bg-base-200/30">
-      <p class="text-base-content/60 text-sm">
-        <strong class="text-base-content">Note:</strong> These are placeholder images from Unsplash. 
-        Replace them with your own photos by adding images to the <code class="bg-base-300/50 px-1 rounded">public/photos</code> folder 
-        and updating the paths in this file.
+    <div class="mt-16 p-6 rounded-2xl grainy-card animate-fade-up stagger-3">
+      <p class="text-base-content/70 text-sm text-center">
+        <strong class="text-accent">Note:</strong> These are placeholder images from
+        Unsplash. Replace them with your own photos by updating the paths in this
+        file.
       </p>
     </div>
   </section>
-</BaseLayout>
 
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox">
+    <button
+      id="lightbox-close"
+      class="lightbox-close"
+      aria-label="Close lightbox"
+    >
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+    <img id="lightbox-img" src="" alt="" />
+  </div>
+
+  <style>
+    .filter-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--fallback-bc, #f8f4fc);
+      opacity: 0.7;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: rgba(244, 114, 182, 0.15);
+      border-color: rgba(244, 114, 182, 0.3);
+      color: var(--color-accent-500, #ec4899);
+      opacity: 1;
+    }
+
+    [data-theme="light"] .filter-btn {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.1);
+      color: #1a1225;
+    }
+
+    [data-theme="light"] .filter-btn:hover,
+    [data-theme="light"] .filter-btn.active {
+      background: rgba(236, 72, 153, 0.1);
+      border-color: rgba(236, 72, 153, 0.3);
+      color: var(--color-accent-600, #db2777);
+    }
+
+    .photo-item.hidden {
+      display: none;
+    }
+  </style>
+
+  <script>
+    // Filter functionality
+    const filterBtns = document.querySelectorAll(".filter-btn");
+    const photoItems = document.querySelectorAll(".photo-item");
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        // Update active state
+        filterBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const category = btn.getAttribute("data-category");
+
+        photoItems.forEach((item) => {
+          if (
+            category === "all" ||
+            item.getAttribute("data-category") === category
+          ) {
+            item.classList.remove("hidden");
+          } else {
+            item.classList.add("hidden");
+          }
+        });
+      });
+    });
+
+    // Lightbox functionality
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById(
+      "lightbox-img",
+    ) as HTMLImageElement;
+    const lightboxClose = document.getElementById("lightbox-close");
+
+    photoItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        const src = item.getAttribute("data-src");
+        const alt = item.getAttribute("data-alt");
+
+        if (src && lightboxImg) {
+          lightboxImg.src = src;
+          lightboxImg.alt = alt || "";
+          lightbox?.classList.add("active");
+          document.body.style.overflow = "hidden";
+        }
+      });
+    });
+
+    function closeLightbox() {
+      lightbox?.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+
+    lightboxClose?.addEventListener("click", closeLightbox);
+    lightbox?.addEventListener("click", (e) => {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && lightbox?.classList.contains("active")) {
+        closeLightbox();
+      }
+    });
+  </script>
+</BaseLayout>
