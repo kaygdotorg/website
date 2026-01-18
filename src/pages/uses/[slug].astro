@@ -1,0 +1,62 @@
+---
+import MarkdownLayout from "../../layouts/MarkdownLayout.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("uses");
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+// Calculate reading time
+const wordCount = entry.body.split(/\s+/).length;
+const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+// Get dates (now always Date objects thanks to z.coerce.date())
+const createdDate = entry.data.date;
+const lastEdited = entry.data["last edited"];
+
+// Get all entries for prev/next navigation
+const allEntries = await getCollection("uses");
+const sortedEntries = allEntries.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const currentIndex = sortedEntries.findIndex((e) => e.slug === entry.slug);
+const prevEntry =
+  currentIndex < sortedEntries.length - 1
+    ? sortedEntries[currentIndex + 1]
+    : null;
+const nextEntry = currentIndex > 0 ? sortedEntries[currentIndex - 1] : null;
+
+// Create backlinks to timeline and adjacent entries
+const backlinks = [{ title: "← All Uses Entries", href: "/uses" }];
+if (prevEntry) {
+  backlinks.push({
+    title: `← ${prevEntry.data.title}`,
+    href: `/uses/${prevEntry.slug}`,
+  });
+}
+if (nextEntry) {
+  backlinks.push({
+    title: `${nextEntry.data.title} →`,
+    href: `/uses/${nextEntry.slug}`,
+  });
+}
+---
+
+<MarkdownLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  createdDate={createdDate}
+  lastEdited={lastEdited}
+  readingTime={readingTime}
+  backlinks={backlinks}
+>
+  <Content />
+</MarkdownLayout>

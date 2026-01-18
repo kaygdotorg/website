@@ -1,0 +1,58 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Placeholder images - replace with your actual photos
+const photos = [
+  { src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", alt: "Mountain landscape", category: "Landscape" },
+  { src: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80", alt: "City skyline", category: "Urban" },
+  { src: "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=800&q=80", alt: "Night sky", category: "Landscape" },
+  { src: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80", alt: "Snowy mountain", category: "Landscape" },
+  { src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80", alt: "City at night", category: "Urban" },
+  { src: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=800&q=80", alt: "Bird in flight", category: "Nature" },
+];
+---
+
+<BaseLayout title="Photography" description="A collection of moments captured">
+  <section class="max-w-5xl mx-auto px-6 py-24">
+    <header class="mb-12 max-w-2xl">
+      <h1 class="font-display text-4xl md:text-5xl mb-4 opacity-0 animate-fade-in">Photography</h1>
+      <p class="text-base-content/60 opacity-0 animate-fade-in animation-delay-100">
+        Moments I've captured. I shoot mostly landscapes and urban scenes, 
+        finding beauty in both nature and the built environment.
+      </p>
+    </header>
+
+    <!-- Photo Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {photos.map((photo, index) => (
+        <div 
+          class="group relative aspect-[4/3] overflow-hidden rounded-lg opacity-0 animate-fade-in"
+          style={`animation-delay: ${200 + index * 100}ms`}
+        >
+          <img 
+            src={photo.src} 
+            alt={photo.alt}
+            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="absolute bottom-0 left-0 right-0 p-4">
+              <p class="text-white text-sm">{photo.alt}</p>
+              <p class="text-white/60 text-xs">{photo.category}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Note about replacing photos -->
+    <div class="mt-16 p-6 rounded-lg border border-base-300/50 bg-base-200/30">
+      <p class="text-base-content/60 text-sm">
+        <strong class="text-base-content">Note:</strong> These are placeholder images from Unsplash. 
+        Replace them with your own photos by adding images to the <code class="bg-base-300/50 px-1 rounded">public/photos</code> folder 
+        and updating the paths in this file.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+

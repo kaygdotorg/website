@@ -1,0 +1,29 @@
+---
+import TimelineLayout from '../../layouts/TimelineLayout.astro';
+import { getCollection } from 'astro:content';
+
+// Get all uses entries
+const allEntries = await getCollection('uses');
+
+// Transform entries for the timeline
+const entries = allEntries.map(entry => {
+  const rawDate = entry.data.date;
+  const date = rawDate instanceof Date ? rawDate : new Date(rawDate);
+  
+  return {
+    slug: entry.slug,
+    title: entry.data.title,
+    date: date,
+    excerpt: entry.data.excerpt || entry.data.description,
+    href: `/uses/${entry.slug}`,
+  };
+});
+---
+
+<TimelineLayout 
+  title="Uses"
+  description="A timeline of my tools, software, and gear. See how my setup has evolved over time."
+  entries={entries}
+  basePath="/uses"
+/>
+

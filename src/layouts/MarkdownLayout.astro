@@ -1,0 +1,332 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import { formatDate, getRelativeTime } from "../utils/dates";
+
+interface Props {
+  title: string;
+  description?: string;
+  createdDate?: Date | string;
+  lastEdited?: Date | string;
+  readingTime?: number;
+  backlinks?: Array<{ title: string; href: string }>;
+}
+
+const {
+  title,
+  description,
+  createdDate,
+  lastEdited,
+  readingTime,
+  backlinks = [],
+} = Astro.props;
+
+const relativeLastEdited = lastEdited ? getRelativeTime(lastEdited) : null;
+const formattedLastEdited = lastEdited ? formatDate(lastEdited) : null;
+const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="md-page-container">
+    <!-- Title Card - Always visible -->
+    <div class="grainy-card md-card-title">
+      <h1>{title}</h1>
+      <div class="md-card-metadata">
+        {/* Reading time */}
+        {
+          readingTime && (
+            <span title="Estimated reading time">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                />
+              </svg>
+              {readingTime} min read
+            </span>
+          )
+        }
+
+        {/* Created date */}
+        {
+          formattedCreatedDate && (
+            <span title="Published">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+              {formattedCreatedDate}
+            </span>
+          )
+        }
+
+        {/* Last edited - tappable to show full date */}
+        {
+          relativeLastEdited && (
+            <span
+              class="last-edited-toggle cursor-pointer"
+              data-relative={`Updated ${relativeLastEdited}`}
+              data-absolute={`Updated ${formattedLastEdited}`}
+            >
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+              <span class="last-edited-text">Updated {relativeLastEdited}</span>
+            </span>
+          )
+        }
+      </div>
+    </div>
+
+    <!-- Table of Contents Card - Collapsible -->
+    <div class="grainy-card md-card-collapsible md-card-toc" id="toc-card">
+      <div class="md-card-header" onclick="toggleCard('toc-card')">
+        <h2>Table of Contents</h2>
+        <svg
+          class="md-card-toggle"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </div>
+      <div class="md-card-content">
+        <ul id="toc-list">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+    </div>
+
+    <!-- Content Card - Collapsible -->
+    <div class="grainy-card md-card-collapsible md-card-body" id="content-card">
+      <div class="md-card-header" onclick="toggleCard('content-card')">
+        <h2>Content</h2>
+        <svg
+          class="md-card-toggle"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </div>
+      <div class="md-card-content" id="markdown-content">
+        <slot />
+      </div>
+    </div>
+
+    <!-- Backlinks Card - Collapsible -->
+    {
+      backlinks.length > 0 && (
+        <div
+          class="grainy-card md-card-collapsible md-card-backlinks collapsed"
+          id="backlinks-card"
+        >
+          <div class="md-card-header" onclick="toggleCard('backlinks-card')">
+            <h2>Backlinks ({backlinks.length})</h2>
+            <svg
+              class="md-card-toggle"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+          <div class="md-card-content">
+            <ul>
+              {backlinks.map((link) => (
+                <li>
+                  <a href={link.href}>{link.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    }
+  </div>
+
+  <script is:inline>
+    // Toggle collapsible cards
+    function toggleCard(cardId) {
+      const card = document.getElementById(cardId);
+      if (card) {
+        card.classList.toggle("collapsed");
+      }
+    }
+
+    // Generate TOC from headings
+    function generateTOC() {
+      const content = document.getElementById("markdown-content");
+      const tocList = document.getElementById("toc-list");
+      if (!content || !tocList) return;
+
+      const headings = content.querySelectorAll("h2, h3");
+
+      if (headings.length === 0) {
+        // Hide TOC if no headings
+        document.getElementById("toc-card")?.classList.add("collapsed");
+        return;
+      }
+
+      headings.forEach((heading, index) => {
+        // Add ID to heading if not present
+        if (!heading.id) {
+          heading.id = `heading-${index}`;
+        }
+
+        const li = document.createElement("li");
+        li.className = `toc-level-${heading.tagName.toLowerCase() === "h2" ? "2" : "3"}`;
+
+        const a = document.createElement("a");
+        a.href = `#${heading.id}`;
+        a.textContent = heading.textContent;
+
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+    }
+
+    // Auto-collapse TOC on scroll
+    let lastScrollY = 0;
+    function handleTocScroll() {
+      const tocCard = document.getElementById("toc-card");
+      if (!tocCard) return;
+
+      const currentScrollY = window.scrollY;
+
+      // Collapse TOC when scrolling down past 200px
+      if (currentScrollY > 200 && currentScrollY > lastScrollY) {
+        tocCard.classList.add("collapsed");
+      }
+
+      lastScrollY = currentScrollY;
+    }
+
+    // Scroll Progress Button Logic
+    function initScrollProgress() {
+      const btn = document.getElementById("scroll-progress-btn");
+      const progressFill = document.querySelector(".scroll-progress-fill");
+      const downIcon = document.querySelector(
+        ".scroll-progress-icon.scroll-down",
+      );
+      const upIcon = document.querySelector(".scroll-progress-icon.scroll-up");
+
+      if (!btn || !progressFill || !downIcon || !upIcon) return;
+
+      // Show the button (it's hidden by default in BaseLayout)
+      btn.classList.remove("hidden");
+
+      const circumference = 2 * Math.PI * 16; // r=16
+      progressFill.style.strokeDasharray = String(circumference);
+      progressFill.style.strokeDashoffset = String(circumference);
+
+      // Track current scroll direction
+      let shouldScrollDown = true;
+
+      function updateScrollProgress() {
+        const scrollTop = window.scrollY;
+        const docHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = docHeight > 0 ? scrollTop / docHeight : 0;
+
+        // Update progress ring
+        const offset = circumference - scrollPercent * circumference;
+        progressFill.style.strokeDashoffset = String(offset);
+
+        // Determine direction: if in top 1/3, show down arrow; else show up arrow
+        shouldScrollDown = scrollPercent < 0.33;
+
+        if (shouldScrollDown) {
+          downIcon.classList.remove("hidden");
+          upIcon.classList.add("hidden");
+        } else {
+          downIcon.classList.add("hidden");
+          upIcon.classList.remove("hidden");
+        }
+      }
+
+      // Handle click
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const docHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+
+        if (shouldScrollDown) {
+          // Scroll to bottom
+          window.scrollTo({ top: docHeight, behavior: "smooth" });
+        } else {
+          // Scroll to top
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+
+      // Listen for scroll
+      window.addEventListener("scroll", updateScrollProgress, {
+        passive: true,
+      });
+
+      // Initial update
+      updateScrollProgress();
+    }
+
+    // Last edited toggle (tap to show full date)
+    function initLastEditedToggle() {
+      const toggleEl = document.querySelector(".last-edited-toggle");
+      if (!toggleEl) return;
+
+      const textEl = toggleEl.querySelector(".last-edited-text");
+      const relativeText = toggleEl.getAttribute("data-relative");
+      const absoluteText = toggleEl.getAttribute("data-absolute");
+
+      let showingRelative = true;
+
+      toggleEl.addEventListener("click", () => {
+        showingRelative = !showingRelative;
+        if (textEl) {
+          textEl.textContent = showingRelative ? relativeText : absoluteText;
+        }
+      });
+    }
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", () => {
+      generateTOC();
+      window.addEventListener("scroll", handleTocScroll, { passive: true });
+      initScrollProgress();
+      initLastEditedToggle();
+    });
+
+    // Make toggleCard available globally (safer assignment)
+    if (typeof window.toggleCard === "undefined") {
+      window.toggleCard = toggleCard;
+    }
+  </script>
+</BaseLayout>

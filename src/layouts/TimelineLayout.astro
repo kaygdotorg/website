@@ -1,0 +1,233 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { formatDate, formatMonth, getRelativeTime } from '../utils/dates';
+
+interface TimelineEntry {
+  slug: string;
+  title: string;
+  date: Date;
+  excerpt?: string;
+  href: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  entries: TimelineEntry[];
+  basePath: string; // e.g., '/now' or '/uses'
+}
+
+const { title, description, entries, basePath } = Astro.props;
+
+// Sort entries by date, newest first
+const sortedEntries = entries.sort((a, b) => b.date.getTime() - a.date.getTime());
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="timeline-container">
+    <!-- Header -->
+    <header class="timeline-header">
+      <div class="grainy-card p-8 md:p-12 text-center">
+        <h1 class="font-display text-4xl md:text-5xl text-accent mb-4">{title}</h1>
+        <p class="text-base-content/70 text-lg max-w-lg mx-auto">{description}</p>
+        <p class="text-base-content/50 text-sm mt-4">{sortedEntries.length} entries</p>
+      </div>
+    </header>
+
+    <!-- Timeline -->
+    <div class="timeline">
+      {sortedEntries.map((entry, index) => (
+        <a href={entry.href} class="timeline-entry group">
+          <!-- Timeline line and dot -->
+          <div class="timeline-line-container">
+            <div class="timeline-dot"></div>
+            {index < sortedEntries.length - 1 && <div class="timeline-line"></div>}
+          </div>
+          
+          <!-- Entry card -->
+          <div class="timeline-card grainy-card">
+            <div class="timeline-card-header">
+              <h2 class="timeline-card-title">{entry.title}</h2>
+              <div class="timeline-card-dates">
+                <span class="timeline-card-date">{formatDate(entry.date)}</span>
+                <span class="timeline-card-relative">{getRelativeTime(entry.date)}</span>
+              </div>
+            </div>
+            {entry.excerpt && (
+              <p class="timeline-card-excerpt">{entry.excerpt}</p>
+            )}
+            <div class="timeline-card-arrow">
+              <span>read more</span>
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- Footer note -->
+    <footer class="timeline-footer">
+      <p class="text-base-content/50 text-sm">
+        {basePath === '/now' && (
+          <>Inspired by <a href="https://nownownow.com/about" target="_blank" rel="noopener" class="text-accent hover:underline">nownownow.com</a></>
+        )}
+        {basePath === '/uses' && (
+          <>Inspired by <a href="https://uses.tech" target="_blank" rel="noopener" class="text-accent hover:underline">uses.tech</a></>
+        )}
+      </p>
+    </footer>
+  </div>
+</BaseLayout>
+
+<style>
+  .timeline-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .timeline-header {
+    margin-bottom: 3rem;
+  }
+
+  .timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .timeline-entry {
+    display: flex;
+    gap: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .timeline-line-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  .timeline-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-accent-500);
+    border: 2px solid var(--color-accent-400);
+    flex-shrink: 0;
+    margin-top: 1.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .timeline-entry:hover .timeline-dot {
+    transform: scale(1.3);
+    box-shadow: 0 0 12px var(--color-accent-500);
+  }
+
+  .timeline-line {
+    width: 2px;
+    flex: 1;
+    background: linear-gradient(to bottom, var(--color-accent-500) 0%, transparent 100%);
+    margin-top: 0.5rem;
+    opacity: 0.3;
+  }
+
+  .timeline-card {
+    flex: 1;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .timeline-entry:hover .timeline-card {
+    transform: translateX(4px);
+  }
+
+  .timeline-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .timeline-card-header {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+  }
+
+  .timeline-card-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-accent-500);
+    margin: 0;
+  }
+
+  .timeline-card-dates {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    font-family: "Cascadia Code", monospace;
+  }
+
+  .timeline-card-date {
+    opacity: 0.6;
+  }
+
+  .timeline-card-relative {
+    opacity: 0.4;
+  }
+
+  .timeline-card-excerpt {
+    color: var(--fallback-bc, #f8f4fc);
+    opacity: 0.75;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+  }
+
+  [data-theme="light"] .timeline-card-excerpt {
+    color: #1a1225;
+  }
+
+  .timeline-card-arrow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-accent-500);
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .timeline-entry:hover .timeline-card-arrow {
+    opacity: 0.7;
+    transform: translateX(0);
+  }
+
+  .timeline-card-arrow svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .timeline-footer {
+    text-align: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  [data-theme="light"] .timeline-footer {
+    border-top-color: rgba(0, 0, 0, 0.1);
+  }
+</style>
+

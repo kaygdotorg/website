@@ -1,0 +1,639 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  hideNavInitially?: boolean;
+}
+
+const {
+  title,
+  description = "Personal website",
+  hideNavInitially = false,
+} = Astro.props;
+const currentPath = Astro.url.pathname;
+
+const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/now", label: "Now" },
+  { href: "/uses", label: "Uses" },
+  { href: "/photography", label: "Photography" },
+  { href: "/writing", label: "Writing" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <!-- Font preloading for better LCP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Pagefind UI CSS (loaded on-demand) -->
+    <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+    <!-- Theme detection: respects system preference, allows override -->
+    <script is:inline>
+      (function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) {
+          document.documentElement.setAttribute("data-theme", savedTheme);
+        } else {
+          // No saved preference: use system preference
+          const prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+          document.documentElement.setAttribute(
+            "data-theme",
+            prefersDark ? "dark" : "light",
+          );
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-screen text-base-content">
+    <!-- Animated Film Grain Background -->
+    <div class="animated-gradient-bg" aria-hidden="true">
+      <!-- Soft color flares (like light leaks) -->
+      <div class="film-flare"></div>
+      <!-- Subtle color tint -->
+      <div class="film-tint"></div>
+      <!-- Vignette darkening at edges -->
+      <div class="film-vignette"></div>
+      <!-- Animated grain texture -->
+      <div class="film-grain"></div>
+    </div>
+
+    <!-- Floating Pill Navigation -->
+    <nav
+      id="nav-container"
+      class:list={[
+        "fixed top-0 left-0 right-0 z-50 p-4 nav-container",
+        hideNavInitially ? "nav-hidden" : "nav-visible",
+      ]}
+    >
+      <div class="max-w-4xl mx-auto">
+        <!-- Desktop: Three separate pills -->
+        <div class="hidden md:flex items-center justify-center gap-3">
+          <!-- Left pill: Logo -->
+          <a
+            href="/"
+            class="glass-pill px-4 py-2 font-display text-lg hover:opacity-80 transition-opacity"
+          >
+            K
+          </a>
+
+          <!-- Center pill: Nav links -->
+          <div class="glass-pill px-2 py-1">
+            <ul class="flex items-center gap-1 text-sm">
+              {
+                navLinks.map((link) => (
+                  <li>
+                    <a
+                      href={link.href}
+                      class:list={[
+                        "block px-3 py-1.5 rounded-full transition-all",
+                        currentPath === link.href
+                          ? "bg-base-content/10 text-accent"
+                          : "text-base-content/70 hover:text-base-content hover:bg-base-content/5",
+                      ]}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
+          <!-- Right pill: Search + Theme toggle -->
+          <div class="glass-pill flex items-center gap-1 p-1">
+            <button
+              id="search-toggle-desktop"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
+              aria-label="Search"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                ></path>
+              </svg>
+            </button>
+            <button
+              id="theme-toggle-desktop"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
+              aria-label="Toggle dark mode"
+            >
+              <svg
+                class="sun-icon w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                ></path>
+              </svg>
+              <svg
+                class="moon-icon w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile: Logo left, controls right -->
+        <div class="flex md:hidden items-center justify-between">
+          <!-- Left pill: Logo -->
+          <a
+            href="/"
+            class="glass-pill px-4 py-2 font-display text-lg hover:opacity-80 transition-opacity"
+          >
+            K
+          </a>
+
+          <!-- Right pill: Search + Theme toggle + Hamburger -->
+          <div class="glass-pill flex items-center gap-1 p-1">
+            <button
+              id="search-toggle-mobile"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
+              aria-label="Search"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                ></path>
+              </svg>
+            </button>
+            <button
+              id="theme-toggle-mobile"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
+              aria-label="Toggle dark mode"
+            >
+              <svg
+                class="sun-icon w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                ></path>
+              </svg>
+              <svg
+                class="moon-icon w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                ></path>
+              </svg>
+            </button>
+            <button
+              id="mobile-menu-toggle"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
+              aria-label="Open menu"
+            >
+              <svg
+                id="hamburger-icon"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+              <svg
+                id="close-icon"
+                class="w-5 h-5 hidden"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay (centered) -->
+    <div
+      id="mobile-menu"
+      class="mobile-menu-container fixed inset-0 z-40 md:hidden"
+    >
+      <!-- Backdrop - dims and blurs the page -->
+      <div
+        id="mobile-menu-backdrop"
+        class="mobile-menu-backdrop absolute inset-0"
+      >
+      </div>
+
+      <!-- Centered menu panel with grainy card -->
+      <div class="absolute inset-0 flex items-center justify-center p-6">
+        <div class="mobile-menu-card grainy-card w-full max-w-sm p-6">
+          <ul class="flex flex-col gap-2">
+            {
+              navLinks.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class:list={[
+                      "block px-4 py-3 rounded-2xl text-lg text-center transition-all",
+                      currentPath === link.href
+                        ? "bg-base-content/10 text-accent font-medium"
+                        : "text-base-content/80 hover:text-base-content hover:bg-base-content/5",
+                    ]}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="search-modal-container fixed inset-0 z-[60]">
+      <div id="search-backdrop" class="search-backdrop absolute inset-0"></div>
+      <div
+        class="absolute inset-0 flex items-start justify-center pt-20 md:pt-32 p-4"
+      >
+        <div class="search-modal-card grainy-card w-full max-w-2xl">
+          <div id="search-container"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <main class={`relative z-10 ${hideNavInitially ? "" : "pt-24"}`}>
+      <slot />
+    </main>
+
+    <style>
+      /* When using page cards, remove footer margin */
+      main:has(.page-cards-container) + footer {
+        display: none;
+      }
+    </style>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-base-content/10 mt-24">
+      <div class="max-w-4xl mx-auto px-6 py-12">
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
+        >
+          <p class="text-sm text-base-content/60">
+            &copy; {new Date().getFullYear()} · Built with curiosity
+          </p>
+          <div class="flex items-center gap-4">
+            <a
+              href="https://github.com"
+              target="_blank"
+              rel="noopener"
+              class="text-base-content/60 hover:text-base-content transition-colors"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                  clip-rule="evenodd"></path>
+              </svg>
+            </a>
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              rel="noopener"
+              class="text-base-content/60 hover:text-base-content transition-colors"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                ></path>
+              </svg>
+            </a>
+            <a
+              href="mailto:hello@example.com"
+              class="text-base-content/60 hover:text-base-content transition-colors"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                ></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scroll Progress Button (outside stacking contexts, hidden on homepage) -->
+    <button
+      id="scroll-progress-btn"
+      class:list={[
+        "scroll-progress-btn",
+        currentPath === "/" ? "hidden-permanently" : "hidden",
+      ]}
+      aria-label="Scroll to top or bottom"
+    >
+      <svg class="scroll-progress-ring" viewBox="0 0 36 36">
+        <circle
+          class="scroll-progress-bg"
+          cx="18"
+          cy="18"
+          r="16"
+          fill="none"
+          stroke-width="2"></circle>
+        <circle
+          class="scroll-progress-fill"
+          cx="18"
+          cy="18"
+          r="16"
+          fill="none"
+          stroke-width="2"></circle>
+      </svg>
+      <svg
+        class="scroll-progress-icon scroll-down"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+      </svg>
+      <svg
+        class="scroll-progress-icon scroll-up hidden"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+      </svg>
+    </button>
+
+    <!-- Scripts -->
+    <script>
+      // Theme toggle (both desktop and mobile)
+      const themeToggles = [
+        document.getElementById("theme-toggle-desktop"),
+        document.getElementById("theme-toggle-mobile"),
+      ];
+
+      themeToggles.forEach((toggle) => {
+        toggle?.addEventListener("click", () => {
+          const html = document.documentElement;
+          const currentTheme = html.getAttribute("data-theme");
+          const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+          html.classList.add("theme-transitioning");
+          html.setAttribute("data-theme", newTheme);
+          localStorage.setItem("theme", newTheme);
+
+          setTimeout(() => {
+            html.classList.remove("theme-transitioning");
+          }, 300);
+        });
+      });
+
+      // Pause animations when tab is hidden (performance)
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          document.body.classList.add("reduce-motion");
+        } else {
+          document.body.classList.remove("reduce-motion");
+        }
+      });
+
+      // Mobile menu toggle
+      const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+      const mobileMenuBackdrop = document.getElementById(
+        "mobile-menu-backdrop",
+      );
+      const hamburgerIcon = document.getElementById("hamburger-icon");
+      const closeIcon = document.getElementById("close-icon");
+
+      function openMobileMenu() {
+        mobileMenu?.classList.add("menu-open");
+        hamburgerIcon?.classList.add("hidden");
+        closeIcon?.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeMobileMenu() {
+        mobileMenu?.classList.remove("menu-open");
+        hamburgerIcon?.classList.remove("hidden");
+        closeIcon?.classList.add("hidden");
+        document.body.style.overflow = "";
+      }
+
+      mobileMenuToggle?.addEventListener("click", () => {
+        const isOpen = mobileMenu?.classList.contains("menu-open");
+        if (isOpen) {
+          closeMobileMenu();
+        } else {
+          openMobileMenu();
+        }
+      });
+
+      // Close when clicking backdrop
+      mobileMenuBackdrop?.addEventListener("click", closeMobileMenu);
+
+      // Close mobile menu when clicking a link
+      mobileMenu?.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", closeMobileMenu);
+      });
+
+      // ========================================
+      // Search Modal
+      // ========================================
+      const searchModal = document.getElementById("search-modal");
+      const searchBackdrop = document.getElementById("search-backdrop");
+      const searchContainer = document.getElementById("search-container");
+      const searchToggles = [
+        document.getElementById("search-toggle-desktop"),
+        document.getElementById("search-toggle-mobile"),
+      ];
+
+      let pagefindLoaded = false;
+
+      async function loadPagefind() {
+        if (pagefindLoaded) return;
+
+        try {
+          // Load CSS
+          if (
+            !document.querySelector('link[href="/pagefind/pagefind-ui.css"]')
+          ) {
+            const link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.href = "/pagefind/pagefind-ui.css";
+            document.head.appendChild(link);
+          }
+
+          // Load JS via script tag (more reliable than dynamic import)
+          await new Promise((resolve, reject) => {
+            if (window.PagefindUI) {
+              resolve();
+              return;
+            }
+            const script = document.createElement("script");
+            script.src = "/pagefind/pagefind-ui.js";
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+
+          // Initialize Pagefind UI
+          new window.PagefindUI({
+            element: "#search-container",
+            showSubResults: true,
+            showImages: false,
+            excerptLength: 15,
+          });
+          pagefindLoaded = true;
+        } catch (e) {
+          console.error("Pagefind load error:", e);
+          // Pagefind not available (dev mode) - show message
+          if (searchContainer) {
+            searchContainer.innerHTML = `
+              <div class="p-6 text-center text-base-content/60">
+                <p class="mb-2">Search is available after building the site.</p>
+                <p class="text-sm">Run <code class="bg-base-content/10 px-2 py-1 rounded">npm run build</code> to enable search.</p>
+              </div>
+            `;
+          }
+        }
+      }
+
+      function openSearch() {
+        searchModal?.classList.add("search-open");
+        document.body.style.overflow = "hidden";
+        loadPagefind().then(() => {
+          // Focus the search input after a brief delay
+          setTimeout(() => {
+            const input = searchContainer?.querySelector("input");
+            input?.focus();
+          }, 100);
+        });
+      }
+
+      function closeSearch() {
+        searchModal?.classList.remove("search-open");
+        document.body.style.overflow = "";
+      }
+
+      searchToggles.forEach((toggle) => {
+        toggle?.addEventListener("click", () => {
+          const isOpen = searchModal?.classList.contains("search-open");
+          if (isOpen) {
+            closeSearch();
+          } else {
+            openSearch();
+          }
+        });
+      });
+
+      searchBackdrop?.addEventListener("click", closeSearch);
+
+      // Close on escape key
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          if (searchModal?.classList.contains("search-open")) {
+            closeSearch();
+          } else if (mobileMenu?.classList.contains("menu-open")) {
+            closeMobileMenu();
+          }
+        }
+        // Cmd/Ctrl + K to open search
+        if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+          e.preventDefault();
+          const isOpen = searchModal?.classList.contains("search-open");
+          if (isOpen) {
+            closeSearch();
+          } else {
+            openSearch();
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
