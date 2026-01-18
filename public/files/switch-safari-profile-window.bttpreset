@@ -1,0 +1,50 @@
+[
+  {
+    "BTTLastUpdatedAt" : 1756467584.508472,
+    "BTTTriggerType" : 643,
+    "BTTTriggerTypeDescriptionReadOnly" : "Named Trigger: Switch Safari WIndow to Personal",
+    "BTTTriggerClass" : "BTTTriggerTypeOtherTriggers",
+    "BTTUUID" : "68E24D49-F3CB-4740-B394-F8395907CF0A",
+    "BTTCustomContextMenuItemConfig" : {
+
+    },
+    "BTTTriggerName" : "Switch Safari WIndow to Personal",
+    "BTTOrder" : 3,
+    "BTTActionsToExecute" : [
+      {
+        "BTTLastUpdatedAt" : 1756467386.330034,
+        "BTTTriggerParentUUID" : "68E24D49-F3CB-4740-B394-F8395907CF0A",
+        "BTTIsPureAction" : true,
+        "BTTTriggerClass" : "BTTTriggerTypeOtherTriggers",
+        "BTTUUID" : "B2C615F3-4ECB-463F-BD4C-416FCE087D14",
+        "BTTPredefinedActionType" : 59,
+        "BTTPredefinedActionName" : "Open URL  or  Open URL With Selection",
+        "BTTOpenURL" : "http:\/\/personal.page",
+        "BTTOpenURLBrowser" : "Default",
+        "BTTOrder" : 0
+      },
+      {
+        "BTTLastUpdatedAt" : 1756467432.6955171,
+        "BTTTriggerParentUUID" : "68E24D49-F3CB-4740-B394-F8395907CF0A",
+        "BTTIsPureAction" : true,
+        "BTTTriggerClass" : "BTTTriggerTypeOtherTriggers",
+        "BTTUUID" : "9E5E5915-9DD8-431C-B6EA-139D4E817A24",
+        "BTTPredefinedActionType" : 423,
+        "BTTPredefinedActionName" : "Wait For Change Of Focused Window",
+        "BTTGenericActionConfig2" : "{\n  \"BTTActionWaitForFocusChangeInterval\" : 1\n}",
+        "BTTOrder" : 1
+      },
+      {
+        "BTTLastUpdatedAt" : 1756465067.8744659,
+        "BTTTriggerParentUUID" : "68E24D49-F3CB-4740-B394-F8395907CF0A",
+        "BTTIsPureAction" : true,
+        "BTTTriggerClass" : "BTTTriggerTypeOtherTriggers",
+        "BTTUUID" : "72858992-B5BE-4D7C-949C-9F5F7487FC87",
+        "BTTPredefinedActionType" : 124,
+        "BTTPredefinedActionName" : "Trigger Menu Bar Menu-Item",
+        "BTTMenubarPath" : "File;Close Tab",
+        "BTTOrder" : 3
+      }
+    ]
+  }
+]

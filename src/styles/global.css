@@ -689,6 +689,14 @@ html[data-theme="light"] body {
   padding-left: 1.5rem;
 }
 
+.md-card-body .md-card-content ul {
+  list-style-type: disc;
+}
+
+.md-card-body .md-card-content ol {
+  list-style-type: decimal;
+}
+
 .md-card-body .md-card-content li {
   margin: 0.5rem 0;
   opacity: 0.85;
