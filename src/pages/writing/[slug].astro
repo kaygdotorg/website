@@ -2,10 +2,16 @@
 import MarkdownLayout from "../../layouts/MarkdownLayout.astro";
 import { getCollection } from "astro:content";
 
+// Helper to get the URL slug (frontmatter slug or filename)
+function getUrlSlug(post: any): string {
+    return post.data.slug || post.slug;
+}
+
 export async function getStaticPaths() {
     const posts = await getCollection("writing");
     return posts.map((post) => ({
-        params: { slug: post.slug },
+        // Use frontmatter slug for URL, fallback to file slug
+        params: { slug: post.data.slug || post.slug },
         props: { post },
     }));
 }
@@ -27,7 +33,9 @@ const sortedPosts = allPosts.sort(
     (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );
 
-const currentIndex = sortedPosts.findIndex((p) => p.slug === post.slug);
+const currentIndex = sortedPosts.findIndex(
+    (p) => getUrlSlug(p) === getUrlSlug(post),
+);
 const prevPost =
     currentIndex < sortedPosts.length - 1
         ? sortedPosts[currentIndex + 1]
@@ -39,13 +47,13 @@ const backlinks = [{ title: "← All Writing", href: "/writing" }];
 if (prevPost) {
     backlinks.push({
         title: `← ${prevPost.data.title}`,
-        href: `/writing/${prevPost.slug}`,
+        href: `/writing/${getUrlSlug(prevPost)}`,
     });
 }
 if (nextPost) {
     backlinks.push({
         title: `${nextPost.data.title} →`,
-        href: `/writing/${nextPost.slug}`,
+        href: `/writing/${getUrlSlug(nextPost)}`,
     });
 }
 ---
