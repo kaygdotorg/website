@@ -58,7 +58,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
   <main class="homepage">
     <!-- Hero Section -->
     <section class="hero-section">
-      <div class="grainy-card hero-card">
+      <div class="grainy-card-homepage hero-card">
         <div class="hero-content">
           <!-- Profile Picture -->
           {
@@ -132,7 +132,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     {
       quote && (
         <section class="footer-section">
-          <div class="grainy-card footer-card">
+          <div class="grainy-card-homepage footer-card">
             <p class="footer-quote">"{quote}"</p>
             {email && (
               <a href={`mailto:${email}`} class="footer-cta">

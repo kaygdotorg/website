@@ -9,6 +9,7 @@ interface Props {
   lastEdited?: Date | string;
   readingTime?: number;
   backlinks?: Array<{ title: string; href: string }>;
+  image?: string;
 }
 
 const {
@@ -18,6 +19,7 @@ const {
   lastEdited,
   readingTime,
   backlinks = [],
+  image,
 } = Astro.props;
 
 const relativeLastEdited = lastEdited ? getRelativeTime(lastEdited) : null;
@@ -29,6 +31,15 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
   <div class="md-page-container">
     <!-- Unified Single Card for entire page -->
     <div class="grainy-card md-unified-card">
+      <!-- Featured Image at top of card -->
+      {
+        image && (
+          <div class="md-card-featured-image">
+            <img src={image} alt={title} />
+          </div>
+        )
+      }
+
       <!-- Title Section -->
       <div class="md-card-title">
         <h1>{title}</h1>
@@ -122,58 +133,21 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
       <!-- Divider -->
       <hr class="md-section-divider" />
 
-      <!-- Content Section - Collapsible -->
-      <div
-        class="md-section md-card-collapsible md-card-body"
-        id="content-card"
-      >
-        <div class="md-card-header" onclick="toggleCard('content-card')">
-          <h2>Content</h2>
-          <svg
-            class="md-card-toggle"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </div>
+      <!-- Content Section - Not collapsible -->
+      <div class="md-section md-card-body" id="content-card">
         <div class="md-card-content" id="markdown-content">
           <slot />
         </div>
       </div>
 
-      <!-- Backlinks Section - Collapsible -->
+      <!-- Backlinks Section - Not collapsible -->
       {
         backlinks.length > 0 && (
           <>
             <hr class="md-section-divider" />
-            <div
-              class="md-section md-card-collapsible md-card-backlinks collapsed"
-              id="backlinks-card"
-            >
-              <div
-                class="md-card-header"
-                onclick="toggleCard('backlinks-card')"
-              >
+            <div class="md-section md-card-backlinks" id="backlinks-card">
+              <div class="md-backlinks-header">
                 <h2>Backlinks ({backlinks.length})</h2>
-                <svg
-                  class="md-card-toggle"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
               </div>
               <div class="md-card-content">
                 <ul>

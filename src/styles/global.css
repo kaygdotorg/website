@@ -103,7 +103,7 @@ html[data-theme="light"] body {
 }
 
 [data-theme="dark"] .film-grain {
-  opacity: 0.12;
+  opacity: 0.07;
   mix-blend-mode: overlay;
 }
 
@@ -260,10 +260,59 @@ html[data-theme="light"] body {
 }
 
 /* ========================================
-   Grainy/Frosted Card
+   Frosted Card (non-grainy default)
    ======================================== */
 
 .grainy-card {
+  background: rgba(20, 15, 28, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  /* Subtle glow effect */
+  box-shadow:
+    0 0 30px rgba(244, 114, 182, 0.04),
+    0 0 50px rgba(168, 85, 247, 0.025),
+    0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Grain texture overlay for grainy-card */
+.grainy-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 0;
+}
+
+[data-theme="dark"] .grainy-card {
+  box-shadow:
+    0 0 25px rgba(244, 114, 182, 0.05),
+    0 0 40px rgba(168, 85, 247, 0.03),
+    0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="light"] .grainy-card {
+  background: rgba(245, 240, 250, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .grainy-card::before {
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+}
+
+/* ========================================
+   Grainy Card (Homepage Only)
+   ======================================== */
+
+.grainy-card-homepage {
   background: rgba(128, 128, 128, 0.25);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -279,15 +328,15 @@ html[data-theme="light"] body {
     0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-[data-theme="dark"] .grainy-card {
+[data-theme="dark"] .grainy-card-homepage {
   box-shadow:
     0 0 25px rgba(244, 114, 182, 0.05),
     0 0 40px rgba(168, 85, 247, 0.03),
     0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
-/* Grain texture overlay */
-.grainy-card::before {
+/* Grain texture overlay - homepage only */
+.grainy-card-homepage::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -297,12 +346,12 @@ html[data-theme="light"] body {
   mix-blend-mode: overlay;
 }
 
-[data-theme="light"] .grainy-card {
+[data-theme="light"] .grainy-card-homepage {
   background: rgba(200, 200, 200, 0.25);
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-[data-theme="light"] .grainy-card::before {
+[data-theme="light"] .grainy-card-homepage::before {
   opacity: 0.05;
 }
 
@@ -528,7 +577,7 @@ html[data-theme="light"] body {
   width: 100%;
   max-width: none;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -536,20 +585,75 @@ html[data-theme="light"] body {
 
 @media (min-width: 768px) {
   .md-page-container {
-    padding: 3rem 2rem;
+    padding: 1.5rem 1rem;
     gap: 1.75rem;
   }
 }
 
 @media (min-width: 1200px) {
   .md-page-container {
-    padding: 3rem 4rem;
+    padding: 2rem 1.5rem;
   }
 }
 
 /* Unified Card - contains all sections as one card */
 .md-unified-card {
   padding: 0;
+}
+
+/* Featured Image at top of card */
+.md-card-featured-image {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 2rem 2rem 0 0;
+}
+
+.md-card-featured-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 60%, rgba(20, 15, 28, 0.6) 100%);
+  pointer-events: none;
+}
+
+[data-theme="light"] .md-card-featured-image::after {
+  background: linear-gradient(to bottom, transparent 60%, rgba(250, 248, 252, 0.6) 100%);
+}
+
+.md-card-featured-image img {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.md-card-featured-image:hover img {
+  transform: scale(1.04);
+}
+
+@media (min-width: 768px) {
+  .md-card-featured-image img {
+    max-height: 400px;
+  }
+}
+
+/* Backlinks Header - non-collapsible */
+.md-backlinks-header {
+  padding: 1rem 2.5rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.md-backlinks-header h2 {
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: inherit;
+  margin: 0;
 }
 
 /* Section divider between card sections */
@@ -573,6 +677,14 @@ html[data-theme="light"] body {
 }
 
 /* Section classes inherit from md-card-collapsible */
+
+/* Ensure all sections appear above grain overlay */
+.md-section,
+.md-card-title,
+.md-section-divider {
+  position: relative;
+  z-index: 1;
+}
 
 /* Title Card - Always visible, not collapsible */
 .md-card-title {
@@ -633,10 +745,12 @@ html[data-theme="light"] body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
+  padding: 1rem 2.5rem;
   cursor: pointer;
   user-select: none;
   transition: background 0.2s ease;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
 .md-card-header:hover {
@@ -649,9 +763,9 @@ html[data-theme="light"] body {
 
 .md-card-header h2 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.08em;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
   color: inherit;
   margin: 0;
 }
@@ -685,11 +799,16 @@ html[data-theme="light"] body {
 }
 
 /* TOC Card */
+.md-card-toc .md-card-content {
+  padding: 1.5rem 2.5rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
 .md-card-toc .md-card-content ul {
   list-style: none;
   padding: 0;
-  margin: 0 auto;
-  max-width: 720px;
+  margin: 0;
 }
 
 .md-card-toc .md-card-content li {
@@ -707,24 +826,48 @@ html[data-theme="light"] body {
 
 .md-card-toc .md-card-content a {
   color: inherit;
-  opacity: 0.8;
+  opacity: 0.9;
   text-decoration: none;
-  transition: opacity 0.2s ease, color 0.2s ease;
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  display: inline-block;
+  transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .md-card-toc .md-card-content a:hover {
   opacity: 1;
   color: var(--color-accent-500);
+  transform: translateX(6px) scale(1.04);
 }
 
 .md-card-toc .md-card-content li.toc-level-2 {
-  padding-left: 1rem;
-  font-size: 0.9em;
+  padding-left: 0;
 }
 
 .md-card-toc .md-card-content li.toc-level-3 {
-  padding-left: 2rem;
-  font-size: 0.85em;
+  padding-left: 1.5rem;
+}
+
+.md-card-toc .md-card-content li.toc-level-3 a {
+  font-size: 1.1rem;
+}
+
+/* Backlinks Card */
+/* Backlinks styled via shared internal-link-pill logic below */
+.md-card-backlinks .md-card-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.md-card-backlinks .md-card-content li {
+  padding: 0;
+  border-bottom: none;
 }
 
 /* Content Card - Enhanced readability for long-form content */
@@ -818,13 +961,101 @@ html[data-theme="light"] body {
   background: rgba(236, 72, 153, 0.06);
 }
 
+/* Base link styling - all links in content are pink */
 .md-card-body .md-card-content a {
   color: var(--color-accent-500);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  z-index: 1;
 }
 
-.md-card-body .md-card-content a:hover {
+/* Internal links - pill-style with document icon (like mymind.com) */
+.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]),
+.md-card-backlinks .md-card-content a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.85rem 0.25rem 0.65rem;
+  background: rgba(20, 15, 28, 0.5);
+  border-radius: 9999px;
+  font-weight: 500;
+  font-size: 0.95em;
+  border: 1px solid transparent;
+  background-image: linear-gradient(rgba(20, 15, 28, 0.8), rgba(20, 15, 28, 0.8)),
+    linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  vertical-align: middle;
+  margin: -2px 1px;
+}
+
+.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"])::before,
+.md-card-backlinks .md-card-content a::before {
+  content: "";
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ec4899' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+}
+
+[data-theme="light"] .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]),
+[data-theme="light"] .md-card-backlinks .md-card-content a {
+  background-image: linear-gradient(#fdf2f8, #fdf2f8),
+    linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+  color: var(--color-accent-600);
+}
+
+.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]):hover,
+.md-card-backlinks .md-card-content a:hover {
+  transform: translateY(-2px) scale(1.04);
+  background-image: linear-gradient(rgba(20, 15, 28, 0.65), rgba(20, 15, 28, 0.65)),
+    linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6, #06b6d4);
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.2);
+}
+
+/* External links - underlined with external icon */
+.md-card-body .md-card-content a[href^="http"] {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+}
+
+.md-card-body .md-card-content a[href^="http"]::after {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-left: 0.3em;
+  vertical-align: middle;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ec4899' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.8;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.md-card-body .md-card-content a[href^="http"]:hover {
+  opacity: 0.8;
+}
+
+.md-card-body .md-card-content a[href^="http"]:hover::after {
+  transform: translate(2px, -2px);
+  opacity: 1;
+}
+
+/* Anchor links (same page) stay simple */
+.md-card-body .md-card-content a[href^="#"] {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+}
+
+.md-card-body .md-card-content a[href^="#"]:hover {
   opacity: 0.8;
 }
 
@@ -1178,8 +1409,8 @@ h4:hover .heading-link {
 
 .menu-open .mobile-menu-backdrop {
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 [data-theme="light"] .menu-open .mobile-menu-backdrop {
@@ -1704,8 +1935,8 @@ html.theme-transitioning *::after {
 
 .search-backdrop {
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -2041,9 +2272,21 @@ html.theme-transitioning *::after {
   background-color: var(--color-accent-500, #ec4899) !important;
 }
 
-.page-card-title,
+/* Title headings are white, only links and callouts have pink */
 .md-card-title h1,
 .md-card-header h2,
+.md-backlinks-header h2 {
+  color: #ffffff;
+}
+
+[data-theme="light"] .md-card-title h1,
+[data-theme="light"] .md-card-header h2,
+[data-theme="light"] .md-backlinks-header h2 {
+  color: #1a1225;
+}
+
+/* Page card titles stay accent colored (different context) */
+.page-card-title,
 .timeline-card-title {
   color: var(--color-accent-500, #ec4899);
 }
