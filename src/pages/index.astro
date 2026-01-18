@@ -10,11 +10,13 @@ if (!homeEntry) {
   throw new Error("Could not find home.md in src/content/pages/");
 }
 
+const { Content } = await homeEntry.render();
+
 // Fetch entries from now and uses collections to get latest dates
 const nowEntries = await getCollection("now");
 const usesEntries = await getCollection("uses");
 
-// Sort to get latest entries
+// Sort to get latest entries (dates are now always Date objects thanks to z.coerce.date())
 const latestNow = nowEntries.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 )[0];
@@ -22,289 +24,419 @@ const latestUses = usesEntries.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 )[0];
 
-// Extract data from frontmatter
-const { name, tagline, profileImage, email, quote } = homeEntry.data;
+// Create a map of slug -> lastUpdated date
+const pageLastUpdated = new Map<string, Date>();
+if (latestNow) {
+  pageLastUpdated.set("/now", latestNow.data.date);
+}
+if (latestUses) {
+  pageLastUpdated.set("/uses", latestUses.data.date);
+}
 
-// Bento grid items
-const bentoItems = [
-  {
-    title: "Now",
-    subtitle:
-      "What I'm currently focused on — the projects, ideas, and activities occupying my mind.",
-    href: "/now",
-    image:
-      "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80",
-    size: "normal",
-    date: latestNow ? formatDateWithComma(latestNow.data.date) : null,
-  },
-  {
-    title: "Uses",
-    subtitle: "The tools, software, and gear that power my daily workflow.",
-    href: "/uses",
-    image:
-      "https://images.unsplash.com/photo-1483058712412-4245e9b90334?w=800&q=80",
-    size: "normal",
-    date: latestUses ? formatDateWithComma(latestUses.data.date) : null,
-  },
-  {
-    title: "Photography",
-    subtitle: "Moments captured through my lens.",
-    href: "/photography",
-    image:
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-    size: "wide",
-  },
-  {
-    title: "Writing",
-    subtitle: "Thoughts on technology, creativity, and life.",
-    href: "/writing",
-    image:
-      "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80",
-    size: "normal",
-  },
-];
+// Extract all the data from frontmatter
+const {
+  name,
+  tagline,
+  profileImage,
+  email,
+  cardPhotos: rawCardPhotos,
+  pageCards,
+  quote,
+} = homeEntry.data;
+
+// Enhance cardPhotos with dynamic dates from page metadata
+const cardPhotos = rawCardPhotos?.map((card) => {
+  const pageDate = pageLastUpdated.get(card.href);
+  return {
+    ...card,
+    date: pageDate ? formatDateWithComma(pageDate) : card.date || "Unknown",
+  };
+});
 ---
 
-<BaseLayout title="Home" description="Personal website and digital garden">
-  <div class="bento-container">
-    <!-- Sparkles background -->
-    <div class="sparkles-container" aria-hidden="true">
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
-      <div class="sparkle"></div>
-    </div>
-
-    <div class="bento-grid">
-      <!-- Hero Cell - Profile -->
-      <a
-        href="#about"
-        class="bento-cell bento-hero grainy-card glow-hover gradient-border animate-fade-up"
-      >
-        <div class="bento-content">
-          <div class="hero-top">
-            {
-              profileImage && (
-                <div class="profile-card">
-                  <div class="profile-image-wrapper">
-                    <img
-                      src={profileImage}
-                      alt={`${name} photo`}
-                      class="w-24 h-24 md:w-32 md:h-32 object-cover rounded-full"
-                      fetchpriority="high"
-                    />
-                  </div>
+<BaseLayout
+  title="Home"
+  description="Personal website and digital garden"
+  hideNavInitially={true}
+>
+  <div class="page-cards-container" id="page-cards-container">
+    <!-- Hero Section -->
+    <section class="page-card-section" id="hero-section">
+      <div class="grainy-card p-8 md:p-12 max-w-2xl w-full">
+        <div class="text-center space-y-6 mb-8">
+          <!-- Profile Picture -->
+          {
+            profileImage && (
+              <div class="opacity-0 animate-fade-in">
+                <div class="w-28 h-28 md:w-36 md:h-36 mx-auto rounded-full overflow-hidden border-2 border-pink-400/30">
+                  <img
+                    src={profileImage}
+                    alt={`${name || "Profile"} photo`}
+                    class="w-full h-full object-cover"
+                    fetchpriority="high"
+                  />
                 </div>
-              )
-            }
-          </div>
-          <div class="hero-bottom">
-            <h1 class="bento-title gradient-text">{name}</h1>
-            <p class="bento-subtitle">{tagline}</p>
-          </div>
-        </div>
-      </a>
+              </div>
+            )
+          }
 
-      <!-- Now Cell -->
-      <a
-        href={bentoItems[0].href}
-        class="bento-cell bento-image grainy-card glow-hover animate-fade-up stagger-1"
-        style={`background-image: url('${bentoItems[0].image}')`}
-      >
-        <div class="bento-content">
-          <div>
-            <h2 class="bento-title">{bentoItems[0].title}</h2>
-            {
-              bentoItems[0].date && (
-                <p class="text-xs opacity-60 mt-1">
-                  Updated {bentoItems[0].date}
-                </p>
-              )
-            }
-          </div>
-          <div class="bento-arrow">
-            <span>explore</span>
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-            </svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- Uses Cell -->
-      <a
-        href={bentoItems[1].href}
-        class="bento-cell bento-image grainy-card glow-hover animate-fade-up stagger-2"
-        style={`background-image: url('${bentoItems[1].image}')`}
-      >
-        <div class="bento-content">
-          <div>
-            <h2 class="bento-title">{bentoItems[1].title}</h2>
-            {
-              bentoItems[1].date && (
-                <p class="text-xs opacity-60 mt-1">
-                  Updated {bentoItems[1].date}
-                </p>
-              )
-            }
-          </div>
-          <div class="bento-arrow">
-            <span>explore</span>
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-            </svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- Photography Cell (wide) -->
-      <a
-        href={bentoItems[2].href}
-        class="bento-cell bento-wide bento-image grainy-card glow-hover animate-fade-up stagger-3"
-        style={`background-image: url('${bentoItems[2].image}')`}
-      >
-        <div class="bento-content">
-          <div>
-            <h2 class="bento-title">{bentoItems[2].title}</h2>
-            <p class="bento-subtitle hidden md:block">
-              {bentoItems[2].subtitle}
-            </p>
-          </div>
-          <div class="bento-arrow">
-            <span>view gallery</span>
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-            </svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- Writing Cell -->
-      <a
-        href={bentoItems[3].href}
-        class="bento-cell bento-image grainy-card glow-hover animate-fade-up stagger-4"
-        style={`background-image: url('${bentoItems[3].image}')`}
-      >
-        <div class="bento-content">
-          <div>
-            <h2 class="bento-title">{bentoItems[3].title}</h2>
-          </div>
-          <div class="bento-arrow">
-            <span>read</span>
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-            </svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- Quote Cell -->
-      <a
-        href={`mailto:${email}`}
-        class="bento-cell grainy-card glow-hover animate-fade-up stagger-5"
-      >
-        <div class="bento-content quote-cell">
-          <blockquote
-            class="text-lg md:text-xl italic opacity-80 leading-relaxed"
+          <!-- Name -->
+          <h1
+            class="font-display text-4xl md:text-5xl leading-tight opacity-0 animate-fade-in animation-delay-100"
           >
-            "{quote}"
-          </blockquote>
-          <div class="bento-arrow mt-4">
-            <span>get in touch</span>
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-            </svg>
-          </div>
+            <span class="text-accent font-medium">{name}</span>
+          </h1>
+
+          <!-- Tagline -->
+          <p
+            class="text-lg md:text-xl text-base-content/80 max-w-md mx-auto leading-relaxed opacity-0 animate-fade-in animation-delay-200"
+          >
+            {tagline}
+          </p>
         </div>
-      </a>
-    </div>
+
+        <!-- Card Hand -->
+        {
+          cardPhotos && cardPhotos.length > 0 && (
+            <div
+              class="w-full opacity-0 animate-fade-in animation-delay-300"
+              id="hero-photo-section"
+            >
+              <div class="card-hand" id="card-hand">
+                <div class="card-hand-inner" id="card-hand-inner">
+                  {cardPhotos.map((item, index) => (
+                    <a
+                      href={item.href}
+                      class="card-in-hand"
+                      data-index={index}
+                      data-position={index}
+                    >
+                      <div class="card-in-hand-image">
+                        <img
+                          src={item.src}
+                          alt={item.label}
+                          draggable="false"
+                        />
+                      </div>
+                      <div class="card-in-hand-label">
+                        <div class="card-in-hand-slug">{item.href}</div>
+                        <div class="card-in-hand-date">
+                          {item.date || "Dec 2024"}
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+              <p class="text-center text-sm text-base-content/60 mt-4">
+                swipe to shuffle · scroll to explore · tap to navigate
+              </p>
+            </div>
+          )
+        }
+
+        <!-- Scroll hint inside card -->
+        <div class="page-card-scroll-hint-inline">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Page Cards -->
+    {
+      pageCards &&
+        pageCards.map((card, index) => (
+          <section class="page-card-section" data-card-index={index}>
+            <div class="grainy-card page-card">
+              <h2 class="page-card-title">{card.title}</h2>
+              <p class="page-card-summary">{card.summary}</p>
+              <a href={card.href} class="page-card-arrow">
+                <span>explore</span>
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </a>
+
+              {/* Show scroll hint inside card on all but last */}
+              {index < (pageCards?.length || 0) - 1 && (
+                <div class="page-card-scroll-hint-inline">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                    />
+                  </svg>
+                </div>
+              )}
+            </div>
+          </section>
+        ))
+    }
+
+    <!-- Quote Card (Final) -->
+    {
+      quote && (
+        <section class="page-card-section">
+          <div class="grainy-card page-card">
+            <p class="font-display text-2xl md:text-3xl italic text-base-content/80 text-center leading-relaxed">
+              "{quote}"
+            </p>
+            {email && (
+              <a href={`mailto:${email}`} class="page-card-arrow mt-8">
+                <span>get in touch</span>
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </a>
+            )}
+          </div>
+        </section>
+      )
+    }
   </div>
 
-  <style>
-    .bento-container {
-      min-height: 100vh;
-      padding: 2rem 0;
-      position: relative;
+  <!-- Page Indicator Dots -->
+  <div class="page-indicator" id="page-indicator"></div>
+
+  <!-- Scripts -->
+  <script>
+    // ========================================
+    // Scroll Snap with Intersection Observer
+    // ========================================
+
+    const container = document.getElementById("page-cards-container");
+    const pageSections = document.querySelectorAll(
+      ".page-card-section",
+    ) as NodeListOf<HTMLElement>;
+    const pageIndicator = document.getElementById("page-indicator");
+    const navContainer = document.getElementById("nav-container");
+
+    let currentPage = 0;
+
+    // Initialize pages and indicators
+    function initializePages() {
+      pageSections.forEach((section, index) => {
+        // First section starts active
+        if (index === 0) {
+          section.classList.add("active");
+        }
+
+        // Create indicator dot
+        if (pageIndicator) {
+          const dot = document.createElement("button");
+          dot.className = "page-indicator-dot" + (index === 0 ? " active" : "");
+          dot.setAttribute("aria-label", `Go to page ${index + 1}`);
+          dot.addEventListener("click", () => scrollToPage(index));
+          pageIndicator.appendChild(dot);
+        }
+      });
     }
 
-    @media (min-width: 768px) {
-      .bento-container {
-        padding: 4rem 0;
-        display: flex;
-        align-items: center;
+    // Scroll to specific page
+    function scrollToPage(pageIndex: number) {
+      const target = pageSections[pageIndex];
+      if (target && container) {
+        target.scrollIntoView({ behavior: "smooth" });
       }
     }
 
-    .sparkles-container {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
+    // Update page indicator
+    function updateIndicator(index: number) {
+      const dots = pageIndicator?.querySelectorAll(".page-indicator-dot");
+      dots?.forEach((dot, i) => {
+        dot.classList.toggle("active", i === index);
+      });
     }
 
-    .hero-top {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .hero-bottom {
-      text-align: center;
-    }
-
-    .hero-bottom .bento-title {
-      font-size: 2rem;
-      margin-bottom: 0.75rem;
-    }
-
-    @media (min-width: 768px) {
-      .hero-bottom .bento-title {
-        font-size: 2.75rem;
+    // Update navbar visibility
+    function updateNavbar(index: number) {
+      if (!navContainer) return;
+      if (index > 0) {
+        navContainer.classList.remove("nav-hidden");
+        navContainer.classList.add("nav-visible");
+      } else {
+        navContainer.classList.add("nav-hidden");
+        navContainer.classList.remove("nav-visible");
       }
     }
 
-    .quote-cell {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      text-align: center;
-    }
+    // Intersection Observer to detect visible section
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Add active class for fade-in animation
+            entry.target.classList.add("active");
 
-    .quote-cell .bento-arrow {
-      justify-content: center;
-    }
+            // Find the index of this section
+            const index = Array.from(pageSections).indexOf(
+              entry.target as HTMLElement,
+            );
+            if (index !== -1 && index !== currentPage) {
+              currentPage = index;
+              updateIndicator(index);
+              updateNavbar(index);
+            }
+          }
+        });
+      },
+      {
+        root: container,
+        threshold: 0.6, // Trigger when 60% visible
+      },
+    );
 
-    /* Ensure bento cells have proper min-height on mobile */
-    @media (max-width: 639px) {
-      .bento-cell {
-        min-height: 180px;
+    // Observe all sections
+    pageSections.forEach((section) => {
+      observer.observe(section);
+    });
+
+    // Initialize
+    initializePages();
+
+    // ========================================
+    // Card Hand Swipe Logic (Polaroid cards)
+    // ========================================
+
+    const cardHand = document.getElementById("card-hand");
+    const cards = document.querySelectorAll(
+      ".card-in-hand",
+    ) as NodeListOf<HTMLElement>;
+
+    if (cardHand && cards.length > 0) {
+      const numCards = cards.length;
+      let currentOffset = 0;
+      let isDragging = false;
+      let hasMoved = false;
+      let startX = 0;
+      let currentX = 0;
+      let dragThreshold = 50;
+      let tapThreshold = 10;
+
+      function updateCardPositions() {
+        cards.forEach((card, index) => {
+          let posIndex = (index - currentOffset + numCards) % numCards;
+          card.setAttribute("data-position", posIndex.toString());
+        });
       }
 
-      .bento-cell.bento-hero {
-        min-height: 320px;
+      function handleCardStart(e: MouseEvent | TouchEvent) {
+        isDragging = true;
+        hasMoved = false;
+        startX = "touches" in e ? e.touches[0].clientX : e.clientX;
+        currentX = startX;
+        e.stopPropagation(); // Prevent triggering page flip
       }
+
+      function handleCardMove(e: MouseEvent | TouchEvent) {
+        if (!isDragging) return;
+        currentX = "touches" in e ? e.touches[0].clientX : e.clientX;
+
+        if (Math.abs(currentX - startX) > tapThreshold) {
+          hasMoved = true;
+        }
+      }
+
+      function handleCardEnd() {
+        if (!isDragging) return;
+        isDragging = false;
+
+        const deltaX = currentX - startX;
+
+        if (Math.abs(deltaX) > dragThreshold) {
+          if (deltaX < 0) {
+            currentOffset = (currentOffset + 1) % numCards;
+          } else {
+            currentOffset = (currentOffset - 1 + numCards) % numCards;
+          }
+          updateCardPositions();
+        }
+      }
+
+      cards.forEach((card) => {
+        card.addEventListener("click", (e) => {
+          if (hasMoved) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          hasMoved = false;
+        });
+
+        card.addEventListener("mousedown", handleCardStart);
+        card.addEventListener("touchstart", handleCardStart, {
+          passive: false,
+        });
+      });
+
+      cardHand.addEventListener("mousedown", handleCardStart);
+      cardHand.addEventListener("touchstart", handleCardStart, {
+        passive: false,
+      });
+
+      document.addEventListener("mousemove", handleCardMove);
+      document.addEventListener("mouseup", handleCardEnd);
+      document.addEventListener("touchmove", handleCardMove, { passive: true });
+      document.addEventListener("touchend", handleCardEnd);
+
+      // Horizontal scroll/wheel to shuffle cards
+      let wheelTimeout: ReturnType<typeof setTimeout> | null = null;
+      let accumulatedDelta = 0;
+      const wheelThreshold = 50;
+
+      cardHand.addEventListener(
+        "wheel",
+        (e: WheelEvent) => {
+          // Use deltaX for horizontal scroll, or deltaY if no horizontal
+          const delta =
+            Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+
+          // Prevent page flip when scrolling on cards
+          e.stopPropagation();
+
+          // Accumulate delta for smoother response
+          accumulatedDelta += delta;
+
+          // Clear previous timeout
+          if (wheelTimeout) clearTimeout(wheelTimeout);
+
+          // Check if we've scrolled enough to shuffle
+          if (Math.abs(accumulatedDelta) > wheelThreshold) {
+            if (accumulatedDelta > 0) {
+              currentOffset = (currentOffset + 1) % numCards;
+            } else {
+              currentOffset = (currentOffset - 1 + numCards) % numCards;
+            }
+            updateCardPositions();
+            accumulatedDelta = 0;
+          }
+
+          // Reset accumulated delta after a pause
+          wheelTimeout = setTimeout(() => {
+            accumulatedDelta = 0;
+          }, 150);
+        },
+        { passive: true },
+      );
+
+      updateCardPositions();
     }
-  </style>
+  </script>
 </BaseLayout>
