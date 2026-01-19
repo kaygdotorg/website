@@ -946,10 +946,10 @@ html[data-theme="light"] body {
 
 /* Content Card - Enhanced readability for long-form content */
 .md-card-body .md-card-content {
-  line-height: 1.9;
-  font-size: 1.125rem;
-  /* 18px for comfortable reading */
-  color: rgba(255, 255, 255, 0.92);
+  line-height: 2.0;
+  font-size: 1.1875rem;
+  /* 19px for comfortable reading */
+  color: rgba(255, 255, 255, 0.95);
   padding: 2rem 2.5rem;
   letter-spacing: 0.01em;
   /* Slight letter-spacing for clarity */
@@ -988,9 +988,9 @@ html[data-theme="light"] body {
 }
 
 .md-card-body .md-card-content p {
-  margin: 1.75rem 0;
+  margin: 2rem 0;
   /* More breathing room between paragraphs */
-  opacity: 0.92;
+  opacity: 0.95;
 }
 
 .md-card-body .md-card-content ul,
