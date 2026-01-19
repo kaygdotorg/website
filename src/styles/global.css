@@ -682,11 +682,11 @@ html[data-theme="light"] body {
 }
 
 .md-card-header:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: transparent;
 }
 
 [data-theme="light"] .md-card-header:hover {
-  background: rgba(0, 0, 0, 0.02);
+  background: transparent;
 }
 
 .md-card-header h2 {
