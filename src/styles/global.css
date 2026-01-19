@@ -993,19 +993,37 @@ html[data-theme="light"] body {
 
 /* Callout / Blockquote Card Transformation */
 .md-card-body .md-card-content blockquote.callout-card {
-  margin: 2rem 0;
-  padding: 1.5rem;
+  margin: 2.5rem 0;
+  padding: 1.5rem 1.75rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4);
   position: relative;
+  overflow: hidden;
+  /* Prevent child overflow */
+  border-left: none !important;
+  /* Remove legacy border */
+}
+
+/* Fix image peeking/overflow in callout cards */
+.md-card-body .md-card-content blockquote.callout-card img {
+  max-width: 100% !important;
+  height: auto !important;
+  border-radius: 12px;
+  margin: 1.25rem 0;
+  display: block;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 [data-theme="light"] .md-card-body .md-card-content blockquote.callout-card {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.05);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.025);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .md-card-body .md-card-content blockquote.callout-card img {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
 .callout-header {

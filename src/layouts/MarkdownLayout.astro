@@ -366,18 +366,24 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
       }
     }
 
-    // Transform Obsidian-style callouts [!TYPE] into floating cards
+    // Transform Obsidian-style [!TYPE] or standard **Type:** markers into floating cards
     function initCallouts() {
       const content = document.getElementById("markdown-content");
       if (!content) return;
 
       const blockquotes = content.querySelectorAll("blockquote");
       blockquotes.forEach((bq) => {
-        // Only process if it starts with the [!TYPE] marker
+        // Find the first paragraph or direct text node
         const firstP = bq.querySelector("p") || bq;
-        const text = firstP.innerText.trim();
+        const text = firstP.innerHTML.trim();
 
-        const match = text.match(/^\[!(\w+)\]\s*(.*)/i);
+        // 1. Match [!TYPE] or [!TYPE] Title
+        // 2. Match **Type:** or **Type**
+        const obsidianMatch = text.match(/^\[!(\w+)\]\s*(.*)/i);
+        const boldMatch = text.match(/^<strong>(\w+):?<\/strong>\s*(.*)/i);
+
+        const match = obsidianMatch || boldMatch;
+
         if (match) {
           const type = match[1].toLowerCase();
           const title = match[2];
@@ -393,10 +399,10 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
           typeLabel.innerHTML = `<em>${type}</em>`;
           header.appendChild(typeLabel);
 
-          if (title) {
+          if (title && title.trim() !== "") {
             const titleSpan = document.createElement("span");
             titleSpan.className = "callout-title";
-            titleSpan.textContent = title;
+            titleSpan.innerHTML = title;
             header.appendChild(titleSpan);
           }
 
@@ -404,11 +410,13 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
           bq.insertBefore(header, bq.firstChild);
 
           // Clean up the raw marker text from the first paragraph/node
-          // Use innerHTML for the replacement to preserve other formatting if any
-          const rawMatch = firstP.innerHTML.match(/^\[!(\w+)\]\s*(.*)/i);
-          if (rawMatch) {
+          if (obsidianMatch) {
             firstP.innerHTML = firstP.innerHTML
               .replace(/^\[!(\w+)\]\s*(.*)/i, "")
+              .trim();
+          } else if (boldMatch) {
+            firstP.innerHTML = firstP.innerHTML
+              .replace(/^<strong>(\w+):?<\/strong>\s*(.*)/i, "")
               .trim();
           }
 
