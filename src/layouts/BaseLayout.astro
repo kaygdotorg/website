@@ -456,27 +456,39 @@ import { ClientRouter } from "astro:transitions";
 
     <!-- Scripts -->
     <script>
-      // Theme toggle (both desktop and mobile)
-      const themeToggles = [
-        document.getElementById("theme-toggle-desktop"),
-        document.getElementById("theme-toggle-mobile"),
-      ];
+      // Initialize theme toggle on every page load (needed for View Transitions)
+      function initThemeToggle() {
+        const themeToggles = [
+          document.getElementById("theme-toggle-desktop"),
+          document.getElementById("theme-toggle-mobile"),
+        ];
 
-      themeToggles.forEach((toggle) => {
-        toggle?.addEventListener("click", () => {
-          const html = document.documentElement;
-          const currentTheme = html.getAttribute("data-theme");
-          const newTheme = currentTheme === "dark" ? "light" : "dark";
+        themeToggles.forEach((toggle) => {
+          // Remove old listeners by cloning the element
+          const newToggle = toggle?.cloneNode(true);
+          toggle?.parentNode?.replaceChild(newToggle, toggle);
 
-          html.classList.add("theme-transitioning");
-          html.setAttribute("data-theme", newTheme);
-          localStorage.setItem("theme", newTheme);
+          newToggle?.addEventListener("click", () => {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
 
-          setTimeout(() => {
-            html.classList.remove("theme-transitioning");
-          }, 300);
+            html.classList.add("theme-transitioning");
+            html.setAttribute("data-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+
+            setTimeout(() => {
+              html.classList.remove("theme-transitioning");
+            }, 300);
+          });
         });
-      });
+      }
+
+      // Initialize on first load
+      initThemeToggle();
+
+      // Re-initialize after View Transitions navigation
+      document.addEventListener("astro:page-load", initThemeToggle);
 
       // Pause animations when tab is hidden (performance)
       document.addEventListener("visibilitychange", () => {
@@ -487,158 +499,185 @@ import { ClientRouter } from "astro:transitions";
         }
       });
 
-      // Mobile menu toggle
-      const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
-      const mobileMenu = document.getElementById("mobile-menu");
-      const mobileMenuBackdrop = document.getElementById(
-        "mobile-menu-backdrop",
-      );
-      const hamburgerIcon = document.getElementById("hamburger-icon");
-      const closeIcon = document.getElementById("close-icon");
+      // Mobile menu toggle - wrapped for View Transitions
+      function initMobileMenu() {
+        const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const mobileMenuBackdrop = document.getElementById(
+          "mobile-menu-backdrop",
+        );
+        const hamburgerIcon = document.getElementById("hamburger-icon");
+        const closeIcon = document.getElementById("close-icon");
 
-      function openMobileMenu() {
-        mobileMenu?.classList.add("menu-open");
-        hamburgerIcon?.classList.add("hidden");
-        closeIcon?.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-      }
-
-      function closeMobileMenu() {
-        mobileMenu?.classList.remove("menu-open");
-        hamburgerIcon?.classList.remove("hidden");
-        closeIcon?.classList.add("hidden");
-        document.body.style.overflow = "";
-      }
-
-      mobileMenuToggle?.addEventListener("click", () => {
-        const isOpen = mobileMenu?.classList.contains("menu-open");
-        if (isOpen) {
-          closeMobileMenu();
-        } else {
-          openMobileMenu();
+        function openMobileMenu() {
+          mobileMenu?.classList.add("menu-open");
+          hamburgerIcon?.classList.add("hidden");
+          closeIcon?.classList.remove("hidden");
+          document.body.style.overflow = "hidden";
         }
-      });
 
-      // Close when clicking backdrop
-      mobileMenuBackdrop?.addEventListener("click", closeMobileMenu);
+        function closeMobileMenu() {
+          mobileMenu?.classList.remove("menu-open");
+          hamburgerIcon?.classList.remove("hidden");
+          closeIcon?.classList.add("hidden");
+          document.body.style.overflow = "";
+        }
 
-      // Close mobile menu when clicking a link
-      mobileMenu?.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", closeMobileMenu);
-      });
+        // Clone to remove old listeners
+        if (mobileMenuToggle) {
+          const newToggle = mobileMenuToggle.cloneNode(true) as HTMLElement;
+          mobileMenuToggle.parentNode?.replaceChild(
+            newToggle,
+            mobileMenuToggle,
+          );
+          newToggle.addEventListener("click", () => {
+            const isOpen = mobileMenu?.classList.contains("menu-open");
+            if (isOpen) closeMobileMenu();
+            else openMobileMenu();
+          });
+        }
 
-      // ========================================
-      // Search Modal
-      // ========================================
-      const searchModal = document.getElementById("search-modal");
-      const searchBackdrop = document.getElementById("search-backdrop");
-      const searchContainer = document.getElementById("search-container");
-      const searchToggles = [
-        document.getElementById("search-toggle-desktop"),
-        document.getElementById("search-toggle-mobile"),
-      ];
+        if (mobileMenuBackdrop) {
+          const newBackdrop = mobileMenuBackdrop.cloneNode(true) as HTMLElement;
+          mobileMenuBackdrop.parentNode?.replaceChild(
+            newBackdrop,
+            mobileMenuBackdrop,
+          );
+          newBackdrop.addEventListener("click", closeMobileMenu);
+        }
 
-      let pagefindLoaded = false;
+        mobileMenu?.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", closeMobileMenu);
+        });
+      }
 
-      async function loadPagefind() {
-        if (pagefindLoaded) return;
+      // Search Modal - wrapped for View Transitions
+      function initSearchModal() {
+        const searchModal = document.getElementById("search-modal");
+        const searchBackdrop = document.getElementById("search-backdrop");
+        const searchContainer = document.getElementById("search-container");
+        const searchToggles = [
+          document.getElementById("search-toggle-desktop"),
+          document.getElementById("search-toggle-mobile"),
+        ];
 
-        try {
-          // Load CSS
-          if (
-            !document.querySelector('link[href="/pagefind/pagefind-ui.css"]')
-          ) {
-            const link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = "/pagefind/pagefind-ui.css";
-            document.head.appendChild(link);
-          }
+        let pagefindLoaded = false;
 
-          // Load JS via script tag (more reliable than dynamic import)
-          await new Promise((resolve, reject) => {
-            if (window.PagefindUI) {
-              resolve();
-              return;
+        async function loadPagefind() {
+          if (pagefindLoaded) return;
+          try {
+            if (
+              !document.querySelector('link[href="/pagefind/pagefind-ui.css"]')
+            ) {
+              const link = document.createElement("link");
+              link.rel = "stylesheet";
+              link.href = "/pagefind/pagefind-ui.css";
+              document.head.appendChild(link);
             }
-            const script = document.createElement("script");
-            script.src = "/pagefind/pagefind-ui.js";
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-          });
-
-          // Initialize Pagefind UI
-          new window.PagefindUI({
-            element: "#search-container",
-            showSubResults: true,
-            showImages: false,
-            excerptLength: 15,
-          });
-          pagefindLoaded = true;
-        } catch (e) {
-          console.error("Pagefind load error:", e);
-          // Pagefind not available (dev mode) - show message
-          if (searchContainer) {
-            searchContainer.innerHTML = `
-              <div class="p-6 text-center text-base-content/60">
-                <p class="mb-2">Search is available after building the site.</p>
-                <p class="text-sm">Run <code class="bg-base-content/10 px-2 py-1 rounded">npm run build</code> to enable search.</p>
-              </div>
-            `;
+            await new Promise<void>((resolve, reject) => {
+              if ((window as any).PagefindUI) {
+                resolve();
+                return;
+              }
+              const script = document.createElement("script");
+              script.src = "/pagefind/pagefind-ui.js";
+              script.onload = () => resolve();
+              script.onerror = reject;
+              document.head.appendChild(script);
+            });
+            new (window as any).PagefindUI({
+              element: "#search-container",
+              showSubResults: true,
+              showImages: false,
+              excerptLength: 15,
+            });
+            pagefindLoaded = true;
+          } catch (e) {
+            console.error("Pagefind load error:", e);
+            if (searchContainer) {
+              searchContainer.innerHTML = `
+                <div class="p-6 text-center text-base-content/60">
+                  <p class="mb-2">Search is available after building the site.</p>
+                  <p class="text-sm">Run <code class="bg-base-content/10 px-2 py-1 rounded">npm run build</code> to enable search.</p>
+                </div>
+              `;
+            }
           }
+        }
+
+        function openSearch() {
+          searchModal?.classList.add("search-open");
+          document.body.style.overflow = "hidden";
+          loadPagefind().then(() => {
+            setTimeout(() => {
+              const input = searchContainer?.querySelector("input");
+              (input as HTMLInputElement)?.focus();
+            }, 100);
+          });
+        }
+
+        function closeSearch() {
+          searchModal?.classList.remove("search-open");
+          document.body.style.overflow = "";
+        }
+
+        searchToggles.forEach((toggle) => {
+          if (toggle) {
+            const newToggle = toggle.cloneNode(true) as HTMLElement;
+            toggle.parentNode?.replaceChild(newToggle, toggle);
+            newToggle.addEventListener("click", () => {
+              const isOpen = searchModal?.classList.contains("search-open");
+              if (isOpen) closeSearch();
+              else openSearch();
+            });
+          }
+        });
+
+        if (searchBackdrop) {
+          const newBackdrop = searchBackdrop.cloneNode(true) as HTMLElement;
+          searchBackdrop.parentNode?.replaceChild(newBackdrop, searchBackdrop);
+          newBackdrop.addEventListener("click", closeSearch);
         }
       }
 
-      function openSearch() {
-        searchModal?.classList.add("search-open");
-        document.body.style.overflow = "hidden";
-        loadPagefind().then(() => {
-          // Focus the search input after a brief delay
-          setTimeout(() => {
-            const input = searchContainer?.querySelector("input");
-            input?.focus();
-          }, 100);
-        });
-      }
+      // Initialize all interactive elements
+      initMobileMenu();
+      initSearchModal();
 
-      function closeSearch() {
-        searchModal?.classList.remove("search-open");
-        document.body.style.overflow = "";
-      }
-
-      searchToggles.forEach((toggle) => {
-        toggle?.addEventListener("click", () => {
-          const isOpen = searchModal?.classList.contains("search-open");
-          if (isOpen) {
-            closeSearch();
-          } else {
-            openSearch();
-          }
-        });
+      // Re-initialize after View Transitions navigation
+      document.addEventListener("astro:page-load", () => {
+        initMobileMenu();
+        initSearchModal();
       });
 
-      searchBackdrop?.addEventListener("click", closeSearch);
+      // Global keyboard shortcuts (only add once)
+      if (!(window as any).__keyboardShortcutsInitialized) {
+        document.addEventListener("keydown", (e) => {
+          const searchModal = document.getElementById("search-modal");
+          const mobileMenu = document.getElementById("mobile-menu");
 
-      // Close on escape key
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          if (searchModal?.classList.contains("search-open")) {
-            closeSearch();
-          } else if (mobileMenu?.classList.contains("menu-open")) {
-            closeMobileMenu();
+          if (e.key === "Escape") {
+            if (searchModal?.classList.contains("search-open")) {
+              searchModal.classList.remove("search-open");
+              document.body.style.overflow = "";
+            } else if (mobileMenu?.classList.contains("menu-open")) {
+              mobileMenu.classList.remove("menu-open");
+              document.body.style.overflow = "";
+            }
           }
-        }
-        // Cmd/Ctrl + K to open search
-        if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-          e.preventDefault();
-          const isOpen = searchModal?.classList.contains("search-open");
-          if (isOpen) {
-            closeSearch();
-          } else {
-            openSearch();
+          if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+            e.preventDefault();
+            if (searchModal?.classList.contains("search-open")) {
+              searchModal.classList.remove("search-open");
+              document.body.style.overflow = "";
+            } else {
+              searchModal?.classList.add("search-open");
+              document.body.style.overflow = "hidden";
+            }
           }
-        }
-      });
+        });
+        (window as any).__keyboardShortcutsInitialized = true;
+      }
     </script>
   </body>
 </html>
