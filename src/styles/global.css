@@ -2028,7 +2028,7 @@ body {
   width: 100%;
   max-width: 56rem;
   /* Match navbar max-width (max-w-4xl) on desktop */
-  height: 120px;
+  height: 160px;
   z-index: 40;
   pointer-events: none;
 
@@ -2036,16 +2036,16 @@ body {
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
 
-  /* Gradient mask: fully visible at top, fading to transparent at bottom */
+  /* Symmetric gradient mask: blurs around the navbar pill (top & bottom) */
   -webkit-mask-image: linear-gradient(to bottom,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.8) 30%,
-      rgba(0, 0, 0, 0.4) 60%,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 15%,
+      rgba(0, 0, 0, 1) 50%,
       rgba(0, 0, 0, 0) 100%);
   mask-image: linear-gradient(to bottom,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.8) 30%,
-      rgba(0, 0, 0, 0.4) 60%,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 15%,
+      rgba(0, 0, 0, 1) 50%,
       rgba(0, 0, 0, 0) 100%);
 }
 
