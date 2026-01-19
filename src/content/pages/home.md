@@ -34,19 +34,19 @@ cardPhotos:
     date: Dec 2024
   - src: https://images.unsplash.com/photo-1455390582262-044cdead277a?w=500&q=80
     label: Writing
-    href: /writing
+    href: /blog
     date: Nov 2024
 
 recentWriting:
   - title: Building in public
     date: Dec 2024
-    href: /writing
+    href: /blog
   - title: On digital gardens
     date: Nov 2024
-    href: /writing
+    href: /blog
   - title: Tools for thought
     date: Oct 2024
-    href: /writing
+    href: /blog
 
 projects:
   - title: Project One
