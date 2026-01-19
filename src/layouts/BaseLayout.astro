@@ -21,6 +21,8 @@ const navLinks = [
   { href: "/photography", label: "Photography" },
   { href: "/writing", label: "Writing" },
 ];
+
+import { ClientRouter } from "astro:transitions";
 ---
 
 <!doctype html>
@@ -32,6 +34,7 @@ const navLinks = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ClientRouter />
     <!-- Fonts are now self-hosted via fontsource -->
     <!-- Theme detection: respects system preference, allows override -->
     <script is:inline>
@@ -54,7 +57,7 @@ const navLinks = [
   </head>
   <body class="min-h-screen text-base-content">
     <!-- Animated Film Grain Background -->
-    <div class="animated-gradient-bg" aria-hidden="true">
+    <div class="animated-gradient-bg" aria-hidden="true" transition:persist>
       <!-- Soft color flares (like light leaks) -->
       <div class="film-flare"></div>
       <!-- Subtle color tint -->
