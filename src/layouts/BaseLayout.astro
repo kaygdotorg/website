@@ -488,7 +488,22 @@ import { ClientRouter } from "astro:transitions";
       initThemeToggle();
 
       // Re-initialize after View Transitions navigation
-      document.addEventListener("astro:page-load", initThemeToggle);
+      document.addEventListener("astro:page-load", () => {
+        // Restore theme from localStorage after navigation (View Transitions may reset it)
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) {
+          document.documentElement.setAttribute("data-theme", savedTheme);
+        } else {
+          const prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+          document.documentElement.setAttribute(
+            "data-theme",
+            prefersDark ? "dark" : "light",
+          );
+        }
+        initThemeToggle();
+      });
 
       // Pause animations when tab is hidden (performance)
       document.addEventListener("visibilitychange", () => {
