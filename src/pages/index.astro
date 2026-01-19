@@ -138,116 +138,129 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       </div>
     </section>
 
-    <!-- Bento Grid Section - 2x2 asymmetric grid inspired by mymind.com -->
+    <!-- Bento Grid Section - Asymmetric grid inspired by mymind.com -->
+    <!-- The grid is wrapped in a container card for visual grouping -->
     <section class="bento-section">
-      <div class="bento-grid">
-        <!-- Card 1: Latest Writing (top-left) -->
-        <a
-          href={latestWriting ? `/writing/${latestWriting.slug}` : "/writing"}
-          class="bento-card bento-writing"
-        >
-          <div class="bento-card-content">
-            <span class="bento-label">Latest Writing</span>
-            <h2 class="bento-title">
-              {latestWriting?.data.title || "Explore my thoughts"}
-            </h2>
-            {
-              latestWriting && (
-                <p class="bento-excerpt">
-                  {latestWriting.data.description || "Read my latest post →"}
-                </p>
-              )
-            }
-          </div>
-          <div class="bento-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-              <path d="m15 5 4 4"></path>
-            </svg>
-          </div>
-        </a>
+      <div class="grainy-card-homepage bento-wrapper">
+        <!-- Section header -->
+        <div class="bento-header">
+          <span class="bento-header-label">Explore</span>
+          <h2 class="bento-header-title">A little bit about me</h2>
+        </div>
 
-        <!-- Card 2: Photography (top-right) -->
-        <a href="/photography" class="bento-card bento-photography">
-          <div class="bento-card-image">
-            <img
-              src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80"
-              alt="Photography preview"
-              loading="lazy"
-            />
-          </div>
-          <div class="bento-card-overlay">
-            <span class="bento-label">Photography</span>
-            <p class="bento-subtitle">Moments captured →</p>
-          </div>
-        </a>
-
-        <!-- Card 3: Now Page (bottom-left) -->
-        <a href="/now" class="bento-card bento-now">
-          <div class="bento-card-content">
-            <span class="bento-label">Now</span>
-            <h2 class="bento-title">What I'm doing</h2>
-            <p class="bento-excerpt">
+        <div class="bento-grid">
+          <!-- Card 1: Latest Writing (spans 2 columns - wide at top) -->
+          <a
+            href={latestWriting ? `/writing/${latestWriting.slug}` : "/writing"}
+            class="bento-card bento-writing bento-wide"
+          >
+            <div class="bento-card-content">
+              <span class="bento-label">Latest Writing</span>
+              <h3 class="bento-title">
+                {latestWriting?.data.title || "Explore my thoughts"}
+              </h3>
               {
-                latestNow
-                  ? `Updated ${formatDateWithComma(latestNow.data.date)}`
-                  : "Current focus & interests →"
+                latestWriting && (
+                  <p class="bento-excerpt">
+                    {latestWriting.data.description || "Read my latest post →"}
+                  </p>
+                )
               }
-            </p>
-          </div>
-          <div class="bento-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-          </div>
-        </a>
+            </div>
+            <div class="bento-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"
+                ></path>
+                <path d="m15 5 4 4"></path>
+              </svg>
+            </div>
+          </a>
 
-        <!-- Card 4: Uses Page (bottom-right) -->
-        <a href="/uses" class="bento-card bento-uses">
-          <div class="bento-card-content">
-            <span class="bento-label">Uses</span>
-            <h2 class="bento-title">My setup</h2>
-            <p class="bento-excerpt">Tools, gear & software →</p>
-          </div>
-          <div class="bento-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect width="20" height="14" x="2" y="3" rx="2"></rect>
-              <line x1="8" x2="16" y1="21" y2="21"></line>
-              <line x1="12" x2="12" y1="17" y2="21"></line>
-            </svg>
-          </div>
-        </a>
+          <!-- Card 2: Photography (tall card - spans 2 rows) -->
+          <a
+            href="/photography"
+            class="bento-card bento-photography bento-tall"
+          >
+            <div class="bento-card-image">
+              <img
+                src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80"
+                alt="Photography preview"
+                loading="lazy"
+              />
+            </div>
+            <div class="bento-card-overlay">
+              <span class="bento-label">Photography</span>
+              <p class="bento-subtitle">Moments captured →</p>
+            </div>
+          </a>
+
+          <!-- Card 3: Now Page (regular size) -->
+          <a href="/now" class="bento-card bento-now">
+            <div class="bento-card-content">
+              <span class="bento-label">Now</span>
+              <h3 class="bento-title">What I'm doing</h3>
+              <p class="bento-excerpt">
+                {
+                  latestNow
+                    ? `Updated ${formatDateWithComma(latestNow.data.date)}`
+                    : "Current focus & interests →"
+                }
+              </p>
+            </div>
+            <div class="bento-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+          </a>
+
+          <!-- Card 4: Uses Page (regular size) -->
+          <a href="/uses" class="bento-card bento-uses">
+            <div class="bento-card-content">
+              <span class="bento-label">Uses</span>
+              <h3 class="bento-title">My setup</h3>
+              <p class="bento-excerpt">Tools, gear & software →</p>
+            </div>
+            <div class="bento-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+                <line x1="8" x2="16" y1="21" y2="21"></line>
+                <line x1="12" x2="12" y1="17" y2="21"></line>
+              </svg>
+            </div>
+          </a>
+        </div>
       </div>
     </section>
   </main>
@@ -500,29 +513,65 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
     /* ============================================
      * Bento Grid Section
-     * A 2x2 asymmetric grid inspired by mymind.com
-     * Features pastel backgrounds with dark mode variants
+     * Asymmetric grid wrapped in a container card
+     * Layout: Writing (wide at top), Photo (tall right),
+     *         Now + Uses (stacked on left bottom)
      * ============================================ */
     .bento-section {
-      padding: 2rem;
-      padding-bottom: 6rem;
+      padding: 0 2rem 6rem;
+      display: flex;
+      justify-content: center;
     }
 
+    /* Wrapper card - uses the same glassmorphism as hero */
+    .bento-wrapper {
+      padding: 2rem;
+      max-width: 700px;
+      width: 100%;
+    }
+
+    /* Section header inside wrapper */
+    .bento-header {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .bento-header-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-accent-500, #ec4899);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .bento-header-title {
+      font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      color: var(--color-base-content, inherit);
+    }
+
+    /* Grid layout - 2 columns with named grid areas for asymmetry */
     .bento-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
-      gap: 1.25rem;
-      max-width: 800px;
-      margin: 0 auto;
+      grid-template-rows: auto auto auto;
+      grid-template-areas:
+        "writing  writing"
+        "now      photo"
+        "uses     photo";
+      gap: 1rem;
     }
 
     /* Base card styles */
     .bento-card {
       position: relative;
-      border-radius: 1.5rem;
-      padding: 1.75rem;
-      min-height: 200px;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      min-height: 140px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -534,8 +583,32 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     }
 
     .bento-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Grid area assignments */
+    .bento-writing {
+      grid-area: writing;
+    }
+    .bento-photography {
+      grid-area: photo;
+    }
+    .bento-now {
+      grid-area: now;
+    }
+    .bento-uses {
+      grid-area: uses;
+    }
+
+    /* Wide card spans full width (already via grid-area) */
+    .bento-wide {
+      min-height: 120px;
+    }
+
+    /* Tall card - photography spans 2 rows */
+    .bento-tall {
+      min-height: 280px; /* Combined height of now + uses + gap */
     }
 
     /* Card content layout */
@@ -545,49 +618,49 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     }
 
     .bento-label {
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       opacity: 0.7;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
       display: block;
     }
 
     .bento-title {
       font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: 500;
       line-height: 1.2;
-      margin: 0.5rem 0;
+      margin: 0.25rem 0;
       letter-spacing: -0.02em;
     }
 
     .bento-excerpt {
-      font-size: 0.9rem;
-      opacity: 0.75;
-      margin-top: 0.5rem;
-      line-height: 1.5;
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+      line-height: 1.4;
     }
 
     .bento-subtitle {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       margin-top: 0.25rem;
     }
 
     /* Icon positioned in corner */
     .bento-icon {
       position: absolute;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      opacity: 0.3;
+      bottom: 1rem;
+      right: 1rem;
+      opacity: 0.25;
       transition:
         opacity 0.3s ease,
         transform 0.3s ease;
     }
 
     .bento-card:hover .bento-icon {
-      opacity: 0.6;
+      opacity: 0.5;
       transform: scale(1.1);
     }
 
@@ -670,7 +743,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     .bento-card-overlay {
       position: relative;
       z-index: 1;
-      padding: 1.75rem;
+      padding: 1.5rem;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -678,7 +751,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       background: linear-gradient(
         to top,
         rgba(0, 0, 0, 0.7) 0%,
-        rgba(0, 0, 0, 0.3) 40%,
+        rgba(0, 0, 0, 0.2) 50%,
         transparent 100%
       );
       color: white;
@@ -686,6 +759,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
     .bento-card-overlay .bento-label {
       color: rgba(255, 255, 255, 0.9);
+      opacity: 1;
     }
 
     /* ============================================
@@ -694,21 +768,37 @@ const cardPhotos = rawCardPhotos?.map((card) => {
      * ============================================ */
     @media (max-width: 640px) {
       .bento-section {
-        padding: 1rem;
-        padding-bottom: 4rem;
+        padding: 0 1rem 4rem;
+      }
+
+      .bento-wrapper {
+        padding: 1.5rem;
+      }
+
+      .bento-header-title {
+        font-size: 1.25rem;
       }
 
       .bento-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        grid-template-areas:
+          "writing"
+          "photo"
+          "now"
+          "uses";
+        gap: 0.75rem;
       }
 
       .bento-card {
-        min-height: 160px;
+        min-height: 120px;
+      }
+
+      .bento-tall {
+        min-height: 200px;
       }
 
       .bento-title {
-        font-size: 1.25rem;
+        font-size: 1.1rem;
       }
     }
 
