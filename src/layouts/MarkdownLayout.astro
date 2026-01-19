@@ -294,12 +294,30 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
       });
     }
 
+    // Initialize videos for autoplay (like Ghost)
+    function initVideoAutoplay() {
+      const content = document.getElementById("markdown-content");
+      if (!content) return;
+
+      const videos = content.querySelectorAll("video");
+      videos.forEach((video) => {
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.autoplay = true;
+        video.play().catch(() => {
+          // Autoplay blocked, ignore
+        });
+      });
+    }
+
     // Initialize
     document.addEventListener("DOMContentLoaded", () => {
       generateTOC();
 
       initScrollProgress();
       initLastEditedToggle();
+      initVideoAutoplay();
 
       // Initialize Clipboard Links
       const content = document.getElementById("markdown-content");
