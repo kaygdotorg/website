@@ -384,7 +384,8 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     }
 
     // Scroll-Aware Navigation Logic
-    document.addEventListener("astro:page-load", () => {
+    // Wrapped in a function so it can run on initial load AND on View Transitions
+    function initNavScrollObserver() {
       const heroSection = document.getElementById("hero-section");
       const navContainer = document.getElementById("nav-container");
       const blurOverlay = document.getElementById("navbar-blur");
@@ -415,7 +416,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
         observer.observe(heroSection);
 
-        // Cleanup
+        // Cleanup on View Transition navigation
         document.addEventListener(
           "astro:before-swap",
           () => {
@@ -424,7 +425,13 @@ const cardPhotos = rawCardPhotos?.map((card) => {
           { once: true },
         );
       }
-    });
+    }
+
+    // Initialize on first page load
+    initNavScrollObserver();
+
+    // Re-initialize after View Transitions navigation
+    document.addEventListener("astro:page-load", initNavScrollObserver);
   </script>
 
   <style>
@@ -525,19 +532,19 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
     /* Wrapper card - uses the same glassmorphism as hero */
     .bento-wrapper {
-      padding: 2rem;
-      max-width: 700px;
+      padding: 2.5rem;
+      max-width: 900px;
       width: 100%;
     }
 
     /* Section header inside wrapper */
     .bento-header {
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
       text-align: center;
     }
 
     .bento-header-label {
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.15em;
@@ -548,7 +555,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
     .bento-header-title {
       font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-      font-size: 1.5rem;
+      font-size: 2.25rem;
       font-weight: 400;
       letter-spacing: -0.03em;
       color: var(--color-base-content, inherit);
@@ -563,15 +570,15 @@ const cardPhotos = rawCardPhotos?.map((card) => {
         "writing  writing"
         "now      photo"
         "uses     photo";
-      gap: 1rem;
+      gap: 1.5rem;
     }
 
-    /* Base card styles */
+    /* Base card styles - LARGER cards like mymind.com */
     .bento-card {
       position: relative;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      min-height: 140px;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      min-height: 200px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -583,8 +590,8 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     }
 
     .bento-card:hover {
-      transform: translateY(-3px) scale(1.01);
-      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.2);
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.25);
     }
 
     /* Grid area assignments */
@@ -601,14 +608,15 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       grid-area: uses;
     }
 
-    /* Wide card spans full width (already via grid-area) */
+    /* Wide card - Writing with extra padding */
     .bento-wide {
-      min-height: 120px;
+      min-height: 180px;
+      padding: 2.5rem;
     }
 
-    /* Tall card - photography spans 2 rows */
+    /* Tall card - Photography spans 2 rows, much taller */
     .bento-tall {
-      min-height: 280px; /* Combined height of now + uses + gap */
+      min-height: 440px;
     }
 
     /* Card content layout */
@@ -618,45 +626,50 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     }
 
     .bento-label {
-      font-size: 0.65rem;
+      font-size: 0.8rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.1em;
       opacity: 0.7;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.75rem;
       display: block;
     }
 
     .bento-title {
       font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-      font-size: 1.25rem;
+      font-size: 1.75rem;
       font-weight: 500;
       line-height: 1.2;
-      margin: 0.25rem 0;
+      margin: 0.5rem 0;
       letter-spacing: -0.02em;
     }
 
     .bento-excerpt {
-      font-size: 0.8rem;
-      opacity: 0.7;
-      margin-top: 0.25rem;
-      line-height: 1.4;
+      font-size: 1rem;
+      opacity: 0.75;
+      margin-top: 0.75rem;
+      line-height: 1.5;
     }
 
     .bento-subtitle {
-      font-size: 0.85rem;
-      margin-top: 0.25rem;
+      font-size: 1.1rem;
+      margin-top: 0.5rem;
     }
 
-    /* Icon positioned in corner */
+    /* Icon positioned in corner - larger */
     .bento-icon {
       position: absolute;
-      bottom: 1rem;
-      right: 1rem;
+      bottom: 1.5rem;
+      right: 1.5rem;
       opacity: 0.25;
       transition:
         opacity 0.3s ease,
         transform 0.3s ease;
+    }
+
+    .bento-icon svg {
+      width: 36px;
+      height: 36px;
     }
 
     .bento-card:hover .bento-icon {
