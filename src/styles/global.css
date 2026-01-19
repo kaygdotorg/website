@@ -2026,10 +2026,75 @@ body {
 
 
 
-/* Light theme variant with slightly reduced intensity */
-[data-theme="light"] .navbar-blur-overlay {
-  backdrop-filter: blur(16px) saturate(120%);
-  -webkit-backdrop-filter: blur(16px) saturate(120%);
+/* ========================================
+   Subtle Image Zoom (Lightbox)
+   A premium, blurred-background zoom effect
+   ======================================== */
+.img-zoomable {
+  cursor: zoom-in;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.img-zoomable:hover {
+  transform: scale(1.01);
+}
+
+.zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    background 0.4s ease,
+    backdrop-filter 0.4s ease,
+    opacity 0.4s ease;
+}
+
+.zoom-overlay.active {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.zoomed-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  transform: scale(0.9);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.zoom-overlay.active .zoomed-image {
+  transform: scale(1);
+}
+
+/* Ensure images in markdown/prose are zoomable by default */
+.prose img,
+.md-card-body img,
+.photo-item img {
+  cursor: zoom-in;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+.prose img:hover,
+.md-card-body img:hover,
+.photo-item img:hover {
+  transform: scale(1.01);
 }
 
 /* ========================================

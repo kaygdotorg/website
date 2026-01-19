@@ -66,6 +66,11 @@ import { ClientRouter } from "astro:transitions";
       <div class="film-vignette"></div>
     </div>
 
+    <!-- Global Image Zoom Overlay -->
+    <div id="zoom-overlay" class="zoom-overlay" aria-hidden="true">
+      <img id="zoomed-image" class="zoomed-image" src="" alt="" />
+    </div>
+
     <!-- Floating Pill Navigation -->
     <nav
       id="nav-container"
@@ -471,23 +476,26 @@ import { ClientRouter } from "astro:transitions";
         ];
 
         themeToggles.forEach((toggle) => {
+          if (!toggle) return;
           // Remove old listeners by cloning the element
-          const newToggle = toggle?.cloneNode(true);
-          toggle?.parentNode?.replaceChild(newToggle, toggle);
+          const newToggle = toggle.cloneNode(true);
+          if (newToggle && toggle.parentNode) {
+            toggle.parentNode.replaceChild(newToggle, toggle);
 
-          newToggle?.addEventListener("click", () => {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute("data-theme");
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            newToggle.addEventListener("click", () => {
+              const html = document.documentElement;
+              const currentTheme = html.getAttribute("data-theme");
+              const newTheme = currentTheme === "dark" ? "light" : "dark";
 
-            html.classList.add("theme-transitioning");
-            html.setAttribute("data-theme", newTheme);
-            localStorage.setItem("theme", newTheme);
+              html.classList.add("theme-transitioning");
+              html.setAttribute("data-theme", newTheme);
+              localStorage.setItem("theme", newTheme);
 
-            setTimeout(() => {
-              html.classList.remove("theme-transitioning");
-            }, 300);
-          });
+              setTimeout(() => {
+                html.classList.remove("theme-transitioning");
+              }, 300);
+            });
+          }
         });
       }
 
@@ -711,6 +719,60 @@ import { ClientRouter } from "astro:transitions";
         });
         (window as any).__keyboardShortcutsInitialized = true;
       }
+
+      // Initialize Image Zoom
+      function initImageZoom() {
+        const images = document.querySelectorAll(
+          ".prose img, .md-card-body img, .photo-item img",
+        );
+        const overlay = document.getElementById("zoom-overlay");
+        const zoomedImg = document.getElementById(
+          "zoomed-image",
+        ) as HTMLImageElement;
+
+        if (!overlay || !zoomedImg) return;
+
+        images.forEach((img) => {
+          // If already initialized or has no src, skip
+          if ((img as any).__zoomInitialized || !img.getAttribute("src"))
+            return;
+          (img as any).__zoomInitialized = true;
+
+          img.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const src = img.getAttribute("src");
+            const alt = img.getAttribute("alt");
+            if (src) {
+              zoomedImg.src = src;
+              zoomedImg.alt = alt || "";
+              overlay.classList.add("active");
+              document.body.style.overflow = "hidden";
+            }
+          });
+        });
+
+        // Close on overlay click
+        overlay.addEventListener("click", () => {
+          overlay.classList.remove("active");
+          document.body.style.overflow = "";
+        });
+
+        // Close on 'Esc' key if active
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && overlay.classList.contains("active")) {
+            overlay.classList.remove("active");
+            document.body.style.overflow = "";
+          }
+        });
+      }
+      initImageZoom();
+
+      // Re-init on page transitions
+      document.addEventListener("astro:page-load", () => {
+        initImageZoom();
+      });
     </script>
   </body>
 </html>

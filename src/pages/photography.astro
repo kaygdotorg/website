@@ -146,24 +146,6 @@ const categories = [...new Set(photos.map((p) => p.category))];
     </div>
   </section>
 
-  <!-- Lightbox Modal -->
-  <div id="lightbox" class="lightbox">
-    <button
-      id="lightbox-close"
-      class="lightbox-close"
-      aria-label="Close lightbox"
-    >
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M6 18L18 6M6 6l12 12"></path>
-      </svg>
-    </button>
-    <img id="lightbox-img" src="" alt="" />
-  </div>
-
   <style>
     .filter-btn {
       background: rgba(255, 255, 255, 0.05);
@@ -191,6 +173,7 @@ const categories = [...new Set(photos.map((p) => p.category))];
       background: rgba(236, 72, 153, 0.1);
       border-color: rgba(236, 72, 153, 0.3);
       color: var(--color-accent-600, #db2777);
+      opacity: 1;
     }
 
     .photo-item.hidden {
@@ -222,45 +205,6 @@ const categories = [...new Set(photos.map((p) => p.category))];
           }
         });
       });
-    });
-
-    // Lightbox functionality
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImg = document.getElementById(
-      "lightbox-img",
-    ) as HTMLImageElement;
-    const lightboxClose = document.getElementById("lightbox-close");
-
-    photoItems.forEach((item) => {
-      item.addEventListener("click", () => {
-        const src = item.getAttribute("data-src");
-        const alt = item.getAttribute("data-alt");
-
-        if (src && lightboxImg) {
-          lightboxImg.src = src;
-          lightboxImg.alt = alt || "";
-          lightbox?.classList.add("active");
-          document.body.style.overflow = "hidden";
-        }
-      });
-    });
-
-    function closeLightbox() {
-      lightbox?.classList.remove("active");
-      document.body.style.overflow = "";
-    }
-
-    lightboxClose?.addEventListener("click", closeLightbox);
-    lightbox?.addEventListener("click", (e) => {
-      if (e.target === lightbox) {
-        closeLightbox();
-      }
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && lightbox?.classList.contains("active")) {
-        closeLightbox();
-      }
     });
   </script>
 </BaseLayout>
