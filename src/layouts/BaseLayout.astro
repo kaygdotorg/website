@@ -262,7 +262,12 @@ const navLinks = [
     </nav>
 
     <!-- Progressive Blur Overlay (variable blur below navbar) -->
-    <div class="navbar-blur-overlay" aria-hidden="true"></div>
+    <div
+      id="navbar-blur"
+      class:list={["navbar-blur-overlay", hideNavInitially && "blur-hidden"]}
+      aria-hidden="true"
+    >
+    </div>
 
     <!-- Mobile Menu Overlay (centered) -->
     <div

@@ -257,19 +257,22 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     document.addEventListener("astro:page-load", () => {
       const heroSection = document.getElementById("hero-section");
       const navContainer = document.getElementById("nav-container");
+      const blurOverlay = document.getElementById("navbar-blur");
 
       if (heroSection && navContainer) {
         const observer = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
               if (!entry.isIntersecting) {
-                // Hero is out of view (scrolled past) -> Show Nav
+                // Hero is out of view (scrolled past) -> Show Nav & Blur
                 navContainer.classList.remove("nav-hidden");
                 navContainer.classList.add("nav-visible");
+                blurOverlay?.classList.remove("blur-hidden");
               } else {
-                // Hero is in view -> Hide Nav
+                // Hero is in view -> Hide Nav & Blur
                 navContainer.classList.remove("nav-visible");
                 navContainer.classList.add("nav-hidden");
+                blurOverlay?.classList.add("blur-hidden");
               }
             });
           },
@@ -295,23 +298,24 @@ const cardPhotos = rawCardPhotos?.map((card) => {
   </script>
 
   <style>
-    /* Homepage Layout - No scroll snap */
+    /* Homepage Layout */
     .homepage {
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       gap: 4rem;
-      padding: 2rem;
+      padding: 0; /* Remove padding to allow hero to fill screen */
       max-width: 1200px;
       margin: 0 auto;
     }
 
-    /* Hero Section - Center card accounting for navbar */
+    /* Hero Section - Full viewport, centered */
     .hero-section {
+      min-height: 100vh;
+      min-height: 100dvh; /* Dynamic viewport height for mobile */
       display: flex;
       align-items: center;
       justify-content: center;
-      flex: 1;
+      padding: 2rem;
     }
 
     .hero-card {
