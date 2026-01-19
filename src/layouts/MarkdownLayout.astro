@@ -500,9 +500,81 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
       }, 3000);
     }
 
+    // Lightbox Logic
+    function initLightbox() {
+      // Create overlay if it doesn't exist
+      let overlay = document.querySelector(".lightbox-overlay");
+      if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.className = "lightbox-overlay";
+        overlay.innerHTML = `
+          <div class="lightbox-close">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+
+        // Close logic
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay || e.target.closest(".lightbox-close")) {
+            closeLightbox();
+          }
+        });
+
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && overlay.classList.contains("active")) {
+            closeLightbox();
+          }
+        });
+      }
+
+      function openLightbox(imgSrc) {
+        // Remove existing image if any
+        const existingImg = overlay.querySelector(".lightbox-image");
+        if (existingImg) {
+          existingImg.remove();
+        }
+
+        const img = document.createElement("img");
+        img.src = imgSrc;
+        img.className = "lightbox-image";
+        overlay.appendChild(img);
+
+        // Prevent body scroll
+        document.body.style.overflow = "hidden";
+
+        // Show overlay with slight delay for transition
+        setTimeout(() => {
+          overlay.classList.add("active");
+        }, 10);
+      }
+
+      function closeLightbox() {
+        overlay.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      // Attach listeners to all images in the content card
+      const contentImages = document.querySelectorAll(".md-unified-card img");
+      contentImages.forEach((img) => {
+        img.addEventListener("click", (e) => {
+          e.stopPropagation(); // Prevent other clicks
+          openLightbox(img.src);
+        });
+      });
+    }
+
     // Make toggleCard available globally (safer assignment)
     if (typeof window.toggleCard === "undefined") {
       window.toggleCard = toggleCard;
     }
+
+    // Run initLightbox inside DOMContentLoaded
+    document.addEventListener("DOMContentLoaded", () => {
+      // ... existing calls ...
+      initLightbox();
+    });
   </script>
 </BaseLayout>
