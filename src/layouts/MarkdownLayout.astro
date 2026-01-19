@@ -221,6 +221,9 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
         return;
       }
 
+      // Clear existing TOC to prevent duplicates on re-init
+      tocList.innerHTML = "";
+
       headings.forEach((heading, index) => {
         // Add ID to heading if not present
         if (!heading.id) {
@@ -350,6 +353,7 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
     function initMarkdownFeatures() {
       wrapHeadingText();
       generateTOC();
+      initCallouts();
       initScrollProgress();
       initLastEditedToggle();
       initVideoAutoplay();
@@ -360,6 +364,60 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
         initHeadingClipboard(content);
         content.dataset.clipboardInitialized = "true";
       }
+    }
+
+    // Transform Obsidian-style callouts [!TYPE] into floating cards
+    function initCallouts() {
+      const content = document.getElementById("markdown-content");
+      if (!content) return;
+
+      const blockquotes = content.querySelectorAll("blockquote");
+      blockquotes.forEach((bq) => {
+        // Only process if it starts with the [!TYPE] marker
+        const firstP = bq.querySelector("p") || bq;
+        const text = firstP.innerText.trim();
+
+        const match = text.match(/^\[!(\w+)\]\s*(.*)/i);
+        if (match) {
+          const type = match[1].toLowerCase();
+          const title = match[2];
+
+          bq.classList.add("callout-card", `callout-${type}`);
+
+          // Create the header with italicized type label
+          const header = document.createElement("div");
+          header.className = "callout-header";
+
+          const typeLabel = document.createElement("span");
+          typeLabel.className = "callout-type";
+          typeLabel.innerHTML = `<em>${type}</em>`;
+          header.appendChild(typeLabel);
+
+          if (title) {
+            const titleSpan = document.createElement("span");
+            titleSpan.className = "callout-title";
+            titleSpan.textContent = title;
+            header.appendChild(titleSpan);
+          }
+
+          // Prepend header
+          bq.insertBefore(header, bq.firstChild);
+
+          // Clean up the raw marker text from the first paragraph/node
+          // Use innerHTML for the replacement to preserve other formatting if any
+          const rawMatch = firstP.innerHTML.match(/^\[!(\w+)\]\s*(.*)/i);
+          if (rawMatch) {
+            firstP.innerHTML = firstP.innerHTML
+              .replace(/^\[!(\w+)\]\s*(.*)/i, "")
+              .trim();
+          }
+
+          // Remove paragraph if it's now empty
+          if (firstP.innerHTML === "" && firstP !== bq) {
+            firstP.remove();
+          }
+        }
+      });
     }
 
     // Helper for clipboard initialization
