@@ -1055,18 +1055,24 @@ html[data-theme="light"] body {
   margin: 2rem auto;
 }
 
-@media (min-width: 900px) {
-  .md-card-body .md-card-content figure {
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-  }
+/* Breakout: Images and videos expand to 900px max on larger screens */
+@media (min-width: 960px) {
 
+  .md-card-body .md-card-content figure,
   .md-card-body .md-card-content img,
   .md-card-body .md-card-content video {
     max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
+    width: calc(100% + 180px);
+    margin-left: -90px;
+    margin-right: -90px;
+  }
+
+  .md-card-body .md-card-content figure img,
+  .md-card-body .md-card-content figure video {
+    /* Reset for items inside figures */
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 
