@@ -2478,25 +2478,26 @@ html.theme-transitioning *::after {
   opacity: 1;
 }
 
-/* Search modal card - minimal container, no visible border */
+/* Search modal card - localized pill/container for search results */
 .search-modal-card {
   transform: translateY(-20px) scale(0.95);
   opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
   max-height: 80vh;
-  overflow: hidden;
+  overflow-y: auto;
+  border-radius: 24px;
+  /* Enhanced frosted effect for search specifically */
+  background: rgba(15, 10, 22, 0.85) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.5), 0 18px 36px -18px rgba(0, 0, 0, 0.5) !important;
 }
 
-.search-modal-card.frosted-card {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 24px !important;
-}
-
-.search-modal-card.frosted-card::before {
-  display: none !important;
-  /* Hide grain texture */
+[data-theme="light"] .search-modal-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.1), 0 18px 36px -18px rgba(0, 0, 0, 0.1) !important;
 }
 
 .search-modal-container.search-open .search-modal-card {
@@ -2514,7 +2515,11 @@ html.theme-transitioning *::after {
   --pagefind-ui-tag: rgba(255, 255, 255, 0.1);
   --pagefind-ui-border-width: 1px;
   --pagefind-ui-border-radius: 12px;
-  --pagefind-ui-font: "IBM Plex Sans", system-ui, sans-serif;
+  --pagefind-ui-font: var(--font-body, system-ui, sans-serif);
+}
+
+#search-container {
+  padding: 1.5rem;
 }
 
 [data-theme="light"] .pagefind-ui {
@@ -2537,30 +2542,32 @@ html.theme-transitioning *::after {
 }
 
 .pagefind-ui__search-input {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  font-size: 1rem !important;
-  height: 48px !important;
-  padding: 0 4rem 0 3rem !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-size: 1.1rem !important;
+  height: 54px !important;
+  padding: 0 4rem 0 3.5rem !important;
   /* Space for search icon left, clear button right */
   border-radius: 9999px !important;
   /* Capsule shape */
   color: var(--pagefind-ui-text) !important;
+  transition: all 0.3s ease !important;
 }
 
 [data-theme="light"] .pagefind-ui__search-input {
-  background: rgba(0, 0, 0, 0.05) !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background: rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
 }
 
 .pagefind-ui__search-input:focus {
-  outline: none !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(236, 72, 153, 0.5) !important;
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1) !important;
 }
 
 [data-theme="light"] .pagefind-ui__search-input:focus {
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(236, 72, 153, 0.4) !important;
 }
 
 /* Clear button - position at right side */
@@ -2599,17 +2606,17 @@ html.theme-transitioning *::after {
 }
 
 .pagefind-ui__result {
-  padding: 1rem !important;
-  margin-bottom: 0.5rem;
-  border-radius: 12px !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
-  background: rgba(255, 255, 255, 0.02) !important;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  padding: 1.25rem !important;
+  margin-bottom: 0.75rem;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  transition: all 0.2s ease;
 }
 
 [data-theme="light"] .pagefind-ui__result {
-  border: 1px solid rgba(0, 0, 0, 0.05) !important;
-  background: rgba(0, 0, 0, 0.01) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  background: rgba(0, 0, 0, 0.02) !important;
 }
 
 .pagefind-ui__result:hover {
