@@ -8,7 +8,6 @@ tags:
   - "Blog"
   - "MacOS"
   - "Safari"
-draft: false
 image: "https://images.unsplash.com/photo-1683113028948-4b716d1a18d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=2000"
 ---
 

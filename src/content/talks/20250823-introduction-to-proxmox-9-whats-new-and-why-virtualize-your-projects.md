@@ -3,7 +3,8 @@ title: "Introduction to Proxmox 9: What's New and Why Virtualize Your Projects?"
 description: "Proxmox 9 was recently released and brings in a lot of features that might cater to the advanced. However, with this new release, they bring an end to one of my biggest complaints to Proxmox: the mobile UI - it simply sucked: both the mobile web and mobile app. "
 date: "2025-08-23T18:47:00.000+05:30"
 last edited: "2025-09-07T16:06:37.000+05:30"
-image: "./20250823-introduction-to-proxmox-9-whats-new-and-why-virtualize-your-projects/cover-1768837884870.jpeg"
+draft: true
+image: "./20250823-introduction-to-proxmox-9-whats-new-and-why-virtualize-your-projects/cover-1768838912486.jpeg"
 ---
 
 > [!NOTE] Event Details

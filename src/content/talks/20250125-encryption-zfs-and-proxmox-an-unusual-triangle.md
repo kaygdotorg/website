@@ -4,7 +4,7 @@ description: "Encryption is all the buzz these days. In a hypervisor environment
 date: "2025-01-25T14:30:00.000+05:30"
 last edited: "2025-09-08T14:42:30.000+05:30"
 draft: true
-image: "./20250125-encryption-zfs-and-proxmox-an-unusual-triangle/cover-1768837885216.jpeg"
+image: "./20250125-encryption-zfs-and-proxmox-an-unusual-triangle/cover-1768838912832.jpeg"
 ---
 
 > [!NOTE] Presentation Details

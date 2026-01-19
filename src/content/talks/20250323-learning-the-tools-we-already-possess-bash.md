@@ -4,7 +4,7 @@ description: "This presentation will contain lots of tips and tricks from the bo
 date: "2025-03-23T13:31:00.000+05:30"
 last edited: "2025-09-08T14:33:44.000+05:30"
 draft: true
-image: "./20250323-learning-the-tools-we-already-possess-bash/cover-1768837885017.png"
+image: "./20250323-learning-the-tools-we-already-possess-bash/cover-1768838912634.png"
 ---
 
 > [!NOTE] Event Details
