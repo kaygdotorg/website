@@ -346,142 +346,112 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
       });
     }
 
-    // Initialize
-    document.addEventListener("DOMContentLoaded", () => {
+    // Initialize all markdown features
+    function initMarkdownFeatures() {
       wrapHeadingText();
       generateTOC();
-
       initScrollProgress();
       initLastEditedToggle();
       initVideoAutoplay();
 
-      // Initialize Clipboard Links (works on both desktop and mobile)
+      // Initialize Clipboard Links
       const content = document.getElementById("markdown-content");
-      if (content) {
-        function copyHeadingLink(heading) {
-          if (heading && heading.id) {
-            const url = `${window.location.origin}${window.location.pathname}#${heading.id}`;
-            console.log("Attempting to copy:", url);
+      if (content && !content.dataset.clipboardInitialized) {
+        initHeadingClipboard(content);
+        content.dataset.clipboardInitialized = "true";
+      }
+    }
 
-            // Add visual feedback for mobile
-            heading.classList.add("tapped");
-            setTimeout(() => {
-              heading.classList.remove("tapped");
-            }, 3000);
+    // Helper for clipboard initialization
+    function initHeadingClipboard(content) {
+      function copyHeadingLink(heading) {
+        if (heading && heading.id) {
+          const url = `${window.location.origin}${window.location.pathname}#${heading.id}`;
+          heading.classList.add("tapped");
+          setTimeout(() => heading.classList.remove("tapped"), 3000);
 
-            // Try modern API first
-            if (navigator.clipboard && window.isSecureContext) {
-              navigator.clipboard
-                .writeText(url)
-                .then(() => {
-                  console.log("Clipboard API success");
-                  showToast("Link copied to clipboard!");
-                })
-                .catch((err) => {
-                  console.error("Clipboard API failed, trying fallback:", err);
-                  fallbackCopyTextToClipboard(url);
-                });
-            } else {
-              // Fallback for non-secure contexts or missing API
-              fallbackCopyTextToClipboard(url);
-            }
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard
+              .writeText(url)
+              .then(() => showToast("Link copied to clipboard!"))
+              .catch(() => fallbackCopyTextToClipboard(url));
+          } else {
+            fallbackCopyTextToClipboard(url);
           }
         }
+      }
 
-        function fallbackCopyTextToClipboard(text) {
-          const textArea = document.createElement("textarea");
-          textArea.value = text;
+      function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          if (document.execCommand("copy"))
+            showToast("Link copied to clipboard!");
+        } catch (err) {}
+        document.body.removeChild(textArea);
+      }
 
-          // Ensure it's not visible and doesn't scroll the page
-          textArea.style.position = "fixed";
-          textArea.style.left = "-9999px";
-          textArea.style.top = "0";
-          document.body.appendChild(textArea);
-          textArea.focus();
-          textArea.select();
-
-          try {
-            const successful = document.execCommand("copy");
-            if (successful) {
-              console.log("Fallback copy success");
-              showToast("Link copied to clipboard!");
-            } else {
-              console.error("Fallback copy failed");
-            }
-          } catch (err) {
-            console.error("Fallback copy error:", err);
-          }
-
-          document.body.removeChild(textArea);
+      function handleHeadingInteraction(e) {
+        const link = e.target.closest(".heading-link");
+        if (link) {
+          e.preventDefault();
+          e.stopPropagation();
+          copyHeadingLink(link.closest("h1, h2, h3, h4, h5, h6"));
+          return;
         }
-
-        function handleHeadingInteraction(e) {
-          console.log("Heading interaction triggered", e.type);
-          // Check if clicked on heading-link icon
-          const link = e.target.closest(".heading-link");
-          if (link) {
-            e.preventDefault();
-            e.stopPropagation();
-            const heading = link.closest("h1, h2, h3, h4, h5, h6");
-            copyHeadingLink(heading);
-            return;
-          }
-
-          // Check if clicked on heading text itself (not links or other interactive elements)
-          const heading = e.target.closest("h2, h3, h4");
-          if (heading && !e.target.closest("a:not(.heading-link)")) {
-            e.preventDefault();
-            e.stopPropagation();
-            copyHeadingLink(heading);
-          }
+        const heading = e.target.closest("h2, h3, h4");
+        if (heading && !e.target.closest("a:not(.heading-link)")) {
+          e.preventDefault();
+          e.stopPropagation();
+          copyHeadingLink(heading);
         }
+      }
 
-        // Robust tap detection for mobile
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let touchStartTime = 0;
-
-        function handleTouchStart(e) {
+      let touchStartX = 0,
+        touchStartY = 0,
+        touchStartTime = 0;
+      content.addEventListener(
+        "touchstart",
+        (e) => {
           const touch = e.changedTouches[0];
           touchStartX = touch.clientX;
           touchStartY = touch.clientY;
           touchStartTime = Date.now();
-        }
+        },
+        { passive: true },
+      );
 
-        function handleTouchEnd(e) {
+      content.addEventListener(
+        "touchend",
+        (e) => {
           const touch = e.changedTouches[0];
-          const touchEndX = touch.clientX;
-          const touchEndY = touch.clientY;
-          const touchEndTime = Date.now();
-
-          const dx = Math.abs(touchEndX - touchStartX);
-          const dy = Math.abs(touchEndY - touchStartY);
-          const dt = touchEndTime - touchStartTime;
-
-          // If movement is less than 10px and duration is less than 300ms, it's a tap
+          const dx = Math.abs(touch.clientX - touchStartX);
+          const dy = Math.abs(touch.clientY - touchStartY);
+          const dt = Date.now() - touchStartTime;
           if (dx < 10 && dy < 10 && dt < 300) {
             const heading = e.target.closest("h2, h3, h4");
             const link = e.target.closest(".heading-link");
-
             if (heading || link) {
-              // Only prevent default if it's a confirmed tap on the target
-              console.log("Confirmed tap on heading");
               e.preventDefault();
               handleHeadingInteraction(e);
             }
           }
-        }
+        },
+        { passive: false },
+      );
 
-        content.addEventListener("touchstart", handleTouchStart, {
-          passive: true,
-        });
-        content.addEventListener("touchend", handleTouchEnd, {
-          passive: false,
-        });
-        // Still keep click for desktop but it won't fire if preventDefault was called on touchend
-        content.addEventListener("click", handleHeadingInteraction);
-      }
-    });
+      content.addEventListener("click", handleHeadingInteraction);
+    }
+
+    // Initialize on load and on page transitions
+    document.addEventListener("DOMContentLoaded", initMarkdownFeatures);
+    document.addEventListener("astro:page-load", initMarkdownFeatures);
 
     function showToast(message) {
       let toast = document.getElementById("toast-notification");
