@@ -2001,31 +2001,29 @@ body {
   max-width: 0;
   overflow: hidden;
   white-space: nowrap;
-  transition: max-width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease, margin 0.4s ease;
+  transition:
+    max-width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.3s ease,
+    margin 0.4s ease;
   opacity: 0;
 }
 
 #search-toggle-desktop:hover .search-expand-label {
-  max-width: 200px;
+  max-width: 250px;
   opacity: 1;
-  margin-left: 0.75rem;
+  margin-left: 0.5rem;
   margin-right: 0.5rem;
 }
 
 .search-pill {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-  border-radius: 9999px;
-  background: rgba(var(--color-base-content-rgb), 0.05);
-  border: 1px solid rgba(var(--color-base-content-rgb), 0.1);
   transition: all 0.3s ease;
 }
 
 #search-toggle-desktop:hover .search-pill {
-  background: rgba(var(--color-base-content-rgb), 0.1);
-  border-color: rgba(var(--color-base-content-rgb), 0.2);
+  /* Subtle emphasis when expanding */
+  background: rgba(var(--color-base-content-rgb), 0.05);
 }
+
 
 
 /* Light theme variant with slightly reduced intensity */
