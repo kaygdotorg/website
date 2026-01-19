@@ -12,13 +12,10 @@ if (!homeEntry) {
 
 const { Content } = await homeEntry.render();
 
-// Fetch entries from now, uses, and writing collections
+// Fetch entries from now, uses, and blog collections
 const nowEntries = await getCollection("now");
 const usesEntries = await getCollection("uses");
-const writingEntries = await getCollection(
-  "writing",
-  ({ data }) => !data.draft,
-);
+const blogEntries = await getCollection("blog", ({ data }) => !data.draft);
 const talksEntries = await getCollection("talks");
 const notesEntries = await getCollection("notes", ({ data }) => !data.draft);
 
@@ -31,8 +28,8 @@ const latestUses = usesEntries.sort(
 )[0];
 
 // Get latest entries for bento cards
-const latestWriting = writingEntries.sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+const latestBlog = blogEntries.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 )[0];
 const latestTalk = talksEntries.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -164,22 +161,21 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
         <div class="bento-grid">
           <!-- Card 1: Latest Writing (spans 2 columns - wide at top) -->
-          <!-- Card 1: Latest Writing (wide at top) -->
           <a
-            href={latestWriting ? `/blog/${latestWriting.slug}` : "/blog"}
-            class="bento-card bento-writing bento-wide"
+            href={latestBlog ? `/blog/${latestBlog.slug}` : "/blog"}
+            class="bento-card bento-blog bento-wide"
           >
             <div class="bento-card-header">
               <span class="bento-label">Latest Writing</span>
               <h3 class="bento-title">
-                {latestWriting?.data.title || "Explore my thoughts"}
+                {latestBlog?.data.title || "Explore my thoughts"}
               </h3>
             </div>
             {
-              latestWriting && (
+              latestBlog && (
                 <div class="bento-card-body">
                   <p class="bento-excerpt">
-                    {latestWriting.data.description || "Read my latest post →"}
+                    {latestBlog.data.description || "Read my latest post →"}
                   </p>
                 </div>
               )
@@ -640,7 +636,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       grid-template-columns: 1fr 1fr;
       grid-template-rows: auto auto auto;
       grid-template-areas:
-        "writing  writing"
+        "blog  blog"
         "now      photo"
         "uses     photo"
         "talks    notes";
@@ -669,8 +665,8 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     }
 
     /* Grid area assignments */
-    .bento-writing {
-      grid-area: writing;
+    .bento-blog {
+      grid-area: blog;
     }
     .bento-photography {
       grid-area: photo;
@@ -762,8 +758,8 @@ const cardPhotos = rawCardPhotos?.map((card) => {
      * Coordinated palette matching mymind.com
      * ============================================ */
 
-    /* Writing card - Soft peach */
-    .bento-writing {
+    /* Blog card - Soft peach */
+    .bento-blog {
       background: #fdf2f0;
       color: #5a3d3d;
     }
@@ -802,7 +798,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
      * Individual Card Colors - Dark Mode
      * Muted, desaturated versions
      * ============================================ */
-    :root[data-theme="dark"] .bento-writing {
+    :root[data-theme="dark"] .bento-blog {
       background: #2a1f1e;
       color: #e0cccc;
     }
@@ -936,7 +932,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       .bento-grid {
         grid-template-columns: 1fr;
         grid-template-areas:
-          "writing"
+          "blog"
           "photo"
           "now"
           "uses"
