@@ -570,11 +570,5 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
     if (typeof window.toggleCard === "undefined") {
       window.toggleCard = toggleCard;
     }
-
-    // Run initLightbox inside DOMContentLoaded
-    document.addEventListener("DOMContentLoaded", () => {
-      // ... existing calls ...
-      initLightbox();
-    });
   </script>
 </BaseLayout>

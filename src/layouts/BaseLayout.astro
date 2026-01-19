@@ -21,6 +21,8 @@ const navLinks = [
   { href: "/photography", label: "Photography" },
   { href: "/writing", label: "Writing" },
 ];
+
+import { ClientRouter } from "astro:transitions";
 ---
 
 <!doctype html>
@@ -32,6 +34,7 @@ const navLinks = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <ClientRouter />
     <!-- Fonts are now self-hosted via fontsource -->
     <!-- Theme detection: respects system preference, allows override -->
     <script is:inline>
