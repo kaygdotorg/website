@@ -116,7 +116,9 @@ const cardPhotos = rawCardPhotos?.map((card) => {
                   ))}
                 </div>
               </div>
-              <p class="hero-cards-hint">swipe to shuffle · tap to navigate</p>
+              <p class="hero-cards-hint">
+                swipe to shuffle · tap to navigate · scroll to explore
+              </p>
             </div>
           )
         }
@@ -127,30 +129,6 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     <section class="bento-section">
       <p class="bento-placeholder">Bento grid coming soon...</p>
     </section>
-
-    <!-- Footer Message -->
-    {
-      quote && (
-        <section class="footer-section">
-          <div class="grainy-card-homepage footer-card">
-            <p class="footer-quote">"{quote}"</p>
-            {email && (
-              <a href={`mailto:${email}`} class="footer-cta">
-                <span>get in touch</span>
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </a>
-            )}
-          </div>
-        </section>
-      )
-    }
   </main>
 
   <!-- Card Hand Swipe Script -->
@@ -284,13 +262,12 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       margin: 0 auto;
     }
 
-    /* Hero Section */
+    /* Hero Section - Center card accounting for navbar */
     .hero-section {
-      min-height: 80vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding-top: 4rem;
+      flex: 1;
     }
 
     .hero-card {
@@ -423,8 +400,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       }
 
       .hero-section {
-        min-height: 70vh;
-        padding-top: 2rem;
+        flex: 1;
       }
 
       .hero-card {

@@ -174,6 +174,39 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
       }
     }
 
+    // Wrap heading text content in spans for squiggly underline targeting
+    function wrapHeadingText() {
+      const content = document.getElementById("markdown-content");
+      if (!content) return;
+
+      const headings = content.querySelectorAll("h2, h3, h4");
+      headings.forEach((heading) => {
+        // Skip if already wrapped
+        if (heading.querySelector(".heading-text")) return;
+
+        // Get the heading link if present
+        const headingLink = heading.querySelector(".heading-link");
+
+        // Create wrapper span for text content only
+        const textSpan = document.createElement("span");
+        textSpan.className = "heading-text";
+
+        // Move all child nodes except .heading-link into the span
+        const nodesToMove = [];
+        heading.childNodes.forEach((node) => {
+          if (
+            node !== headingLink &&
+            !node.classList?.contains("heading-link")
+          ) {
+            nodesToMove.push(node);
+          }
+        });
+
+        nodesToMove.forEach((node) => textSpan.appendChild(node));
+        heading.insertBefore(textSpan, heading.firstChild);
+      });
+    }
+
     // Generate TOC from headings
     function generateTOC() {
       const content = document.getElementById("markdown-content");
@@ -199,7 +232,9 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
 
         const a = document.createElement("a");
         a.href = `#${heading.id}`;
-        a.textContent = heading.textContent;
+        // Get text from heading-text span or fallback to textContent
+        const textSpan = heading.querySelector(".heading-text");
+        a.textContent = textSpan ? textSpan.textContent : heading.textContent;
 
         li.appendChild(a);
         tocList.appendChild(li);
@@ -313,37 +348,84 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
 
     // Initialize
     document.addEventListener("DOMContentLoaded", () => {
+      wrapHeadingText();
       generateTOC();
 
       initScrollProgress();
       initLastEditedToggle();
       initVideoAutoplay();
 
-      // Initialize Clipboard Links
+      // Initialize Clipboard Links (works on both desktop and mobile)
       const content = document.getElementById("markdown-content");
       if (content) {
-        content.addEventListener("click", (e) => {
-          // Check if we clicked the link or any children of the link (like the SVG)
+        function copyHeadingLink(heading) {
+          if (heading && heading.id) {
+            const url = `${window.location.origin}${window.location.pathname}#${heading.id}`;
+
+            // Add visual feedback for mobile
+            heading.classList.add("tapped");
+            setTimeout(() => {
+              heading.classList.remove("tapped");
+            }, 300);
+
+            navigator.clipboard
+              .writeText(url)
+              .then(() => {
+                showToast("Link copied to clipboard!");
+              })
+              .catch((err) => {
+                console.error("Could not copy text: ", err);
+              });
+          }
+        }
+
+        function handleHeadingInteraction(e) {
+          // Check if clicked on heading-link icon
           const link = e.target.closest(".heading-link");
           if (link) {
             e.preventDefault();
             e.stopPropagation();
-
-            // Find the closest heading (the link is usually inside the heading)
             const heading = link.closest("h1, h2, h3, h4, h5, h6");
-            if (heading && heading.id) {
-              const url = `${window.location.origin}${window.location.pathname}#${heading.id}`;
-              navigator.clipboard
-                .writeText(url)
-                .then(() => {
-                  showToast("Link copied to clipboard!");
-                })
-                .catch((err) => {
-                  console.error("Could not copy text: ", err);
-                });
-            }
+            copyHeadingLink(heading);
+            return;
           }
-        });
+
+          // Check if clicked on heading text itself (not links or other interactive elements)
+          const heading = e.target.closest("h2, h3, h4");
+          if (heading && !e.target.closest("a:not(.heading-link)")) {
+            e.preventDefault();
+            e.stopPropagation();
+            copyHeadingLink(heading);
+          }
+        }
+
+        // Use both touchend and click, with a flag to prevent double firing
+        let touchHandled = false;
+
+        function handleTouch(e) {
+          const heading = e.target.closest("h2, h3, h4");
+          const link = e.target.closest(".heading-link");
+
+          if (heading || link) {
+            // Prevent text selection on touch
+            e.preventDefault();
+            touchHandled = true;
+            handleHeadingInteraction(e);
+            // Reset flag after a short delay
+            setTimeout(() => {
+              touchHandled = false;
+            }, 300);
+          }
+        }
+
+        function handleClick(e) {
+          // Skip if already handled by touch
+          if (touchHandled) return;
+          handleHeadingInteraction(e);
+        }
+
+        content.addEventListener("touchend", handleTouch, { passive: false });
+        content.addEventListener("click", handleClick);
       }
     });
 

@@ -1,9 +1,8 @@
 /* Local fonts via fontsource */
-@import "@fontsource/nunito/latin-300.css";
-@import "@fontsource/nunito/latin-400.css";
-@import "@fontsource/nunito/latin-500.css";
-@import "@fontsource/nunito/latin-600.css";
-@import "@fontsource/nunito/latin-700.css";
+@import "@fontsource/dm-sans/latin-400.css";
+@import "@fontsource/dm-sans/latin-500.css";
+@import "@fontsource/dm-sans/latin-600.css";
+@import "@fontsource/dm-sans/latin-700.css";
 @import "@fontsource/playfair-display/latin-400.css";
 @import "@fontsource/playfair-display/latin-500.css";
 @import "@fontsource/playfair-display/latin-600.css";
@@ -18,8 +17,8 @@
 
 @theme {
   --font-heading: "Playfair Display", Georgia, serif;
-  --font-display: "Nunito", system-ui, sans-serif;
-  --font-body: "Nunito", system-ui, sans-serif;
+  --font-display: "DM Sans", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
 
   /* Hot Pink accent palette */
   --color-accent-50: #fdf2f8;
@@ -780,6 +779,26 @@ html[data-theme="light"] body {
   margin: 0;
 }
 
+/* TOC Floating Card Styling - creates depth and separation */
+.md-card-toc {
+  margin: 0 1rem 1rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .md-card-toc {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
 .md-card-toc .md-card-header h2 {
   font-size: 1.5rem;
   /* Larger font size for TOC header */
@@ -965,11 +984,12 @@ html[data-theme="light"] body {
 
 .md-card-body .md-card-content h2 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: 1.75rem;
-  font-weight: 500;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  /* Larger than body text */
+  font-weight: 600;
   color: #ffffff;
   margin: 2.5rem 0 1rem;
-  letter-spacing: -0.08em;
+  letter-spacing: -0.06em;
   line-height: 1.2;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
@@ -978,22 +998,47 @@ html[data-theme="light"] body {
   margin-top: 0;
 }
 
+[data-theme="light"] .md-card-body .md-card-content h2 {
+  color: rgba(0, 0, 0, 0.9);
+  text-shadow: none;
+}
+
 .md-card-body .md-card-content h3 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: 1.4rem;
+  font-size: clamp(1.375rem, 3.5vw, 1.75rem);
+  /* Larger than body text */
   font-weight: 500;
   color: #ffffff;
   opacity: 0.95;
   margin: 2rem 0 0.75rem;
-  letter-spacing: -0.08em;
+  letter-spacing: -0.06em;
   line-height: 1.25;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .md-card-body .md-card-content h3 {
+  color: rgba(0, 0, 0, 0.85);
+  text-shadow: none;
 }
 
 .md-card-body .md-card-content p {
   margin: 2rem 0;
   /* More breathing room between paragraphs */
   opacity: 0.95;
+  font-size: 1.1875rem;
+  /* Match body line-height font size */
+}
+
+/* Drop cap for first paragraph - elegant article intro */
+.md-card-body .md-card-content>p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+  font-size: 3.5em;
+  line-height: 0.8;
+  padding-right: 0.1em;
+  margin-top: 0.1em;
+  color: var(--color-accent-400, #f472b6);
+  font-weight: 600;
 }
 
 .md-card-body .md-card-content ul,
@@ -1023,6 +1068,8 @@ html[data-theme="light"] body {
 .md-card-body .md-card-content li {
   margin: 0.75rem 0;
   opacity: 0.95;
+  font-size: 1.1875rem;
+  /* Match paragraph font size */
 }
 
 /* Blockquote / Callout styling */
@@ -1049,6 +1096,23 @@ html[data-theme="light"] body {
 }
 
 /* ========================================
+   Horizontal Rules (Section Breaks)
+   ======================================== */
+
+.md-card-body .md-card-content hr {
+  border: none;
+  height: 2px;
+  margin: 3rem auto;
+  max-width: 200px;
+  background: linear-gradient(90deg, transparent, var(--color-accent-500, #ec4899), transparent);
+  opacity: 0.6;
+}
+
+[data-theme="light"] .md-card-body .md-card-content hr {
+  background: linear-gradient(90deg, transparent, var(--color-accent-600, #db2777), transparent);
+}
+
+/* ========================================
    Media: Images, Videos & Captions
    ======================================== */
 
@@ -1064,8 +1128,14 @@ html[data-theme="light"] body {
   display: block;
   max-width: 100%;
   height: auto;
-  border-radius: 1rem;
+  border-radius: 1.25rem;
   margin: 2rem auto;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 20px;
+}
+
+[data-theme="light"] .md-card-body .md-card-content img,
+[data-theme="light"] .md-card-body .md-card-content video {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 20px;
 }
 
 /* Breakout: Images and videos expand to 900px max on larger screens */
@@ -1249,8 +1319,56 @@ html[data-theme="light"] body {
 }
 
 /* ========================================
-   Heading Links (Clipboard)
+   Heading Links (Clipboard) with Squiggly Underline
    ======================================== */
+
+/* Headings in content - wrapped in pseudo-block for proper layout while keeping inline for underline */
+.md-card-body .md-card-content h2,
+.md-card-body .md-card-content h3,
+.md-card-body .md-card-content h4 {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+/* Inner span wraps text content for inline squiggly underline */
+.md-card-body .md-card-content h2>.heading-text,
+.md-card-body .md-card-content h3>.heading-text,
+.md-card-body .md-card-content h4>.heading-text {
+  display: inline;
+  position: relative;
+}
+
+/* Squiggly underline on hover - appears under the heading text span */
+.md-card-body .md-card-content h2>.heading-text::after,
+.md-card-body .md-card-content h3>.heading-text::after,
+.md-card-body .md-card-content h4>.heading-text::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 4px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4'%3E%3Cpath d='M0 3 Q 5 0, 10 3 T 20 3' stroke='%23ec4899' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 20px 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.md-card-body .md-card-content h2:hover>.heading-text::after,
+.md-card-body .md-card-content h3:hover>.heading-text::after,
+.md-card-body .md-card-content h4:hover>.heading-text::after {
+  opacity: 1;
+}
+
+/* Also show underline when heading-link is visible */
+.md-card-body .md-card-content h2:has(.heading-link:hover)>.heading-text::after,
+.md-card-body .md-card-content h3:has(.heading-link:hover)>.heading-text::after,
+.md-card-body .md-card-content h4:has(.heading-link:hover)>.heading-text::after {
+  opacity: 1;
+}
 
 .heading-link {
   display: inline-flex;
@@ -1262,12 +1380,15 @@ html[data-theme="light"] body {
   color: var(--color-accent-500);
   vertical-align: middle;
   cursor: pointer;
+  /* Make the entire heading clickable on mobile */
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* Show heading link on hover (desktop) */
 h2:hover .heading-link,
 h3:hover .heading-link,
 h4:hover .heading-link {
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
 .heading-link:hover {
@@ -1278,6 +1399,28 @@ h4:hover .heading-link {
 .heading-link svg {
   width: 1em;
   height: 1em;
+}
+
+/* Mobile: enable tap-to-copy with visual touch feedback */
+@media (max-width: 768px) {
+  .heading-link {
+    display: none;
+  }
+
+  /* Keep cursor as pointer for tappable headings on mobile */
+  .md-card-body .md-card-content h2,
+  .md-card-body .md-card-content h3,
+  .md-card-body .md-card-content h4 {
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(236, 72, 153, 0.2);
+  }
+
+  /* Show squiggly underline briefly on tap via .tapped class */
+  .md-card-body .md-card-content h2.tapped>.heading-text::after,
+  .md-card-body .md-card-content h3.tapped>.heading-text::after,
+  .md-card-body .md-card-content h4.tapped>.heading-text::after {
+    opacity: 1;
+  }
 }
 
 /* Toast Notification - Frosted glass with subtle pink */
@@ -1752,6 +1895,45 @@ body {
     transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ========================================
+   Progressive Blur Overlay (Variable Blur)
+   Creates a gradient blur effect below navbar
+   ======================================== */
+
+.navbar-blur-overlay {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 56rem;
+  /* Match navbar max-width (max-w-4xl) on desktop */
+  height: 120px;
+  z-index: 40;
+  pointer-events: none;
+
+  /* The blur effect */
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+
+  /* Gradient mask: fully visible at top, fading to transparent at bottom */
+  -webkit-mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.8) 30%,
+      rgba(0, 0, 0, 0.4) 60%,
+      rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.8) 30%,
+      rgba(0, 0, 0, 0.4) 60%,
+      rgba(0, 0, 0, 0) 100%);
+}
+
+/* Light theme variant with slightly reduced intensity */
+[data-theme="light"] .navbar-blur-overlay {
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+}
 
 /* ========================================
    Photo Deck / Shuffle Cards
