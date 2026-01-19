@@ -361,25 +361,62 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
         function copyHeadingLink(heading) {
           if (heading && heading.id) {
             const url = `${window.location.origin}${window.location.pathname}#${heading.id}`;
+            console.log("Attempting to copy:", url);
 
             // Add visual feedback for mobile
             heading.classList.add("tapped");
             setTimeout(() => {
               heading.classList.remove("tapped");
-            }, 300);
+            }, 500);
 
-            navigator.clipboard
-              .writeText(url)
-              .then(() => {
-                showToast("Link copied to clipboard!");
-              })
-              .catch((err) => {
-                console.error("Could not copy text: ", err);
-              });
+            // Try modern API first
+            if (navigator.clipboard && window.isSecureContext) {
+              navigator.clipboard
+                .writeText(url)
+                .then(() => {
+                  console.log("Clipboard API success");
+                  showToast("Link copied to clipboard!");
+                })
+                .catch((err) => {
+                  console.error("Clipboard API failed, trying fallback:", err);
+                  fallbackCopyTextToClipboard(url);
+                });
+            } else {
+              // Fallback for non-secure contexts or missing API
+              fallbackCopyTextToClipboard(url);
+            }
           }
         }
 
+        function fallbackCopyTextToClipboard(text) {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+
+          // Ensure it's not visible and doesn't scroll the page
+          textArea.style.position = "fixed";
+          textArea.style.left = "-9999px";
+          textArea.style.top = "0";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+
+          try {
+            const successful = document.execCommand("copy");
+            if (successful) {
+              console.log("Fallback copy success");
+              showToast("Link copied to clipboard!");
+            } else {
+              console.error("Fallback copy failed");
+            }
+          } catch (err) {
+            console.error("Fallback copy error:", err);
+          }
+
+          document.body.removeChild(textArea);
+        }
+
         function handleHeadingInteraction(e) {
+          console.log("Heading interaction triggered", e.type);
           // Check if clicked on heading-link icon
           const link = e.target.closest(".heading-link");
           if (link) {
@@ -428,6 +465,7 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
 
             if (heading || link) {
               // Only prevent default if it's a confirmed tap on the target
+              console.log("Confirmed tap on heading");
               e.preventDefault();
               handleHeadingInteraction(e);
             }

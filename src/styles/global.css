@@ -1122,33 +1122,50 @@ html[data-theme="light"] body {
   padding: 0;
 }
 
-/* Images and videos - break out of text width on larger screens */
-.md-card-body .md-card-content img,
-.md-card-body .md-card-content video {
+/* Images and videos - target all within the card including featured image */
+.md-unified-card img,
+.md-unified-card video {
   display: block;
   max-width: 100%;
   height: auto;
   border-radius: 1.25rem;
   margin: 3.5rem auto;
+  /* Premium multi-layered shadow */
   box-shadow:
-    0 20px 50px -10px rgba(0, 0, 0, 0.3),
-    0 10px 30px -5px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+    0 20px 50px -10px rgba(0, 0, 0, 0.4),
+    0 10px 30px -5px rgba(0, 0, 0, 0.3),
+    0 0 1px rgba(255, 255, 255, 0.1);
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.md-card-body .md-card-content img:hover,
-.md-card-body .md-card-content video:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 30px 60px -12px rgba(0, 0, 0, 0.35),
-    0 18px 36px -8px rgba(0, 0, 0, 0.25);
+/* Featured image specific margin override */
+.md-card-featured-image img {
+  margin: 0;
+  border-radius: 1.25rem 1.25rem 0 0;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-[data-theme="light"] .md-card-body .md-card-content img,
-[data-theme="light"] .md-card-body .md-card-content video {
+.md-unified-card img:hover,
+.md-unified-card video:hover {
+  transform: translateY(-4px) scale(1.01);
   box-shadow:
-    0 20px 40px -10px rgba(0, 0, 0, 0.12),
-    0 10px 20px -5px rgba(0, 0, 0, 0.08);
+    0 40px 80px -15px rgba(0, 0, 0, 0.5),
+    0 20px 40px -10px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .md-unified-card img,
+[data-theme="light"] .md-unified-card video {
+  box-shadow:
+    0 20px 40px -10px rgba(0, 0, 0, 0.15),
+    0 10px 20px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .md-card-featured-image img {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* Breakout: Images and videos expand to 900px max on larger screens */
