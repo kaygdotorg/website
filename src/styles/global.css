@@ -32,6 +32,10 @@
   --color-accent-700: #be185d;
   --color-accent-800: #9d174d;
   --color-accent-900: #831843;
+
+  /* Subtle Orchid link colors (inspired by kayg.org) */
+  --color-link: #DA70D6;
+  --color-link-hover: #ff8acd;
 }
 
 /* Override DaisyUI dark theme - dark purple */
@@ -1031,11 +1035,55 @@ html[data-theme="light"] body {
   background: rgba(236, 72, 153, 0.06);
 }
 
-/* Base link styling - all links in content are pink */
+/* ========================================
+   Media: Images, Videos & Captions
+   ======================================== */
+
+/* Base figure styling */
+.md-card-body .md-card-content figure {
+  margin: 2rem 0;
+  padding: 0;
+}
+
+/* Images and videos - break out of text width on larger screens */
+.md-card-body .md-card-content img,
+.md-card-body .md-card-content video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  margin: 2rem auto;
+}
+
+@media (min-width: 900px) {
+
+  .md-card-body .md-card-content figure,
+  .md-card-body .md-card-content img,
+  .md-card-body .md-card-content video {
+    max-width: 900px;
+    margin-left: calc(50% - 450px);
+    margin-right: calc(50% - 450px);
+  }
+}
+
+/* Figcaption styling - centered, subtle, smaller */
+.md-card-body .md-card-content figcaption {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  margin-top: 1rem;
+  font-style: normal;
+}
+
+[data-theme="light"] .md-card-body .md-card-content figcaption {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Base link styling - all links in content use subtle Orchid */
 .md-card-body .md-card-content a {
-  color: var(--color-accent-500);
+  color: var(--color-link);
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: all 0.2s ease;
   position: relative;
   z-index: 1;
 }
@@ -1090,9 +1138,9 @@ html[data-theme="light"] body {
 
 /* External links - underlined with external icon */
 .md-card-body .md-card-content a[href^="http"] {
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 1.5px;
+  text-decoration: none;
+  border-bottom: 1.5px solid transparent;
+  padding-bottom: 1px;
 }
 
 .md-card-body .md-card-content a[href^="http"]::after {
@@ -1110,7 +1158,8 @@ html[data-theme="light"] body {
 }
 
 .md-card-body .md-card-content a[href^="http"]:hover {
-  opacity: 0.8;
+  color: var(--color-link-hover);
+  border-bottom-color: var(--color-link-hover);
 }
 
 .md-card-body .md-card-content a[href^="http"]:hover::after {
