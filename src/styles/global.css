@@ -1130,13 +1130,14 @@ html[data-theme="light"] body {
   height: auto;
   border-radius: 1.25rem;
   margin: 3.5rem auto;
-  /* Premium multi-layered shadow */
+  /* Ultra-premium multi-layered deep shadow */
   box-shadow:
-    0 20px 50px -10px rgba(0, 0, 0, 0.4),
-    0 10px 30px -5px rgba(0, 0, 0, 0.3),
-    0 0 1px rgba(255, 255, 255, 0.1);
+    0 30px 60px -12px rgba(0, 0, 0, 0.5),
+    0 18px 36px -18px rgba(0, 0, 0, 0.5),
+    0 12px 24px -12px rgba(0, 0, 0, 0.5),
+    0 0 1px rgba(255, 255, 255, 0.15);
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Featured image specific margin override */
@@ -1144,28 +1145,28 @@ html[data-theme="light"] body {
   margin: 0;
   border-radius: 1.25rem 1.25rem 0 0;
   border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .md-unified-card img:hover,
 .md-unified-card video:hover {
-  transform: translateY(-4px) scale(1.01);
+  transform: translateY(-6px) scale(1.02);
   box-shadow:
-    0 40px 80px -15px rgba(0, 0, 0, 0.5),
-    0 20px 40px -10px rgba(0, 0, 0, 0.4);
+    0 50px 100px -20px rgba(0, 0, 0, 0.6),
+    0 30px 60px -15px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="light"] .md-unified-card img,
 [data-theme="light"] .md-unified-card video {
   box-shadow:
-    0 20px 40px -10px rgba(0, 0, 0, 0.15),
-    0 10px 20px -5px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+    0 30px 60px -15px rgba(0, 0, 0, 0.2),
+    0 15px 30px -10px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 [data-theme="light"] .md-card-featured-image img {
   border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 /* Breakout: Images and videos expand to 900px max on larger screens */
@@ -1251,8 +1252,7 @@ html[data-theme="light"] body {
   color: var(--color-accent-600);
 }
 
-.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]):hover,
-.md-card-backlinks .md-card-content a:hover {
+.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]):hover {
   transform: translateY(-2px) scale(1.04);
   background-image: linear-gradient(rgba(20, 15, 28, 0.65), rgba(20, 15, 28, 0.65)),
     linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6, #06b6d4);
@@ -1370,7 +1370,7 @@ html[data-theme="light"] body {
   position: relative;
 }
 
-/* Squiggly underline on hover - appears under the heading text span */
+/* Squiggly underline base styling */
 .md-card-body .md-card-content h2>.heading-text::after,
 .md-card-body .md-card-content h3>.heading-text::after,
 .md-card-body .md-card-content h4>.heading-text::after {
@@ -1387,17 +1387,28 @@ html[data-theme="light"] body {
   transition: opacity 0.2s ease;
 }
 
-.md-card-body .md-card-content h2:hover>.heading-text::after,
-.md-card-body .md-card-content h3:hover>.heading-text::after,
-.md-card-body .md-card-content h4:hover>.heading-text::after {
-  opacity: 1;
-}
+/* Only show squiggly underline on hover for devices that support hover */
+@media (hover: hover) {
 
-/* Also show underline when heading-link is visible */
-.md-card-body .md-card-content h2:has(.heading-link:hover)>.heading-text::after,
-.md-card-body .md-card-content h3:has(.heading-link:hover)>.heading-text::after,
-.md-card-body .md-card-content h4:has(.heading-link:hover)>.heading-text::after {
-  opacity: 1;
+  .md-card-body .md-card-content h2:hover>.heading-text::after,
+  .md-card-body .md-card-content h3:hover>.heading-text::after,
+  .md-card-body .md-card-content h4:hover>.heading-text::after {
+    opacity: 1;
+  }
+
+  /* Also show underline when heading-link is visible */
+  .md-card-body .md-card-content h2:has(.heading-link:hover)>.heading-text::after,
+  .md-card-body .md-card-content h3:has(.heading-link:hover)>.heading-text::after,
+  .md-card-body .md-card-content h4:has(.heading-link:hover)>.heading-text::after {
+    opacity: 1;
+  }
+
+  /* Show heading link on hover (desktop) */
+  h2:hover .heading-link,
+  h3:hover .heading-link,
+  h4:hover .heading-link {
+    opacity: 0.7;
+  }
 }
 
 .heading-link {
@@ -1410,15 +1421,7 @@ html[data-theme="light"] body {
   color: var(--color-accent-500);
   vertical-align: middle;
   cursor: pointer;
-  /* Make the entire heading clickable on mobile */
   -webkit-tap-highlight-color: transparent;
-}
-
-/* Show heading link on hover (desktop) */
-h2:hover .heading-link,
-h3:hover .heading-link,
-h4:hover .heading-link {
-  opacity: 0.7;
 }
 
 .heading-link:hover {
@@ -1434,7 +1437,16 @@ h4:hover .heading-link {
 /* Mobile: enable tap-to-copy with visual touch feedback */
 @media (max-width: 768px) {
   .heading-link {
-    display: none;
+    opacity: 0;
+    /* Changed from display: none to allow fade in */
+    transition: opacity 0.3s ease;
+  }
+
+  /* Show link icon on tap */
+  h2.tapped .heading-link,
+  h3.tapped .heading-link,
+  h4.tapped .heading-link {
+    opacity: 1 !important;
   }
 
   /* Keep cursor as pointer for tappable headings on mobile */
