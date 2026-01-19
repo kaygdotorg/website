@@ -21,8 +21,6 @@ const navLinks = [
   { href: "/photography", label: "Photography" },
   { href: "/writing", label: "Writing" },
 ];
-
-import { ClientRouter } from "astro:transitions";
 ---
 
 <!doctype html>
@@ -34,7 +32,6 @@ import { ClientRouter } from "astro:transitions";
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
-    <ClientRouter />
     <!-- Fonts are now self-hosted via fontsource -->
     <!-- Theme detection: respects system preference, allows override -->
     <script is:inline>
@@ -57,15 +54,13 @@ import { ClientRouter } from "astro:transitions";
   </head>
   <body class="min-h-screen text-base-content">
     <!-- Animated Film Grain Background -->
-    <div class="animated-gradient-bg" aria-hidden="true" transition:persist>
+    <div class="animated-gradient-bg" aria-hidden="true">
       <!-- Soft color flares (like light leaks) -->
       <div class="film-flare"></div>
       <!-- Subtle color tint -->
       <div class="film-tint"></div>
       <!-- Vignette darkening at edges -->
       <div class="film-vignette"></div>
-      <!-- Animated grain texture -->
-      <div class="film-grain"></div>
     </div>
 
     <!-- Floating Pill Navigation -->
@@ -320,10 +315,7 @@ import { ClientRouter } from "astro:transitions";
     </div>
 
     <!-- Main content -->
-    <main
-      class={`relative z-10 ${hideNavInitially ? "" : "pt-24"}`}
-      transition:animate="fade"
-    >
+    <main class={`relative z-10 ${hideNavInitially ? "" : "pt-24"}`}>
       <slot />
     </main>
 
