@@ -206,22 +206,6 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
       });
     }
 
-    // Auto-collapse TOC on scroll
-    let lastScrollY = 0;
-    function handleTocScroll() {
-      const tocCard = document.getElementById("toc-card");
-      if (!tocCard) return;
-
-      const currentScrollY = window.scrollY;
-
-      // Collapse TOC when scrolling down past 200px
-      if (currentScrollY > 200 && currentScrollY > lastScrollY) {
-        tocCard.classList.add("collapsed");
-      }
-
-      lastScrollY = currentScrollY;
-    }
-
     // Scroll Progress Button Logic
     function initScrollProgress() {
       const btn = document.getElementById("scroll-progress-btn");
@@ -313,7 +297,7 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
     // Initialize
     document.addEventListener("DOMContentLoaded", () => {
       generateTOC();
-      window.addEventListener("scroll", handleTocScroll, { passive: true });
+
       initScrollProgress();
       initLastEditedToggle();
 
