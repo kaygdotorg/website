@@ -40,6 +40,10 @@ cardPhotos:
     label: Talks
     href: /talks
     date: Jan 2026
+  - src: https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&q=80
+    label: Notes
+    href: /notes
+    date: Jan 2026
 
 recentWriting:
   - title: Building in public
@@ -69,6 +73,9 @@ pageCards:
   - title: Now
     summary: What I'm currently focused on — the projects, books, and ideas occupying my mind right now.
     href: /now
+  - title: Notes
+    summary: A digital garden of fragments, ideas, and less polished thoughts.
+    href: /notes
 ---
 
 I'm a curious person who enjoys building software, capturing moments through photography, and thinking about how tools shape our minds.

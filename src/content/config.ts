@@ -106,6 +106,21 @@ const talks = defineCollection({
   schema: datedEntrySchema,
 });
 
+// Collection for /notes entries (similar to writing/blog)
+const notes = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    slug: z.string().optional(),
+    description: z.string().optional(),
+    date: z.coerce.date(),
+    "last edited": z.coerce.date().optional(),
+    tags: z.array(z.string()).nullable().optional(),
+    image: z.string().optional(),
+    draft: z.boolean().optional().default(false),
+  }),
+});
+
 export const collections = {
   pages,
   photos,
@@ -113,4 +128,5 @@ export const collections = {
   uses,
   writing,
   talks,
+  notes,
 };
