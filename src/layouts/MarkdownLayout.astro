@@ -399,33 +399,49 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
           }
         }
 
-        // Use both touchend and click, with a flag to prevent double firing
-        let touchHandled = false;
+        // Robust tap detection for mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchStartTime = 0;
 
-        function handleTouch(e) {
-          const heading = e.target.closest("h2, h3, h4");
-          const link = e.target.closest(".heading-link");
+        function handleTouchStart(e) {
+          const touch = e.changedTouches[0];
+          touchStartX = touch.clientX;
+          touchStartY = touch.clientY;
+          touchStartTime = Date.now();
+        }
 
-          if (heading || link) {
-            // Prevent text selection on touch
-            e.preventDefault();
-            touchHandled = true;
-            handleHeadingInteraction(e);
-            // Reset flag after a short delay
-            setTimeout(() => {
-              touchHandled = false;
-            }, 300);
+        function handleTouchEnd(e) {
+          const touch = e.changedTouches[0];
+          const touchEndX = touch.clientX;
+          const touchEndY = touch.clientY;
+          const touchEndTime = Date.now();
+
+          const dx = Math.abs(touchEndX - touchStartX);
+          const dy = Math.abs(touchEndY - touchStartY);
+          const dt = touchEndTime - touchStartTime;
+
+          // If movement is less than 10px and duration is less than 300ms, it's a tap
+          if (dx < 10 && dy < 10 && dt < 300) {
+            const heading = e.target.closest("h2, h3, h4");
+            const link = e.target.closest(".heading-link");
+
+            if (heading || link) {
+              // Only prevent default if it's a confirmed tap on the target
+              e.preventDefault();
+              handleHeadingInteraction(e);
+            }
           }
         }
 
-        function handleClick(e) {
-          // Skip if already handled by touch
-          if (touchHandled) return;
-          handleHeadingInteraction(e);
-        }
-
-        content.addEventListener("touchend", handleTouch, { passive: false });
-        content.addEventListener("click", handleClick);
+        content.addEventListener("touchstart", handleTouchStart, {
+          passive: true,
+        });
+        content.addEventListener("touchend", handleTouchEnd, {
+          passive: false,
+        });
+        // Still keep click for desktop but it won't fire if preventDefault was called on touchend
+        content.addEventListener("click", handleHeadingInteraction);
       }
     });
 

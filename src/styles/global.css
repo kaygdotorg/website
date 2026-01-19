@@ -1129,13 +1129,26 @@ html[data-theme="light"] body {
   max-width: 100%;
   height: auto;
   border-radius: 1.25rem;
-  margin: 2rem auto;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 20px;
+  margin: 3.5rem auto;
+  box-shadow:
+    0 20px 50px -10px rgba(0, 0, 0, 0.3),
+    0 10px 30px -5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.md-card-body .md-card-content img:hover,
+.md-card-body .md-card-content video:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 30px 60px -12px rgba(0, 0, 0, 0.35),
+    0 18px 36px -8px rgba(0, 0, 0, 0.25);
 }
 
 [data-theme="light"] .md-card-body .md-card-content img,
 [data-theme="light"] .md-card-body .md-card-content video {
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 20px;
+  box-shadow:
+    0 20px 40px -10px rgba(0, 0, 0, 0.12),
+    0 10px 20px -5px rgba(0, 0, 0, 0.08);
 }
 
 /* Breakout: Images and videos expand to 900px max on larger screens */
