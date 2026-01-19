@@ -174,9 +174,28 @@ const cardPhotos = rawCardPhotos?.map((card) => {
             {
               latestBlog && (
                 <div class="bento-card-body">
-                  <p class="bento-excerpt">
-                    {latestBlog.data.description || "Read my latest post →"}
-                  </p>
+                  <div class="bento-body-layout bento-body-side-by-side">
+                    <div class="bento-text-side">
+                      <p class="bento-text">
+                        {latestBlog.data.description || "Read my latest post →"}
+                      </p>
+                    </div>
+                    {latestBlog.data["cover-image"] && (
+                      <div class="bento-image-side">
+                        <div class="bento-image-container">
+                          <img
+                            src={
+                              typeof latestBlog.data["cover-image"] === "string"
+                                ? latestBlog.data["cover-image"]
+                                : latestBlog.data["cover-image"].src
+                            }
+                            alt={latestBlog.data.title}
+                            loading="lazy"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             }
@@ -688,6 +707,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     .bento-wide {
       min-height: 280px;
       padding: 3rem;
+      grid-column: span 2;
     }
 
     /* Tall card - Photography spans 2 rows, much taller */
@@ -720,11 +740,60 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       letter-spacing: -0.03em;
     }
 
-    .bento-excerpt {
-      font-size: 1rem;
+    .bento-text {
+      font-size: 1.15rem;
       opacity: 0.75;
-      margin-top: 0.75rem;
-      line-height: 1.5;
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+
+    /* Bento Card Body Layouts */
+    .bento-body-layout {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      flex: 1;
+    }
+
+    @media (min-width: 1024px) {
+      .bento-body-side-by-side {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .bento-body-side-by-side .bento-text-side {
+        flex: 1;
+        max-width: 65%;
+      }
+
+      .bento-body-side-by-side .bento-image-side {
+        flex: 1;
+        max-width: 35%;
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+
+    .bento-image-container {
+      width: 100%;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      aspect-ratio: 4/3;
+    }
+
+    .bento-card:hover .bento-image-container {
+      transform: scale(1.05) rotate(2deg);
+    }
+
+    .bento-image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .bento-subtitle {
@@ -926,22 +995,20 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       }
 
       .bento-header-title {
-        font-size: 1.25rem;
+        font-size: 2.25rem;
       }
 
       .bento-grid {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-          "blog"
-          "photo"
-          "now"
-          "uses"
-          "talks";
-        gap: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        width: 100%;
       }
 
       .bento-card {
+        width: 100%;
         min-height: 120px;
+        padding: 2rem;
       }
 
       .bento-tall {
@@ -949,7 +1016,12 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       }
 
       .bento-title {
-        font-size: 1.1rem;
+        font-size: 1.6rem;
+      }
+
+      .bento-text {
+        font-size: 1rem;
+        line-height: 1.5;
       }
     }
 

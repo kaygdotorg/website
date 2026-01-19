@@ -2,9 +2,10 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import { formatDate, getRelativeTime } from "../utils/dates";
+import { extractUrlFromMarkdown } from "../utils/markdown";
 
-// Get all writing posts, exclude drafts, sort by date
-const allPosts = await getCollection("writing", ({ data }) => !data.draft);
+// Get all blog posts, exclude drafts, sort by date
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
 const posts = allPosts.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );
@@ -72,10 +73,14 @@ const allTags = [
             >
               <div class="flex flex-col md:flex-row md:items-start gap-4">
                 {/* Feature Image */}
-                {post.data.image && (
+                {post.data["cover-image"] && (
                   <div class="w-full md:w-32 h-24 md:h-20 rounded-lg overflow-hidden flex-shrink-0">
                     <img
-                      src={post.data.image}
+                      src={
+                        typeof post.data["cover-image"] === "string"
+                          ? post.data["cover-image"]
+                          : post.data["cover-image"].src
+                      }
                       alt={post.data.title}
                       class="w-full h-full object-cover transition-transform group-hover:scale-105"
                       loading="lazy"

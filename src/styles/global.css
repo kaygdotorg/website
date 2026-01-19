@@ -577,7 +577,7 @@ html[data-theme="light"] body {
 
 .md-backlinks-header h2 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: 1.125rem;
+  font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.04em;
   color: inherit;
@@ -1712,11 +1712,6 @@ html[data-theme="light"] body {
   margin-bottom: 1rem;
 }
 
-.bento-text {
-  font-size: 1rem;
-  line-height: 1.6;
-  opacity: 0.8;
-}
 
 /* Specific Card Layouts */
 .hero-bento {
@@ -1747,7 +1742,7 @@ html[data-theme="light"] body {
   background: linear-gradient(135deg, rgba(236, 72, 153, 0.05), transparent);
 }
 
-.writing-bento {
+.blog-bento {
   justify-content: flex-start;
 }
 
