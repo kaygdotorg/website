@@ -526,8 +526,8 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
     /* Wrapper card - uses the same glassmorphism as hero */
     .bento-wrapper {
-      padding: 2.5rem;
-      max-width: 900px;
+      padding: 3rem;
+      max-width: 1100px;
       width: 100%;
     }
 
@@ -570,17 +570,17 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     /* Base card styles - LARGER cards like mymind.com */
     .bento-card {
       position: relative;
-      border-radius: 1.5rem;
-      padding: 2rem;
-      min-height: 200px;
+      border-radius: 2rem;
+      padding: 2.5rem;
+      min-height: 320px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       text-decoration: none;
       overflow: hidden;
       transition:
-        transform 0.3s ease,
-        box-shadow 0.3s ease;
+        transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+        box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     .bento-card:hover {
@@ -604,13 +604,13 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
     /* Wide card - Writing with extra padding */
     .bento-wide {
-      min-height: 180px;
-      padding: 2.5rem;
+      min-height: 280px;
+      padding: 3rem;
     }
 
     /* Tall card - Photography spans 2 rows, much taller */
     .bento-tall {
-      min-height: 440px;
+      min-height: 660px;
     }
 
     /* Card content layout */
@@ -631,11 +631,11 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
     .bento-title {
       font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-      font-size: 1.75rem;
+      font-size: 2.25rem;
       font-weight: 500;
-      line-height: 1.2;
-      margin: 0.5rem 0;
-      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin: 0.75rem 0;
+      letter-spacing: -0.03em;
     }
 
     .bento-excerpt {
@@ -739,21 +739,21 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
     .bento-visual-frame {
       position: relative;
-      width: 85%;
-      height: 140px;
-      border-radius: 0.75rem;
+      width: 92%;
+      height: 220px;
+      border-radius: 1.25rem;
       background: white;
       box-shadow:
-        0 10px 30px -5px rgba(0, 0, 0, 0.1),
-        0 5px 15px -5px rgba(0, 0, 0, 0.05);
+        0 15px 45px -10px rgba(0, 0, 0, 0.15),
+        0 10px 20px -10px rgba(0, 0, 0, 0.1);
       overflow: hidden;
-      transform: rotateX(5deg) rotateY(-5deg);
-      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transform: rotateX(4deg) rotateY(-4deg);
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     .bento-card:hover .bento-visual-frame {
-      transform: rotateX(0deg) rotateY(0deg) scale(1.05);
-      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+      transform: rotateX(0deg) rotateY(0deg) scale(1.08);
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2);
     }
 
     .bento-visual-frame img {
@@ -763,12 +763,13 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     }
 
     .photography-frame {
-      height: 240px;
-      width: 90%;
+      height: 480px;
+      width: 95%;
     }
 
     .uses-frame {
-      height: 160px;
+      height: 280px;
+      width: 94%;
     }
 
     /* Card Text Elements */
