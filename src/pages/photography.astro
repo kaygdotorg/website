@@ -118,7 +118,7 @@ const categories = [...new Set(photos.map((p) => p.category))];
       {
         photos.map((photo, index) => (
           <div
-            class="photo-item grainy-card"
+            class="photo-item frosted-card"
             data-category={photo.category}
             data-src={photo.src}
             data-alt={photo.alt}
@@ -137,7 +137,7 @@ const categories = [...new Set(photos.map((p) => p.category))];
     </div>
 
     <!-- Note about replacing photos -->
-    <div class="mt-16 p-6 rounded-2xl grainy-card animate-fade-up stagger-3">
+    <div class="mt-16 p-6 rounded-2xl frosted-card animate-fade-up stagger-3">
       <p class="text-base-content/70 text-sm text-center">
         <strong class="text-accent">Note:</strong> These are placeholder images from
         Unsplash. Replace them with your own photos by updating the paths in this

@@ -62,7 +62,7 @@ const allTags = [
       {
         posts.map((post, index) => (
           <article
-            class="post-card grainy-card p-6 rounded-2xl glow-hover transition-all animate-fade-up"
+            class="post-card frosted-card p-6 rounded-2xl glow-hover transition-all animate-fade-up"
             data-tags={JSON.stringify(post.data.tags || [])}
             style={`animation-delay: ${Math.min(index * 0.05, 0.5)}s`}
           >

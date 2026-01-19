@@ -27,7 +27,7 @@ const sortedEntries = entries.sort((a, b) => b.date.getTime() - a.date.getTime()
   <div class="timeline-container">
     <!-- Header -->
     <header class="timeline-header">
-      <div class="grainy-card p-8 md:p-12 text-center">
+      <div class="frosted-card p-8 md:p-12 text-center">
         <h1 class="font-display text-4xl md:text-5xl text-accent mb-4">{title}</h1>
         <p class="text-base-content/70 text-lg max-w-lg mx-auto">{description}</p>
         <p class="text-base-content/50 text-sm mt-4">{sortedEntries.length} entries</p>
@@ -45,7 +45,7 @@ const sortedEntries = entries.sort((a, b) => b.date.getTime() - a.date.getTime()
           </div>
           
           <!-- Entry card -->
-          <div class="timeline-card grainy-card">
+          <div class="timeline-card frosted-card">
             <div class="timeline-card-header">
               <h2 class="timeline-card-title">{entry.title}</h2>
               <div class="timeline-card-dates">

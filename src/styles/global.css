@@ -166,50 +166,7 @@ html[data-theme="light"] body {
   opacity: 0.5;
 }
 
-/* Grain animation - shifts position rapidly for flickering effect */
-@keyframes grain-shift {
 
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-
-  10% {
-    transform: translate(-5%, -10%);
-  }
-
-  20% {
-    transform: translate(-15%, 5%);
-  }
-
-  30% {
-    transform: translate(7%, -15%);
-  }
-
-  40% {
-    transform: translate(-5%, 15%);
-  }
-
-  50% {
-    transform: translate(-15%, 10%);
-  }
-
-  60% {
-    transform: translate(15%, 0%);
-  }
-
-  70% {
-    transform: translate(0%, 10%);
-  }
-
-  80% {
-    transform: translate(3%, -15%);
-  }
-
-  90% {
-    transform: translate(-10%, 5%);
-  }
-}
 
 /* Color tint pulse */
 @keyframes tint-pulse {
@@ -245,7 +202,7 @@ html[data-theme="light"] body {
    Frosted Card (non-grainy default)
    ======================================== */
 
-.grainy-card {
+.frosted-card {
   background: rgba(30, 25, 40, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -265,40 +222,27 @@ html[data-theme="light"] body {
     0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* Grain texture overlay for grainy-card */
-.grainy-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.02;
-  pointer-events: none;
-  mix-blend-mode: overlay;
-  z-index: 0;
-}
 
-[data-theme="dark"] .grainy-card {
+
+[data-theme="dark"] .frosted-card {
   box-shadow:
     0 0 25px rgba(244, 114, 182, 0.05),
     0 0 40px rgba(168, 85, 247, 0.03),
     0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
-[data-theme="light"] .grainy-card {
+[data-theme="light"] .frosted-card {
   background: rgba(245, 240, 250, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-[data-theme="light"] .grainy-card::before {
-  opacity: 0.04;
-  mix-blend-mode: multiply;
-}
+
 
 /* ========================================
    Grainy Card (Homepage Only)
    ======================================== */
 
-.grainy-card-homepage {
+.frosted-card-homepage {
   background: rgba(128, 128, 128, 0.25);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -314,32 +258,21 @@ html[data-theme="light"] body {
     0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-[data-theme="dark"] .grainy-card-homepage {
+[data-theme="dark"] .frosted-card-homepage {
   box-shadow:
     0 0 25px rgba(244, 114, 182, 0.05),
     0 0 40px rgba(168, 85, 247, 0.03),
     0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
-/* Grain texture overlay - homepage only */
-.grainy-card-homepage::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.08;
-  pointer-events: none;
-  mix-blend-mode: overlay;
-}
 
-[data-theme="light"] .grainy-card-homepage {
+
+[data-theme="light"] .frosted-card-homepage {
   background: rgba(200, 200, 200, 0.25);
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-[data-theme="light"] .grainy-card-homepage::before {
-  opacity: 0.05;
-}
+
 
 /* ========================================
    Full Page Card Sections - Scroll Snap
@@ -365,14 +298,14 @@ html[data-theme="light"] body {
 }
 
 /* Cards fade in when scrolled into view */
-.page-card-section .grainy-card {
+.page-card-section .frosted-card {
   opacity: 0;
   transform: translateY(20px) scale(0.98);
   transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
 
 /* Active/visible card */
-.page-card-section.active .grainy-card {
+.page-card-section.active .frosted-card {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
@@ -1857,7 +1790,7 @@ html[data-theme="light"] body {
   opacity: 0;
   transform: scale(0.9) translateY(-20px);
   transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  /* Override grainy-card blur with stronger blur */
+  /* Override frosted-card blur with stronger blur */
   backdrop-filter: blur(40px) !important;
   -webkit-backdrop-filter: blur(40px) !important;
 }
@@ -2445,14 +2378,14 @@ html.theme-transitioning *::after {
   overflow: hidden;
 }
 
-.search-modal-card.grainy-card {
+.search-modal-card.frosted-card {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   border-radius: 24px !important;
 }
 
-.search-modal-card.grainy-card::before {
+.search-modal-card.frosted-card::before {
   display: none !important;
   /* Hide grain texture */
 }
@@ -2640,7 +2573,7 @@ html.theme-transitioning *::after {
     transition-duration: 0.01ms !important;
   }
 
-  .page-card-section .grainy-card {
+  .page-card-section .frosted-card {
     transition-duration: 0.01ms !important;
     opacity: 1 !important;
     transform: none !important;
@@ -2713,11 +2646,11 @@ html.theme-transitioning *::after {
 
 /* Fallback for browsers without backdrop-filter support */
 @supports not (backdrop-filter: blur(20px)) {
-  .grainy-card {
+  .frosted-card {
     background: rgba(13, 9, 16, 0.92);
   }
 
-  [data-theme="light"] .grainy-card {
+  [data-theme="light"] .frosted-card {
     background: rgba(250, 248, 252, 0.95);
   }
 
@@ -2812,7 +2745,7 @@ html.theme-transitioning *::after {
   }
 
   /* Style cards for print */
-  .grainy-card {
+  .frosted-card {
     background: white !important;
     box-shadow: none !important;
     border: 1px solid #ddd !important;
@@ -2821,7 +2754,7 @@ html.theme-transitioning *::after {
     page-break-inside: avoid;
   }
 
-  .grainy-card::before {
+  .frosted-card::before {
     display: none !important;
   }
 
