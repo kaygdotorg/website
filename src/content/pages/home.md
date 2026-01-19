@@ -36,6 +36,10 @@ cardPhotos:
     label: Writing
     href: /blog
     date: Nov 2024
+  - src: https://images.unsplash.com/photo-1475721027785-f74dea327912?w=500&q=80
+    label: Talks
+    href: /talks
+    date: Jan 2026
 
 recentWriting:
   - title: Building in public

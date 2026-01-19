@@ -100,10 +100,17 @@ const writing = defineCollection({
   }),
 });
 
+// Collection for /talks entries
+const talks = defineCollection({
+  type: 'content',
+  schema: datedEntrySchema,
+});
+
 export const collections = {
   pages,
   photos,
   now,
   uses,
   writing,
+  talks,
 };
