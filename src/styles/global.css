@@ -700,7 +700,10 @@ html[data-theme="light"] body {
 
 /* TOC Floating Card Styling - creates depth and separation */
 .md-card-toc {
-  margin: 0 1rem 1rem 1rem;
+  margin: 0 auto 1.5rem auto;
+  width: fit-content;
+  min-width: 320px;
+  max-width: 100%;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -708,6 +711,11 @@ html[data-theme="light"] body {
     0 4px 16px rgba(0, 0, 0, 0.12),
     0 2px 8px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.md-card-toc .md-card-header {
+  max-width: none;
+  width: 100%;
 }
 
 [data-theme="light"] .md-card-toc {
