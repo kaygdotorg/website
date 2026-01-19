@@ -701,9 +701,8 @@ html[data-theme="light"] body {
 /* TOC Floating Card Styling - creates depth and separation */
 .md-card-toc {
   margin: 0 auto 1.5rem auto;
-  width: fit-content;
-  min-width: 320px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 720px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.06);
