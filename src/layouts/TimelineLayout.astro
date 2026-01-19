@@ -188,14 +188,14 @@ const sortedEntries = entries.sort((a, b) => b.date.getTime() - a.date.getTime()
   }
 
   .timeline-card-excerpt {
-    color: var(--fallback-bc, #f8f4fc);
+    color: #1a1225; /* Start with dark as base */
     opacity: 0.75;
     line-height: 1.6;
     margin: 0 0 1rem 0;
   }
 
-  [data-theme="light"] .timeline-card-excerpt {
-    color: #1a1225;
+  :global([data-theme="dark"]) .timeline-card-excerpt {
+    color: #f8f4fc;
   }
 
   .timeline-card-arrow {
@@ -223,11 +223,11 @@ const sortedEntries = entries.sort((a, b) => b.date.getTime() - a.date.getTime()
     text-align: center;
     margin-top: 3rem;
     padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
   }
 
-  [data-theme="light"] .timeline-footer {
-    border-top-color: rgba(0, 0, 0, 0.1);
+  :global([data-theme="dark"]) .timeline-footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
   }
 </style>
 
