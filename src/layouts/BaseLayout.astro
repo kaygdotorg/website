@@ -76,116 +76,96 @@ import { ClientRouter } from "astro:transitions";
     >
       <div class="max-w-4xl mx-auto">
         <!-- Desktop: Three separate pills -->
-        <div class="hidden md:flex justify-center">
-          <div class="relative flex items-center gap-3">
-            <div
-              class:list={[
-                "navbar-blur",
-                "navbar-blur-overlay",
-                hideNavInitially && "blur-hidden",
-              ]}
-              aria-hidden="true"
-            >
-            </div>
-            <!-- Left pill: Logo -->
-            <a
-              href="/"
-              class="glass-pill px-4 py-1.5 font-display text-lg hover:opacity-80 transition-opacity"
-            >
-              K
-            </a>
+        <div class="hidden md:flex items-center justify-center gap-3">
+          <!-- Left pill: Logo -->
+          <a
+            href="/"
+            class="glass-pill px-4 py-2 font-display text-lg hover:opacity-80 transition-opacity"
+          >
+            K
+          </a>
 
-            <!-- Center pill: Nav links -->
-            <div class="glass-pill px-2 py-1">
-              <ul class="nav-link-container flex items-center gap-1 text-sm">
-                {
-                  navLinks.map((link) => (
-                    <li>
-                      <a
-                        href={link.href}
-                        class:list={[
-                          "nav-link block px-3 py-1.5 rounded-full transition-all",
-                          currentPath === link.href
-                            ? "bg-base-content/10 text-accent font-medium"
-                            : "text-base-content/70 hover:text-base-content hover:bg-base-content/5",
-                        ]}
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))
-                }
-              </ul>
-            </div>
+          <!-- Center pill: Nav links -->
+          <div class="glass-pill px-2 py-1">
+            <ul class="nav-link-container flex items-center gap-1 text-sm">
+              {
+                navLinks.map((link) => (
+                  <li>
+                    <a
+                      href={link.href}
+                      class:list={[
+                        "nav-link block px-3 py-1.5 rounded-full transition-all",
+                        currentPath === link.href
+                          ? "bg-base-content/10 text-accent"
+                          : "text-base-content/70 hover:text-base-content hover:bg-base-content/5",
+                      ]}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
 
-            <!-- Right pill: Search + Theme toggle -->
-            <div class="glass-pill flex items-center gap-1 p-1">
-              <button
-                id="search-toggle-desktop"
-                class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
-                aria-label="Search"
+          <!-- Right pill: Search + Theme toggle -->
+          <div class="glass-pill flex items-center gap-1 p-1">
+            <button
+              id="search-toggle-desktop"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
+              aria-label="Search"
+            >
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
               >
-                <svg
-                  class="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                  ></path>
-                </svg>
-              </button>
-              <button
-                id="theme-toggle-desktop"
-                class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
-                aria-label="Toggle dark mode"
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                ></path>
+              </svg>
+            </button>
+            <button
+              id="theme-toggle-desktop"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
+              aria-label="Toggle dark mode"
+            >
+              <svg
+                class="sun-icon w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
               >
-                <svg
-                  class="sun-icon w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                  ></path>
-                </svg>
-                <svg
-                  class="moon-icon w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                  ></path>
-                </svg>
-              </button>
-            </div>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                ></path>
+              </svg>
+              <svg
+                class="moon-icon w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                ></path>
+              </svg>
+            </button>
           </div>
         </div>
 
         <!-- Mobile: Logo left, controls right -->
-        <div class="relative flex md:hidden items-center justify-between">
-          <div
-            class:list={[
-              "navbar-blur",
-              "navbar-blur-overlay",
-              hideNavInitially && "blur-hidden",
-            ]}
-            aria-hidden="true"
-          >
-          </div>
+        <div class="flex md:hidden items-center justify-between">
           <!-- Left pill: Logo -->
           <a
             href="/"
@@ -283,6 +263,14 @@ import { ClientRouter } from "astro:transitions";
         </div>
       </div>
     </nav>
+
+    <!-- Progressive Blur Overlay (variable blur below navbar) -->
+    <div
+      id="navbar-blur"
+      class:list={["navbar-blur-overlay", hideNavInitially && "blur-hidden"]}
+      aria-hidden="true"
+    >
+    </div>
 
     <!-- Mobile Menu Overlay (centered) -->
     <div

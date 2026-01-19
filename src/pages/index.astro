@@ -382,7 +382,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     function initNavScrollObserver() {
       const heroSection = document.getElementById("hero-section");
       const navContainer = document.getElementById("nav-container");
-      const blurOverlays = document.querySelectorAll(".navbar-blur");
+      const blurOverlay = document.getElementById("navbar-blur");
 
       if (heroSection && navContainer) {
         const observer = new IntersectionObserver(
@@ -392,16 +392,12 @@ const cardPhotos = rawCardPhotos?.map((card) => {
                 // Hero is out of view (scrolled past) -> Show Nav & Blur
                 navContainer.classList.remove("nav-hidden");
                 navContainer.classList.add("nav-visible");
-                blurOverlays.forEach((blur) =>
-                  blur.classList.remove("blur-hidden"),
-                );
+                blurOverlay?.classList.remove("blur-hidden");
               } else {
                 // Hero is in view -> Hide Nav & Blur
                 navContainer.classList.remove("nav-visible");
                 navContainer.classList.add("nav-hidden");
-                blurOverlays.forEach((blur) =>
-                  blur.classList.add("blur-hidden"),
-                );
+                blurOverlay?.classList.add("blur-hidden");
               }
             });
           },

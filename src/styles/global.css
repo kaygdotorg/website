@@ -1954,30 +1954,31 @@ body {
    ======================================== */
 
 .navbar-blur-overlay {
-  position: absolute;
-  top: 50%;
+  position: fixed;
+  top: 0;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(100% + 4rem);
-  /* Bleed out horizontally */
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 56rem;
+  /* Match navbar max-width (max-w-4xl) on desktop */
   height: 160px;
-  z-index: -1;
+  z-index: 40;
   pointer-events: none;
 
   /* The blur effect */
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
 
-  /* Capsule-shaped radial mask: blurs softly in all directions, eliminating boxy edges */
-  -webkit-mask-image: radial-gradient(ellipse at center,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 1) 40%,
-      rgba(0, 0, 0, 0.6) 70%,
+  /* Symmetric gradient mask: blurs around the navbar pill (top & bottom) */
+  -webkit-mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 15%,
+      rgba(0, 0, 0, 1) 50%,
       rgba(0, 0, 0, 0) 100%);
-  mask-image: radial-gradient(ellipse at center,
-      rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 1) 40%,
-      rgba(0, 0, 0, 0.6) 70%,
+  mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 15%,
+      rgba(0, 0, 0, 1) 50%,
       rgba(0, 0, 0, 0) 100%);
 }
 
