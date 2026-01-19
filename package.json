@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && pagefind --site dist",
+    "build:search": "astro build && pagefind --site dist --output public/pagefind",
     "preview": "astro preview",
     "astro": "astro",
     "sync": "node scripts/sync-obsidian.mjs"
