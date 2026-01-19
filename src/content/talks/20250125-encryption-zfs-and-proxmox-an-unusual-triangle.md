@@ -7,11 +7,9 @@ draft: true
 image: "./20250125-encryption-zfs-and-proxmox-an-unusual-triangle/cover-1768837885216.jpeg"
 ---
 
-💡
-
-Presentation here: [https://kayg.craft.me/1tyy301dbZVf4H](https://kayg.craft.me/1tyy301dbZVf4H?ref=kayg.org)  
-  
-This is a talk proposal for January 2025 FOSS United Delhi: [https://fossunited.org/c/delhi/jan2025/cfp/g6rdk839rs](https://fossunited.org/c/delhi/jan2025/cfp/g6rdk839rs?ref=kayg.org)
+> [!NOTE] Presentation Details
+> Presentation: [https://kayg.craft.me/1tyy301dbZVf4H](https://kayg.craft.me/1tyy301dbZVf4H?ref=kayg.org)  
+> Talk Proposal (Jan 2025): [https://fossunited.org/c/delhi/jan2025/cfp/g6rdk839rs](https://fossunited.org/c/delhi/jan2025/cfp/g6rdk839rs?ref=kayg.org)
 
 ## Intro (or the Problem)
 

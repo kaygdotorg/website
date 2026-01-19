@@ -1,8 +1,6 @@
 ---
 title: "Ceph RGW Multi-Site - New Features and An Overview"
-description: "Intro
-
-Formally described as \"devops and a storage engineer,\" but I would say I am the devops who's not very keen on the cloud, and is more interested in making his cloud. The basis of any sort of distributed system is storage, and that's where my interests lie these days. I took to Ceph first and then Proxmox next. While both are key areas to where I am employed as a support guy (https://croit.io), Proxmox rules over my homelab while the density of my wallet doesn't really align with deploying "
+description: "Ceph's RADOS Gateway features multi-site that enables geographically distributed object storage deployments by allowing buckets to be replicated across multiple Ceph clusters."
 date: "2024-05-08T17:37:00.000+05:30"
 last edited: "2025-09-01T20:15:12.000+05:30"
 draft: true

@@ -7,12 +7,10 @@ draft: true
 image: "./20250323-learning-the-tools-we-already-possess-bash/cover-1768837885017.png"
 ---
 
-💡
-
-Event: [https://fossunited.org/c/bennett-university/linuxfest](https://fossunited.org/c/bennett-university/linuxfest?ref=kayg.org)  
-Location: Bennett University, Uttar Pradesh  
-  
-Presentation here: [https://s.craft.me/2r3HMM5U6hIGU0](https://s.craft.me/2r3HMM5U6hIGU0?ref=kayg.org)
+> [!NOTE] Event Details
+> Event: [https://fossunited.org/c/bennett-university/linuxfest](https://fossunited.org/c/bennett-university/linuxfest?ref=kayg.org)  
+> Location: Bennett University, Uttar Pradesh  
+> Presentation: [https://s.craft.me/2r3HMM5U6hIGU0](https://s.craft.me/2r3HMM5U6hIGU0?ref=kayg.org)
 
 ## Proposal
 

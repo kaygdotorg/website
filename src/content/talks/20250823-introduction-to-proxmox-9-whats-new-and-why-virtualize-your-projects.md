@@ -3,16 +3,13 @@ title: "Introduction to Proxmox 9: What's New and Why Virtualize Your Projects?"
 description: "Proxmox 9 was recently released and brings in a lot of features that might cater to the advanced. However, with this new release, they bring an end to one of my biggest complaints to Proxmox: the mobile UI - it simply sucked: both the mobile web and mobile app. "
 date: "2025-08-23T18:47:00.000+05:30"
 last edited: "2025-09-07T16:06:37.000+05:30"
-draft: true
 image: "./20250823-introduction-to-proxmox-9-whats-new-and-why-virtualize-your-projects/cover-1768837884870.jpeg"
 ---
 
-💡
-
-Event: [https://fossunited.org/c/delhi/2025-aug](https://fossunited.org/c/delhi/2025-aug?ref=kayg.org)  
-Location: Essentia.dev office, Sector 62, Noida  
-  
-Presentation here: [https://s.craft.me/xFC3j1QnxJIKIn](https://s.craft.me/xFC3j1QnxJIKIn?ref=kayg.org)
+> [!NOTE] Event Details
+> Event: [https://fossunited.org/c/delhi/2025-aug](https://fossunited.org/c/delhi/2025-aug?ref=kayg.org)  
+> Location: Essentia.dev office, Sector 62, Noida  
+> Presentation: [https://s.craft.me/xFC3j1QnxJIKIn](https://s.craft.me/xFC3j1QnxJIKIn?ref=kayg.org)
 
 ## Proposal Description
 
