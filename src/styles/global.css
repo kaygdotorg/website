@@ -1954,15 +1954,14 @@ body {
    ======================================== */
 
 .navbar-blur-overlay {
-  position: fixed;
-  top: 0;
+  position: absolute;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 56rem;
-  /* Match navbar max-width (max-w-4xl) on desktop */
+  transform: translate(-50%, -50%);
+  width: calc(100% + 4rem);
+  /* Bleed out horizontally */
   height: 160px;
-  z-index: 40;
+  z-index: -1;
   pointer-events: none;
 
   /* The blur effect */
