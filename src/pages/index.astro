@@ -60,12 +60,42 @@ const {
   profileImage,
   email,
   cardPhotos: rawCardPhotos,
-  pageCards,
+  bentoCards: rawBentoCards,
   quote,
 } = homeEntry.data;
 
+// Enhance bento cards with actual latest content where applicable
+const bentoCards = rawBentoCards?.map((card: any) => {
+  if (card.id === "blog" && latestBlog) {
+    return {
+      ...card,
+      title: latestBlog.data.title,
+      summary: latestBlog.data.description || card.summary,
+    };
+  }
+  if (card.id === "talks" && latestTalk) {
+    return {
+      ...card,
+      title: latestTalk.data.title,
+    };
+  }
+  if (card.id === "notes" && latestNote) {
+    return {
+      ...card,
+      summary: `Latest: ${latestNote.data.title}`,
+    };
+  }
+  if (card.id === "now" && latestNow) {
+    return {
+      ...card,
+      summary: `Focused on: ${latestNow.data.title}`,
+    };
+  }
+  return card;
+});
+
 // Enhance cardPhotos with dynamic dates from page metadata
-const cardPhotos = rawCardPhotos?.map((card) => {
+const cardPhotos = rawCardPhotos?.map((card: any) => {
   const pageDate = pageLastUpdated.get(card.href);
   return {
     ...card,
@@ -118,7 +148,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
             <div class="hero-cards-section" id="hero-photo-section">
               <div class="card-hand" id="card-hand">
                 <div class="card-hand-inner" id="card-hand-inner">
-                  {cardPhotos.map((item, index) => (
+                  {cardPhotos.map((item: any, index: number) => (
                     <a
                       href={item.href}
                       class="card-in-hand"
@@ -163,233 +193,144 @@ const cardPhotos = rawCardPhotos?.map((card) => {
         </div>
 
         <div class="bento-grid">
-          <!-- Card 1: Latest Writing (spans 2 columns - wide at top) -->
-          <a
-            href={latestBlog ? `/blog/${latestBlog.slug}` : "/blog"}
-            class="bento-card bento-blog bento-wide"
-          >
-            <div class="bento-card-header">
-              <span class="bento-label">Latest Writing</span>
-              <h3 class="bento-title">
-                {latestBlog?.data.title || "Explore my thoughts"}
-              </h3>
-            </div>
-            {
-              latestBlog && (
-                <div class="bento-card-body">
-                  <div class="bento-body-layout bento-body-side-by-side">
-                    <div class="bento-text-side bento-text-top-align">
-                      <p class="bento-text">
-                        {latestBlog.data.description || "Read my latest post →"}
-                      </p>
-                    </div>
-                    {latestBlog.data["cover-image"] && (
-                      <div class="bento-image-side">
-                        <div class="bento-image-container">
-                          <img
-                            src={
-                              typeof latestBlog.data["cover-image"] === "string"
-                                ? latestBlog.data["cover-image"]
-                                : latestBlog.data["cover-image"].src
-                            }
-                            alt={latestBlog.data.title}
-                            loading="lazy"
-                          />
-                        </div>
+          {
+            bentoCards?.map((card: any) => (
+              <a
+                href={card.href}
+                class={`bento-card bento-${card.id} ${card.id === "talks" ? "bento-wide" : ""}`}
+              >
+                {/* 1. Image / Visual */}
+                <div class="bento-visual-container">
+                  {card.image === "obsidian-graph" ? (
+                    <div class="obsidian-graph-container" id="obsidian-graph">
+                      <canvas id="graph-canvas" />
+                      <div class="graph-overlay">
+                        <span class="graph-text">Digital Garden</span>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div class="bento-image-wrapper">
+                      <img src={card.image} alt={card.title} loading="lazy" />
+                    </div>
+                  )}
                 </div>
-              )
-            }
-            <div class="bento-icon-floating bento-icon-pencil">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"
-                ></path>
-                <path d="m15 5 4 4"></path>
-              </svg>
-            </div>
-          </a>
 
-          <!-- Card 2: Photography (tall card) -->
-          <a
-            href="/photography"
-            class="bento-card bento-photography bento-tall"
-          >
-            <div class="bento-visual-container">
-              <div class="bento-visual-frame photography-frame">
-                <img
-                  src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80"
-                  alt="Photography preview"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="bento-meta-overlay">
-              <span class="bento-label">Photography</span>
-              <h3 class="bento-title-small">Moments captured</h3>
-            </div>
-            <div class="bento-icon-floating">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <path
-                  d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
-                ></path>
-                <circle cx="12" cy="13" r="4"></circle>
-              </svg>
-            </div>
-          </a>
+                {/* 2. Category & Info Overlay */}
+                <div class="bento-content-overlay">
+                  <div class="bento-header-info">
+                    <span class="bento-category">{card.category}</span>
+                    <h3 class="bento-card-title">{card.title}</h3>
+                  </div>
 
-          <!-- Card 3: Now Page -->
-          <a href="/now" class="bento-card bento-now">
-            <div class="bento-card-header">
-              <span class="bento-label"
-                >Now <span class="pulse-dot"></span></span
-              >
-              <h3 class="bento-title">What I'm doing</h3>
-            </div>
-            <div class="bento-card-body">
-              <p class="bento-excerpt">
-                {
-                  latestNow
-                    ? `Updated ${formatDateWithComma(latestNow.data.date)}`
-                    : "Current focus & interests →"
-                }
-              </p>
-            </div>
-            <div class="bento-icon-floating">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-            </div>
-          </a>
+                  {/* 3. Excerpt */}
+                  <p class="bento-excerpt">{card.summary}</p>
+                </div>
 
-          <!-- Card 4: Uses Page -->
-          <a href="/uses" class="bento-card bento-uses">
-            <div class="bento-visual-container">
-              <div class="bento-visual-frame uses-frame">
-                <img
-                  src="/images/uses-bento-grid.jpeg"
-                  alt="My setup preview"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="bento-meta-overlay">
-              <span class="bento-label">Uses</span>
-              <h3 class="bento-title-small">My setup</h3>
-            </div>
-            <div class="bento-icon-floating">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <path
-                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
-                ></path>
-              </svg>
-            </div>
-          </a>
-
-          <!-- Card 5: Talks Page -->
-          <a href="/talks" class="bento-card bento-talks bento-tall">
-            <div class="bento-visual-container">
-              <div class="bento-visual-frame talks-frame">
-                <img
-                  src="/images/talks-bento-grid.jpeg"
-                  alt="Talks preview"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div class="bento-meta-overlay">
-              <span class="bento-label">Talks</span>
-              <h3 class="bento-title-small">Public Speaking</h3>
-              <p class="bento-excerpt-overlay">
-                {
-                  latestTalk
-                    ? `Latest: ${latestTalk.data.title}`
-                    : "Conferences & presentations →"
-                }
-              </p>
-            </div>
-            <div class="bento-icon-floating">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <path d="M22 10v6M2 10v6"></path>
-                <path d="M6 10h12"></path>
-                <path d="m8 6 4-4 4 4"></path>
-                <path d="M12 2v20"></path>
-              </svg>
-            </div>
-          </a>
-
-          <!-- Card 6: Notes Page -->
-          <a href="/notes" class="bento-card bento-notes">
-            <div class="bento-card-header">
-              <span class="bento-label">Notes</span>
-              <h3 class="bento-title">Digital Garden</h3>
-            </div>
-            <div class="bento-card-body">
-              <p class="bento-excerpt">
-                {
-                  latestNote
-                    ? `Latest: ${latestNote.data.title}`
-                    : "Fragments & thoughts →"
-                }
-              </p>
-            </div>
-            <div class="bento-icon-floating">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-              >
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-              </svg>
-            </div>
-          </a>
+                {/* Floating Icon */}
+                <div class="bento-icon-floating">
+                  {card.id === "talks" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <path d="M22 10v6M2 10v6" />
+                      <path d="M6 10h12" />
+                      <path d="m8 6 4-4 4 4" />
+                      <path d="M12 2v20" />
+                    </svg>
+                  )}
+                  {card.id === "blog" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                      <path d="m15 5 4 4" />
+                    </svg>
+                  )}
+                  {card.id === "notes" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                    </svg>
+                  )}
+                  {card.id === "photography" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                      <circle cx="12" cy="13" r="4" />
+                    </svg>
+                  )}
+                  {card.id === "now" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  )}
+                  {card.id === "uses" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                    </svg>
+                  )}
+                  {card.id === "connect" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                    >
+                      <rect width="20" height="16" x="2" y="4" rx="2" />
+                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                    </svg>
+                  )}
+                </div>
+              </a>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -513,6 +454,97 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       updateCardPositions();
     }
 
+    // Obsidian Graph Animation
+    function initObsidianGraph() {
+      const canvas = document.getElementById(
+        "graph-canvas",
+      ) as HTMLCanvasElement;
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      let width = 0;
+      let height = 0;
+      const nodes: any[] = [];
+      const links: any[] = [];
+      const numNodes = 25;
+      const connectionDistance = 100;
+
+      function resize() {
+        const container = canvas.parentElement;
+        if (container) {
+          width = container.clientWidth;
+          height = container.clientHeight;
+          canvas.width = width * window.devicePixelRatio;
+          canvas.height = height * window.devicePixelRatio;
+          ctx?.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+      }
+
+      function initNodes() {
+        nodes.length = 0;
+        for (let i = 0; i < numNodes; i++) {
+          nodes.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            radius: Math.random() * 2 + 1,
+          });
+        }
+      }
+
+      function update() {
+        nodes.forEach((node) => {
+          node.x += node.vx;
+          node.y += node.vy;
+
+          if (node.x < 0 || node.x > width) node.vx *= -1;
+          if (node.y < 0 || node.y > height) node.vy *= -1;
+        });
+      }
+
+      function draw() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw links
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.15)";
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const dx = nodes[i].x - nodes[j].x;
+            const dy = nodes[i].y - nodes[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < connectionDistance) {
+              ctx.beginPath();
+              ctx.moveTo(nodes[i].x, nodes[i].y);
+              ctx.lineTo(nodes[j].x, nodes[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        // Draw nodes
+        ctx.fillStyle = "#6366f1"; // Indigo nodes
+        nodes.forEach((node) => {
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        update();
+        requestAnimationFrame(draw);
+      }
+
+      window.addEventListener("resize", resize);
+      resize();
+      initNodes();
+      draw();
+    }
+
     // Scroll-Aware Navigation Logic
     // Wrapped in a function so it can run on initial load AND on View Transitions
     function initNavScrollObserver() {
@@ -550,10 +582,12 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
     // Initialize
     initNavScrollObserver();
+    initObsidianGraph();
 
     // Re-initialize on page load (View Transitions)
     document.addEventListener("astro:page-load", () => {
       initNavScrollObserver();
+      initObsidianGraph();
     });
   </script>
 
@@ -793,439 +827,223 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       color: var(--color-base-content, inherit);
     }
 
-    /* Grid layout - 2 columns with named grid areas for asymmetry */
+    /* Grid layout - Asymmetric 2-column layout */
     .bento-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: minmax(380px, auto) minmax(280px, auto) minmax(
-          320px,
-          auto
-        );
-      grid-template-areas:
-        "blog  blog"
-        "now      photo"
-        "uses     photo"
-        "talks    notes";
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-auto-rows: minmax(350px, auto);
+      gap: 2rem;
     }
 
-    /* Base card styles - LARGER cards like mymind.com */
+    /* Desktop asymmetric sizing */
+    @media (min-width: 1024px) {
+      .bento-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .bento-wide {
+        grid-column: span 4;
+      }
+
+      .bento-blog {
+        grid-column: span 3;
+      }
+
+      .bento-notes {
+        grid-column: span 1;
+      }
+
+      .bento-photography,
+      .bento-now,
+      .bento-uses,
+      .bento-connect {
+        grid-column: span 2;
+      }
+    }
+
+    /* Base card styles */
     .bento-card {
       position: relative;
-      border-radius: 2rem;
-      padding: 2.5rem;
-      min-height: 280px;
+      border-radius: 2.5rem;
+      background: rgba(255, 255, 255, 0.03);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       text-decoration: none;
       overflow: hidden;
-      transition:
-        transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-        box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      min-width: 280px; /* SET MIN WIDTH TO PREVENT SQUISHING */
     }
 
     .bento-card:hover {
-      transform: translateY(-4px) scale(1.01);
-      box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.25);
+      transform: translateY(-8px);
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
-    /* Grid area assignments */
-    .bento-blog {
-      grid-area: blog;
-    }
-    .bento-photography {
-      grid-area: photo;
-    }
-    .bento-now {
-      grid-area: now;
-    }
-    .bento-uses {
-      grid-area: uses;
-    }
-    .bento-talks {
-      grid-area: talks;
-    }
-    .bento-notes {
-      grid-area: notes;
-      min-height: 400px;
-    }
-
-    /* Varied heights for visual interest */
-    .bento-blog {
-      min-height: 380px;
-    }
-
-    .bento-now,
-    .bento-uses {
-      min-height: 240px;
-    }
-
-    .bento-photography,
-    .bento-talks {
-      min-height: 520px;
-    }
-
-    /* Wide card - Writing with extra padding */
-    .bento-wide {
-      min-height: 280px;
-      padding: 3rem;
-      grid-column: span 2;
-    }
-
-    /* Tall card - Photography spans 2 rows, much taller */
-    .bento-tall {
-      min-height: 660px;
-    }
-
-    /* Card content layout */
-    .bento-card-content {
-      position: relative;
-      z-index: 1;
-    }
-
-    .bento-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      opacity: 0.7;
-      margin-bottom: 0.75rem;
-      display: block;
-    }
-
-    .bento-title {
-      font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-      font-size: 2.25rem;
-      font-weight: 500;
-      line-height: 1.1;
-      margin: 0.75rem 0;
-      letter-spacing: -0.03em;
-    }
-
-    .bento-text {
-      font-size: 1.15rem;
-      opacity: 0.75;
-      margin-top: 1rem;
-      line-height: 1.6;
-    }
-
-    /* Bento Card Body Layouts */
-    .bento-body-layout {
+    /* Visual container at top */
+    .bento-visual-container {
       width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      flex: 1;
-    }
-
-    @media (min-width: 1024px) {
-      .bento-body-side-by-side {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .bento-body-side-by-side .bento-text-side {
-        flex: 1;
-        max-width: 65%;
-      }
-
-      .bento-body-side-by-side .bento-image-side {
-        flex: 1;
-        max-width: 35%;
-        display: flex;
-        justify-content: flex-end;
-      }
-    }
-
-    .bento-image-container {
-      width: 100%;
-      border-radius: 1rem;
+      height: 240px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-      aspect-ratio: 4/3;
+      position: relative;
     }
 
-    .bento-card:hover .bento-image-container {
-      transform: scale(1.05) rotate(2deg);
+    .bento-image-wrapper {
+      width: 100%;
+      height: 100%;
     }
 
-    .bento-image-container img {
+    .bento-image-wrapper img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-    }
-
-    .bento-subtitle {
-      font-size: 1.1rem;
-      margin-top: 0.5rem;
-    }
-
-    /* Icon positioned in corner - larger */
-    .bento-icon {
-      position: absolute;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      opacity: 0.25;
-      transition:
-        opacity 0.3s ease,
-        transform 0.3s ease;
-    }
-
-    .bento-icon svg {
-      width: 36px;
-      height: 36px;
-    }
-
-    .bento-card:hover .bento-icon {
-      opacity: 0.5;
-      transform: scale(1.1);
-    }
-
-    /* ============================================
-     * Individual Card Colors - Light Mode
-     * Coordinated palette matching mymind.com
-     * ============================================ */
-
-    /* Blog card - Soft peach */
-    .bento-blog {
-      background: #fdf2f0;
-      color: #5a3d3d;
-    }
-
-    /* Photography card - Soft mint */
-    .bento-photography {
-      background: #f0f7f4;
-      color: #3d5a4d;
-    }
-
-    /* Now card - Soft cream/yellow */
-    .bento-now {
-      background: #fcf9ee;
-      color: #5a543d;
-    }
-
-    /* Uses card - Soft lavender/muted tan */
-    .bento-uses {
-      background: #f6f0f7;
-      color: #4d3d5a;
-    }
-
-    /* Talks card - Soft blue/grey */
-    .bento-talks {
-      background: #f0f4f7;
-      color: #3d4d5a;
-    }
-
-    /* Notes card - Soft sage/green */
-    .bento-notes {
-      background: #f4f6f0;
-      color: #4d5a3d;
-    }
-
-    /* ============================================
-     * Individual Card Colors - Dark Mode
-     * Muted, desaturated versions
-     * ============================================ */
-    :root[data-theme="dark"] .bento-blog {
-      background: #2a1f1e;
-      color: #e0cccc;
-    }
-
-    :root[data-theme="dark"] .bento-photography {
-      background: #1e2a24;
-      color: #cce0d6;
-    }
-
-    :root[data-theme="dark"] .bento-now {
-      background: #2a291e;
-      color: #e0decc;
-    }
-
-    :root[data-theme="dark"] .bento-uses {
-      background: #241e2a;
-      color: #d6cce0;
-    }
-
-    :root[data-theme="dark"] .bento-talks {
-      background: #1e242a;
-      color: #ccd6e0;
-    }
-
-    :root[data-theme="dark"] .bento-notes {
-      background: #242a1e;
-      color: #d6e0cc;
-    }
-
-    /* ============================================
-     * Visual Framing & Content Styles
-     * The "framed object on color" look
-     * ============================================ */
-    .bento-visual-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem 0;
-      perspective: 1000px;
-    }
-
-    .bento-visual-frame {
-      position: relative;
-      width: 92%;
-      height: 220px;
-      border-radius: 1.25rem;
-      background: white;
-      box-shadow:
-        0 15px 45px -10px rgba(0, 0, 0, 0.15),
-        0 10px 20px -10px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      transform: rotateX(4deg) rotateY(-4deg);
       transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
-    .bento-card:hover .bento-visual-frame {
-      transform: rotateX(0deg) rotateY(0deg) scale(1.08);
-      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2);
+    .bento-card:hover .bento-image-wrapper img {
+      transform: scale(1.1);
     }
 
-    .bento-visual-frame img {
+    /* Obsidian Graph Special Container */
+    .obsidian-graph-container {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-    }
-
-    .photography-frame {
-      height: 480px;
-      width: 95%;
-    }
-
-    .uses-frame {
-      height: 280px;
-      width: 94%;
-    }
-
-    .talks-frame {
-      height: 220px;
-      width: 92%;
-    }
-
-    .talks-frame img {
-      object-position: 0% 80%;
-    }
-
-    /* Card Text Elements */
-    .bento-card-header,
-    .bento-card-body {
+      background: #0f172a; /* Obsidian dark background */
       position: relative;
-      z-index: 2;
     }
 
-    .bento-meta-overlay {
-      margin-top: auto;
-      padding-top: 1rem;
+    #graph-canvas {
+      width: 100%;
+      height: 100%;
     }
 
-    .bento-title-small {
-      font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-      font-size: 1.1rem;
+    .graph-overlay {
+      position: absolute;
+      top: 1rem;
+      right: 1.25rem;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      padding: 0.4rem 0.8rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .graph-text {
+      font-size: 0.75rem;
+      color: #94a3b8;
       font-weight: 500;
-      margin-top: 0.25rem;
+      white-space: nowrap;
     }
 
-    .bento-excerpt-overlay {
-      font-size: 0.85rem;
-      opacity: 0.8;
-      margin-top: 0.5rem;
-      line-height: 1.4;
+    /* Content Overlay */
+    .bento-content-overlay {
+      padding: 2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 1rem;
     }
 
+    .bento-category {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-accent, #ec4899);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .bento-card-title {
+      font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+      font-size: 1.85rem;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--color-base-content, inherit);
+    }
+
+    .bento-excerpt {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      opacity: 0.7;
+      color: var(--color-base-content, inherit);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Icon positioned in top right */
     .bento-icon-floating {
       position: absolute;
-      top: 2rem;
-      right: 2rem;
-      opacity: 0.2;
-      transition: opacity 0.3s ease;
+      top: 1.5rem;
+      right: 1.5rem;
+      opacity: 0;
+      transform: translateX(10px);
+      transition: all 0.3s ease;
+      color: var(--color-accent, #ec4899);
+      z-index: 10;
     }
 
     .bento-card:hover .bento-icon-floating {
-      opacity: 0.4;
+      opacity: 1;
+      transform: translateX(0);
     }
 
-    /* Top-align text for Latest Writing card on wider layouts */
-    @media (min-width: 768px) {
-      .bento-text-top-align {
-        align-self: flex-start;
+    /* Individual Card Styles */
+    .bento-talks {
+      background: rgba(30, 41, 59, 0.4);
+    }
+    .bento-blog {
+      background: rgba(15, 23, 42, 0.4);
+    }
+    .bento-notes {
+      background: rgba(15, 23, 42, 1);
+    } /* Dark background for graph */
+    .bento-photography {
+      background: rgba(17, 24, 39, 0.4);
+    }
+    .bento-now {
+      background: rgba(15, 23, 42, 0.4);
+    }
+    .bento-uses {
+      background: rgba(17, 24, 39, 0.4);
+    }
+    .bento-connect {
+      background: rgba(30, 41, 59, 0.4);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1023px) {
+      .bento-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      }
+
+      .bento-wide,
+      .bento-blog {
+        grid-column: span 1;
       }
     }
 
-    /* ============================================
-     * Responsive Design
-     * Stack cards vertically on mobile
-     * ============================================ */
     @media (max-width: 640px) {
-      .bento-section {
-        padding: 0 0.5rem 4rem;
-      }
-
       .bento-wrapper {
-        padding: 0.75rem;
-      }
-
-      .bento-header {
-        margin-bottom: 2rem;
-        padding-top: 1.5rem;
-      }
-
-      .bento-header-title {
-        font-size: 2.25rem;
+        padding: 1.5rem;
       }
 
       .bento-grid {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
-        width: 100%;
+        gap: 1.5rem;
       }
 
       .bento-card {
-        width: 100%;
-        min-height: 120px;
-        padding: 1.25rem;
+        min-width: 100%;
       }
 
-      .bento-tall {
-        min-height: 200px;
-      }
-
-      .bento-title {
-        font-size: 1.6rem;
-      }
-
-      .bento-text {
-        font-size: 1rem;
-        line-height: 1.5;
-      }
-
-      .bento-icon-pencil svg {
-        width: 18px;
-        height: 18px;
-      }
-
-      .bento-icon-floating {
-        top: 1.25rem;
-        right: 1.25rem;
-      }
-
-      /* Position icons at bottom right for Photography, Uses, and Talks cards to avoid collision with images */
-      .bento-photography .bento-icon-floating,
-      .bento-uses .bento-icon-floating,
-      .bento-talks .bento-icon-floating {
-        top: auto;
-        bottom: 1.25rem;
+      .bento-card-title {
+        font-size: 1.5rem;
       }
     }
 
