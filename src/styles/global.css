@@ -2643,12 +2643,11 @@ html.theme-transitioning *::after {
 .pagefind-ui__form {
   padding: 0;
   position: relative;
-  background: rgba(15, 10, 22, 0.6) !important;
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
+  /* Completely opaque search capsule */
+  background: rgb(25, 20, 35) !important;
   border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   height: 54px !important;
   /* No overflow:hidden - results are siblings, not children */
 }
@@ -2664,11 +2663,10 @@ html.theme-transitioning *::after {
 }
 
 [data-theme="light"] .pagefind-ui__form {
-  background: rgba(255, 255, 255, 0.5) !important;
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  /* Completely opaque search capsule for light mode */
+  background: rgb(255, 255, 255) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 /* Pagefind has a built-in search icon via ::before */
@@ -2743,21 +2741,22 @@ html.theme-transitioning *::after {
 }
 
 .pagefind-ui__results-area {
-  margin-top: 0;
-  /* Match frosted-card / hamburger menu aesthetics */
-  background: rgba(30, 25, 40, 0.6) !important;
+  margin-top: 1rem;
+  /* Scrollable results card - separate from search capsule */
+  background: rgba(25, 20, 35, 0.95) !important;
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 0 30px rgba(244, 114, 182, 0.08),
-    0 0 50px rgba(168, 85, 247, 0.05),
-    0 8px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
   padding: 1.5rem !important;
-  max-height: 60vh;
-  overflow-y: auto;
+  max-height: 55vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   display: none;
+  /* Custom scrollbar for results */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
 .pagefind-ui__results-area:not(:empty) {
@@ -2765,9 +2764,10 @@ html.theme-transitioning *::after {
 }
 
 [data-theme="light"] .pagefind-ui__results-area {
-  background: rgba(245, 240, 250, 0.9) !important;
+  background: rgba(255, 255, 255, 0.98) !important;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
 }
 
 .pagefind-ui__result {
@@ -2797,11 +2797,13 @@ html.theme-transitioning *::after {
   background: rgba(0, 0, 0, 0.03) !important;
 }
 
+/* Title - NOT faded, stands out */
 .pagefind-ui__result-link {
   color: var(--pagefind-ui-text) !important;
   font-weight: 800 !important;
-  font-size: 1.25rem !important;
+  font-size: 1.2rem !important;
   text-decoration: none !important;
+  opacity: 1 !important;
 }
 
 .pagefind-ui__result-inner {
@@ -2844,40 +2846,68 @@ html.theme-transitioning *::after {
   font-weight: 400 !important;
 }
 
+/* Just show "/" separator, no "Date:" prefix */
 .pagefind-ui__result-tag::before {
   content: "/ ";
-  margin-right: 0.25rem;
 }
 
+/* Hide the 'Date:' label text from Pagefind - set font-size to 0 then reset for content */
 .pagefind-ui__result-tag {
   background: transparent !important;
   border: none !important;
   padding: 0 !important;
   color: inherit !important;
+  font-size: 0 !important;
 }
 
-/* Excerpt wraps to its own line and fades out adjacent text */
+/* Show only the actual date value */
+.pagefind-ui__result-tag b,
+.pagefind-ui__result-tag strong {
+  font-size: 0.85rem !important;
+  font-weight: 400 !important;
+}
+
+/* Excerpt - faded, only matched query pops */
 .pagefind-ui__result-excerpt {
   order: 1 !important;
   width: 100% !important;
-  margin-top: 0.5rem !important;
-  opacity: 0.5 !important;
+  margin-top: 0.75rem !important;
+  opacity: 0.45 !important;
   line-height: 1.6 !important;
+  font-size: 0.9rem !important;
 }
 
-/* Matched query pops with full opacity */
+/* Fade ALL anchors/headings in excerpt - only matched text should pop */
+.pagefind-ui__result-excerpt a {
+  opacity: 0.5 !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  font-weight: 400 !important;
+}
+
+/* Sub-result anchors (the emoji headings) should also be faded */
+.pagefind-ui a[href*="#"] {
+  opacity: 0.5 !important;
+  color: inherit !important;
+  pointer-events: none;
+}
+
+/* Matched query - NOT faded, pops with full opacity and emphasis */
 .pagefind-ui__result mark {
   background: transparent !important;
-  color: inherit !important;
+  color: #fff !important;
   opacity: 1 !important;
-  font-weight: 700;
+  font-weight: 600;
   padding: 0;
   border-radius: 0;
+  /* Make match stand out from faded excerpt */
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
 [data-theme="light"] .pagefind-ui__result mark {
   background: transparent !important;
-  color: inherit !important;
+  color: #1a1a1a !important;
+  text-shadow: none;
 }
 
 .pagefind-ui__message {
