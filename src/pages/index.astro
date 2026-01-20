@@ -841,7 +841,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
     /* Wrapper card - uses the same glassmorphism as hero */
     .bento-wrapper {
-      padding: 4rem 3rem 3rem; /* More top padding for balance */
+      padding: 3rem 1.5rem 2rem; /* Reduced side padding */
       max-width: 1400px;
       width: 100%;
       box-sizing: border-box;
@@ -849,7 +849,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
     @media (max-width: 1023px) {
       .bento-wrapper {
-        padding: 3rem 1.5rem 2rem;
+        padding: 2.5rem 1rem 1.5rem;
       }
     }
 
@@ -977,14 +977,11 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       border-color: rgba(255, 255, 255, 0.15);
     }
 
-    /* Visual container at top - MYMIND FLOATING LOOK */
+    /* Visual container at top - grows to fill available space */
     .bento-visual-container {
       width: 100%;
-      height: clamp(
-        180px,
-        20vw,
-        280px
-      ); /* Fluid height that scales with viewport */
+      flex: 1 1 auto; /* Grow to fill remaining space */
+      min-height: clamp(150px, 15vw, 220px); /* Minimum height */
       padding: clamp(0.75rem, 1.5vw, 1.5rem) clamp(0.75rem, 1.5vw, 1.5rem) 0;
       position: relative;
     }
@@ -1057,11 +1054,11 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       white-space: nowrap;
     }
 
-    /* Content Container */
+    /* Content Container - only takes the space it needs */
     .bento-content-container {
       padding: clamp(1rem, 2vw, 1.5rem) clamp(1.25rem, 2.5vw, 2rem)
         clamp(1.5rem, 3vw, 2.5rem);
-      flex: 1;
+      flex: 0 0 auto; /* Don't grow, only take needed space */
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
@@ -1124,26 +1121,10 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       transform: translateX(0);
     }
 
-    /* Individual Card Styles - Soft Pastels (Light Mode) */
     .bento-talks {
       background: #f0f4f8;
       --bento-text: #2d3436;
       --color-accent: #6b7280;
-    }
-
-    /* Talks card: image-dominant layout (~75% image, ~25% text) */
-    .bento-talks {
-      display: flex;
-      flex-direction: column;
-    }
-    .bento-talks .bento-visual-container {
-      flex: 3; /* Image takes 75% */
-      height: auto;
-      min-height: clamp(200px, 25vw, 320px);
-    }
-    .bento-talks .bento-content-container {
-      flex: 1; /* Text takes 25% */
-      padding: clamp(0.75rem, 1.5vw, 1.25rem) clamp(1rem, 2vw, 1.5rem);
     }
     .bento-blog {
       background: #fdf2f0;
@@ -1174,21 +1155,6 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       background: #ebf8ff;
       --bento-text: #2d3436;
       --color-accent: #6b7280;
-    }
-
-    /* Homelab card: image-dominant layout (~75% image, ~25% text) */
-    .bento-homelab {
-      display: flex;
-      flex-direction: column;
-    }
-    .bento-homelab .bento-visual-container {
-      flex: 3; /* Image takes 75% */
-      height: auto;
-      min-height: clamp(200px, 25vw, 320px);
-    }
-    .bento-homelab .bento-content-container {
-      flex: 1; /* Text takes 25% */
-      padding: clamp(0.75rem, 1.5vw, 1.25rem) clamp(1rem, 2vw, 1.5rem);
     }
     .bento-about {
       background: #fff5f5;
