@@ -14,12 +14,20 @@ const {
 } = Astro.props;
 const currentPath = Astro.url.pathname;
 
-const navLinks = [
-  { href: "/", label: "Home" },
+const visibleNavLinks = [
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+  { href: "/blog", label: "Writing" },
   { href: "/now", label: "Now" },
   { href: "/uses", label: "Uses" },
+];
+
+const allNavLinks = [
+  { href: "/", label: "Home" },
+  ...visibleNavLinks,
   { href: "/photography", label: "Photography" },
-  { href: "/blog", label: "Writing" },
+  { href: "/notes", label: "Notes" },
+  { href: "/talks", label: "Talks" },
 ];
 
 import { ClientRouter } from "astro:transitions";
@@ -94,7 +102,7 @@ import { ClientRouter } from "astro:transitions";
           <div class="glass-pill px-2 py-1">
             <ul class="nav-link-container flex items-center gap-1 text-sm">
               {
-                navLinks.map((link) => (
+                visibleNavLinks.map((link) => (
                   <li>
                     <a
                       href={link.href}
@@ -171,6 +179,38 @@ import { ClientRouter } from "astro:transitions";
                   stroke-linejoin="round"
                   d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
                 ></path>
+              </svg>
+            </button>
+            <button
+              id="menu-toggle-desktop"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
+              aria-label="Open menu"
+            >
+              <svg
+                id="hamburger-icon-desktop"
+                class="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+              <svg
+                id="close-icon-desktop"
+                class="w-5 h-5 hidden"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
@@ -285,10 +325,7 @@ import { ClientRouter } from "astro:transitions";
     </div>
 
     <!-- Mobile Menu Overlay (centered) -->
-    <div
-      id="mobile-menu"
-      class="mobile-menu-container fixed inset-0 z-40 md:hidden"
-    >
+    <div id="mobile-menu" class="mobile-menu-container fixed inset-0 z-40">
       <!-- Backdrop - dims and blurs the page -->
       <div
         id="mobile-menu-backdrop"
@@ -297,11 +334,14 @@ import { ClientRouter } from "astro:transitions";
       </div>
 
       <!-- Centered menu panel with grainy card -->
-      <div class="absolute inset-0 flex items-center justify-center p-6">
+      <div
+        id="mobile-menu-inner"
+        class="absolute inset-0 flex items-center justify-center p-6"
+      >
         <div class="mobile-menu-card frosted-card w-full max-w-sm p-6">
           <ul class="flex flex-col gap-2">
             {
-              navLinks.map((link) => (
+              allNavLinks.map((link) => (
                 <li>
                   <a
                     href={link.href}
@@ -317,6 +357,27 @@ import { ClientRouter } from "astro:transitions";
                 </li>
               ))
             }
+            <li class="mt-4 flex justify-center">
+              <button
+                id="menu-search-toggle"
+                class="p-4 rounded-2xl text-base-content/60 hover:text-base-content hover:bg-base-content/10 transition-all cursor-pointer group"
+                aria-label="Search"
+              >
+                <svg
+                  class="w-6 h-6 group-hover:scale-110 transition-transform"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  ></path>
+                </svg>
+              </button>
+            </li>
           </ul>
         </div>
       </div>
@@ -326,6 +387,7 @@ import { ClientRouter } from "astro:transitions";
     <div id="search-modal" class="search-modal-container fixed inset-0 z-[60]">
       <div id="search-backdrop" class="search-backdrop absolute inset-0"></div>
       <div
+        id="search-modal-inner"
         class="absolute inset-0 flex items-start justify-center pt-20 md:pt-32 p-4"
       >
         <div class="search-modal-card frosted-card w-full max-w-2xl">
@@ -343,6 +405,22 @@ import { ClientRouter } from "astro:transitions";
       /* When using page cards, remove footer margin */
       main:has(.page-cards-container) + footer {
         display: none;
+      }
+
+      /* Hide navbar when mobile menu is active */
+      :global(body.mobile-menu-active) .nav-container {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(-20px) !important;
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease !important;
+      }
+
+      .nav-container {
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
       }
     </style>
 
@@ -529,43 +607,59 @@ import { ClientRouter } from "astro:transitions";
         }
       });
 
-      // Mobile menu toggle - wrapped for View Transitions
-      function initMobileMenu() {
-        const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+      // Global menu toggle (mobile/desktop) - wrapped for View Transitions
+      function initGlobalMenu() {
         const mobileMenu = document.getElementById("mobile-menu");
         const mobileMenuBackdrop = document.getElementById(
           "mobile-menu-backdrop",
         );
-        const hamburgerIcon = document.getElementById("hamburger-icon");
-        const closeIcon = document.getElementById("close-icon");
+        const mobileMenuInner = document.getElementById("mobile-menu-inner");
+        const hamburgerIcons = [
+          document.getElementById("hamburger-icon"),
+          document.getElementById("hamburger-icon-desktop"),
+        ];
+        const closeIcons = [
+          document.getElementById("close-icon"),
+          document.getElementById("close-icon-desktop"),
+        ];
 
-        function openMobileMenu() {
+        function openMenu() {
           mobileMenu?.classList.add("menu-open");
-          hamburgerIcon?.classList.add("hidden");
-          closeIcon?.classList.remove("hidden");
+          document.body.classList.add("mobile-menu-active");
+          hamburgerIcons.forEach((icon) => icon?.classList.add("hidden"));
+          closeIcons.forEach((icon) => icon?.classList.remove("hidden"));
           document.body.style.overflow = "hidden";
         }
 
-        function closeMobileMenu() {
+        function closeMenu() {
           mobileMenu?.classList.remove("menu-open");
-          hamburgerIcon?.classList.remove("hidden");
-          closeIcon?.classList.add("hidden");
+          document.body.classList.remove("mobile-menu-active");
+          hamburgerIcons.forEach((icon) => icon?.classList.remove("hidden"));
+          closeIcons.forEach((icon) => icon?.classList.add("hidden"));
           document.body.style.overflow = "";
         }
 
-        // Clone to remove old listeners
-        if (mobileMenuToggle) {
-          const newToggle = mobileMenuToggle.cloneNode(true) as HTMLElement;
-          mobileMenuToggle.parentNode?.replaceChild(
-            newToggle,
-            mobileMenuToggle,
-          );
-          newToggle.addEventListener("click", () => {
-            const isOpen = mobileMenu?.classList.contains("menu-open");
-            if (isOpen) closeMobileMenu();
-            else openMobileMenu();
+        if (mobileMenuInner) {
+          mobileMenuInner.addEventListener("click", (e) => {
+            if (e.target === mobileMenuInner) closeMenu();
           });
         }
+
+        const toggles = [
+          document.getElementById("mobile-menu-toggle"),
+          document.getElementById("menu-toggle-desktop"),
+        ];
+
+        toggles.forEach((toggle) => {
+          if (!toggle) return;
+          const newToggle = toggle.cloneNode(true) as HTMLElement;
+          toggle.parentNode?.replaceChild(newToggle, toggle);
+          newToggle.addEventListener("click", () => {
+            const isOpen = mobileMenu?.classList.contains("menu-open");
+            if (isOpen) closeMenu();
+            else openMenu();
+          });
+        });
 
         if (mobileMenuBackdrop) {
           const newBackdrop = mobileMenuBackdrop.cloneNode(true) as HTMLElement;
@@ -573,12 +667,32 @@ import { ClientRouter } from "astro:transitions";
             newBackdrop,
             mobileMenuBackdrop,
           );
-          newBackdrop.addEventListener("click", closeMobileMenu);
+          newBackdrop.addEventListener("click", closeMenu);
         }
 
         mobileMenu?.querySelectorAll("a").forEach((link) => {
-          link.addEventListener("click", closeMobileMenu);
+          link.addEventListener("click", closeMenu);
         });
+
+        const menuSearchToggle = document.getElementById("menu-search-toggle");
+        if (menuSearchToggle) {
+          const newSearchToggle = menuSearchToggle.cloneNode(
+            true,
+          ) as HTMLElement;
+          menuSearchToggle.parentNode?.replaceChild(
+            newSearchToggle,
+            menuSearchToggle,
+          );
+          newSearchToggle.addEventListener("click", () => {
+            closeMenu();
+            setTimeout(() => {
+              const searchToggle =
+                document.getElementById("search-toggle-desktop") ||
+                document.getElementById("search-toggle-mobile");
+              searchToggle?.click();
+            }, 100);
+          });
+        }
       }
 
       // Search Modal - wrapped for View Transitions
@@ -635,6 +749,13 @@ import { ClientRouter } from "astro:transitions";
           }
         }
 
+        const searchModalInner = document.getElementById("search-modal-inner");
+        if (searchModalInner) {
+          searchModalInner.addEventListener("click", (e) => {
+            if (e.target === searchModalInner) closeSearch();
+          });
+        }
+
         function openSearch() {
           searchModal?.classList.add("search-open");
           document.body.style.overflow = "hidden";
@@ -671,12 +792,12 @@ import { ClientRouter } from "astro:transitions";
       }
 
       // Initialize all interactive elements
-      initMobileMenu();
+      initGlobalMenu();
       initSearchModal();
 
       // Re-initialize after View Transitions navigation
       document.addEventListener("astro:page-load", () => {
-        initMobileMenu();
+        initGlobalMenu();
         initSearchModal();
         updateSearchShortcut();
       });
@@ -703,6 +824,7 @@ import { ClientRouter } from "astro:transitions";
               document.body.style.overflow = "";
             } else if (mobileMenu?.classList.contains("menu-open")) {
               mobileMenu.classList.remove("menu-open");
+              document.body.classList.remove("mobile-menu-active");
               document.body.style.overflow = "";
             }
           }
