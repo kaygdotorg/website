@@ -886,28 +886,49 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       border-color: rgba(255, 255, 255, 0.15);
     }
 
-    /* Visual container at top */
+    /* Visual container at top - MYMIND FLOATING LOOK */
     .bento-visual-container {
       width: 100%;
-      height: 240px;
-      overflow: hidden;
+      height: 260px;
+      padding: 1.5rem 1.5rem 0; /* Padding makes it float */
       position: relative;
     }
 
     .bento-image-wrapper {
       width: 100%;
       height: 100%;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      position: relative;
+      background: white; /* Clean background for the floater */
+      box-shadow:
+        0 10px 30px -10px rgba(0, 0, 0, 0.15),
+        0 4px 10px -2px rgba(0, 0, 0, 0.05);
+
+      /* progressive bottom blur mask */
+      -webkit-mask-image: linear-gradient(
+        to bottom,
+        black 85%,
+        transparent 100%
+      );
+      mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
     }
 
     .bento-image-wrapper img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     .bento-card:hover .bento-image-wrapper img {
-      transform: scale(1.1);
+      transform: scale(1.05);
+    }
+
+    /* Remove floating effect for Obsidian Graph to keep it filling */
+    .bento-notes .bento-visual-container {
+      padding: 0;
+      height: 240px;
     }
 
     /* Obsidian Graph Special Container */
@@ -1011,27 +1032,31 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       transform: translateX(0);
     }
 
-    /* Individual Card Styles */
+    /* Individual Card Styles - Softer, Mymind-like colors */
     .bento-talks {
-      background: rgba(30, 41, 59, 0.4);
+      background: #f0f4f8;
     }
     .bento-blog {
-      background: rgba(15, 23, 42, 0.4);
+      background: #fdf2f0;
     }
     .bento-notes {
-      background: rgba(15, 23, 42, 1);
-    } /* Dark background for graph */
+      background: #0f172a;
+    } /* Keep obsidian dark */
     .bento-photography {
-      background: rgba(17, 24, 39, 0.4);
+      background: #f0f7f4;
     }
     .bento-now {
-      background: rgba(15, 23, 42, 0.4);
+      background: #fcf9ee;
     }
     .bento-uses {
-      background: rgba(17, 24, 39, 0.4);
+      background: #f6f0f7;
     }
     .bento-connect {
-      background: rgba(30, 41, 59, 0.4);
+      background: #fdf0f7;
+    }
+
+    :root[data-theme="dark"] .bento-card:not(.bento-notes) {
+      background: rgba(255, 255, 255, 0.05);
     }
 
     /* Responsive Design */
@@ -1047,18 +1072,23 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     }
 
     @media (max-width: 640px) {
+      .bento-section {
+        padding: 0 0.5rem 4rem; /* VERY CLOSE TO EDGE */
+      }
+
       .bento-wrapper {
-        padding: 1.5rem;
+        padding: 1rem 0.75rem; /* Narrower padding */
       }
 
       .bento-grid {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1.25rem;
       }
 
       .bento-card {
         min-width: 100%;
+        border-radius: 1.75rem; /* Slightly tighter for mobile */
       }
 
       .bento-card-title {
@@ -1112,16 +1142,18 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     /* Responsive */
     @media (max-width: 768px) {
       .homepage {
-        padding: 1rem;
+        padding: 0.5rem; /* Go closer to edge */
         gap: 3rem;
       }
 
       .hero-section {
         flex: 1;
+        padding: 1rem 0.5rem; /* Closer to edge */
       }
 
       .hero-card {
-        padding: 2rem;
+        padding: 2.5rem 1.25rem;
+        max-width: 95%; /* Wider on mobile */
       }
 
       .hero-name {
