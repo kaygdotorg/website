@@ -553,26 +553,18 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       }
 
       function update() {
+        const padding = 10; // Keep nodes away from edges
         nodes.forEach((node) => {
           node.x += node.vx;
           node.y += node.vy;
 
-          // Stay within bounds accounting for radius
-          if (node.x - node.radius < 0) {
-            node.x = node.radius;
-            node.vx *= -1;
-          } else if (node.x + node.radius > width) {
-            node.x = width - node.radius;
-            node.vx *= -1;
-          }
+          // Bounce with padding so nodes don't touch edges
+          if (node.x < padding || node.x > width - padding) node.vx *= -1;
+          if (node.y < padding || node.y > height - padding) node.vy *= -1;
 
-          if (node.y - node.radius < 0) {
-            node.y = node.radius;
-            node.vy *= -1;
-          } else if (node.y + node.radius > height) {
-            node.y = height - node.radius;
-            node.vy *= -1;
-          }
+          // Clamp position to stay within bounds
+          node.x = Math.max(padding, Math.min(width - padding, node.x));
+          node.y = Math.max(padding, Math.min(height - padding, node.y));
         });
       }
 
@@ -898,12 +890,14 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       color: var(--color-base-content, inherit);
     }
 
-    /* Grid layout - Asymmetric 2-column layout */
+    /* Grid layout - mymind style: fixed proportions that scale */
     .bento-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      grid-auto-rows: minmax(350px, auto);
-      gap: 2rem;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 380px;
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     /* Desktop asymmetric sizing */
@@ -912,6 +906,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         grid-template-columns: repeat(4, 1fr);
       }
 
+      /* Row 1: Talks (large) | Writing (small) */
       .bento-talks {
         grid-column: span 3;
       }
@@ -919,6 +914,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         grid-column: span 1;
       }
 
+      /* Row 2: Notes (equal) | Now (equal) */
       .bento-notes {
         grid-column: span 2;
       }
@@ -926,11 +922,12 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         grid-column: span 2;
       }
 
+      /* Row 3: Photography (full) */
       .bento-photography {
         grid-column: span 4;
-        height: 500px;
       }
 
+      /* Row 4: Uses (small) | Homelab (large) */
       .bento-uses {
         grid-column: span 1;
       }
@@ -938,6 +935,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         grid-column: span 3;
       }
 
+      /* Row 5: About (equal) | Contact (equal) */
       .bento-about {
         grid-column: span 2;
       }
@@ -969,33 +967,28 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     .bento-visual-container {
       width: 100%;
       height: 260px;
-      padding: 1.5rem 1.5rem 0;
+      padding: 1.5rem 1.5rem 0; /* Padding makes it float */
       position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     .bento-image-wrapper {
-      width: auto;
+      width: 100%;
       height: 100%;
-      aspect-ratio: 16/10; /* Fixed aspect ratio so images look consistent across card widths */
-      max-width: 100%;
-      border-radius: 1.25rem;
+      border-radius: 1.5rem;
       overflow: hidden;
       position: relative;
-      background: white;
+      background: white; /* Clean background for the floater */
       box-shadow:
-        0 10px 30px -10px rgba(0, 0, 0, 0.1),
+        0 10px 30px -10px rgba(0, 0, 0, 0.15),
         0 4px 10px -2px rgba(0, 0, 0, 0.05);
 
       /* progressive bottom blur mask */
       -webkit-mask-image: linear-gradient(
         to bottom,
-        black 80%,
+        black 85%,
         transparent 100%
       );
-      mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
     }
 
     .bento-image-wrapper img {
@@ -1116,7 +1109,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       transform: translateX(0);
     }
 
-    /* Individual Card Styles - Soft Pastels (Light) */
+    /* Individual Card Styles - Soft Pastels (Light Mode) */
     .bento-talks {
       background: #f0f4f8;
       --bento-text: #2d3436;
@@ -1163,42 +1156,51 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       --color-accent: #6b7280;
     }
 
-    /* Dark Mode Pastel Muting */
+    /* Dark Mode - Muted Pastel Backgrounds */
     :root[data-theme="dark"] .bento-talks {
-      background: #1a1e23;
-      --bento-text: #e2e8f0;
+      background: #1e293b;
+      --bento-text: #ffffff;
+      --color-accent: #94a3b8;
     }
     :root[data-theme="dark"] .bento-blog {
-      background: #231d1c;
-      --bento-text: #fef2f2;
+      background: #2d2327;
+      --bento-text: #ffffff;
+      --color-accent: #e5b8a8;
+    }
+    :root[data-theme="dark"] .bento-notes {
+      background: #0f172a;
+      --bento-text: #ffffff;
+      --color-accent: #00d2d3;
     }
     :root[data-theme="dark"] .bento-photography {
-      background: #1c231f;
-      --bento-text: #f0fdf4;
+      background: #1a2e25;
+      --bento-text: #ffffff;
+      --color-accent: #6ee7b7;
     }
     :root[data-theme="dark"] .bento-now {
-      background: #23221c;
-      --bento-text: #fefce8;
+      background: #2a2820;
+      --bento-text: #ffffff;
+      --color-accent: #fcd34d;
     }
     :root[data-theme="dark"] .bento-uses {
-      background: #231c23;
-      --bento-text: #fdf4ff;
+      background: #2a2030;
+      --bento-text: #ffffff;
+      --color-accent: #c4b5fd;
     }
     :root[data-theme="dark"] .bento-homelab {
-      background: #1c2123;
-      --bento-text: #f0f9ff;
+      background: #1a2535;
+      --bento-text: #ffffff;
+      --color-accent: #7dd3fc;
     }
     :root[data-theme="dark"] .bento-about {
-      background: #231c1c;
-      --bento-text: #fef2f2;
+      background: #2d2025;
+      --bento-text: #ffffff;
+      --color-accent: #fca5a5;
     }
     :root[data-theme="dark"] .bento-contact {
-      background: #231c21;
-      --bento-text: #fdf4ff;
-    }
-
-    :root[data-theme="dark"] .bento-card:not(.bento-notes) {
-      --color-accent: #94a3b8;
+      background: #2a2030;
+      --bento-text: #ffffff;
+      --color-accent: #f9a8d4;
     }
 
     /* Photography Specific Layout */
@@ -1299,36 +1301,55 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       object-fit: cover;
     }
 
-    /* Responsive Design */
+    /* Responsive Design - Scale proportionally */
     @media (max-width: 1023px) {
       .bento-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 320px;
       }
 
-      .bento-wide,
-      .bento-blog {
+      /* All cards become equal width on tablet */
+      .bento-talks,
+      .bento-blog,
+      .bento-notes,
+      .bento-now,
+      .bento-uses,
+      .bento-homelab,
+      .bento-about,
+      .bento-contact {
         grid-column: span 1;
+      }
+
+      .bento-photography {
+        grid-column: span 2;
+        height: auto;
       }
     }
 
     @media (max-width: 640px) {
       .bento-section {
-        padding: 0 0.5rem 4rem; /* VERY CLOSE TO EDGE */
+        padding: 0 0.75rem 4rem;
       }
 
       .bento-wrapper {
-        padding: 1rem 0.75rem; /* Narrower padding */
+        padding: 1rem 0.5rem;
       }
 
       .bento-grid {
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+        gap: 1rem;
       }
 
       .bento-card {
         min-width: 100%;
-        border-radius: 1.75rem; /* Slightly tighter for mobile */
+        border-radius: 1.75rem;
+        min-height: 380px;
+      }
+
+      .bento-photography {
+        grid-column: span 1;
+        min-height: 500px;
       }
 
       .bento-card-title {
