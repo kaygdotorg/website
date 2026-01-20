@@ -129,12 +129,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
           }
 
           <!-- Name -->
-          <h1 class="hero-name">
-            <span class="hero-name-wrapper">
-              <span class="hero-name-full">{name}</span>
-              <span class="hero-name-short">@kaygdotorg</span>
-            </span>
-          </h1>
+          <h1 class="hero-name">{name}</h1>
 
           <!-- Tagline -->
           <p class="hero-tagline">
@@ -189,7 +184,14 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         <!-- Section header -->
         <div class="bento-header">
           <span class="bento-header-label">Explore</span>
-          <h2 class="bento-header-title">A little bit about me</h2>
+          <h2 class="bento-header-title">
+            A little bit about<br />
+            <span class="rotating-text-wrapper">
+              <span class="rotating-text font-tangerine" id="rotating-text"
+                >me</span
+              >
+            </span>
+          </h2>
         </div>
 
         <div class="bento-grid">
@@ -646,15 +648,46 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     // Initialize
     initNavScrollObserver();
     initObsidianGraph();
+    initRotatingText();
 
     // Re-initialize on page load (View Transitions)
     document.addEventListener("astro:page-load", () => {
       initNavScrollObserver();
       initObsidianGraph();
+      initRotatingText();
     });
+
+    // Rotating text for bento header
+    function initRotatingText() {
+      const textElement = document.getElementById("rotating-text");
+      if (!textElement) return;
+
+      const texts = ["me", "@kaygdotorg", "K Gopal Krishna"];
+      let currentIndex = 0;
+
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % texts.length;
+        textElement.style.opacity = "0";
+        textElement.style.transform = "translateY(-100%)";
+
+        setTimeout(() => {
+          textElement.textContent = texts[currentIndex];
+          textElement.style.opacity = "1";
+          textElement.style.transform = "translateY(0)";
+        }, 1500); // Wait for half of transition to swap text
+      }, 5000); // 3s transition + 2s paused
+    }
   </script>
 
   <style>
+    @font-face {
+      font-family: "Lovely Coffee";
+      src: url("/fonts/Lovely Coffee.otf") format("opentype");
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
     /* Homepage Layout */
     .homepage {
       display: flex;
@@ -712,82 +745,22 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       letter-spacing: -0.07em;
     }
 
-    .hero-name-wrapper {
-      position: relative;
+    /* Rotating Text Animation for Bento Header */
+    .rotating-text-wrapper {
       display: inline-block;
-      color: var(--color-base-content, inherit);
+      position: relative;
+      min-width: 200px;
+      height: 1.5em;
+      overflow: hidden;
+      vertical-align: bottom;
+      margin-top: 1.5rem; /* Added spacing from text above */
     }
 
-    .hero-name-full,
-    .hero-name-short {
-      display: block;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .hero-name-short {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      opacity: 0;
-      transform: translateY(10px);
-      white-space: nowrap;
-      font-size: 0.85em;
-      letter-spacing: normal;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-    }
-
-    /* Desktop Hover - Name Swap */
-    @media (min-width: 1024px) {
-      .hero-card:hover .hero-name-full {
-        opacity: 0;
-        transform: translateY(-8px);
-      }
-      .hero-card:hover .hero-name-short {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Mobile - Subtle premium transition (slower) */
-    @media (max-width: 1023px) {
-      .hero-name-full {
-        animation: mobile-name-fade 12s ease-in-out infinite;
-      }
-      .hero-name-short {
-        animation: mobile-short-fade 12s ease-in-out infinite;
-      }
-    }
-
-    @keyframes mobile-name-fade {
-      0%,
-      45%,
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      50%,
-      95% {
-        opacity: 0;
-        transform: translateY(-8px);
-      }
-    }
-
-    @keyframes mobile-short-fade {
-      0%,
-      45%,
-      100% {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      50%,
-      95% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .rotating-text {
+      display: inline-block;
+      transition:
+        opacity 3s ease,
+        transform 3s ease;
     }
 
     .hero-glow {
@@ -856,18 +829,34 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       padding: 0 2rem 6rem;
       display: flex;
       justify-content: center;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 1023px) {
+      .bento-section {
+        padding: 0 1rem 4rem;
+      }
     }
 
     /* Wrapper card - uses the same glassmorphism as hero */
     .bento-wrapper {
-      padding: 3rem;
+      padding: 4rem 3rem 3rem; /* More top padding for balance */
       max-width: 1400px;
       width: 100%;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 1023px) {
+      .bento-wrapper {
+        padding: 3rem 1.5rem 2rem;
+      }
     }
 
     /* Section header inside wrapper */
     .bento-header {
-      margin-bottom: 3.5rem;
+      margin-bottom: 4rem;
+      padding-top: 1rem;
       text-align: center;
     }
 
@@ -890,20 +879,47 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       color: var(--color-base-content, inherit);
     }
 
+    /* Lovely Coffee font for signature accents */
+    .font-tangerine {
+      font-family: "Lovely Coffee", cursive;
+      font-size: 1.8em; /* Slightly larger for Lovely Coffee */
+      font-weight: 400;
+      line-height: 1;
+    }
+
     /* Grid layout - mymind style: fixed proportions that scale */
     .bento-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-auto-rows: 380px;
+      grid-template-columns: repeat(1, 1fr); /* Mobile first */
+      grid-auto-rows: auto;
       gap: 1.5rem;
       max-width: 1200px;
       margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Tablet Range: 2 columns */
+    @media (min-width: 641px) and (max-width: 1099px) {
+      .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: minmax(350px, auto);
+      }
+
+      .bento-card {
+        grid-column: span 1 !important;
+      }
+
+      .bento-photography {
+        grid-column: span 2 !important;
+      }
     }
 
     /* Desktop asymmetric sizing */
-    @media (min-width: 1024px) {
+    /* Desktop Range: 4 columns */
+    @media (min-width: 1100px) {
       .bento-grid {
         grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
       }
 
       /* Row 1: Talks (large) | Writing (small) */
@@ -954,7 +970,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       overflow: hidden;
       transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       border: 1px solid rgba(255, 255, 255, 0.05); /* Very subtle border */
-      min-width: 280px;
+      min-width: 240px; /* Reduced min-width to prevent overflow */
     }
 
     .bento-card:hover {
@@ -1086,10 +1102,6 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       line-height: 1.6;
       opacity: 0.8;
       color: var(--bento-text, var(--color-base-content, inherit));
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
     }
 
     /* Icon positioned in top right */
@@ -1114,6 +1126,11 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       background: #f0f4f8;
       --bento-text: #2d3436;
       --color-accent: #6b7280;
+    }
+
+    /* Talks card: show more image */
+    .bento-talks .bento-visual-container {
+      height: 380px;
     }
     .bento-blog {
       background: #fdf2f0;
@@ -1301,30 +1318,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       object-fit: cover;
     }
 
-    /* Responsive Design - Scale proportionally */
-    @media (max-width: 1023px) {
-      .bento-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-auto-rows: 320px;
-      }
-
-      /* All cards become equal width on tablet */
-      .bento-talks,
-      .bento-blog,
-      .bento-notes,
-      .bento-now,
-      .bento-uses,
-      .bento-homelab,
-      .bento-about,
-      .bento-contact {
-        grid-column: span 1;
-      }
-
-      .bento-photography {
-        grid-column: span 2;
-        height: auto;
-      }
-    }
+    /* Remove redundant responsive rules as they are now handled above */
 
     @media (max-width: 640px) {
       .bento-section {
@@ -1332,7 +1326,16 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       }
 
       .bento-wrapper {
-        padding: 1rem 0.5rem;
+        padding: 3rem 1rem 1.5rem; /* Keep top padding consistent */
+      }
+
+      .bento-header {
+        margin-bottom: 2.5rem;
+        padding-top: 0.5rem;
+      }
+
+      .bento-header-title {
+        font-size: 2.5rem;
       }
 
       .bento-grid {
