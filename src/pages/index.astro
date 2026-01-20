@@ -851,11 +851,11 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       }
 
       .bento-blog {
-        grid-column: span 3;
+        grid-column: span 2;
       }
 
       .bento-notes {
-        grid-column: span 1;
+        grid-column: span 2;
       }
 
       .bento-photography,
@@ -870,14 +870,13 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     .bento-card {
       position: relative;
       border-radius: 2.5rem;
-      background: rgba(255, 255, 255, 0.03);
       display: flex;
       flex-direction: column;
       text-decoration: none;
       overflow: hidden;
       transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      min-width: 280px; /* SET MIN WIDTH TO PREVENT SQUISHING */
+      border: 1px solid rgba(255, 255, 255, 0.05); /* Very subtle border */
+      min-width: 280px;
     }
 
     .bento-card:hover {
@@ -1000,15 +999,15 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       font-size: 1.85rem;
       font-weight: 500;
       line-height: 1.2;
-      color: var(--color-base-content, inherit);
+      color: var(--bento-text, var(--color-base-content, inherit));
       margin: 0;
     }
 
     .bento-excerpt {
       font-size: 1.05rem;
       line-height: 1.6;
-      opacity: 0.7;
-      color: var(--color-base-content, inherit);
+      opacity: 0.8;
+      color: var(--bento-text, var(--color-base-content, inherit));
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
@@ -1032,31 +1031,74 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       transform: translateX(0);
     }
 
-    /* Individual Card Styles - Softer, Mymind-like colors */
+    /* Individual Card Styles - Characterful Colors */
     .bento-talks {
-      background: #f0f4f8;
+      background: #2d3436;
+      --bento-text: #ffffff;
+      --color-accent: #fab1a0;
     }
     .bento-blog {
-      background: #fdf2f0;
+      background: #2f3640;
+      --bento-text: #ffffff;
+      --color-accent: #dcdde1;
     }
     .bento-notes {
       background: #0f172a;
-    } /* Keep obsidian dark */
+      --bento-text: #ffffff;
+      --color-accent: #00d2d3;
+    }
     .bento-photography {
-      background: #f0f7f4;
+      background: #353b48;
+      --bento-text: #ffffff;
+      --color-accent: #fbc531;
     }
     .bento-now {
-      background: #fcf9ee;
+      background: #40739e;
+      --bento-text: #ffffff;
+      --color-accent: #f5f6fa;
     }
     .bento-uses {
-      background: #f6f0f7;
+      background: #487eb0;
+      --bento-text: #ffffff;
+      --color-accent: #dcdde1;
     }
     .bento-connect {
-      background: #fdf0f7;
+      background: #192a56;
+      --bento-text: #ffffff;
+      --color-accent: #44bd32;
     }
 
-    :root[data-theme="dark"] .bento-card:not(.bento-notes) {
-      background: rgba(255, 255, 255, 0.05);
+    /* Light Mode Overrides for Characterful Colors */
+    :root[data-theme="light"] .bento-talks {
+      background: #f1f2f6;
+      --bento-text: #2f3542;
+    }
+    :root[data-theme="light"] .bento-blog {
+      background: #eccc68;
+      --bento-text: #2f3542;
+    }
+    :root[data-theme="light"] .bento-photography {
+      background: #7bed9f;
+      --bento-text: #2f3542;
+    }
+    :root[data-theme="light"] .bento-now {
+      background: #70a1ff;
+      --bento-text: #ffffff;
+    }
+    :root[data-theme="light"] .bento-uses {
+      background: #ffa502;
+      --bento-text: #ffffff;
+    }
+    :root[data-theme="light"] .bento-connect {
+      background: #ff4757;
+      --bento-text: #ffffff;
+    }
+
+    /* Keep Note card Dark in Light mode for contrast? Or make it a light characterful one? */
+    /* Let's keep it dark as it's the "Digital Garden" and looks better with the graph on dark */
+    :root[data-theme="light"] .bento-notes {
+      background: #1e272e;
+      --bento-text: #ffffff;
     }
 
     /* Responsive Design */
