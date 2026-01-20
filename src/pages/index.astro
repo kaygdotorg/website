@@ -1131,9 +1131,19 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       --color-accent: #6b7280;
     }
 
-    /* Talks card: slightly taller visual for wide card */
+    /* Talks card: image-dominant layout (~75% image, ~25% text) */
+    .bento-talks {
+      display: flex;
+      flex-direction: column;
+    }
     .bento-talks .bento-visual-container {
-      height: clamp(220px, 28vw, 380px);
+      flex: 3; /* Image takes 75% */
+      height: auto;
+      min-height: clamp(200px, 25vw, 320px);
+    }
+    .bento-talks .bento-content-container {
+      flex: 1; /* Text takes 25% */
+      padding: clamp(0.75rem, 1.5vw, 1.25rem) clamp(1rem, 2vw, 1.5rem);
     }
     .bento-blog {
       background: #fdf2f0;
@@ -1164,6 +1174,21 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       background: #ebf8ff;
       --bento-text: #2d3436;
       --color-accent: #6b7280;
+    }
+
+    /* Homelab card: image-dominant layout (~75% image, ~25% text) */
+    .bento-homelab {
+      display: flex;
+      flex-direction: column;
+    }
+    .bento-homelab .bento-visual-container {
+      flex: 3; /* Image takes 75% */
+      height: auto;
+      min-height: clamp(200px, 25vw, 320px);
+    }
+    .bento-homelab .bento-content-container {
+      flex: 1; /* Text takes 25% */
+      padding: clamp(0.75rem, 1.5vw, 1.25rem) clamp(1rem, 2vw, 1.5rem);
     }
     .bento-about {
       background: #fff5f5;
