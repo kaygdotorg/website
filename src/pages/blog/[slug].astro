@@ -66,14 +66,12 @@ if (nextPost) {
     lastEdited={lastEdited}
     readingTime={readingTime}
     backlinks={backlinks}
-    image={typeof post.data["cover-image"] === "string"
-        ? post.data["cover-image"]
-        : post.data["cover-image"]?.src}
+    coverImage={post.data["cover-image"]}
 >
     {
         post.data.tags && post.data.tags.length > 0 && (
             <div class="flex flex-wrap gap-2 mb-6">
-                {post.data.tags.map((tag) => (
+                {post.data.tags.map((tag: string) => (
                     <span class="px-3 py-1 text-xs rounded-full bg-white/10 text-white/80">
                         {tag}
                     </span>

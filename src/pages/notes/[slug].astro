@@ -65,12 +65,12 @@ if (nextNote) {
     lastEdited={lastEdited}
     readingTime={readingTime}
     backlinks={backlinks}
-    image={note.data.image}
+    coverImage={note.data["cover-image"]}
 >
     {
         note.data.tags && note.data.tags.length > 0 && (
             <div class="flex flex-wrap gap-2 mb-6">
-                {note.data.tags.map((tag) => (
+                {note.data.tags.map((tag: string) => (
                     <span class="px-3 py-1 text-xs rounded-full bg-white/10 text-white/80">
                         {tag}
                     </span>

@@ -1,29 +1,29 @@
 ---
-import TimelineLayout from '../../layouts/TimelineLayout.astro';
-import { getCollection } from 'astro:content';
+import TimelineLayout from "../../layouts/TimelineLayout.astro";
+import { getCollection } from "astro:content";
 
 // Get all now entries
-const allEntries = await getCollection('now');
+const allEntries = await getCollection("now");
 
 // Transform entries for the timeline
-const entries = allEntries.map(entry => {
+const entries = allEntries.map((entry) => {
   const rawDate = entry.data.date;
   const date = rawDate instanceof Date ? rawDate : new Date(rawDate);
-  
+
   return {
     slug: entry.slug,
     title: entry.data.title,
     date: date,
     excerpt: entry.data.excerpt || entry.data.description,
     href: `/now/${entry.slug}`,
+    coverImage: entry.data["cover-image"],
   };
 });
 ---
 
-<TimelineLayout 
+<TimelineLayout
   title="Now"
   description="A timeline of what I've been focused on. Like an about page, but for different points in my life."
   entries={entries}
   basePath="/now"
 />
-

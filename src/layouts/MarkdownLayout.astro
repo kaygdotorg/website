@@ -9,7 +9,7 @@ interface Props {
   lastEdited?: Date | string;
   readingTime?: number;
   backlinks?: Array<{ title: string; href: string }>;
-  image?: string;
+  coverImage?: any;
 }
 
 const {
@@ -19,7 +19,7 @@ const {
   lastEdited,
   readingTime,
   backlinks = [],
-  image,
+  coverImage,
 } = Astro.props;
 
 const relativeLastEdited = lastEdited ? getRelativeTime(lastEdited) : null;
@@ -33,9 +33,17 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
     <div class="frosted-card md-unified-card">
       <!-- Featured Image at top of card -->
       {
-        image && (
+        coverImage && (
           <div class="md-card-featured-image">
-            <img src={image} alt={title} />
+            {typeof coverImage === "string" ? (
+              <img src={coverImage} alt={title} />
+            ) : (
+              <img
+                src={coverImage.src}
+                alt={title}
+                {...coverImage.attributes}
+              />
+            )}
           </div>
         )
       }

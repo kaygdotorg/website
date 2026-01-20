@@ -8,6 +8,7 @@ interface TimelineEntry {
   date: Date;
   excerpt?: string;
   href: string;
+  coverImage?: any;
 }
 
 interface Props {
@@ -42,22 +43,37 @@ const sortedEntries = entries.sort((a, b) => b.date.getTime() - a.date.getTime()
             
             <div class="w-full md:w-1/2 px-8">
               <a href={entry.href} class="block frosted-card p-6 h-full hover:scale-[1.02] transition-all duration-300">
-                <div class="flex justify-between items-start mb-2">
-                  <time class="text-sm font-semibold uppercase tracking-wider text-accent-500">
-                    {formatDate(entry.date)}
-                  </time>
-                  <span class="text-xs font-mono opacity-40">{getRelativeTime(entry.date)}</span>
+                <div class="flex flex-col h-full">
+                  {entry.coverImage && (
+                    <div class="w-full mb-6">
+                      <div class="aspect-[16/9] rounded-xl overflow-hidden border border-white/10 shadow-lg">
+                        {typeof entry.coverImage === 'string' ? (
+                          <img src={entry.coverImage} alt={entry.title} class="w-full h-full object-cover" />
+                        ) : (
+                          <img src={entry.coverImage.src} alt={entry.title} class="w-full h-full object-cover" />
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <div class="flex-1">
+                    <div class="flex justify-between items-start mb-2">
+                      <time class="text-sm font-semibold uppercase tracking-wider text-accent-500">
+                        {formatDate(entry.date)}
+                      </time>
+                      <span class="text-xs font-mono opacity-40">{getRelativeTime(entry.date)}</span>
+                    </div>
+                    <h2 class="text-2xl font-heading text-base-content mb-3 group-hover:text-accent-500 transition-colors tracking-tight">{entry.title}</h2>
+                    {entry.excerpt && (
+                      <p class="text-base-content/70 leading-relaxed text-sm line-clamp-3">{entry.excerpt}</p>
+                    )}
+                    <span class="inline-flex items-center mt-4 text-sm font-medium text-accent-500 group-hover:text-accent-600 transition-colors">
+                      Read more
+                      <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </span>
+                  </div>
                 </div>
-                <h2 class="text-2xl font-heading text-base-content mb-3">{entry.title}</h2>
-                {entry.excerpt && (
-                  <p class="text-base-content/70 leading-relaxed text-sm line-clamp-3">{entry.excerpt}</p>
-                )}
-                <span class="inline-flex items-center mt-4 text-sm font-medium text-accent-500 hover:text-accent-600 transition-colors">
-                  Read more
-                  <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </span>
               </a>
             </div>
           </div>
