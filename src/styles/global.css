@@ -2936,6 +2936,35 @@ html.theme-transitioning *::after {
   display: none !important;
 }
 
+/* Mobile responsive search results */
+@media (max-width: 640px) {
+  .pagefind-ui__result {
+    padding: 1rem !important;
+  }
+
+  .pagefind-ui__result-link {
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .pagefind-ui__result-excerpt {
+    font-size: 0.85rem !important;
+  }
+
+  .pagefind-ui__results-area {
+    padding: 1rem !important;
+  }
+
+  .pagefind-ui__form {
+    height: 48px !important;
+  }
+
+  .pagefind-ui__search-input {
+    height: 48px !important;
+    font-size: 1rem !important;
+  }
+}
+
 /* ========================================
    Accessibility: Reduced Motion Support
    ======================================== */
