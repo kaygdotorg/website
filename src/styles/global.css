@@ -2645,7 +2645,8 @@ html.theme-transitioning *::after {
   position: relative;
   /* Completely opaque search capsule */
   background: rgb(25, 20, 35) !important;
-  border-radius: 9999px;
+  /* Match hamburger menu border radius */
+  border-radius: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   height: 54px !important;
@@ -2686,7 +2687,7 @@ html.theme-transitioning *::after {
   height: 54px !important;
   padding: 0 3.5rem 0 3.5rem !important;
   /* Balanced padding */
-  border-radius: 9999px !important;
+  border-radius: 2rem !important;
   color: var(--pagefind-ui-text) !important;
   transition: all 0.3s ease !important;
   outline: none !important;
@@ -2746,7 +2747,8 @@ html.theme-transitioning *::after {
   background: rgba(25, 20, 35, 0.95) !important;
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-  border-radius: 24px;
+  /* Match hamburger menu border radius */
+  border-radius: 2rem !important;
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
   padding: 1.5rem !important;
@@ -2797,13 +2799,18 @@ html.theme-transitioning *::after {
   background: rgba(0, 0, 0, 0.03) !important;
 }
 
-/* Title - NOT faded, stands out */
+/* Title - NOT faded, stands out, wraps if too long */
 .pagefind-ui__result-link {
   color: var(--pagefind-ui-text) !important;
   font-weight: 800 !important;
   font-size: 1.2rem !important;
   text-decoration: none !important;
   opacity: 1 !important;
+  /* Wrap long titles instead of overflow */
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  max-width: 100% !important;
 }
 
 .pagefind-ui__result-inner {
@@ -2894,19 +2901,21 @@ html.theme-transitioning *::after {
 
 /* Matched query - NOT faded, pops with full opacity and emphasis */
 .pagefind-ui__result mark {
-  background: transparent !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   color: #fff !important;
-  opacity: 1 !important;
+  /* Override parent opacity cascade */
+  filter: brightness(2.2) !important;
   font-weight: 600;
-  padding: 0;
-  border-radius: 0;
-  /* Make match stand out from faded excerpt */
-  text-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
+  padding: 0.1em 0.2em;
+  border-radius: 3px;
+  /* Make match truly stand out from faded excerpt */
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
 }
 
 [data-theme="light"] .pagefind-ui__result mark {
-  background: transparent !important;
-  color: #1a1a1a !important;
+  background: rgba(0, 0, 0, 0.08) !important;
+  color: #000 !important;
+  filter: contrast(1.5) !important;
   text-shadow: none;
 }
 
