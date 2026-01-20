@@ -199,14 +199,11 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                 href={card.href}
                 class={`bento-card bento-${card.id} ${card.id === "talks" ? "bento-wide" : ""}`}
               >
-                {/* 1. Image / Visual */}
+                {/* 1. Image / Visual (Top) */}
                 <div class="bento-visual-container">
                   {card.image === "obsidian-graph" ? (
                     <div class="obsidian-graph-container" id="obsidian-graph">
                       <canvas id="graph-canvas" />
-                      <div class="graph-overlay">
-                        <span class="graph-text">Digital Garden</span>
-                      </div>
                     </div>
                   ) : (
                     <div class="bento-image-wrapper">
@@ -215,14 +212,22 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                   )}
                 </div>
 
-                {/* 2. Category & Info Overlay */}
-                <div class="bento-content-overlay">
-                  <div class="bento-header-info">
-                    <span class="bento-category">{card.category}</span>
-                    <h3 class="bento-card-title">{card.title}</h3>
+                {/* 2. Category & Info (Middle) */}
+                <div class="bento-content-container">
+                  <div class="bento-meta">
+                    <span class="bento-category">
+                      {card.id === "notes" ? "Notes" : card.category}
+                    </span>
+                    {card.id === "notes" && (
+                      <span class="bento-title-aside">{card.title}</span>
+                    )}
                   </div>
 
-                  {/* 3. Excerpt */}
+                  {card.id !== "notes" && (
+                    <h3 class="bento-card-title">{card.title}</h3>
+                  )}
+
+                  {/* 3. Excerpt (Bottom) */}
                   <p class="bento-excerpt">{card.summary}</p>
                 </div>
 
@@ -936,14 +941,21 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       white-space: nowrap;
     }
 
-    /* Content Overlay */
-    .bento-content-overlay {
-      padding: 2rem;
+    /* Content Container */
+    .bento-content-container {
+      padding: 1.5rem 2rem 2.5rem;
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      gap: 1rem;
+      gap: 0.75rem;
+    }
+
+    .bento-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.25rem;
     }
 
     .bento-category {
@@ -952,8 +964,14 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       text-transform: uppercase;
       letter-spacing: 0.15em;
       color: var(--color-accent, #ec4899);
-      display: block;
-      margin-bottom: 0.5rem;
+    }
+
+    .bento-title-aside {
+      font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--color-base-content, inherit);
+      opacity: 0.9;
     }
 
     .bento-card-title {
@@ -962,6 +980,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       font-weight: 500;
       line-height: 1.2;
       color: var(--color-base-content, inherit);
+      margin: 0;
     }
 
     .bento-excerpt {
