@@ -887,90 +887,88 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       line-height: 1;
     }
 
-    /* Grid layout - mymind style: fixed proportions that scale */
+    /* Grid layout - mymind style: fluid proportions that scale */
+    /* The grid ALWAYS uses 4 columns with asymmetric spans */
+    /* It simply scales down proportionally on smaller screens */
     .bento-grid {
       display: grid;
-      grid-template-columns: repeat(1, 1fr); /* Mobile first */
-      grid-auto-rows: auto;
-      gap: 1.5rem;
-      max-width: 1200px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(0.75rem, 2vw, 2rem); /* Fluid gap */
+      max-width: 1400px;
       margin: 0 auto;
       width: 100%;
     }
 
-    /* Tablet Range: 2 columns */
-    @media (min-width: 641px) and (max-width: 1099px) {
-      .bento-grid {
-        grid-template-columns: repeat(2, 1fr);
-        grid-auto-rows: minmax(350px, auto);
-      }
-
-      .bento-card {
-        grid-column: span 1 !important;
-      }
-
-      .bento-photography {
-        grid-column: span 2 !important;
-      }
+    /* Asymmetric spans - ALWAYS applied (not breakpoint-specific) */
+    /* Row 1: Talks (large) | Writing (small) */
+    .bento-talks {
+      grid-column: span 3;
+    }
+    .bento-blog {
+      grid-column: span 1;
     }
 
-    /* Desktop asymmetric sizing */
-    /* Desktop Range: 4 columns */
-    @media (min-width: 1100px) {
+    /* Row 2: Notes (equal) | Now (equal) */
+    .bento-notes {
+      grid-column: span 2;
+    }
+    .bento-now {
+      grid-column: span 2;
+    }
+
+    /* Row 3: Photography (full width) */
+    .bento-photography {
+      grid-column: span 4;
+    }
+
+    /* Row 4: Uses (small) | Homelab (large) */
+    .bento-uses {
+      grid-column: span 1;
+    }
+    .bento-homelab {
+      grid-column: span 3;
+    }
+
+    /* Row 5: About (equal) | Contact (equal) */
+    .bento-about {
+      grid-column: span 2;
+    }
+    .bento-contact {
+      grid-column: span 2;
+    }
+
+    /* Mobile: Switch to 1-column linear layout */
+    @media (max-width: 640px) {
       .bento-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 2rem;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
       }
 
-      /* Row 1: Talks (large) | Writing (small) */
-      .bento-talks {
-        grid-column: span 3;
-      }
-      .bento-blog {
-        grid-column: span 1;
-      }
-
-      /* Row 2: Notes (equal) | Now (equal) */
-      .bento-notes {
-        grid-column: span 2;
-      }
-      .bento-now {
-        grid-column: span 2;
-      }
-
-      /* Row 3: Photography (full) */
-      .bento-photography {
-        grid-column: span 4;
-      }
-
-      /* Row 4: Uses (small) | Homelab (large) */
-      .bento-uses {
-        grid-column: span 1;
-      }
-      .bento-homelab {
-        grid-column: span 3;
-      }
-
-      /* Row 5: About (equal) | Contact (equal) */
-      .bento-about {
-        grid-column: span 2;
-      }
+      /* All cards become full width on mobile */
+      .bento-talks,
+      .bento-blog,
+      .bento-notes,
+      .bento-now,
+      .bento-photography,
+      .bento-uses,
+      .bento-homelab,
+      .bento-about,
       .bento-contact {
-        grid-column: span 2;
+        grid-column: span 1;
       }
     }
 
     /* Base card styles */
     .bento-card {
       position: relative;
-      border-radius: 2.5rem;
+      border-radius: clamp(1.5rem, 3vw, 2.5rem); /* Fluid border radius */
       display: flex;
       flex-direction: column;
       text-decoration: none;
       overflow: hidden;
       transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-      border: 1px solid rgba(255, 255, 255, 0.05); /* Very subtle border */
-      min-width: 240px; /* Reduced min-width to prevent overflow */
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      min-width: 0; /* Allow grid to control sizing */
     }
 
     .bento-card:hover {
@@ -982,8 +980,12 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     /* Visual container at top - MYMIND FLOATING LOOK */
     .bento-visual-container {
       width: 100%;
-      height: 260px;
-      padding: 1.5rem 1.5rem 0; /* Padding makes it float */
+      height: clamp(
+        180px,
+        20vw,
+        280px
+      ); /* Fluid height that scales with viewport */
+      padding: clamp(0.75rem, 1.5vw, 1.5rem) clamp(0.75rem, 1.5vw, 1.5rem) 0;
       position: relative;
     }
 
@@ -1057,12 +1059,13 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
     /* Content Container */
     .bento-content-container {
-      padding: 1.5rem 2rem 2.5rem;
+      padding: clamp(1rem, 2vw, 1.5rem) clamp(1.25rem, 2.5vw, 2rem)
+        clamp(1.5rem, 3vw, 2.5rem);
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      gap: 0.75rem;
+      gap: clamp(0.5rem, 1vw, 0.75rem);
     }
 
     .bento-meta {
@@ -1073,7 +1076,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     }
 
     .bento-category {
-      font-size: 0.75rem;
+      font-size: clamp(0.65rem, 1vw, 0.75rem);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.15em;
@@ -1090,7 +1093,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
     .bento-card-title {
       font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-      font-size: 1.85rem;
+      font-size: clamp(1.25rem, 2.5vw, 1.85rem); /* Fluid title size */
       font-weight: 500;
       line-height: 1.2;
       color: var(--bento-text, var(--color-base-content, inherit));
@@ -1098,7 +1101,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     }
 
     .bento-excerpt {
-      font-size: 1.05rem;
+      font-size: clamp(0.875rem, 1.2vw, 1.05rem); /* Fluid excerpt size */
       line-height: 1.6;
       opacity: 0.8;
       color: var(--bento-text, var(--color-base-content, inherit));
@@ -1128,9 +1131,9 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       --color-accent: #6b7280;
     }
 
-    /* Talks card: show more image */
+    /* Talks card: slightly taller visual for wide card */
     .bento-talks .bento-visual-container {
-      height: 380px;
+      height: clamp(220px, 28vw, 380px);
     }
     .bento-blog {
       background: #fdf2f0;
@@ -1223,25 +1226,26 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     /* Photography Specific Layout */
     .bento-photography {
       display: flex;
-      flex-direction: row-reverse !important; /* Image feature on the right on desktop */
+      flex-direction: row-reverse !important; /* Image feature on the right */
       align-items: stretch;
       padding: 0;
-      height: 500px;
+      height: clamp(350px, 40vw, 500px); /* Fluid height */
     }
 
-    @media (max-width: 1023px) {
+    /* Only switch to column layout on true mobile */
+    @media (max-width: 640px) {
       .bento-photography {
-        flex-direction: column !important; /* Image feature on top on mobile */
+        flex-direction: column !important;
         height: auto;
       }
       .bento-photography .bento-visual-container {
-        height: 400px;
+        height: clamp(280px, 60vw, 400px);
         flex: none;
       }
     }
 
     .bento-photography .bento-visual-container {
-      flex: 1.2; /* Photos slightly larger space */
+      flex: 1.2;
       height: 100%;
       padding: 0;
     }
@@ -1249,7 +1253,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     .bento-photography .bento-content-container {
       flex: 1;
       justify-content: center;
-      padding: 3rem;
+      padding: clamp(1.5rem, 3vw, 3rem);
     }
 
     .photo-grid-feature {
@@ -1318,45 +1322,27 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       object-fit: cover;
     }
 
-    /* Remove redundant responsive rules as they are now handled above */
-
+    /* Mobile-specific adjustments */
     @media (max-width: 640px) {
       .bento-section {
         padding: 0 0.75rem 4rem;
       }
 
       .bento-wrapper {
-        padding: 3rem 1rem 1.5rem; /* Keep top padding consistent */
+        padding: 2rem 1rem 1.5rem;
       }
 
       .bento-header {
-        margin-bottom: 2.5rem;
-        padding-top: 0.5rem;
+        margin-bottom: 2rem;
       }
 
       .bento-header-title {
-        font-size: 2.5rem;
+        font-size: 2rem;
       }
 
-      .bento-grid {
-        grid-template-columns: 1fr;
-        grid-auto-rows: auto;
-        gap: 1rem;
-      }
-
-      .bento-card {
-        min-width: 100%;
-        border-radius: 1.75rem;
-        min-height: 380px;
-      }
-
-      .bento-photography {
-        grid-column: span 1;
-        min-height: 500px;
-      }
-
-      .bento-card-title {
-        font-size: 1.5rem;
+      /* Visual container gets more height on mobile for better image display */
+      .bento-visual-container {
+        height: clamp(200px, 50vw, 280px);
       }
     }
 
