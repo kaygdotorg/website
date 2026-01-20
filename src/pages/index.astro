@@ -557,8 +557,22 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
           node.x += node.vx;
           node.y += node.vy;
 
-          if (node.x < 0 || node.x > width) node.vx *= -1;
-          if (node.y < 0 || node.y > height) node.vy *= -1;
+          // Stay within bounds accounting for radius
+          if (node.x - node.radius < 0) {
+            node.x = node.radius;
+            node.vx *= -1;
+          } else if (node.x + node.radius > width) {
+            node.x = width - node.radius;
+            node.vx *= -1;
+          }
+
+          if (node.y - node.radius < 0) {
+            node.y = node.radius;
+            node.vy *= -1;
+          } else if (node.y + node.radius > height) {
+            node.y = height - node.radius;
+            node.vy *= -1;
+          }
         });
       }
 
@@ -898,23 +912,23 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         grid-template-columns: repeat(4, 1fr);
       }
 
-      .bento-now {
-        grid-column: span 1;
-      }
       .bento-talks {
         grid-column: span 3;
       }
-
       .bento-blog {
-        grid-column: span 3;
-      }
-      .bento-notes {
         grid-column: span 1;
+      }
+
+      .bento-notes {
+        grid-column: span 2;
+      }
+      .bento-now {
+        grid-column: span 2;
       }
 
       .bento-photography {
         grid-column: span 4;
-        height: 500px; /* Taller for the full width feature */
+        height: 500px;
       }
 
       .bento-uses {
@@ -925,10 +939,10 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       }
 
       .bento-about {
-        grid-column: span 3;
+        grid-column: span 2;
       }
       .bento-contact {
-        grid-column: span 1;
+        grid-column: span 2;
       }
     }
 
@@ -955,28 +969,33 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     .bento-visual-container {
       width: 100%;
       height: 260px;
-      padding: 1.5rem 1.5rem 0; /* Padding makes it float */
+      padding: 1.5rem 1.5rem 0;
       position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .bento-image-wrapper {
-      width: 100%;
+      width: auto;
       height: 100%;
-      border-radius: 1.5rem;
+      aspect-ratio: 16/10; /* Fixed aspect ratio so images look consistent across card widths */
+      max-width: 100%;
+      border-radius: 1.25rem;
       overflow: hidden;
       position: relative;
-      background: white; /* Clean background for the floater */
+      background: white;
       box-shadow:
-        0 10px 30px -10px rgba(0, 0, 0, 0.15),
+        0 10px 30px -10px rgba(0, 0, 0, 0.1),
         0 4px 10px -2px rgba(0, 0, 0, 0.05);
 
       /* progressive bottom blur mask */
       -webkit-mask-image: linear-gradient(
         to bottom,
-        black 85%,
+        black 80%,
         transparent 100%
       );
-      mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
     }
 
     .bento-image-wrapper img {
@@ -1097,7 +1116,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       transform: translateX(0);
     }
 
-    /* Individual Card Styles - Soft Pastels */
+    /* Individual Card Styles - Soft Pastels (Light) */
     .bento-talks {
       background: #f0f4f8;
       --bento-text: #2d3436;
@@ -1144,10 +1163,42 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       --color-accent: #6b7280;
     }
 
-    /* Keep dark mode characterful but muted */
+    /* Dark Mode Pastel Muting */
+    :root[data-theme="dark"] .bento-talks {
+      background: #1a1e23;
+      --bento-text: #e2e8f0;
+    }
+    :root[data-theme="dark"] .bento-blog {
+      background: #231d1c;
+      --bento-text: #fef2f2;
+    }
+    :root[data-theme="dark"] .bento-photography {
+      background: #1c231f;
+      --bento-text: #f0fdf4;
+    }
+    :root[data-theme="dark"] .bento-now {
+      background: #23221c;
+      --bento-text: #fefce8;
+    }
+    :root[data-theme="dark"] .bento-uses {
+      background: #231c23;
+      --bento-text: #fdf4ff;
+    }
+    :root[data-theme="dark"] .bento-homelab {
+      background: #1c2123;
+      --bento-text: #f0f9ff;
+    }
+    :root[data-theme="dark"] .bento-about {
+      background: #231c1c;
+      --bento-text: #fef2f2;
+    }
+    :root[data-theme="dark"] .bento-contact {
+      background: #231c21;
+      --bento-text: #fdf4ff;
+    }
+
     :root[data-theme="dark"] .bento-card:not(.bento-notes) {
-      background: rgba(255, 255, 255, 0.03);
-      --bento-text: #ffffff;
+      --color-accent: #94a3b8;
     }
 
     /* Photography Specific Layout */
