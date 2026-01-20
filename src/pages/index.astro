@@ -82,7 +82,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
   <main class="homepage">
     <!-- Hero Section -->
     <section class="hero-section" id="hero-section">
-      <div class="frosted-card-homepage hero-card">
+      <div class="frosted-card-homepage hero-card hero-glow">
         <div class="hero-content">
           <!-- Profile Picture -->
           {
@@ -100,7 +100,10 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
           <!-- Name -->
           <h1 class="hero-name">
-            <span class="text-accent">{name}</span>
+            <span class="hero-name-wrapper">
+              <span class="hero-name-full">{name}</span>
+              <span class="hero-name-short">@kaygdotorg</span>
+            </span>
           </h1>
 
           <!-- Tagline -->
@@ -175,7 +178,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
               latestBlog && (
                 <div class="bento-card-body">
                   <div class="bento-body-layout bento-body-side-by-side">
-                    <div class="bento-text-side">
+                    <div class="bento-text-side bento-text-top-align">
                       <p class="bento-text">
                         {latestBlog.data.description || "Read my latest post →"}
                       </p>
@@ -199,7 +202,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
                 </div>
               )
             }
-            <div class="bento-icon-floating">
+            <div class="bento-icon-floating bento-icon-pencil">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -234,12 +237,30 @@ const cardPhotos = rawCardPhotos?.map((card) => {
               <span class="bento-label">Photography</span>
               <h3 class="bento-title-small">Moments captured</h3>
             </div>
+            <div class="bento-icon-floating">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                ></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </div>
           </a>
 
           <!-- Card 3: Now Page -->
           <a href="/now" class="bento-card bento-now">
             <div class="bento-card-header">
-              <span class="bento-label">Now</span>
+              <span class="bento-label"
+                >Now <span class="pulse-dot"></span></span
+              >
               <h3 class="bento-title">What I'm doing</h3>
             </div>
             <div class="bento-card-body">
@@ -282,16 +303,38 @@ const cardPhotos = rawCardPhotos?.map((card) => {
               <span class="bento-label">Uses</span>
               <h3 class="bento-title-small">My setup</h3>
             </div>
+            <div class="bento-icon-floating">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                ></path>
+              </svg>
+            </div>
           </a>
 
           <!-- Card 5: Talks Page -->
-          <a href="/talks" class="bento-card bento-talks">
-            <div class="bento-card-header">
-              <span class="bento-label">Talks</span>
-              <h3 class="bento-title">Public Speaking</h3>
+          <a href="/talks" class="bento-card bento-talks bento-tall">
+            <div class="bento-visual-container">
+              <div class="bento-visual-frame talks-frame">
+                <img
+                  src="/images/talks-bento-grid.jpeg"
+                  alt="Talks preview"
+                  loading="lazy"
+                />
+              </div>
             </div>
-            <div class="bento-card-body">
-              <p class="bento-excerpt">
+            <div class="bento-meta-overlay">
+              <span class="bento-label">Talks</span>
+              <h3 class="bento-title-small">Public Speaking</h3>
+              <p class="bento-excerpt-overlay">
                 {
                   latestTalk
                     ? `Latest: ${latestTalk.data.title}`
@@ -502,23 +545,16 @@ const cardPhotos = rawCardPhotos?.map((card) => {
         );
 
         observer.observe(heroSection);
-
-        // Cleanup on View Transition navigation
-        document.addEventListener(
-          "astro:before-swap",
-          () => {
-            observer.disconnect();
-          },
-          { once: true },
-        );
       }
     }
 
-    // Initialize on first page load
+    // Initialize
     initNavScrollObserver();
 
-    // Re-initialize after View Transitions navigation
-    document.addEventListener("astro:page-load", initNavScrollObserver);
+    // Re-initialize on page load (View Transitions)
+    document.addEventListener("astro:page-load", () => {
+      initNavScrollObserver();
+    });
   </script>
 
   <style>
@@ -562,7 +598,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       height: 8rem;
       border-radius: 50%;
       overflow: hidden;
-      border: 3px solid var(--color-pink-400, #f472b6);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     .hero-profile-img {
@@ -577,6 +613,114 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       font-weight: 400;
       line-height: 1.1;
       letter-spacing: -0.07em;
+    }
+
+    .hero-name-wrapper {
+      position: relative;
+      display: inline-block;
+      color: var(--color-base-content, inherit);
+    }
+
+    .hero-name-full,
+    .hero-name-short {
+      display: block;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hero-name-short {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      opacity: 0;
+      transform: translateY(10px);
+      white-space: nowrap;
+      font-size: 0.85em;
+      letter-spacing: normal;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+
+    /* Desktop Hover - Name Swap */
+    @media (min-width: 1024px) {
+      .hero-card:hover .hero-name-full {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+      .hero-card:hover .hero-name-short {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Mobile - Subtle premium transition (slower) */
+    @media (max-width: 1023px) {
+      .hero-name-full {
+        animation: mobile-name-fade 12s ease-in-out infinite;
+      }
+      .hero-name-short {
+        animation: mobile-short-fade 12s ease-in-out infinite;
+      }
+    }
+
+    @keyframes mobile-name-fade {
+      0%,
+      45%,
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      50%,
+      95% {
+        opacity: 0;
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes mobile-short-fade {
+      0%,
+      45%,
+      100% {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      50%,
+      95% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-glow {
+      box-shadow:
+        0 0 60px rgba(236, 72, 153, 0.08),
+        0 0 120px rgba(236, 72, 153, 0.08),
+        0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Pulsing dot for Now card */
+    .pulse-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      margin-left: 0.5rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+      }
     }
 
     @media (min-width: 768px) {
@@ -653,7 +797,10 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     .bento-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto auto;
+      grid-template-rows: minmax(380px, auto) minmax(280px, auto) minmax(
+          320px,
+          auto
+        );
       grid-template-areas:
         "blog  blog"
         "now      photo"
@@ -667,7 +814,7 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       position: relative;
       border-radius: 2rem;
       padding: 2.5rem;
-      min-height: 320px;
+      min-height: 280px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -701,6 +848,22 @@ const cardPhotos = rawCardPhotos?.map((card) => {
     }
     .bento-notes {
       grid-area: notes;
+      min-height: 400px;
+    }
+
+    /* Varied heights for visual interest */
+    .bento-blog {
+      min-height: 380px;
+    }
+
+    .bento-now,
+    .bento-uses {
+      min-height: 240px;
+    }
+
+    .bento-photography,
+    .bento-talks {
+      min-height: 520px;
     }
 
     /* Wide card - Writing with extra padding */
@@ -950,6 +1113,10 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       width: 92%;
     }
 
+    .talks-frame img {
+      object-position: 0% 80%;
+    }
+
     /* Card Text Elements */
     .bento-card-header,
     .bento-card-body {
@@ -969,6 +1136,13 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       margin-top: 0.25rem;
     }
 
+    .bento-excerpt-overlay {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-top: 0.5rem;
+      line-height: 1.4;
+    }
+
     .bento-icon-floating {
       position: absolute;
       top: 2rem;
@@ -979,6 +1153,13 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
     .bento-card:hover .bento-icon-floating {
       opacity: 0.4;
+    }
+
+    /* Top-align text for Latest Writing card on wider layouts */
+    @media (min-width: 768px) {
+      .bento-text-top-align {
+        align-self: flex-start;
+      }
     }
 
     /* ============================================
@@ -992,6 +1173,11 @@ const cardPhotos = rawCardPhotos?.map((card) => {
 
       .bento-wrapper {
         padding: 0.75rem;
+      }
+
+      .bento-header {
+        margin-bottom: 2rem;
+        padding-top: 1.5rem;
       }
 
       .bento-header-title {
@@ -1022,6 +1208,24 @@ const cardPhotos = rawCardPhotos?.map((card) => {
       .bento-text {
         font-size: 1rem;
         line-height: 1.5;
+      }
+
+      .bento-icon-pencil svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .bento-icon-floating {
+        top: 1.25rem;
+        right: 1.25rem;
+      }
+
+      /* Position icons at bottom right for Photography, Uses, and Talks cards to avoid collision with images */
+      .bento-photography .bento-icon-floating,
+      .bento-uses .bento-icon-floating,
+      .bento-talks .bento-icon-floating {
+        top: auto;
+        bottom: 1.25rem;
       }
     }
 
