@@ -672,42 +672,6 @@ import { ClientRouter } from "astro:transitions";
         }
       });
 
-      // Sync navbar blur overlay width with actual navbar pills
-      function initNavbarBlur() {
-        const navContainer = document.querySelector(
-          "#nav-container > div > .hidden.md\\:flex",
-        );
-        const blurOverlay = document.getElementById("navbar-blur");
-
-        if (!navContainer || !blurOverlay) return;
-
-        function syncBlurWidth() {
-          const rect = navContainer.getBoundingClientRect();
-          // Add padding for smooth edges
-          const width = rect.width + 40;
-          document.documentElement.style.setProperty(
-            "--navbar-blur-width",
-            `${width}px`,
-          );
-        }
-
-        // Initial sync
-        syncBlurWidth();
-
-        // Re-sync on resize
-        window.addEventListener("resize", syncBlurWidth);
-
-        // Re-sync when navbar elements expand (logo hover, search expand)
-        if (typeof ResizeObserver !== "undefined") {
-          const observer = new ResizeObserver(syncBlurWidth);
-          observer.observe(navContainer);
-        }
-      }
-
-      // Initialize blur sync
-      initNavbarBlur();
-      document.addEventListener("astro:page-load", initNavbarBlur);
-
       // Global menu toggle (mobile/desktop) - wrapped for View Transitions
       function initGlobalMenu() {
         const mobileMenu = document.getElementById("mobile-menu");
