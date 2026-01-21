@@ -8,7 +8,12 @@
 @import "@fontsource/playfair-display/latin-600.css";
 @import "@fontsource/playfair-display/latin-700.css";
 @import "@fontsource/cascadia-code/latin-400.css";
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
+@import "@fontsource/dancing-script/latin-400.css";
+@import "@fontsource/dancing-script/latin-500.css";
+@import "@fontsource/dancing-script/latin-600.css";
+@import "@fontsource/dancing-script/latin-700.css";
+@import "@fontsource/tangerine/latin-400.css";
+@import "@fontsource/tangerine/latin-700.css";
 
 @import "tailwindcss";
 
