@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
 import { getCollection } from "astro:content";
 import { formatDate } from "../utils/dates";
 
@@ -122,19 +123,11 @@ const allTags = [
 
                                 {/* Arrow */}
                                 <div class="hidden md:flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <svg
+                                    <Icon
+                                        name="arrow"
                                         class="w-5 h-5 text-accent"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M17 8l4 4m0 0l-4 4m4-4H3"
-                                        />
-                                    </svg>
+                                        strokeWidth={2}
+                                    />
                                 </div>
                             </div>
                         </a>
