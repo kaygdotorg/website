@@ -841,7 +841,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
     /* Wrapper card - uses the same glassmorphism as hero */
     .bento-wrapper {
-      padding: 3rem 1.5rem 2rem; /* Reduced side padding */
+      padding: 3rem 0rem 2rem; /* Minimal side padding */
       max-width: 1400px;
       width: 100%;
       box-sizing: border-box;
@@ -849,7 +849,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
     @media (max-width: 1023px) {
       .bento-wrapper {
-        padding: 2.5rem 1rem 1.5rem;
+        padding: 2.5rem 0rem 1.5rem;
       }
     }
 
@@ -887,54 +887,55 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       line-height: 1;
     }
 
-    /* Grid layout - mymind style: fluid proportions that scale */
-    /* The grid ALWAYS uses 4 columns with asymmetric spans */
-    /* It simply scales down proportionally on smaller screens */
+    /* Grid layout - 6 columns for flexible splits */
     .bento-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: clamp(0.75rem, 2vw, 2rem); /* Fluid gap */
+      grid-template-columns: repeat(
+        6,
+        1fr
+      ); /* 6 columns for clean 50/50 splits */
+      grid-auto-rows: 500px;
+      gap: clamp(0.75rem, 2vw, 2rem);
       max-width: 1400px;
       margin: 0 auto;
       width: 100%;
     }
 
-    /* Asymmetric spans - ALWAYS applied (not breakpoint-specific) */
-    /* Row 1: Talks (large) | Writing (small) */
+    /* Row 1: Talks (67%) | Writing (33%) */
     .bento-talks {
-      grid-column: span 3;
+      grid-column: span 4;
     }
     .bento-blog {
-      grid-column: span 1;
+      grid-column: span 2;
     }
 
-    /* Row 2: Notes (equal) | Now (equal) */
+    /* Row 2: Notes (50%) | Now (50%) */
     .bento-notes {
-      grid-column: span 2;
+      grid-column: span 3;
     }
     .bento-now {
-      grid-column: span 2;
+      grid-column: span 3;
     }
 
     /* Row 3: Photography (full width) */
     .bento-photography {
+      grid-column: span 6;
+    }
+
+    /* Row 4: Uses (33%) | Homelab (67%) */
+    .bento-uses {
+      grid-column: span 2;
+    }
+    .bento-homelab {
       grid-column: span 4;
     }
 
-    /* Row 4: Uses (small) | Homelab (large) */
-    .bento-uses {
-      grid-column: span 1;
-    }
-    .bento-homelab {
+    /* Row 5: About (50%) | Contact (50%) */
+    .bento-about {
       grid-column: span 3;
     }
-
-    /* Row 5: About (equal) | Contact (equal) */
-    .bento-about {
-      grid-column: span 2;
-    }
     .bento-contact {
-      grid-column: span 2;
+      grid-column: span 3;
     }
 
     /* Mobile: Switch to 1-column linear layout */
@@ -981,7 +982,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     .bento-visual-container {
       width: 100%;
       flex: 1 1 auto; /* Grow to fill remaining space */
-      min-height: clamp(150px, 15vw, 220px); /* Minimum height */
+      min-height: clamp(120px, 12vw, 180px); /* Shorter cards */
       padding: clamp(0.75rem, 1.5vw, 1.5rem) clamp(0.75rem, 1.5vw, 1.5rem) 0;
       position: relative;
     }
@@ -1098,10 +1099,15 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     }
 
     .bento-excerpt {
-      font-size: clamp(0.875rem, 1.2vw, 1.05rem); /* Fluid excerpt size */
+      font-size: clamp(0.875rem, 1.2vw, 1.05rem);
       line-height: 1.6;
       opacity: 0.8;
       color: var(--bento-text, var(--color-base-content, inherit));
+      /* Truncate with ellipsis after 3 lines */
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     /* Icon positioned in top right */
@@ -1120,7 +1126,9 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       opacity: 1;
       transform: translateX(0);
     }
-
+    /* Individual Card Styles - Soft Pastels (Light Mode) */
+    /* Row 1: Talks/Writing - use aspect-ratio to control height */
+    /* Adjust ratio: 3/2 = shorter, 4/3 = taller, 2/1 = very short */
     .bento-talks {
       background: #f0f4f8;
       --bento-text: #2d3436;
