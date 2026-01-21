@@ -61,11 +61,11 @@ import { ClientRouter } from "astro:transitions";
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <ClientRouter />
-    <!-- Google Font: Cookie for signature accents -->
+    <!-- Google Font: Tangerine for nav logo -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cookie&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <!-- Fonts are now self-hosted via fontsource -->
@@ -131,9 +131,9 @@ import { ClientRouter } from "astro:transitions";
           <!-- Left pill: Logo -->
           <a
             href="/"
-            class="glass-pill px-4 py-2 font-display text-lg hover:opacity-80 transition-opacity"
+            class="glass-pill nav-logo px-3 py-2 hover:opacity-80 transition-opacity"
           >
-            K
+            <span class="nav-logo-text">kayg<br />dot<br />org</span>
           </a>
 
           <!-- Center pill: Nav links -->
@@ -259,9 +259,9 @@ import { ClientRouter } from "astro:transitions";
           <!-- Left pill: Logo -->
           <a
             href="/"
-            class="glass-pill px-4 py-2 font-display text-lg hover:opacity-80 transition-opacity"
+            class="glass-pill nav-logo px-3 py-2 hover:opacity-80 transition-opacity"
           >
-            K
+            <span class="nav-logo-text">kayg<br />dot<br />org</span>
           </a>
 
           <!-- Right pill: Search + Theme toggle + Hamburger -->

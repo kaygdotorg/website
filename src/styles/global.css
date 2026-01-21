@@ -2034,6 +2034,25 @@ body {
     0 0 20px rgba(244, 114, 182, 0.02);
 }
 
+/* Nav Logo - Tilted multi-line cursive */
+.nav-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.nav-logo-text {
+  font-family: "Tangerine", cursive;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 0.85;
+  text-align: center;
+  transform: rotate(-12deg);
+  display: block;
+  color: inherit;
+}
+
 /* Navbar visibility on scroll */
 .nav-hidden {
   opacity: 0;
