@@ -1,6 +1,16 @@
 ---
+import Icon from "./Icon.astro";
+
+interface ExperienceItem {
+    role: string;
+    company: string;
+    startDate: string;
+    endDate: string;
+    isCurrent?: boolean;
+}
+
 interface Props {
-    experience: any[];
+    experience: ExperienceItem[];
     resumeUrl?: string;
 }
 
@@ -22,19 +32,7 @@ const { experience, resumeUrl } = Astro.props;
                         download
                     >
                         <span>Resume</span>
-                        <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5 5m0 0l5-5m-5 5V3"
-                            />
-                        </svg>
+                        <Icon name="download" class="w-4 h-4" strokeWidth={2} />
                     </a>
                 )
             }
@@ -45,7 +43,7 @@ const { experience, resumeUrl } = Astro.props;
             <div class="timeline-line"></div>
 
             {
-                experience?.map((exp: any) => (
+                experience?.map((exp) => (
                     <div class="experience-item">
                         <div class="experience-dot-wrapper">
                             <div

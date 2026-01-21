@@ -11,7 +11,8 @@ interface Props {
         | "twitter"
         | "email"
         | "arrow-down"
-        | "arrow-up";
+        | "arrow-up"
+        | "download";
     class?: string;
     strokeWidth?: number;
     id?: string;
@@ -35,6 +36,8 @@ const icons: Record<string, string> = {
         '<path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />',
     "arrow-up":
         '<path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />',
+    download:
+        '<path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M7 10l5 5m0 0l5-5m-5 5V3" />',
 };
 
 // Icons that use fill instead of stroke

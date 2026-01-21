@@ -2,6 +2,13 @@
  * Date formatting utilities for consistent date display across the site
  */
 
+/** Short month names for compact date formatting */
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Full month names for verbose date formatting */
+const MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'];
+
 /**
  * Ensures a value is a Date object
  */
@@ -18,9 +25,8 @@ export function toDate(value: Date | string | undefined): Date | null {
 export function formatDate(date: Date | string | undefined): string {
   const d = toDate(date);
   if (!d) return '';
-  
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+
+  return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 /**
@@ -29,9 +35,8 @@ export function formatDate(date: Date | string | undefined): string {
 export function formatDateWithComma(date: Date | string | undefined): string {
   const d = toDate(date);
   if (!d) return '';
-  
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${d.getDate()} ${months[d.getMonth()]}, ${d.getFullYear()}`;
+
+  return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}, ${d.getFullYear()}`;
 }
 
 /**
@@ -40,10 +45,8 @@ export function formatDateWithComma(date: Date | string | undefined): string {
 export function formatMonth(date: Date | string | undefined): string {
   const d = toDate(date);
   if (!d) return '';
-  
-  const months = ['January', 'February', 'March', 'April', 'May', 'June',
-                  'July', 'August', 'September', 'October', 'November', 'December'];
-  return `${months[d.getMonth()]} ${d.getFullYear()}`;
+
+  return `${MONTHS_FULL[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 /**
@@ -52,7 +55,7 @@ export function formatMonth(date: Date | string | undefined): string {
 export function getRelativeTime(date: Date | string | undefined): string {
   const d = toDate(date);
   if (!d) return '';
-  
+
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
   const diffSecs = Math.floor(diffMs / 1000);
@@ -62,7 +65,7 @@ export function getRelativeTime(date: Date | string | undefined): string {
   const diffWeeks = Math.floor(diffDays / 7);
   const diffMonths = Math.floor(diffDays / 30);
   const diffYears = Math.floor(diffDays / 365);
-  
+
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Yesterday';
   if (diffYears > 0) return `${diffYears} year${diffYears > 1 ? 's' : ''} ago`;
