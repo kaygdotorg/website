@@ -2095,16 +2095,18 @@ body {
 
 /* ========================================
    Progressive Blur Overlay
-   Full-width soft blur at top of page, fades to transparent
-   Creates a premium 'frosted top' effect without boxy edges
+   Fades to transparent at bottom, restricted to navbar width on desktop
    ======================================== */
 
 .navbar-blur-overlay {
   position: fixed;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 56rem;
+  /* Match navbar max-width on desktop */
+  height: 80px;
   z-index: 40;
   pointer-events: none;
 
@@ -2112,21 +2114,21 @@ body {
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
 
-  /* Vertical fade: solid at very top, gradually transparent */
+  /* Vertical fade: solid at top, transparent at bottom */
   -webkit-mask-image: linear-gradient(to bottom,
       rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.6) 50%,
+      rgba(0, 0, 0, 0.5) 50%,
       rgba(0, 0, 0, 0) 100%);
   mask-image: linear-gradient(to bottom,
       rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.6) 50%,
+      rgba(0, 0, 0, 0.5) 50%,
       rgba(0, 0, 0, 0) 100%);
 }
 
-/* Mobile: full width */
+/* Mobile: full width edge-to-edge */
 @media (max-width: 768px) {
   .navbar-blur-overlay {
-    width: 100%;
+    max-width: none;
     left: 0;
     transform: none;
   }
@@ -2160,6 +2162,25 @@ body {
 #search-toggle-desktop:hover .search-pill {
   /* Subtle emphasis when expanding */
   background: rgba(var(--color-base-content-rgb), 0.05);
+}
+
+/* Theme toggle expandable label (same pattern as search) */
+.theme-expand-label {
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    max-width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.3s ease,
+    margin 0.4s ease;
+  opacity: 0;
+}
+
+#theme-toggle-desktop:hover .theme-expand-label {
+  max-width: 200px;
+  opacity: 1;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 

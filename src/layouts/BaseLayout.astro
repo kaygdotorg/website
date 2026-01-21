@@ -188,7 +188,7 @@ import { ClientRouter } from "astro:transitions";
             </button>
             <button
               id="theme-toggle-desktop"
-              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer flex items-center"
               aria-label="Toggle dark mode"
             >
               <svg
@@ -217,6 +217,13 @@ import { ClientRouter } from "astro:transitions";
                   d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
                 ></path>
               </svg>
+              <span
+                class="theme-expand-label text-sm font-medium text-base-content/70"
+              >
+                Theme <span id="theme-shortcut-label" class="opacity-50 ml-1"
+                  >CMD + D</span
+                >
+              </span>
             </button>
             <button
               id="menu-toggle-desktop"
@@ -873,6 +880,7 @@ import { ClientRouter } from "astro:transitions";
         initGlobalMenu();
         initSearchModal();
         updateSearchShortcut();
+        updateThemeShortcut();
       });
 
       // Update Search Shortcut based on OS
@@ -884,6 +892,16 @@ import { ClientRouter } from "astro:transitions";
         }
       }
       updateSearchShortcut();
+
+      // Update Theme Shortcut based on OS
+      function updateThemeShortcut() {
+        const label = document.getElementById("theme-shortcut-label");
+        if (label) {
+          const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+          label.textContent = isMac ? "CMD + D" : "CTRL + D";
+        }
+      }
+      updateThemeShortcut();
 
       // Global keyboard shortcuts (only add once)
       if (!(window as any).__keyboardShortcutsInitialized) {
@@ -901,6 +919,7 @@ import { ClientRouter } from "astro:transitions";
               document.body.style.overflow = "";
             }
           }
+          // CMD/CTRL + K: Toggle search
           if ((e.metaKey || e.ctrlKey) && e.key === "k") {
             e.preventDefault();
             if (searchModal?.classList.contains("search-open")) {
@@ -915,10 +934,23 @@ import { ClientRouter } from "astro:transitions";
               document.body.style.overflow = "hidden";
               // Focus input
               setTimeout(() => {
-                const input = searchModal.querySelector("input");
+                const input = searchModal?.querySelector("input");
                 (input as HTMLInputElement)?.focus();
               }, 100);
             }
+          }
+          // CMD/CTRL + D: Toggle dark/light mode
+          if ((e.metaKey || e.ctrlKey) && e.key === "d") {
+            e.preventDefault();
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            html.classList.add("theme-transitioning");
+            html.setAttribute("data-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+            setTimeout(() => {
+              html.classList.remove("theme-transitioning");
+            }, 300);
           }
         });
         (window as any).__keyboardShortcutsInitialized = true;
