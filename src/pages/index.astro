@@ -519,7 +519,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       const texts = ["me", "@kaygdotorg", "K Gopal Krishna"];
       let currentIndex = 0;
 
-      setInterval(() => {
+      function animateText() {
         currentIndex = (currentIndex + 1) % texts.length;
         // Slide down and fade out
         textElement.style.opacity = "0";
@@ -528,18 +528,23 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         setTimeout(() => {
           // Change text while hidden
           textElement.textContent = texts[currentIndex];
-          // Reset position above
+          // Reset position above (no transition)
           textElement.style.transition = "none";
           textElement.style.transform = "translateY(-100%)";
 
-          // Force reflow, then animate in
-          textElement.offsetHeight;
-          textElement.style.transition =
-            "opacity 0.4s ease, transform 0.4s ease";
-          textElement.style.opacity = "1";
-          textElement.style.transform = "translateY(0)";
+          // Use requestAnimationFrame to ensure style is applied before re-enabling transition
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              textElement.style.transition =
+                "opacity 0.4s ease, transform 0.4s ease";
+              textElement.style.opacity = "1";
+              textElement.style.transform = "translateY(0)";
+            });
+          });
         }, 400); // Wait for exit animation
-      }, 4000); // 4s static display
+      }
+
+      setInterval(animateText, 5000); // 5s static display
     }
   </script>
 
@@ -719,7 +724,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
     /* Section header inside wrapper */
     .bento-header {
-      margin-bottom: 4rem;
+      margin-bottom: 2rem; /* Reduced to bring cards closer */
       padding-top: 1rem;
       text-align: center;
     }
@@ -743,10 +748,10 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       color: var(--color-base-content, inherit);
     }
 
-    /* Lovely Coffee font for signature accents */
+    /* Cookie font for signature accents */
     .font-tangerine {
-      font-family: "Lovely Coffee", cursive;
-      font-size: 1.8em; /* Slightly larger for Lovely Coffee */
+      font-family: "Cookie", cursive;
+      font-size: 1.6em;
       font-weight: 400;
       line-height: 1;
     }
