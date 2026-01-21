@@ -2094,15 +2094,48 @@ body {
 }
 
 /* ========================================
-   Progressive Blur Overlay - DISABLED
-   Glass-pill elements already have backdrop-filter blur
-   which is strictly restricted to their pill boundaries.
-   This overlay was causing blur to extend beyond navbar.
+   Progressive Blur Overlay
+   Blur is heaviest at top, fades to transparent at bottom
+   Width is synced with navbar via JS (--navbar-blur-width CSS var)
    ======================================== */
 
 .navbar-blur-overlay {
-  display: none;
-  /* Disabled - blur comes from glass-pill elements */
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Width synced with navbar via JavaScript */
+  width: var(--navbar-blur-width, 100%);
+  height: 80px;
+  z-index: 40;
+  pointer-events: none;
+  transition: width 0.3s ease;
+  /* Smooth expansion with navbar elements */
+
+  /* Progressive blur */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+  /* Vertical fade: solid at top, transparent at bottom */
+  -webkit-mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.7) 40%,
+      rgba(0, 0, 0, 0.3) 70%,
+      rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.7) 40%,
+      rgba(0, 0, 0, 0.3) 70%,
+      rgba(0, 0, 0, 0) 100%);
+}
+
+/* Mobile: full width */
+@media (max-width: 768px) {
+  .navbar-blur-overlay {
+    width: 100%;
+    left: 0;
+    transform: none;
+  }
 }
 
 /* ========================================
@@ -2597,8 +2630,8 @@ html.theme-transitioning *::after {
   opacity: 0;
   /* Fast 0.2s exit */
   transition: transform 0.2s ease, opacity 0.2s ease;
-  max-height: calc(100vh - 120px);
-  /* Dynamic: near bottom edge */
+  /* Dynamic height: grows with content, max near bottom of screen */
+  max-height: calc(100dvh - 140px);
   width: 100%;
   max-width: 42rem;
   background: transparent !important;
@@ -2878,12 +2911,15 @@ html.theme-transitioning *::after {
   border: none !important;
   padding: 0 !important;
   color: inherit !important;
+  font-size: 0 !important;
+  /* Hide 'Date:' label */
 }
 
 /* Show only the actual date value */
 .pagefind-ui__result-tag b,
 .pagefind-ui__result-tag strong {
   font-size: 0.85rem !important;
+  /* Restore font-size for value */
   font-weight: 400 !important;
 }
 
