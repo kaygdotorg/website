@@ -895,7 +895,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       max-width: 1400px;
       margin: 0 auto;
       width: 100%;
-      align-items: start; /* Cards don't stretch to fill row height */
+      align-items: stretch; /* Cards in same row match height (mymind style) */
     }
 
     /* Row 1: Talks (67%) | Writing (33%) */
@@ -975,10 +975,10 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       border-color: rgba(255, 255, 255, 0.15);
     }
 
-    /* Visual container at top */
+    /* Visual container at top - grows to fill available space */
     .bento-visual-container {
       width: 100%;
-      flex: 0 0 auto; /* Don't grow, let image aspect-ratio control height */
+      flex: 1 1 auto; /* Grow to fill remaining card space */
       padding: clamp(0.75rem, 1.5vw, 1.5rem) clamp(0.75rem, 1.5vw, 1.5rem) 0;
       position: relative;
     }
@@ -1005,8 +1005,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
     .bento-image-wrapper img {
       width: 100%;
-      height: auto;
-      aspect-ratio: 4 / 3; /* Fixed image ratio for consistency */
+      height: 100%;
       object-fit: cover;
       transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
