@@ -2034,7 +2034,7 @@ body {
     0 0 20px rgba(244, 114, 182, 0.02);
 }
 
-/* Nav Logo - Tilted multi-line cursive */
+/* Nav Logo - Expandable @kayg → @kaygdotorg */
 .nav-logo {
   display: flex;
   align-items: center;
@@ -2044,13 +2044,32 @@ body {
 
 .nav-logo-text {
   font-family: "Tangerine", cursive;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  line-height: 0.85;
-  text-align: center;
-  transform: rotate(-12deg);
-  display: block;
+  line-height: 1;
   color: inherit;
+  white-space: nowrap;
+}
+
+/* Expandable part - hidden by default on desktop */
+.nav-logo-expand {
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 0.3s ease, opacity 0.2s ease;
+}
+
+/* Show on hover */
+.nav-logo:hover .nav-logo-expand {
+  max-width: 100px;
+  opacity: 1;
+}
+
+/* Mobile: compact with tight letter-spacing */
+.nav-logo-mobile .nav-logo-text {
+  font-size: 1.3rem;
+  letter-spacing: -0.03em;
 }
 
 /* Navbar visibility on scroll */
