@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Timeline from "../components/Timeline.astro";
 import { getEntry, getCollection } from "astro:content";
 import { formatDateWithComma } from "../utils/dates";
 
@@ -62,6 +63,8 @@ const {
   cardPhotos: rawCardPhotos,
   bentoCards: rawBentoCards,
   quote,
+  workExperience,
+  resumeUrl,
 } = homeEntry.data;
 
 // Enhance bento cards with actual latest content where applicable
@@ -240,6 +243,9 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         </div>
       </div>
     </section>
+
+    <!-- Work Experience Section -->
+    <Timeline experience={workExperience} resumeUrl={resumeUrl} />
   </main>
 
   <!-- Card Hand Swipe Script -->
