@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Icon from "../components/Icon.astro";
+import TagFilter from "../components/TagFilter.astro";
 import { getCollection } from "astro:content";
 import { formatDate } from "../utils/dates";
 
@@ -32,31 +33,14 @@ const allTags = [
         </header>
 
         <!-- Tag Filters -->
-        {
-            allTags.length > 0 && (
-                <div class="flex flex-wrap gap-2 mb-10 animate-fade-up stagger-1">
-                    <button
-                        class="tag-filter active px-3 py-1.5 rounded-full text-sm transition-all"
-                        data-tag="all"
-                    >
-                        All ({notes.length})
-                    </button>
-                    {allTags.slice(0, 10).map((tag) => {
-                        const count = notes.filter((n) =>
-                            n.data.tags?.includes(tag),
-                        ).length;
-                        return (
-                            <button
-                                class="tag-filter px-3 py-1.5 rounded-full text-sm transition-all"
-                                data-tag={tag}
-                            >
-                                {tag} ({count})
-                            </button>
-                        );
-                    })}
-                </div>
-            )
-        }
+        <TagFilter
+            tags={allTags.slice(0, 10).map((tag) => ({
+                tag,
+                count: notes.filter((n) => n.data.tags?.includes(tag)).length,
+            }))}
+            totalCount={notes.length}
+            cardSelector=".note-card"
+        />
 
         <!-- Notes List -->
         <div class="space-y-6">
@@ -138,35 +122,6 @@ const allTags = [
     </section>
 
     <style>
-        .tag-filter {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--fallback-bc, #f8f4fc);
-            opacity: 0.7;
-        }
-
-        .tag-filter:hover,
-        .tag-filter.active {
-            background: rgba(244, 114, 182, 0.15);
-            border-color: rgba(244, 114, 182, 0.3);
-            color: var(--color-accent-500, #ec4899);
-            opacity: 1;
-        }
-
-        [data-theme="light"] .tag-filter {
-            background: rgba(0, 0, 0, 0.03);
-            border-color: rgba(0, 0, 0, 0.1);
-            color: #1a1225;
-        }
-
-        [data-theme="light"] .tag-filter:hover,
-        [data-theme="light"] .tag-filter.active {
-            background: rgba(236, 72, 153, 0.1);
-            border-color: rgba(236, 72, 153, 0.3);
-            color: var(--color-accent-600, #db2777);
-            opacity: 1;
-        }
-
         .note-card.hidden {
             display: none;
         }
@@ -178,42 +133,4 @@ const allTags = [
             overflow: hidden;
         }
     </style>
-
-    <script>
-        function initFilters() {
-            const tagFilters = document.querySelectorAll(".tag-filter");
-            const noteCards = document.querySelectorAll(".note-card");
-
-            if (!tagFilters.length || !noteCards.length) return;
-
-            tagFilters.forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    // Update active state
-                    tagFilters.forEach((b) => b.classList.remove("active"));
-                    btn.classList.add("active");
-
-                    const selectedTag = btn.getAttribute("data-tag");
-
-                    noteCards.forEach((card) => {
-                        const noteTags = JSON.parse(
-                            card.getAttribute("data-tags") || "[]",
-                        );
-
-                        if (
-                            selectedTag === "all" ||
-                            noteTags.includes(selectedTag)
-                        ) {
-                            card.classList.remove("hidden");
-                        } else {
-                            card.classList.add("hidden");
-                        }
-                    });
-                });
-            });
-        }
-
-        // Init on first load and on view transitions
-        document.addEventListener("DOMContentLoaded", initFilters);
-        document.addEventListener("astro:page-load", initFilters);
-    </script>
 </BaseLayout>
