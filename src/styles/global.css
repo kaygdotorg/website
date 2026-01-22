@@ -707,8 +707,10 @@ html[data-theme="light"] body {
 
 /* TOC Floating Card Styling - creates depth and separation */
 .md-card-toc {
-  margin: 0 auto 1.5rem auto;
-  width: 100%;
+  margin: 0 1rem 1.5rem 1rem;
+  /* Horizontal margin to prevent touching parent edges */
+  width: calc(100% - 2rem);
+  /* Account for horizontal margins */
   max-width: 720px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 1.25rem;
@@ -717,6 +719,14 @@ html[data-theme="light"] body {
     0 4px 16px rgba(0, 0, 0, 0.12),
     0 2px 8px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* On larger screens, center the ToC with auto margins */
+@media (min-width: 768px) {
+  .md-card-toc {
+    margin: 0 auto 1.5rem auto;
+    width: 100%;
+  }
 }
 
 .md-card-toc .md-card-header {
@@ -898,7 +908,8 @@ html[data-theme="light"] body {
 
 /* Content Card - Enhanced readability for long-form content */
 .md-card-body .md-card-content {
-  line-height: 2.0;
+  line-height: 1.7;
+  /* Reduced from 2.0 for better visual density */
   font-size: 1.1875rem;
   /* 19px for comfortable reading */
   color: #F8F7F5;
@@ -999,7 +1010,8 @@ html[data-theme="light"] body {
 }
 
 .md-card-body .md-card-content li {
-  margin: 0.75rem 0;
+  margin: 0.4rem 0;
+  /* Reduced from 0.75rem for tighter lists */
   opacity: 0.95;
   font-size: 1.1875rem;
   /* Match paragraph font size */
