@@ -1,0 +1,88 @@
+---
+/**
+ * 404 Not Found Page
+ *
+ * Displayed when a user navigates to a route that doesn't exist.
+ * Features a clean, minimal design with a link back to home.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+---
+
+<BaseLayout
+    title="Page Not Found"
+    description="The page you're looking for doesn't exist."
+>
+    <main class="min-h-[80vh] flex items-center justify-center px-6">
+        <div class="text-center max-w-lg animate-fade-up">
+            {/* Glowing 404 */}
+            <div class="relative mb-8">
+                <h1
+                    class="text-[10rem] md:text-[14rem] font-display font-bold leading-none gradient-text opacity-20"
+                >
+                    404
+                </h1>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div
+                        class="text-6xl md:text-8xl font-display font-bold gradient-text"
+                    >
+                        404
+                    </div>
+                </div>
+            </div>
+
+            {/* Message */}
+            <h2
+                class="text-2xl md:text-3xl font-display mb-4 text-base-content"
+            >
+                Page not found
+            </h2>
+            <p class="text-base-content/60 mb-8 leading-relaxed">
+                The page you're looking for doesn't exist or has been moved.
+                Let's get you back on track.
+            </p>
+
+            {/* Actions */}
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                    href="/"
+                    class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-accent text-white font-medium hover:bg-accent/90 transition-all hover:scale-105"
+                >
+                    <Icon name="home" class="w-4 h-4" />
+                    Go Home
+                </a>
+                <button
+                    onclick="history.back()"
+                    class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-base-content/20 text-base-content/80 font-medium hover:bg-base-content/5 transition-all cursor-pointer"
+                >
+                    <Icon name="arrow" class="w-4 h-4 rotate-180" />
+                    Go Back
+                </button>
+            </div>
+
+            {/* Decorative element */}
+            <div class="mt-16 opacity-30">
+                <div
+                    class="w-24 h-px bg-gradient-to-r from-transparent via-accent to-transparent mx-auto"
+                >
+                </div>
+            </div>
+        </div>
+    </main>
+</BaseLayout>
+
+<style>
+    @keyframes float {
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    .gradient-text {
+        animation: float 6s ease-in-out infinite;
+    }
+</style>
