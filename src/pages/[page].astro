@@ -1,0 +1,54 @@
+---
+/**
+ * Dynamic route for simple markdown pages.
+ *
+ * This single file handles multiple static content pages that share the same
+ * structure: about, contact, homelab. Each page:
+ * - Fetches its index.md from the corresponding content collection
+ * - Renders the markdown content using MarkdownLayout
+ * - Displays title, dates, reading time, and cover image
+ *
+ * This consolidation eliminates 3 nearly-identical page files into one.
+ * Note: changelog has custom styling so it remains separate.
+ *
+ * Supported pages: /about, /contact, /homelab
+ */
+import MarkdownLayout from "../layouts/MarkdownLayout.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+    // Define which collections this route handles
+    // Note: changelog is excluded as it has custom styling (see changelog.astro)
+    const staticPages = ["about", "contact", "homelab"];
+    return staticPages.map((page) => ({
+        params: { page },
+    }));
+}
+
+const { page } = Astro.params as { page: "about" | "contact" | "homelab" };
+
+// Fetch the collection for this page
+const allEntries = await getCollection(page);
+const entry = allEntries.find((e) => e.id === "index.md");
+
+if (!entry) {
+    throw new Error(`Could not find index.md in src/content/${page}/`);
+}
+
+const { Content } = await entry.render();
+
+// Calculate reading time
+const wordCount = entry.body?.split(/\s+/).length || 0;
+const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+---
+
+<MarkdownLayout
+    title={entry.data.title}
+    entry={entry}
+    createdDate={entry.data.date}
+    lastEdited={entry.data["last edited"]}
+    readingTime={readingTime}
+    coverImage={entry.data["cover-image"]}
+>
+    <Content />
+</MarkdownLayout>

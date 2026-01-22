@@ -1,12 +1,17 @@
 ---
+/**
+ * Notes List Page (Digital Garden)
+ *
+ * Displays all notes with tag filtering.
+ * Uses ContentCard component for consistent card rendering.
+ * Includes "Digital Garden" section label to differentiate from blog.
+ */
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Icon from "../components/Icon.astro";
+import ContentCard from "../components/ContentCard.astro";
 import TagFilter from "../components/TagFilter.astro";
 import { getCollection } from "astro:content";
-import { formatDate } from "../utils/dates";
-import { getExcerpt } from "../utils/markdown";
 
-// Use getCollection and filter for index.md - more reliable than getEntry
+// Get index.md for page metadata
 const allNotesEntries = await getCollection("notes");
 const entry = allNotesEntries.find((e) => e.id === "index.md");
 
@@ -14,33 +19,32 @@ if (!entry) {
     throw new Error("Could not find index.md in src/content/notes/");
 }
 
-const { Content } = await entry.render();
-
-// Get all notes, exclude drafts and index.md (landing page), sort by date
+// Get all notes, exclude drafts and index.md, sort by date
 const notes = allNotesEntries
     .filter((e) => e.id !== "index.md" && !e.data.draft)
     .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-// Calculate tag counts for TagFilter component
-const tagCounts: { tag: string; count: number }[] = [];
+// Calculate tag counts for TagFilter
 const tagMap = new Map<string, number>();
 notes.forEach((note) => {
     (note.data.tags || []).forEach((tag) => {
         tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
     });
 });
-tagMap.forEach((count, tag) => tagCounts.push({ tag, count }));
-tagCounts.sort((a, b) => b.count - a.count);
+const tagCounts = Array.from(tagMap, ([tag, count]) => ({ tag, count })).sort(
+    (a, b) => b.count - a.count,
+);
 ---
 
 <BaseLayout title={entry.data.title} description={entry.data.description}>
     <section class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
-        <!-- Header -->
+        {/* Header */}
         <header class="mb-12 max-w-2xl animate-fade-up">
             <span
                 class="text-accent font-medium tracking-widest uppercase text-xs mb-3 block"
-                >Digital Garden</span
             >
+                Digital Garden
+            </span>
             <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
                 {entry.data.title}
             </h1>
@@ -49,94 +53,24 @@ tagCounts.sort((a, b) => b.count - a.count);
             </p>
         </header>
 
-        <!-- Tag Filter -->
+        {/* Tag Filter */}
         <TagFilter
             tags={tagCounts}
             totalCount={notes.length}
             cardSelector=".note-card"
         />
 
-        <!-- Notes List -->
+        {/* Notes List */}
         <div class="space-y-6">
             {
                 notes.map((note, index) => (
-                    <article
-                        class="note-card frosted-card p-6 rounded-2xl glow-hover transition-all animate-fade-up"
-                        data-tags={JSON.stringify(note.data.tags || [])}
-                        style={`animation-delay: ${Math.min(index * 0.05, 0.5)}s`}
-                    >
-                        <a href={`/notes/${note.slug}`} class="block group">
-                            <div class="flex flex-col md:flex-row md:items-start gap-4">
-                                {/* Feature Image */}
-                                {note.data["cover-image"] && (
-                                    <div class="w-full md:w-32 h-24 md:h-20 rounded-lg overflow-hidden flex-shrink-0">
-                                        <img
-                                            src={
-                                                typeof note.data[
-                                                    "cover-image"
-                                                ] === "string"
-                                                    ? note.data["cover-image"]
-                                                    : note.data["cover-image"]
-                                                          .src
-                                            }
-                                            alt={note.data.title}
-                                            class="w-full h-full object-cover transition-transform group-hover:scale-105"
-                                            loading="lazy"
-                                        />
-                                    </div>
-                                )}
-
-                                {/* Content */}
-                                <div class="flex-1 min-w-0">
-                                    <h2 class="font-display text-xl font-medium mb-2 group-hover:text-accent transition-colors">
-                                        {note.data.title}
-                                    </h2>
-
-                                    {(note.data.description ||
-                                        getExcerpt(note.body)) && (
-                                        <p class="text-base-content/60 text-sm mb-3 line-clamp-2">
-                                            {note.data.description ||
-                                                getExcerpt(note.body)}
-                                        </p>
-                                    )}
-
-                                    <div class="flex flex-wrap items-center gap-3 text-xs text-base-content/50">
-                                        <time
-                                            datetime={note.data.date.toISOString()}
-                                        >
-                                            {formatDate(note.data.date)}
-                                        </time>
-
-                                        {note.data.tags &&
-                                            note.data.tags.length > 0 && (
-                                                <>
-                                                    <span class="opacity-30">
-                                                        •
-                                                    </span>
-                                                    <div class="flex gap-2">
-                                                        {note.data.tags
-                                                            .slice(0, 3)
-                                                            .map((tag) => (
-                                                                <span class="text-accent/70">
-                                                                    #{tag}
-                                                                </span>
-                                                            ))}
-                                                    </div>
-                                                </>
-                                            )}
-                                    </div>
-                                </div>
-
-                                {/* Arrow */}
-                                <div class="hidden md:flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Icon
-                                        name="arrow"
-                                        class="w-4 h-4 text-accent"
-                                    />
-                                </div>
-                            </div>
-                        </a>
-                    </article>
+                    <ContentCard
+                        entry={note}
+                        basePath="/notes"
+                        index={index}
+                        cardClass="note-card"
+                        showTags={true}
+                    />
                 ))
             }
         </div>

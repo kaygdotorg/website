@@ -1,0 +1,150 @@
+---
+/**
+ * ContentCard Component
+ *
+ * A reusable card component for displaying content entries in list views.
+ * Used by blog.astro and notes.astro for consistent card rendering.
+ *
+ * Features:
+ * - Cover image with hover scale effect
+ * - Title, description, and date
+ * - Optional tags display
+ * - Optional section label (e.g., "Digital Garden" for notes)
+ * - Hover arrow indicator
+ * - Staggered animation support
+ *
+ * Usage:
+ * <ContentCard
+ *   entry={post}
+ *   basePath="/blog"
+ *   index={0}
+ *   showTags={true}
+ * />
+ */
+import Icon from "./Icon.astro";
+import { formatDate } from "../utils/dates";
+import { getExcerpt } from "../utils/markdown";
+import { getUrlSlug } from "../utils/content";
+
+interface Props {
+    /** The content entry to display */
+    entry: any;
+    /** Base URL path for links (e.g., "/blog", "/notes") */
+    basePath: string;
+    /** Index for staggered animation delay */
+    index: number;
+    /** CSS class for the card element (used by TagFilter) */
+    cardClass?: string;
+    /** Whether to show tags on the card */
+    showTags?: boolean;
+    /** Optional label to display above the title (e.g., "Digital Garden") */
+    sectionLabel?: string;
+}
+
+const {
+    entry,
+    basePath,
+    index,
+    cardClass = "content-card",
+    showTags = true,
+    sectionLabel,
+} = Astro.props;
+
+const coverImage = entry.data["cover-image"];
+const description = entry.data.description || getExcerpt(entry.body);
+const tags = entry.data.tags || [];
+const href = `${basePath}/${getUrlSlug(entry)}`;
+---
+
+<article
+    class={`${cardClass} frosted-card p-6 rounded-2xl glow-hover transition-all animate-fade-up`}
+    data-tags={JSON.stringify(tags)}
+    style={`animation-delay: ${Math.min(index * 0.05, 0.5)}s`}
+>
+    <a href={href} class="block group">
+        <div class="flex flex-col md:flex-row md:items-start gap-4">
+            {/* Cover Image */}
+            {
+                coverImage && (
+                    <div class="w-full md:w-32 h-24 md:h-20 rounded-lg overflow-hidden flex-shrink-0">
+                        <img
+                            src={
+                                typeof coverImage === "string"
+                                    ? coverImage
+                                    : coverImage.src
+                            }
+                            alt={entry.data.title}
+                            class="w-full h-full object-cover transition-transform group-hover:scale-105"
+                            loading="lazy"
+                        />
+                    </div>
+                )
+            }
+
+            {/* Content */}
+            <div class="flex-1 min-w-0">
+                {/* Optional Section Label */}
+                {
+                    sectionLabel && (
+                        <span class="text-accent font-medium tracking-widest uppercase text-xs mb-2 block">
+                            {sectionLabel}
+                        </span>
+                    )
+                }
+
+                <h2
+                    class="font-display text-xl font-medium mb-2 group-hover:text-accent transition-colors"
+                >
+                    {entry.data.title}
+                </h2>
+
+                {
+                    description && (
+                        <p class="text-base-content/60 text-sm mb-3 line-clamp-2">
+                            {description}
+                        </p>
+                    )
+                }
+
+                <div
+                    class="flex flex-wrap items-center gap-3 text-xs text-base-content/50"
+                >
+                    <time datetime={entry.data.date.toISOString()}>
+                        {formatDate(entry.data.date)}
+                    </time>
+
+                    {
+                        showTags && tags.length > 0 && (
+                            <>
+                                <span class="opacity-30">•</span>
+                                <div class="flex gap-2">
+                                    {tags.slice(0, 3).map((tag: string) => (
+                                        <span class="text-accent/70">
+                                            #{tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </>
+                        )
+                    }
+                </div>
+            </div>
+
+            {/* Hover Arrow */}
+            <div
+                class="hidden md:flex items-center opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+                <Icon name="arrow" class="w-4 h-4 text-accent" />
+            </div>
+        </div>
+    </a>
+</article>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>

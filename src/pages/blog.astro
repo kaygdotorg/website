@@ -1,12 +1,16 @@
 ---
+/**
+ * Blog List Page
+ *
+ * Displays all blog posts with tag filtering.
+ * Uses ContentCard component for consistent card rendering.
+ */
 import BaseLayout from "../layouts/BaseLayout.astro";
-import Icon from "../components/Icon.astro";
+import ContentCard from "../components/ContentCard.astro";
 import TagFilter from "../components/TagFilter.astro";
 import { getCollection } from "astro:content";
-import { formatDate } from "../utils/dates";
-import { getExcerpt } from "../utils/markdown";
 
-// Use getCollection and filter for index.md - more reliable than getEntry
+// Get index.md for page metadata
 const allBlogEntries = await getCollection("blog");
 const entry = allBlogEntries.find((e) => e.id === "index.md");
 
@@ -14,28 +18,26 @@ if (!entry) {
   throw new Error("Could not find index.md in src/content/blog/");
 }
 
-const { Content } = await entry.render();
-
-// Get all blog posts, exclude drafts and index.md (landing page), sort by date
+// Get all blog posts, exclude drafts and index.md, sort by date
 const posts = allBlogEntries
   .filter((e) => e.id !== "index.md" && !e.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-// Calculate tag counts for TagFilter component
-const tagCounts: { tag: string; count: number }[] = [];
+// Calculate tag counts for TagFilter
 const tagMap = new Map<string, number>();
 posts.forEach((post) => {
   (post.data.tags || []).forEach((tag) => {
     tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
   });
 });
-tagMap.forEach((count, tag) => tagCounts.push({ tag, count }));
-tagCounts.sort((a, b) => b.count - a.count);
+const tagCounts = Array.from(tagMap, ([tag, count]) => ({ tag, count })).sort(
+  (a, b) => b.count - a.count,
+);
 ---
 
 <BaseLayout title={entry.data.title} description={entry.data.description}>
   <section class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
-    <!-- Header -->
+    {/* Header */}
     <header class="mb-12 max-w-2xl animate-fade-up">
       <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
         {entry.data.title}
@@ -45,84 +47,24 @@ tagCounts.sort((a, b) => b.count - a.count);
       </p>
     </header>
 
-    <!-- Tag Filter -->
+    {/* Tag Filter */}
     <TagFilter
       tags={tagCounts}
       totalCount={posts.length}
       cardSelector=".post-card"
     />
 
-    <!-- Post List -->
+    {/* Post List */}
     <div class="space-y-6">
       {
         posts.map((post, index) => (
-          <article
-            class="post-card frosted-card p-6 rounded-2xl glow-hover transition-all animate-fade-up"
-            data-tags={JSON.stringify(post.data.tags || [])}
-            style={`animation-delay: ${Math.min(index * 0.05, 0.5)}s`}
-          >
-            <a
-              href={`/blog/${post.data.slug || post.slug}`}
-              class="block group"
-            >
-              <div class="flex flex-col md:flex-row md:items-start gap-4">
-                {/* Feature Image */}
-                {post.data["cover-image"] && (
-                  <div class="w-full md:w-32 h-24 md:h-20 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={
-                        typeof post.data["cover-image"] === "string"
-                          ? post.data["cover-image"]
-                          : post.data["cover-image"].src
-                      }
-                      alt={post.data.title}
-                      class="w-full h-full object-cover transition-transform group-hover:scale-105"
-                      loading="lazy"
-                    />
-                  </div>
-                )}
-
-                {/* Content */}
-                <div class="flex-1 min-w-0">
-                  <h2 class="font-display text-xl font-medium mb-2 group-hover:text-accent transition-colors">
-                    {post.data.title}
-                  </h2>
-
-                  {(post.data.description || getExcerpt(post.body)) && (
-                    <p class="text-base-content/60 text-sm mb-3 line-clamp-2">
-                      {post.data.description || getExcerpt(post.body)}
-                    </p>
-                  )}
-
-                  <div class="flex flex-wrap items-center gap-3 text-xs text-base-content/50">
-                    <time datetime={post.data.date.toISOString()}>
-                      {formatDate(post.data.date)}
-                    </time>
-
-                    {post.data.tags && post.data.tags.length > 0 && (
-                      <>
-                        <span class="opacity-30">•</span>
-                        <div class="flex gap-2">
-                          {post.data.tags.slice(0, 3).map((tag) => (
-                            <span class="text-accent/70">#{tag}</span>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Arrow */}
-                <div class="hidden md:flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Icon
-                    name="arrow"
-                    class="w-5 h-5 text-accent"
-                    strokeWidth={2}
-                  />
-                </div>
-              </div>
-            </a>
-          </article>
+          <ContentCard
+            entry={post}
+            basePath="/blog"
+            index={index}
+            cardClass="post-card"
+            showTags={true}
+          />
         ))
       }
     </div>
@@ -131,13 +73,6 @@ tagCounts.sort((a, b) => b.count - a.count);
   <style>
     .post-card.hidden {
       display: none;
-    }
-
-    .line-clamp-2 {
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
     }
   </style>
 </BaseLayout>

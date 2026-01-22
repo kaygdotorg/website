@@ -1,0 +1,118 @@
+---
+/**
+ * Unified Dynamic Route for Content Detail Pages
+ *
+ * This single file handles detail pages for multiple content collections:
+ * blog, notes, talks, now, uses. Each page:
+ * - Fetches the entry from the appropriate collection
+ * - Renders using MarkdownLayout with prev/next navigation
+ * - Displays tags if the collection supports them
+ *
+ * This consolidation eliminates 5 separate [slug].astro files into one.
+ *
+ * Supported routes:
+ * - /blog/[slug]
+ * - /notes/[slug]
+ * - /talks/[slug]
+ * - /now/[slug]
+ * - /uses/[slug]
+ */
+import MarkdownLayout from "../../layouts/MarkdownLayout.astro";
+import { getCollection } from "astro:content";
+import {
+    calculateReadingTime,
+    getUrlSlug,
+    buildBacklinks,
+    CONTENT_COLLECTIONS,
+    type ContentCollection,
+} from "../../utils/content";
+
+export async function getStaticPaths() {
+    const collections: ContentCollection[] = [
+        "blog",
+        "notes",
+        "talks",
+        "now",
+        "uses",
+    ];
+
+    // Generate paths for all entries across all collections
+    const paths = await Promise.all(
+        collections.map(async (collectionName) => {
+            const entries = await getCollection(
+                collectionName,
+                ({ id }) => id !== "index.md",
+            );
+            return entries.map((entry) => ({
+                params: {
+                    collection: collectionName,
+                    slug: getUrlSlug(entry),
+                },
+                props: { entry, collectionName },
+            }));
+        }),
+    );
+
+    return paths.flat();
+}
+
+interface Props {
+    entry: any;
+    collectionName: ContentCollection;
+}
+
+const { entry, collectionName } = Astro.props;
+const { Content } = await entry.render();
+
+// Get collection config
+const config = CONTENT_COLLECTIONS[collectionName];
+
+// Calculate reading time
+const readingTime = calculateReadingTime(entry.body);
+
+// Get dates
+const createdDate = entry.data.date;
+const lastEdited = entry.data["last edited"];
+
+// Get all entries for prev/next navigation (exclude index.md, drafts)
+const allEntries = await getCollection(
+    collectionName,
+    ({ id, data }) => id !== "index.md" && !data.draft,
+);
+const sortedEntries = allEntries.sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+// Build backlinks
+const backlinks = buildBacklinks(
+    config.basePath,
+    config.label,
+    sortedEntries,
+    entry,
+);
+---
+
+<MarkdownLayout
+    title={entry.data.title}
+    description={entry.data.description}
+    createdDate={createdDate}
+    lastEdited={lastEdited}
+    readingTime={readingTime}
+    backlinks={backlinks}
+    coverImage={entry.data["cover-image"]}
+>
+    {/* Render tags if collection supports them */}
+    {
+        config.hasTags && entry.data.tags && entry.data.tags.length > 0 && (
+            <div class="flex flex-wrap gap-2 mb-6">
+                {entry.data.tags.map((tag: string) => (
+                    <span class="px-3 py-1 text-xs rounded-full bg-white/10 text-white/80">
+                        {tag}
+                    </span>
+                ))}
+            </div>
+        )
+    }
+
+    <Content />
+</MarkdownLayout>
