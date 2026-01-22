@@ -1067,14 +1067,19 @@ html[data-theme="light"] body {
   list-style-type: none;
 }
 
-/* Custom accent-colored bullets for unordered lists */
+/* Custom accent-colored bullets for unordered lists
+ * Uses position: absolute to ensure bullet stays aligned with first line
+ * even when markdown wraps content in <p> tags (common for items with nested lists) */
+.md-card-body .md-card-content ul li {
+  position: relative;
+}
+
 .md-card-body .md-card-content ul li::before {
   content: "•";
   color: var(--color-accent-400, #f472b6);
   font-weight: bold;
-  display: inline-block;
-  width: 1.25em;
-  margin-left: -1.25em;
+  position: absolute;
+  left: -1.25em;
 }
 
 .md-card-body .md-card-content ol {
@@ -1087,6 +1092,12 @@ html[data-theme="light"] body {
   opacity: 0.95;
   font-size: 1.1875rem;
   /* Match paragraph font size */
+}
+
+/* Remove paragraph margins inside list items 
+ * Markdown parsers wrap list content in <p> when items have nested content */
+.md-card-body .md-card-content li > p {
+  margin: 0;
 }
 
 /* Callout / Blockquote Card Transformation */
@@ -2065,6 +2076,21 @@ body {
     0 4px 16px rgba(0, 0, 0, 0.15),
     0 0 20px rgba(244, 114, 182, 0.03);
   border-radius: 9999px;
+}
+
+/* Subtle text shadow for navbar readability on varied backgrounds */
+.glass-pill,
+.glass-pill a,
+.glass-pill button,
+.glass-pill span {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .glass-pill,
+[data-theme="light"] .glass-pill a,
+[data-theme="light"] .glass-pill button,
+[data-theme="light"] .glass-pill span {
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
 }
 
 [data-theme="light"] .glass-pill {
