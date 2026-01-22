@@ -443,6 +443,55 @@ import { ClientRouter } from "astro:transitions";
 
     <!-- Scripts -->
     <script>
+      // =========================================================================
+      // THEME TOGGLE UTILITY
+      // =========================================================================
+      //
+      // Shared function used by both click handlers and keyboard shortcuts.
+      // Consolidates all theme switching logic in one place.
+      //
+      // WHAT IT DOES:
+      // 1. Toggles data-theme attribute between 'dark' and 'light'
+      // 2. Persists preference to localStorage
+      // 3. Updates theme-color meta tags (for Safari address bar color)
+      // 4. Adds/removes theme-transitioning class for smooth CSS transitions
+      //
+      // CALLED BY:
+      // - Click handler on theme toggle buttons (desktop + mobile)
+      // - Keyboard shortcut: CMD/CTRL + D
+      //
+      // =========================================================================
+      function toggleTheme() {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+        // Add transitioning class for CSS animations
+        html.classList.add("theme-transitioning");
+
+        // Update theme attribute and persist to localStorage
+        html.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+
+        // Update theme-color meta tags for Safari address bar
+        // Both light and dark media queries get the same color since
+        // we're overriding the preferred color scheme with user choice
+        const bgColor = newTheme === "dark" ? "#0d0910" : "#faf8fc";
+        const themeColorLight = document.querySelector(
+          'meta[name="theme-color"][media*="light"]',
+        );
+        const themeColorDark = document.querySelector(
+          'meta[name="theme-color"][media*="dark"]',
+        );
+        if (themeColorLight) themeColorLight.setAttribute("content", bgColor);
+        if (themeColorDark) themeColorDark.setAttribute("content", bgColor);
+
+        // Remove transitioning class after animation completes (300ms)
+        setTimeout(() => {
+          html.classList.remove("theme-transitioning");
+        }, 300);
+      }
+
       // Initialize theme toggle on every page load (needed for View Transitions)
       function initThemeToggle() {
         const themeToggles = [
@@ -456,33 +505,7 @@ import { ClientRouter } from "astro:transitions";
           const newToggle = toggle.cloneNode(true);
           if (newToggle && toggle.parentNode) {
             toggle.parentNode.replaceChild(newToggle, toggle);
-
-            newToggle.addEventListener("click", () => {
-              const html = document.documentElement;
-              const currentTheme = html.getAttribute("data-theme");
-              const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-              html.classList.add("theme-transitioning");
-              html.setAttribute("data-theme", newTheme);
-              localStorage.setItem("theme", newTheme);
-
-              // Update theme-color meta tags for Safari status bar
-              const bgColor = newTheme === "dark" ? "#0d0910" : "#faf8fc";
-              const themeColorLight = document.querySelector(
-                'meta[name="theme-color"][media*="light"]',
-              );
-              const themeColorDark = document.querySelector(
-                'meta[name="theme-color"][media*="dark"]',
-              );
-              if (themeColorLight)
-                themeColorLight.setAttribute("content", bgColor);
-              if (themeColorDark)
-                themeColorDark.setAttribute("content", bgColor);
-
-              setTimeout(() => {
-                html.classList.remove("theme-transitioning");
-              }, 300);
-            });
+            newToggle.addEventListener("click", toggleTheme);
           }
         });
       }
@@ -803,17 +826,10 @@ import { ClientRouter } from "astro:transitions";
             }
           }
           // CMD/CTRL + D: Toggle dark/light mode
+          // Uses shared toggleTheme() function for consistent behavior
           if ((e.metaKey || e.ctrlKey) && e.key === "d") {
             e.preventDefault();
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute("data-theme");
-            const newTheme = currentTheme === "dark" ? "light" : "dark";
-            html.classList.add("theme-transitioning");
-            html.setAttribute("data-theme", newTheme);
-            localStorage.setItem("theme", newTheme);
-            setTimeout(() => {
-              html.classList.remove("theme-transitioning");
-            }, 300);
+            toggleTheme();
           }
           // CMD/CTRL + /: Toggle menu
           if ((e.metaKey || e.ctrlKey) && e.key === "/") {
