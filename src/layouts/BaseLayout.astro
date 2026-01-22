@@ -65,8 +65,13 @@ import { ClientRouter } from "astro:transitions";
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    
+    <!-- Preconnect to external image CDN for faster loading -->
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="dns-prefetch" href="https://images.unsplash.com" />
+    
     <ClientRouter />
-    <!-- Fonts are now self-hosted via fontsource -->
+    <!-- Fonts: self-hosted via fontsource with font-display: swap (shows fallback immediately) -->
     <!-- Theme detection: respects system preference, allows override -->
     <script is:inline>
       (function () {

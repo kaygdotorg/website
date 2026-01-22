@@ -166,7 +166,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                     >
                       <div class="card-in-hand-image">
                         <img
-                          src={item.src}
+                          src={typeof item.src === 'string' ? item.src : item.src.src}
                           alt={item.label}
                           draggable="false"
                           loading="lazy"
@@ -214,7 +214,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                       <div class="photo-stack">
                         {cardPhotos?.slice(0, 4).map((photo: any) => (
                           <div class="photo-stack-item">
-                            <img src={photo.src} alt="Capture" loading="lazy" decoding="async" />
+                            <img src={typeof photo.src === 'string' ? photo.src : photo.src.src} alt="Capture" loading="lazy" decoding="async" />
                           </div>
                         ))}
                       </div>
