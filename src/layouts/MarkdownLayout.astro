@@ -36,9 +36,12 @@ const displayDates = entry?.data?.["display-dates"] !== false;
 const relativeLastEdited = lastEdited ? getRelativeTime(lastEdited) : null;
 const formattedLastEdited = lastEdited ? formatDate(lastEdited) : null;
 const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
+
+// In-progress state
+const displayInProgress = entry?.data?.["display-in-progress"] === true;
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} displayInProgress={displayInProgress}>
   <div class="md-page-container">
     <!-- Unified Single Card for entire page -->
     <div class="frosted-card md-unified-card">

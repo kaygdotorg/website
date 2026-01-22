@@ -1,17 +1,21 @@
 ---
 import "../styles/global.css";
 import Icon from "../components/Icon.astro";
+import InProgressCard from "../components/InProgressCard.astro";
 
 interface Props {
   title: string;
   description?: string;
   hideNavInitially?: boolean;
+  /** Show in-progress card instead of content */
+  displayInProgress?: boolean;
 }
 
 const {
   title,
   description = "Personal website",
   hideNavInitially = false,
+  displayInProgress = false,
 } = Astro.props;
 const currentPath = Astro.url.pathname;
 
@@ -391,7 +395,7 @@ import { ClientRouter } from "astro:transitions";
 
     <!-- Main content -->
     <main class={`relative z-10 ${hideNavInitially ? "" : "pt-24"}`}>
-      <slot />
+      {displayInProgress ? <InProgressCard title={title} /> : <slot />}
     </main>
 
     <style>
