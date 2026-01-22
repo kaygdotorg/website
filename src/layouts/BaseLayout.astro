@@ -152,7 +152,7 @@ import { ClientRouter } from "astro:transitions";
             </ul>
           </div>
 
-          <!-- Right pill: Search + Theme toggle -->
+          <!-- Right pill: Search + Theme toggle + Menu toggle -->
           <div class="glass-pill flex items-center gap-1 p-1">
             <button
               id="search-toggle-desktop"
@@ -171,45 +171,49 @@ import { ClientRouter } from "astro:transitions";
                 >
               </span>
             </button>
-            <span
-              class="search-expand-label text-sm font-medium text-base-content/70"
+            <button
+              id="theme-toggle-desktop"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer flex items-center"
+              aria-label="Toggle dark mode"
             >
-              Search <span id="search-shortcut-label" class="opacity-50 ml-1"
-                >CMD + K</span
+              <Icon name="sun" id="sun-icon-desktop" class="sun-icon w-5 h-5" />
+              <Icon
+                name="moon"
+                id="moon-icon-desktop"
+                class="moon-icon w-5 h-5"
+              />
+              <span
+                class="theme-expand-label text-sm font-medium text-base-content/70"
               >
-            </span>
+                Theme <span id="theme-shortcut-label" class="opacity-50 ml-1"
+                  >CMD + D</span
+                >
+              </span>
+            </button>
+            <button
+              id="menu-toggle-desktop"
+              class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer flex items-center"
+              aria-label="Open menu"
+            >
+              <Icon
+                name="hamburger"
+                id="hamburger-icon-desktop"
+                class="w-5 h-5"
+              />
+              <Icon
+                name="close"
+                id="close-icon-desktop"
+                class="w-5 h-5 hidden"
+              />
+              <span
+                class="menu-expand-label text-sm font-medium text-base-content/70"
+              >
+                Menu <span id="menu-shortcut-label" class="opacity-50 ml-1"
+                  >CMD + /</span
+                >
+              </span>
+            </button>
           </div>
-          <button
-            id="theme-toggle-desktop"
-            class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer flex items-center"
-            aria-label="Toggle dark mode"
-          >
-            <Icon name="sun" id="sun-icon-desktop" class="sun-icon w-5 h-5" />
-            <Icon
-              name="moon"
-              id="moon-icon-desktop"
-              class="moon-icon w-5 h-5"
-            />
-            <span
-              class="theme-expand-label text-sm font-medium text-base-content/70"
-            >
-              Theme <span id="theme-shortcut-label" class="opacity-50 ml-1"
-                >CMD + D</span
-              >
-            </span>
-          </button>
-          <button
-            id="menu-toggle-desktop"
-            class="p-2 rounded-full hover:bg-base-content/10 transition-colors cursor-pointer"
-            aria-label="Open menu"
-          >
-            <Icon
-              name="hamburger"
-              id="hamburger-icon-desktop"
-              class="w-5 h-5"
-            />
-            <Icon name="close" id="close-icon-desktop" class="w-5 h-5 hidden" />
-          </button>
         </div>
       </div>
 
@@ -729,6 +733,7 @@ import { ClientRouter } from "astro:transitions";
         initSearchModal();
         updateSearchShortcut();
         updateThemeShortcut();
+        updateMenuShortcut();
       });
 
       // Update Search Shortcut based on OS
@@ -750,6 +755,16 @@ import { ClientRouter } from "astro:transitions";
         }
       }
       updateThemeShortcut();
+
+      // Update Menu Shortcut based on OS
+      function updateMenuShortcut() {
+        const label = document.getElementById("menu-shortcut-label");
+        if (label) {
+          const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+          label.textContent = isMac ? "CMD + /" : "CTRL + /";
+        }
+      }
+      updateMenuShortcut();
 
       // Global keyboard shortcuts (only add once)
       if (!(window as any).__keyboardShortcutsInitialized) {
@@ -799,6 +814,14 @@ import { ClientRouter } from "astro:transitions";
             setTimeout(() => {
               html.classList.remove("theme-transitioning");
             }, 300);
+          }
+          // CMD/CTRL + /: Toggle menu
+          if ((e.metaKey || e.ctrlKey) && e.key === "/") {
+            e.preventDefault();
+            const menuToggle =
+              document.getElementById("menu-toggle-desktop") ||
+              document.getElementById("mobile-menu-toggle");
+            menuToggle?.click();
           }
         });
         (window as any).__keyboardShortcutsInitialized = true;
