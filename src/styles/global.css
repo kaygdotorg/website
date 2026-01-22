@@ -1,4 +1,12 @@
-/* Local fonts via fontsource */
+/* Local fonts via fontsource
+   Only loading weights that are actually used in the codebase:
+   - DM Sans: 400 (body), 500 (labels/UI), 600 (buttons/emphasis), 700 (bold text)
+   - Playfair Display: 400/500/600 (headings) - 700 removed, not used
+   - Cascadia Code: 400 (code blocks)
+   - Tangerine: 700 only (nav logo) - 400 removed, not used
+   - Dancing Script: REMOVED entirely (--font-cursive was never used)
+   - Nunito: REMOVED from deps (was never imported, just fallback strings)
+*/
 @import "@fontsource/dm-sans/latin-400.css";
 @import "@fontsource/dm-sans/latin-500.css";
 @import "@fontsource/dm-sans/latin-600.css";
@@ -6,13 +14,7 @@
 @import "@fontsource/playfair-display/latin-400.css";
 @import "@fontsource/playfair-display/latin-500.css";
 @import "@fontsource/playfair-display/latin-600.css";
-@import "@fontsource/playfair-display/latin-700.css";
 @import "@fontsource/cascadia-code/latin-400.css";
-@import "@fontsource/dancing-script/latin-400.css";
-@import "@fontsource/dancing-script/latin-500.css";
-@import "@fontsource/dancing-script/latin-600.css";
-@import "@fontsource/dancing-script/latin-700.css";
-@import "@fontsource/tangerine/latin-400.css";
 @import "@fontsource/tangerine/latin-700.css";
 
 @import "tailwindcss";
@@ -25,7 +27,7 @@
   --font-heading: "Playfair Display", Georgia, serif;
   --font-display: "DM Sans", system-ui, sans-serif;
   --font-body: "DM Sans", system-ui, sans-serif;
-  --font-cursive: "Dancing Script", cursive;
+  /* --font-cursive removed: Dancing Script was never used anywhere */
 
   /* Hot Pink accent palette */
   --color-accent-50: #fdf2f8;
@@ -3784,15 +3786,11 @@ html.theme-transitioning *::after {
    Enhanced Vignette with Color Tint
    ======================================== */
 
-.film-flare {
-  background:
-    radial-gradient(ellipse 60% 50% at 5% 10%, rgba(244, 114, 182, 0.35) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 60% at 95% 85%, rgba(168, 85, 247, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse 45% 40% at 80% 15%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 50% at 15% 80%, rgba(236, 72, 153, 0.25) 0%, transparent 50%);
-  animation: flare-drift 25s ease-in-out infinite;
-  filter: blur(100px);
-}
+/* NOTE: .film-flare definition was removed from here.
+   It was a duplicate that re-added filter: blur(100px), overriding
+   the intentional blur removal in the main definition (line ~152).
+   The blur was removed for performance - it caused scroll lag on Chromium.
+   See the main .film-flare definition in the "Animated Film Grain Effect" section. */
 
 /* ========================================
    Photography Gallery Styles
