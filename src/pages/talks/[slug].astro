@@ -8,7 +8,8 @@ function getUrlSlug(talk: any): string {
 }
 
 export async function getStaticPaths() {
-    const talks = await getCollection("talks");
+    // Filter out index.md which is a landing page, not a talk entry
+    const talks = await getCollection("talks", ({ id }) => id !== "index.md");
     return talks.map((talk) => ({
         // Use frontmatter slug for URL, fallback to file slug
         params: { slug: talk.data.slug || talk.slug },
@@ -27,8 +28,11 @@ const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 const createdDate = talk.data.date;
 const lastEdited = talk.data["last edited"];
 
-// Get all talks for prev/next navigation
-const allTalks = await getCollection("talks", ({ data }) => !data.draft);
+// Get all talks for prev/next navigation (exclude index.md landing page)
+const allTalks = await getCollection(
+    "talks",
+    ({ id, data }) => id !== "index.md" && !data.draft,
+);
 const sortedTalks = allTalks.sort(
     (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );

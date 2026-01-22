@@ -1,24 +1,34 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Timeline from "../components/Timeline.astro";
-import { getEntry, getCollection } from "astro:content";
+import { getCollection } from "astro:content";
 import { formatDateWithComma } from "../utils/dates";
 
-// Load content from home.md
-const homeEntry = await getEntry("pages", "home");
+// Use getCollection and filter for index.md - more reliable than getEntry
+const allHomeEntries = await getCollection("home");
+const homeEntry = allHomeEntries.find((e) => e.id === "index.md");
 
 if (!homeEntry) {
-  throw new Error("Could not find home.md in src/content/pages/");
+  throw new Error("Could not find index.md in src/content/home/");
 }
 
 const { Content } = await homeEntry.render();
 
-// Fetch entries from now, uses, and blog collections
-const nowEntries = await getCollection("now");
-const usesEntries = await getCollection("uses");
-const blogEntries = await getCollection("blog", ({ data }) => !data.draft);
-const talksEntries = await getCollection("talks");
-const notesEntries = await getCollection("notes", ({ data }) => !data.draft);
+// Fetch entries from now, uses, and blog collections (exclude index.md landing pages)
+const nowEntries = await getCollection("now", ({ id }) => id !== "index.md");
+const usesEntries = await getCollection("uses", ({ id }) => id !== "index.md");
+const blogEntries = await getCollection(
+  "blog",
+  ({ id, data }) => id !== "index.md" && !data.draft,
+);
+const talksEntries = await getCollection(
+  "talks",
+  ({ id }) => id !== "index.md",
+);
+const notesEntries = await getCollection(
+  "notes",
+  ({ id, data }) => id !== "index.md" && !data.draft,
+);
 
 // Sort to get latest entries
 const latestNow = nowEntries.sort(
@@ -730,12 +740,14 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       let currentIndex = 0;
 
       function animateText() {
+        if (!textElement) return;
         currentIndex = (currentIndex + 1) % texts.length;
         // Slide down and fade out
         textElement.style.opacity = "0";
         textElement.style.transform = "translateY(100%)";
 
         setTimeout(() => {
+          if (!textElement) return;
           // Change text while hidden
           textElement.textContent = texts[currentIndex];
           // Reset position above (no transition)
@@ -745,6 +757,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
           // Use requestAnimationFrame to ensure style is applied before re-enabling transition
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
+              if (!textElement) return;
               textElement.style.transition =
                 "opacity 0.4s ease, transform 0.4s ease";
               textElement.style.opacity = "1";

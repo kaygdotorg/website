@@ -1,10 +1,12 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import { formatDate, getRelativeTime } from "../utils/dates";
+import { getExcerpt } from "../utils/markdown";
 
 interface Props {
   title: string;
   description?: string;
+  entry?: any; // Add entry prop to extract description
   createdDate?: Date | string;
   lastEdited?: Date | string;
   readingTime?: number;
@@ -14,13 +16,22 @@ interface Props {
 
 const {
   title,
-  description,
+  description: propDescription,
+  entry,
   createdDate,
   lastEdited,
   readingTime,
   backlinks = [],
   coverImage,
 } = Astro.props;
+
+// Use description from props, or extract from entry body, or fallback
+const description =
+  propDescription || (entry?.body ? getExcerpt(entry.body) : undefined);
+
+// Display control logic
+const displayTOC = entry?.data?.["display-table-of-contents"] !== false;
+const displayDates = entry?.data?.["display-dates"] !== false;
 
 const relativeLastEdited = lastEdited ? getRelativeTime(lastEdited) : null;
 const formattedLastEdited = lastEdited ? formatDate(lastEdited) : null;
@@ -71,7 +82,7 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
 
           {/* Created date */}
           {
-            formattedCreatedDate && (
+            displayDates && formattedCreatedDate && (
               <span title="Published" data-pagefind-meta="date">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
@@ -88,7 +99,7 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
 
           {/* Last edited - tappable to show full date */}
           {
-            relativeLastEdited && (
+            displayDates && relativeLastEdited && (
               <span
                 class="last-edited-toggle cursor-pointer"
                 data-relative={`Updated ${relativeLastEdited}`}
@@ -115,31 +126,36 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
       <hr class="md-section-divider" />
 
       <!-- Table of Contents Section - Collapsible -->
-      <div class="md-section md-card-collapsible md-card-toc" id="toc-card">
-        <div class="md-card-header" onclick="toggleCard('toc-card')">
-          <h2>Table of contents</h2>
-          <svg
-            class="md-card-toggle"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </div>
-        <div class="md-card-content">
-          <ul id="toc-list">
-            <!-- Populated by JS -->
-          </ul>
-        </div>
-      </div>
-
-      <!-- Divider -->
-      <hr class="md-section-divider" />
+      {
+        displayTOC && (
+          <>
+            <div class="md-section md-card-collapsible md-card-toc" id="toc-card">
+              <div class="md-card-header" onclick="toggleCard('toc-card')">
+                <h2>Table of contents</h2>
+                <svg
+                  class="md-card-toggle"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+              <div class="md-card-content">
+                <ul id="toc-list">
+                  <!-- Populated by JS -->
+                </ul>
+              </div>
+            </div>
+            <hr class="md-section-divider" />
+          </>
+        )
+      }
 
       <!-- Content Section - Not collapsible -->
       <div class="md-section md-card-body" id="content-card">

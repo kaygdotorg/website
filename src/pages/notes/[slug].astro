@@ -8,7 +8,8 @@ function getUrlSlug(note: any): string {
 }
 
 export async function getStaticPaths() {
-    const notes = await getCollection("notes");
+    // Filter out index.md which is a landing page, not a note entry
+    const notes = await getCollection("notes", ({ id }) => id !== "index.md");
     return notes.map((note) => ({
         // Use frontmatter slug for URL, fallback to file slug
         params: { slug: note.data.slug || note.slug },
@@ -27,8 +28,11 @@ const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 const createdDate = note.data.date;
 const lastEdited = note.data["last edited"];
 
-// Get all notes for prev/next navigation
-const allNotes = await getCollection("notes", ({ data }) => !data.draft);
+// Get all notes for prev/next navigation (exclude index.md landing page)
+const allNotes = await getCollection(
+    "notes",
+    ({ id, data }) => id !== "index.md" && !data.draft,
+);
 const sortedNotes = allNotes.sort(
     (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );

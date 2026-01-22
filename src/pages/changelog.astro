@@ -1,116 +1,104 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import { getEntry } from "astro:content";
+import MarkdownLayout from "../layouts/MarkdownLayout.astro";
+import { getCollection } from "astro:content";
 
-const changelogEntry = await getEntry("pages", "changelog");
-const { Content } = await changelogEntry.render();
+// Use getCollection and filter for index.md - more reliable than getEntry
+const allEntries = await getCollection("changelog");
+const entry = allEntries.find((e) => e.id === "index.md");
+
+if (!entry) {
+    throw new Error("Could not find index.md in src/content/changelog/");
+}
+
+const { Content } = await entry.render();
+
+// Calculate reading time
+const wordCount = entry.body?.split(/\s+/).length || 0;
+const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 ---
 
-<BaseLayout
-    title="Changelog"
-    description="A human-readable history of features and fixes for this site."
+<MarkdownLayout
+    title={entry.data.title}
+    entry={entry}
+    createdDate={entry.data.date}
+    lastEdited={entry.data["last edited"]}
+    readingTime={readingTime}
+    coverImage={entry.data["cover-image"]}
 >
-    <section
-        class="changelog-page max-w-3xl mx-auto px-4 md:px-6 py-12 md:py-24"
-    >
-        <header class="mb-12 animate-fade-up">
-            <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
-                Changelog
-            </h1>
-            <p class="text-base-content/70 text-lg leading-relaxed">
-                A human-readable history of features and fixes for this site.
-                Each checkbox represents a completed feature or bugfix.
-            </p>
-        </header>
+    <div class="changelog-content">
+        <Content />
+    </div>
+</MarkdownLayout>
 
-        <article
-            class="prose prose-invert max-w-none animate-fade-up stagger-1"
-        >
-            <Content />
-        </article>
-    </section>
+<style>
+    .changelog-content :global(h2) {
+        font-family: var(--font-heading, "Playfair Display", serif);
+        font-size: 1.75rem;
+        font-weight: 500;
+        margin-top: 3rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--fallback-bc, #f8f4fc);
+    }
 
-    <style>
-        .changelog-page :global(h2) {
-            font-family: var(--font-heading, "Playfair Display", serif);
-            font-size: 1.75rem;
-            font-weight: 500;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--fallback-bc, #f8f4fc);
-        }
+    [data-theme="light"] .changelog-content :global(h2) {
+        color: #1a1225;
+        border-color: rgba(0, 0, 0, 0.1);
+    }
 
-        [data-theme="light"] .changelog-page :global(h2) {
-            color: #1a1225;
-            border-color: rgba(0, 0, 0, 0.1);
-        }
+    .changelog-content :global(hr) {
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        margin: 3rem 0;
+    }
 
-        .changelog-page :global(hr) {
-            border: none;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            margin: 3rem 0;
-        }
+    [data-theme="light"] .changelog-content :global(hr) {
+        border-color: rgba(0, 0, 0, 0.08);
+    }
 
-        [data-theme="light"] .changelog-page :global(hr) {
-            border-color: rgba(0, 0, 0, 0.08);
-        }
+    .changelog-content :global(ul) {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
 
-        .changelog-page :global(ul) {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+    .changelog-content :global(li) {
+        position: relative;
+        padding: 1rem 0 1rem 2.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: var(--fallback-bc, #f8f4fc);
+        opacity: 0.85;
+        line-height: 1.7;
+    }
 
-        .changelog-page :global(li) {
-            position: relative;
-            padding: 1rem 0 1rem 2.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            color: var(--fallback-bc, #f8f4fc);
-            opacity: 0.85;
-            line-height: 1.7;
-        }
+    [data-theme="light"] .changelog-content :global(li) {
+        color: #1a1225;
+        border-color: rgba(0, 0, 0, 0.05);
+    }
 
-        [data-theme="light"] .changelog-page :global(li) {
-            color: #1a1225;
-            border-color: rgba(0, 0, 0, 0.05);
-        }
+    .changelog-content :global(li:last-child) {
+        border-bottom: none;
+    }
 
-        .changelog-page :global(li:last-child) {
-            border-bottom: none;
-        }
+    /* Checkbox styling */
+    .changelog-content :global(li input[type="checkbox"]) {
+        position: absolute;
+        left: 0;
+        top: 1.25rem;
+        width: 1.25rem;
+        height: 1.25rem;
+        accent-color: var(--color-accent-500, #ec4899);
+        cursor: default;
+        pointer-events: none;
+    }
 
-        /* Checkbox styling */
-        .changelog-page :global(li input[type="checkbox"]) {
-            position: absolute;
-            left: 0;
-            top: 1.25rem;
-            width: 1.25rem;
-            height: 1.25rem;
-            accent-color: var(--color-accent-500, #ec4899);
-            cursor: default;
-            pointer-events: none;
-        }
+    .changelog-content :global(li strong) {
+        color: var(--fallback-bc, #f8f4fc);
+        font-weight: 600;
+    }
 
-        .changelog-page :global(li strong) {
-            color: var(--fallback-bc, #f8f4fc);
-            font-weight: 600;
-        }
-
-        [data-theme="light"] .changelog-page :global(li strong) {
-            color: #1a1225;
-        }
-
-        /* Em-dash separator styling */
-        .changelog-page :global(li strong + text),
-        .changelog-page :global(li) {
-            color: var(--fallback-bc, #f8f4fc);
-            opacity: 0.7;
-        }
-
-        [data-theme="light"] .changelog-page :global(li) {
-            color: #1a1225;
-        }
-    </style>
-</BaseLayout>
+    [data-theme="light"] .changelog-content :global(li strong) {
+        color: #1a1225;
+    }
+</style>

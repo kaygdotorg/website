@@ -9,7 +9,8 @@ function getUrlSlug(post: any): string {
 }
 
 export async function getStaticPaths() {
-    const posts = await getCollection("blog");
+    // Filter out index.md which is a landing page, not a blog post
+    const posts = await getCollection("blog", ({ id }) => id !== "index.md");
     return posts.map((post) => ({
         // Use frontmatter slug for URL, fallback to file slug
         params: { slug: post.data.slug || post.slug },
@@ -28,8 +29,11 @@ const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 const createdDate = post.data.date;
 const lastEdited = post.data["last edited"];
 
-// Get all posts for prev/next navigation
-const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+// Get all posts for prev/next navigation (exclude index.md landing page)
+const allPosts = await getCollection(
+    "blog",
+    ({ id, data }) => id !== "index.md" && !data.draft,
+);
 const sortedPosts = allPosts.sort(
     (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );

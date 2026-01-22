@@ -1,5 +1,16 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+// Use getCollection and filter for index.md - more reliable than getEntry
+const allEntries = await getCollection("photography");
+const entry = allEntries.find((e) => e.id === "index.md");
+
+if (!entry) {
+  throw new Error("Could not find index.md in src/content/photography/");
+}
+
+const { Content } = await entry.render();
 
 // Photos with more variety for the gallery
 const photos = [
@@ -80,16 +91,15 @@ const photos = [
 const categories = [...new Set(photos.map((p) => p.category))];
 ---
 
-<BaseLayout title="Photography" description="A collection of moments captured">
+<BaseLayout title={entry.data.title} description={entry.data.description}>
   <section class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
     <!-- Header -->
     <header class="mb-12 max-w-2xl animate-fade-up">
       <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
-        Photography
+        {entry.data.title}
       </h1>
       <p class="text-base-content/70 text-lg leading-relaxed">
-        Moments I've captured through my lens. I shoot mostly landscapes and
-        urban scenes, finding beauty in both nature and the built environment.
+        {entry.data.description}
       </p>
     </header>
 
@@ -182,29 +192,40 @@ const categories = [...new Set(photos.map((p) => p.category))];
   </style>
 
   <script>
-    // Filter functionality
-    const filterBtns = document.querySelectorAll(".filter-btn");
-    const photoItems = document.querySelectorAll(".photo-item");
+    // Initialize photography gallery filters
+    function initPhotographyFilters() {
+      const filterBtns = document.querySelectorAll(".filter-btn");
+      const photoItems = document.querySelectorAll(".photo-item");
 
-    filterBtns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        // Update active state
-        filterBtns.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
+      // Only add listeners if not already initialized
+      filterBtns.forEach((btn) => {
+        if ((btn as any).__filterInitialized) return;
+        (btn as any).__filterInitialized = true;
 
-        const category = btn.getAttribute("data-category");
+        btn.addEventListener("click", () => {
+          filterBtns.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
 
-        photoItems.forEach((item) => {
-          if (
-            category === "all" ||
-            item.getAttribute("data-category") === category
-          ) {
-            item.classList.remove("hidden");
-          } else {
-            item.classList.add("hidden");
-          }
+          const category = btn.getAttribute("data-category");
+
+          photoItems.forEach((item) => {
+            if (
+              category === "all" ||
+              item.getAttribute("data-category") === category
+            ) {
+              item.classList.remove("hidden");
+            } else {
+              item.classList.add("hidden");
+            }
+          });
         });
       });
-    });
+    }
+
+    // Run on initial load
+    initPhotographyFilters();
+
+    // Also run on view transitions
+    document.addEventListener("astro:page-load", initPhotographyFilters);
   </script>
 </BaseLayout>

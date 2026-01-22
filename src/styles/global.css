@@ -2278,6 +2278,130 @@ body {
   transform: scale(1);
 }
 
+/* Gallery Navigation Controls */
+.zoom-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease, background 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+}
+
+.zoom-overlay.active .zoom-close {
+  opacity: 0.7;
+}
+
+.zoom-close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.zoom-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease, background 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+}
+
+.zoom-overlay.active .zoom-nav {
+  opacity: 0.7;
+}
+
+.zoom-nav:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.zoom-nav:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.zoom-nav:disabled:hover {
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.zoom-prev {
+  left: 1rem;
+}
+
+.zoom-next {
+  right: 1rem;
+}
+
+.zoom-counter {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  color: white;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.zoom-overlay.active .zoom-counter {
+  opacity: 0.7;
+}
+
+/* Hide navigation when not in gallery mode */
+.zoom-overlay:not(.gallery-mode) .zoom-nav,
+.zoom-overlay:not(.gallery-mode) .zoom-counter {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .zoom-nav {
+    width: 44px;
+    height: 44px;
+  }
+
+  .zoom-nav svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .zoom-close {
+    width: 40px;
+    height: 40px;
+  }
+
+  .zoom-close svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
 /* Ensure images in markdown/prose are zoomable by default */
 .prose img,
 .md-card-body img,
@@ -3718,6 +3842,8 @@ html.theme-transitioning *::after {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 50%);
   opacity: 0;
   transition: opacity 0.3s ease;
+  pointer-events: none;
+  /* Allow clicks to pass through to the img */
 }
 
 .photo-item:hover::after {
@@ -3735,6 +3861,8 @@ html.theme-transitioning *::after {
   opacity: 0;
   transition: transform 0.3s ease, opacity 0.3s ease;
   z-index: 1;
+  pointer-events: none;
+  /* Allow clicks to pass through to the img */
 }
 
 .photo-item:hover .photo-overlay {
@@ -4158,4 +4286,15 @@ html.theme-transitioning *::after {
 
 [data-theme="light"] .experience-date {
   color: #1a1225;
+}
+/* ========================================
+   Excerpt Content - Hide H1 Heading
+   ======================================== */
+
+.excerpt-content h1 {
+  display: none;
+}
+
+.excerpt-content p {
+  margin: 0;
 }

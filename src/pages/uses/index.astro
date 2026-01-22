@@ -1,9 +1,20 @@
 ---
 import TimelineLayout from "../../layouts/TimelineLayout.astro";
 import { getCollection } from "astro:content";
+import { getExcerpt } from "../../utils/markdown";
 
-// Get all uses entries
-const allEntries = await getCollection("uses");
+// Use getCollection and filter for index.md - more reliable than getEntry
+const allUsesEntries = await getCollection("uses");
+const entry = allUsesEntries.find((e) => e.id === "index.md");
+
+if (!entry) {
+  throw new Error("Could not find index.md in src/content/uses/");
+}
+
+const { Content } = await entry.render();
+
+// Get all uses entries, exclude index.md (landing page)
+const allEntries = allUsesEntries.filter((e) => e.id !== "index.md");
 
 // Transform entries for the timeline
 const entries = allEntries.map((entry) => {
@@ -14,7 +25,8 @@ const entries = allEntries.map((entry) => {
     slug: entry.slug,
     title: entry.data.title,
     date: date,
-    excerpt: entry.data.excerpt || entry.data.description,
+    excerpt:
+      entry.data.excerpt || entry.data.description || getExcerpt(entry.body),
     href: `/uses/${entry.slug}`,
     coverImage: entry.data["cover-image"],
   };
@@ -22,8 +34,10 @@ const entries = allEntries.map((entry) => {
 ---
 
 <TimelineLayout
-  title="Uses"
-  description="A timeline of my tools, software, and gear. See how my setup has evolved over time."
+  title={entry.data.title || "Uses"}
+  description={entry.data.description || "Tools and setup"}
   entries={entries}
   basePath="/uses"
-/>
+>
+  <p>{entry.data.description}</p>
+</TimelineLayout>

@@ -30,3 +30,18 @@ export function extractUrlFromMarkdown(link: string | undefined | null): string 
 
     return link.trim();
 }
+/**
+ * Extracts the content from the first # Excerpt or # Description heading.
+ */
+export function getExcerpt(content: string | undefined): string | undefined {
+    if (!content) return undefined;
+
+    // Look for # Excerpt or # Description (case insensitive)
+    const excerptMatch = content.match(/^#+\s*(?:Excerpt|Description)\s*\n+([\s\S]*?)(?=\n#+|$)/i);
+
+    if (excerptMatch && excerptMatch[1]) {
+        return excerptMatch[1].trim();
+    }
+
+    return undefined;
+}

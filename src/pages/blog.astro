@@ -4,45 +4,55 @@ import Icon from "../components/Icon.astro";
 import TagFilter from "../components/TagFilter.astro";
 import { getCollection } from "astro:content";
 import { formatDate } from "../utils/dates";
+import { getExcerpt } from "../utils/markdown";
 
-// Get all blog posts, exclude drafts, sort by date
-const allPosts = await getCollection("blog", ({ data }) => !data.draft);
-const posts = allPosts.sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
-);
+// Use getCollection and filter for index.md - more reliable than getEntry
+const allBlogEntries = await getCollection("blog");
+const entry = allBlogEntries.find((e) => e.id === "index.md");
 
-// Get unique tags
-const allTags = [
-  ...new Set(posts.flatMap((post) => post.data.tags || [])),
-].sort();
+if (!entry) {
+  throw new Error("Could not find index.md in src/content/blog/");
+}
+
+const { Content } = await entry.render();
+
+// Get all blog posts, exclude drafts and index.md (landing page), sort by date
+const posts = allBlogEntries
+  .filter((e) => e.id !== "index.md" && !e.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Calculate tag counts for TagFilter component
+const tagCounts: { tag: string; count: number }[] = [];
+const tagMap = new Map<string, number>();
+posts.forEach((post) => {
+  (post.data.tags || []).forEach((tag) => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  });
+});
+tagMap.forEach((count, tag) => tagCounts.push({ tag, count }));
+tagCounts.sort((a, b) => b.count - a.count);
 ---
 
-<BaseLayout
-  title="Writing"
-  description="Thoughts on technology, creativity, and life"
->
-  <section class="max-w-4xl mx-auto px-4 md:px-6 py-12 md:py-24">
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <section class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
     <!-- Header -->
     <header class="mb-12 max-w-2xl animate-fade-up">
       <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
-        Writing
+        {entry.data.title}
       </h1>
       <p class="text-base-content/70 text-lg leading-relaxed">
-        {posts.length} posts on technology, homelab, film, and everything in between.
+        {entry.data.description}
       </p>
     </header>
 
-    <!-- Tag Filters -->
+    <!-- Tag Filter -->
     <TagFilter
-      tags={allTags.slice(0, 10).map((tag) => ({
-        tag,
-        count: posts.filter((p) => p.data.tags?.includes(tag)).length,
-      }))}
+      tags={tagCounts}
       totalCount={posts.length}
       cardSelector=".post-card"
     />
 
-    <!-- Posts List -->
+    <!-- Post List -->
     <div class="space-y-6">
       {
         posts.map((post, index) => (
@@ -78,9 +88,9 @@ const allTags = [
                     {post.data.title}
                   </h2>
 
-                  {post.data.description && (
+                  {(post.data.description || getExcerpt(post.body)) && (
                     <p class="text-base-content/60 text-sm mb-3 line-clamp-2">
-                      {post.data.description}
+                      {post.data.description || getExcerpt(post.body)}
                     </p>
                   )}
 
@@ -91,12 +101,10 @@ const allTags = [
 
                     {post.data.tags && post.data.tags.length > 0 && (
                       <>
-                        <span>·</span>
-                        <div class="flex flex-wrap gap-1">
+                        <span class="opacity-30">•</span>
+                        <div class="flex gap-2">
                           {post.data.tags.slice(0, 3).map((tag) => (
-                            <span class="px-2 py-0.5 rounded-full bg-base-content/5">
-                              {tag}
-                            </span>
+                            <span class="text-accent/70">#{tag}</span>
                           ))}
                         </div>
                       </>

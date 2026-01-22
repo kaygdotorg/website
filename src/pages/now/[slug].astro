@@ -3,7 +3,8 @@ import MarkdownLayout from "../../layouts/MarkdownLayout.astro";
 import { getCollection } from "astro:content";
 
 export async function getStaticPaths() {
-  const entries = await getCollection("now");
+  // Filter out index.md which is a landing page, not a now entry
+  const entries = await getCollection("now", ({ id }) => id !== "index.md");
   return entries.map((entry) => ({
     params: { slug: entry.slug },
     props: { entry },
@@ -21,8 +22,8 @@ const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 const createdDate = entry.data.date;
 const lastEdited = entry.data["last edited"];
 
-// Get all entries for prev/next navigation
-const allEntries = await getCollection("now");
+// Get all entries for prev/next navigation (exclude index.md landing page)
+const allEntries = await getCollection("now", ({ id }) => id !== "index.md");
 const sortedEntries = allEntries.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );

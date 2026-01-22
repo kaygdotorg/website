@@ -1,9 +1,20 @@
 ---
 import TimelineLayout from "../../layouts/TimelineLayout.astro";
 import { getCollection } from "astro:content";
+import { getExcerpt } from "../../utils/markdown";
 
-// Get all now entries
-const allEntries = await getCollection("now");
+// Use getCollection and filter for index.md - more reliable than getEntry
+const allNowEntries = await getCollection("now");
+const entry = allNowEntries.find((e) => e.id === "index.md");
+
+if (!entry) {
+  throw new Error("Could not find index.md in src/content/now/");
+}
+
+const { Content } = await entry.render();
+
+// Get all now entries, exclude index.md (landing page)
+const allEntries = allNowEntries.filter((e) => e.id !== "index.md");
 
 // Transform entries for the timeline
 const entries = allEntries.map((entry) => {
@@ -14,7 +25,8 @@ const entries = allEntries.map((entry) => {
     slug: entry.slug,
     title: entry.data.title,
     date: date,
-    excerpt: entry.data.excerpt || entry.data.description,
+    excerpt:
+      entry.data.excerpt || entry.data.description || getExcerpt(entry.body),
     href: `/now/${entry.slug}`,
     coverImage: entry.data["cover-image"],
   };
@@ -22,8 +34,10 @@ const entries = allEntries.map((entry) => {
 ---
 
 <TimelineLayout
-  title="Now"
-  description="A timeline of what I've been focused on. Like an about page, but for different points in my life."
+  title={entry.data.title || "Now"}
+  description={entry.data.description || "What I'm doing now"}
   entries={entries}
   basePath="/now"
-/>
+>
+  <p>{entry.data.description}</p>
+</TimelineLayout>

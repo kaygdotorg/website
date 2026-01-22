@@ -28,7 +28,9 @@ const sortedEntries = entries.sort((a, b) => b.date.getTime() - a.date.getTime()
   <main class="max-w-4xl mx-auto px-6 py-24">
     <header class="mb-16 animate-fade-in">
       <h1 class="text-4xl md:text-5xl font-heading mb-4 text-base-content">{title}</h1>
-      <p class="text-xl text-base-content/70">{description}</p>
+      <div class="text-xl text-base-content/70 timeline-introduction">
+        <slot />
+      </div>
     </header>
 
     <div class="relative">

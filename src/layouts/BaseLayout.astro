@@ -106,9 +106,60 @@ import { ClientRouter } from "astro:transitions";
       <div class="film-vignette"></div>
     </div>
 
-    <!-- Global Image Zoom Overlay -->
+    <!-- Global Image Zoom Overlay with Gallery Navigation -->
     <div id="zoom-overlay" class="zoom-overlay" aria-hidden="true">
+      <button id="zoom-close" class="zoom-close" aria-label="Close">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <button
+        id="zoom-prev"
+        class="zoom-nav zoom-prev"
+        aria-label="Previous image"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
       <img id="zoomed-image" class="zoomed-image" src="" alt="" />
+      <button id="zoom-next" class="zoom-nav zoom-next" aria-label="Next image">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+      <div id="zoom-counter" class="zoom-counter"></div>
     </div>
 
     <!-- Floating Pill Navigation -->
@@ -881,109 +932,277 @@ import { ClientRouter } from "astro:transitions";
        */
       function initImageZoom() {
         // ---------------------------------------------------------------------
+        // GALLERY STATE - Tracks current gallery and index for navigation
+        // ---------------------------------------------------------------------
+        // Store state on window to persist across View Transitions
+        if (!(window as any).__galleryState) {
+          (window as any).__galleryState = {
+            images: [] as HTMLElement[],
+            currentIndex: 0,
+            isGalleryMode: false,
+          };
+        }
+        const galleryState = (window as any).__galleryState;
+
+        // ---------------------------------------------------------------------
+        // HELPER FUNCTIONS - Read __galleryState dynamically each call
+        // ---------------------------------------------------------------------
+        function closeOverlay() {
+          const overlay = document.getElementById("zoom-overlay");
+          if (overlay) {
+            overlay.classList.remove("active", "gallery-mode");
+            document.body.style.overflow = "";
+            (window as any).__galleryState.isGalleryMode = false;
+          }
+        }
+
+        function showImage(index: number) {
+          const overlay = document.getElementById("zoom-overlay");
+          const zoomedImg = document.getElementById(
+            "zoomed-image",
+          ) as HTMLImageElement;
+          const counter = document.getElementById("zoom-counter");
+          const prevBtn = document.getElementById(
+            "zoom-prev",
+          ) as HTMLButtonElement;
+          const nextBtn = document.getElementById(
+            "zoom-next",
+          ) as HTMLButtonElement;
+
+          const state = (window as any).__galleryState;
+          if (!overlay || !zoomedImg || !state.images || !state.images.length)
+            return;
+
+          // Clamp index
+          index = Math.max(0, Math.min(index, state.images.length - 1));
+          state.currentIndex = index;
+
+          const img = state.images[index];
+          if (!img) return;
+          // Use data-src from parent .photo-item if available (for full-size), else use img src
+          const photoItem = img.closest ? img.closest(".photo-item") : null;
+          const fullSrc =
+            photoItem?.getAttribute("data-src") || img.getAttribute("src");
+          const alt =
+            photoItem?.getAttribute("data-alt") || img.getAttribute("alt");
+
+          if (fullSrc) {
+            zoomedImg.src = fullSrc;
+            zoomedImg.alt = alt || "";
+          }
+
+          // Update counter
+          if (counter && state.isGalleryMode) {
+            counter.textContent = `${index + 1} / ${state.images.length}`;
+          }
+
+          // Update button states
+          if (prevBtn) prevBtn.disabled = index === 0;
+          if (nextBtn) nextBtn.disabled = index === state.images.length - 1;
+        }
+
+        function navigatePrev() {
+          const state = (window as any).__galleryState;
+          if (state.currentIndex > 0) {
+            showImage(state.currentIndex - 1);
+          }
+        }
+
+        function navigateNext() {
+          const state = (window as any).__galleryState;
+          if (state.currentIndex < state.images.length - 1) {
+            showImage(state.currentIndex + 1);
+          }
+        }
+
+        // ---------------------------------------------------------------------
         // FIND ALL ZOOMABLE IMAGES
         // ---------------------------------------------------------------------
-        const images = document.querySelectorAll(
+        const allImages = document.querySelectorAll(
           ".prose img, .md-card-body img, .photo-item img",
         );
 
-        // Exit early if no overlay exists (safety check)
+        // Exit early if no overlay exists
         const overlayCheck = document.getElementById("zoom-overlay");
         if (!overlayCheck) return;
 
         // ---------------------------------------------------------------------
         // ATTACH CLICK HANDLERS TO IMAGES
         // ---------------------------------------------------------------------
-        // Each image tracks its own initialization state via __zoomInitialized.
-        // This prevents duplicate handlers when images persist across navigations.
-        //
-        // IMPORTANT: Handlers use DYNAMIC lookup (getElementById) instead of
-        // closures. This ensures we always get the current overlay element,
-        // which is essential for View Transitions compatibility.
-        //
-        images.forEach((img) => {
-          // Skip if already initialized OR has no src attribute
+        allImages.forEach((img) => {
           if ((img as any).__zoomInitialized || !img.getAttribute("src"))
             return;
-
-          // Mark as initialized to prevent duplicate handlers
           (img as any).__zoomInitialized = true;
 
           img.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
 
-            // DYNAMIC LOOKUP: Get current overlay and image elements
-            // This handles View Transitions where DOM may have changed
             const overlay = document.getElementById("zoom-overlay");
-            const zoomedImg = document.getElementById(
-              "zoomed-image",
-            ) as HTMLImageElement;
+            if (!overlay) return;
 
-            if (!overlay || !zoomedImg) return;
+            const state = (window as any).__galleryState;
 
-            const src = img.getAttribute("src");
-            const alt = img.getAttribute("alt");
-            if (src) {
-              zoomedImg.src = src;
-              zoomedImg.alt = alt || "";
-              overlay.classList.add("active");
-              document.body.style.overflow = "hidden"; // Prevent background scroll
+            // Check if this is part of a photo gallery
+            const photoItem = img.closest(".photo-item");
+            const isGallery = !!photoItem;
+
+            if (isGallery) {
+              // Collect all visible gallery images
+              const allGalleryImages = Array.from(
+                document.querySelectorAll(".photo-item:not(.hidden) img"),
+              ) as HTMLElement[];
+              state.images = allGalleryImages;
+              state.currentIndex = allGalleryImages.indexOf(img as HTMLElement);
+              state.isGalleryMode = true;
+              overlay.classList.add("gallery-mode");
+            } else {
+              // Single image mode
+              state.images = [img as HTMLElement];
+              state.currentIndex = 0;
+              state.isGalleryMode = false;
+              overlay.classList.remove("gallery-mode");
             }
+
+            showImage(state.currentIndex);
+            overlay.classList.add("active");
+            document.body.style.overflow = "hidden";
           });
         });
 
         // ---------------------------------------------------------------------
-        // OVERLAY CLICK TO CLOSE - Uses Global Flag Pattern
+        // CLOSE BUTTON HANDLER
         // ---------------------------------------------------------------------
-        //
-        // PATTERN: Single global listener with initialization guard
-        //
-        // WHY: Overlay click listener must be added only ONCE to prevent
-        // duplicates across View Transitions navigations. We use a window
-        // flag to track whether it's already been added.
-        //
-        // The handler uses dynamic lookup (getElementById) to get the current
-        // overlay, ensuring it works correctly after any DOM changes.
-        //
-        if (!(window as any).__imageZoomOverlayInitialized) {
-          overlayCheck.addEventListener("click", () => {
-            // DYNAMIC LOOKUP: Get current overlay
-            const overlay = document.getElementById("zoom-overlay");
-            if (overlay) {
-              overlay.classList.remove("active");
-              document.body.style.overflow = ""; // Re-enable background scroll
+        if (!(window as any).__zoomCloseInitialized) {
+          document.addEventListener("click", (e) => {
+            const target = e.target as HTMLElement;
+            if (target.closest("#zoom-close")) {
+              e.stopPropagation();
+              closeOverlay();
             }
+          });
+          (window as any).__zoomCloseInitialized = true;
+        }
+
+        // ---------------------------------------------------------------------
+        // NAVIGATION BUTTON HANDLERS
+        // ---------------------------------------------------------------------
+        if (!(window as any).__zoomNavInitialized) {
+          document.addEventListener("click", (e) => {
+            const target = e.target as HTMLElement;
+            if (target.closest("#zoom-prev")) {
+              e.stopPropagation();
+              navigatePrev();
+            } else if (target.closest("#zoom-next")) {
+              e.stopPropagation();
+              navigateNext();
+            }
+          });
+          (window as any).__zoomNavInitialized = true;
+        }
+
+        // ---------------------------------------------------------------------
+        // OVERLAY CLICK TO CLOSE (but not on image or buttons)
+        // ---------------------------------------------------------------------
+        if (!(window as any).__imageZoomOverlayInitialized) {
+          overlayCheck.addEventListener("click", (e) => {
+            const target = e.target as HTMLElement;
+            // Don't close if clicking on the image, nav buttons, or close button
+            if (target.closest(".zoomed-image, .zoom-nav, .zoom-close")) return;
+            closeOverlay();
           });
           (window as any).__imageZoomOverlayInitialized = true;
         }
 
         // ---------------------------------------------------------------------
-        // ESCAPE KEY TO CLOSE - Uses Global Flag Pattern
+        // KEYBOARD NAVIGATION
         // ---------------------------------------------------------------------
-        //
-        // PATTERN: Single global listener with initialization guard
-        //
-        // WHY: Document-level keydown listeners persist across View Transitions.
-        // Adding a new one each navigation would create duplicates. Instead:
-        // - Check window.__imageZoomEscapeInitialized flag
-        // - If not set, add the listener and set the flag
-        // - If set, skip (listener already exists from previous load)
-        //
-        // The handler uses dynamic lookup to always get the current overlay.
-        //
-        if (!(window as any).__imageZoomEscapeInitialized) {
+        if (!(window as any).__imageZoomKeyboardInitialized) {
           document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") {
-              // DYNAMIC LOOKUP: Get current overlay
-              const overlay = document.getElementById("zoom-overlay");
-              if (overlay?.classList.contains("active")) {
-                overlay.classList.remove("active");
-                document.body.style.overflow = "";
-              }
+            const overlay = document.getElementById("zoom-overlay");
+            if (!overlay?.classList.contains("active")) return;
+
+            switch (e.key) {
+              case "Escape":
+                closeOverlay();
+                break;
+              case "ArrowLeft":
+                e.preventDefault();
+                navigatePrev();
+                break;
+              case "ArrowRight":
+                e.preventDefault();
+                navigateNext();
+                break;
             }
           });
-          (window as any).__imageZoomEscapeInitialized = true;
+          (window as any).__imageZoomKeyboardInitialized = true;
+        }
+
+        // ---------------------------------------------------------------------
+        // TOUCH SWIPE SUPPORT & TAP TO CLOSE (Mobile)
+        // ---------------------------------------------------------------------
+        if (!(window as any).__imageZoomSwipeInitialized) {
+          let touchStartX = 0;
+          let touchStartY = 0;
+          let touchStartTime = 0;
+
+          overlayCheck.addEventListener(
+            "touchstart",
+            (e) => {
+              touchStartX = e.touches[0].clientX;
+              touchStartY = e.touches[0].clientY;
+              touchStartTime = Date.now();
+            },
+            { passive: true },
+          );
+
+          overlayCheck.addEventListener(
+            "touchend",
+            (e) => {
+              const overlay = document.getElementById("zoom-overlay");
+              if (!overlay?.classList.contains("active")) return;
+
+              const state = (window as any).__galleryState;
+              const touchEndX = e.changedTouches[0].clientX;
+              const touchEndY = e.changedTouches[0].clientY;
+              const diffX = touchStartX - touchEndX;
+              const diffY = touchStartY - touchEndY;
+              const absDiffX = Math.abs(diffX);
+              const absDiffY = Math.abs(diffY);
+              const duration = Date.now() - touchStartTime;
+
+              // Check if it's a tap (quick, small movement) - close the overlay
+              const target = e.target as HTMLElement;
+              if (duration < 300 && absDiffX < 15 && absDiffY < 15) {
+                // Tap detected - close if not on image/buttons
+                if (
+                  !target.closest(
+                    ".zoomed-image, .zoom-nav, .zoom-close, .zoom-counter",
+                  )
+                ) {
+                  closeOverlay();
+                  return;
+                }
+              }
+
+              // Check for swipe gestures (only in gallery mode)
+              if (
+                state.isGalleryMode &&
+                absDiffX > 50 &&
+                absDiffX > absDiffY * 1.5
+              ) {
+                if (diffX > 0) {
+                  navigateNext(); // Swipe left = next
+                } else {
+                  navigatePrev(); // Swipe right = prev
+                }
+              }
+            },
+            { passive: true },
+          );
+
+          (window as any).__imageZoomSwipeInitialized = true;
         }
       }
 
