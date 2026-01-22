@@ -260,6 +260,37 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
   <!-- Card Hand Swipe Script -->
   <script>
+    // =========================================================================
+    // HOMEPAGE INITIALIZATION GUARDS
+    // =========================================================================
+    //
+    // These guards prevent event listeners and observers from stacking up
+    // when navigating to/from the homepage via View Transitions.
+    //
+    // PROBLEM: With Astro View Transitions, the document object persists
+    // across navigations, but this script runs fresh each time you visit
+    // the homepage. Without guards:
+    // - First visit: adds listener #1
+    // - Navigate away and back: adds listener #2 (both now fire!)
+    // - Each visit adds more duplicate listeners
+    //
+    // SOLUTION: Use window-level flags and cleanup functions to ensure
+    // only one instance of each listener/observer exists at a time.
+    //
+    // =========================================================================
+
+    // Cleanup interface stored on window for cross-navigation persistence
+    interface HomepageCleanup {
+      resizeListener?: () => void;
+      graphObserver?: IntersectionObserver;
+      navObserver?: IntersectionObserver;
+      pageLoadListener?: () => void;
+    }
+
+    // Initialize or retrieve the cleanup registry
+    const cleanup: HomepageCleanup =
+      (window as any).__homepageCleanup || ((window as any).__homepageCleanup = {});
+
     const cardHand = document.getElementById("card-hand");
     const cards = document.querySelectorAll(
       ".card-in-hand",
@@ -631,10 +662,16 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       }
 
       // -----------------------------------------------------------------------
-      // INITIALIZATION
+      // INITIALIZATION (with cleanup to prevent listener stacking)
       // -----------------------------------------------------------------------
 
-      // Listen for window resize to keep canvas dimensions correct
+      // Remove previous resize listener if it exists (prevents stacking)
+      if (cleanup.resizeListener) {
+        window.removeEventListener("resize", cleanup.resizeListener);
+      }
+
+      // Store and add the new resize listener
+      cleanup.resizeListener = resize;
       window.addEventListener("resize", resize);
 
       // Initial setup
@@ -646,7 +683,13 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
       // -----------------------------------------------------------------------
       // INTERSECTION OBSERVER - VISIBILITY-BASED ANIMATION CONTROL
+      // (with cleanup to prevent observer stacking)
       // -----------------------------------------------------------------------
+
+      // Disconnect previous observer if it exists (prevents stacking)
+      if (cleanup.graphObserver) {
+        cleanup.graphObserver.disconnect();
+      }
 
       /**
        * IntersectionObserver watches for the canvas container's visibility.
@@ -675,6 +718,9 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         },
       );
 
+      // Store reference for cleanup on next initialization
+      cleanup.graphObserver = observer;
+
       // Start observing the canvas container (or canvas itself if no container)
       const container = canvas.parentElement;
       if (container) {
@@ -684,14 +730,29 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       }
     }
 
-    // Scroll-Aware Navigation Logic
-    // Wrapped in a function so it can run on initial load AND on View Transitions
+    // =========================================================================
+    // SCROLL-AWARE NAVIGATION LOGIC
+    // =========================================================================
+    //
+    // Shows/hides the navigation bar based on hero section visibility.
+    // When hero is visible (top of page): nav is hidden
+    // When hero is scrolled past: nav appears
+    //
+    // Uses IntersectionObserver for efficient scroll detection without
+    // continuous scroll event listeners.
+    //
+    // =========================================================================
     function initNavScrollObserver() {
       const heroSection = document.getElementById("hero-section");
       const navContainer = document.getElementById("nav-container");
       const blurOverlay = document.getElementById("navbar-blur");
 
       if (heroSection && navContainer) {
+        // Disconnect previous observer if it exists (prevents stacking)
+        if (cleanup.navObserver) {
+          cleanup.navObserver.disconnect();
+        }
+
         const observer = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
@@ -715,59 +776,39 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
           },
         );
 
+        // Store reference for cleanup on next initialization
+        cleanup.navObserver = observer;
+
         observer.observe(heroSection);
       }
     }
 
-    // Initialize
+    // =========================================================================
+    // INITIALIZATION
+    // =========================================================================
+
+    // Run initializers on first load
     initNavScrollObserver();
     initObsidianGraph();
-    initRotatingText();
 
-    // Re-initialize on page load (View Transitions)
-    document.addEventListener("astro:page-load", () => {
-      initNavScrollObserver();
-      initObsidianGraph();
-      initRotatingText();
-    });
-
-    // Rotating text for bento header
-    function initRotatingText() {
-      const textElement = document.getElementById("rotating-text");
-      if (!textElement) return;
-
-      const texts = ["me", "@kaygdotorg", "K Gopal Krishna"];
-      let currentIndex = 0;
-
-      function animateText() {
-        if (!textElement) return;
-        currentIndex = (currentIndex + 1) % texts.length;
-        // Slide down and fade out
-        textElement.style.opacity = "0";
-        textElement.style.transform = "translateY(100%)";
-
-        setTimeout(() => {
-          if (!textElement) return;
-          // Change text while hidden
-          textElement.textContent = texts[currentIndex];
-          // Reset position above (no transition)
-          textElement.style.transition = "none";
-          textElement.style.transform = "translateY(-100%)";
-
-          // Use requestAnimationFrame to ensure style is applied before re-enabling transition
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              if (!textElement) return;
-              textElement.style.transition =
-                "opacity 0.4s ease, transform 0.4s ease";
-              textElement.style.opacity = "1";
-              textElement.style.transform = "translateY(0)";
-            });
-          });
-        }, 400); // Wait for exit animation
-      }
-
-      setInterval(animateText, 5000); // 5s static display
+    // =========================================================================
+    // VIEW TRANSITIONS HANDLER (with guard to prevent listener stacking)
+    // =========================================================================
+    //
+    // Re-initialize homepage features after View Transitions navigation.
+    // The guard ensures only ONE listener is ever attached to the document,
+    // preventing duplicate initializations on repeated homepage visits.
+    //
+    // =========================================================================
+    if (!cleanup.pageLoadListener) {
+      cleanup.pageLoadListener = () => {
+        // Only run on homepage (check for hero section existence)
+        if (document.getElementById("hero-section")) {
+          initNavScrollObserver();
+          initObsidianGraph();
+        }
+      };
+      document.addEventListener("astro:page-load", cleanup.pageLoadListener);
     }
   </script>
 
@@ -835,24 +876,6 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       font-weight: 400;
       line-height: 1.1;
       letter-spacing: -0.07em;
-    }
-
-    /* Rotating Text Animation for Bento Header */
-    .rotating-text-wrapper {
-      display: inline-block;
-      position: relative;
-      min-width: 200px;
-      height: 2em; /* Increased to prevent clipping */
-      overflow: hidden;
-      vertical-align: bottom;
-      margin-top: 2.5rem; /* More spacing from text above */
-    }
-
-    .rotating-text {
-      display: inline-block;
-      transition:
-        opacity 0.4s ease,
-        transform 0.4s ease; /* Fast but smooth */
     }
 
     .hero-glow {
