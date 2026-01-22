@@ -1069,17 +1069,26 @@ html[data-theme="light"] body {
 
 /* Custom accent-colored bullets for unordered lists
  * Uses position: absolute to ensure bullet stays aligned with first line
- * even when markdown wraps content in <p> tags (common for items with nested lists) */
+ * even when markdown wraps content in <p> tags (common for items with nested lists)
+ * 
+ * Hierarchy: ▸ for parent items, • for nested items */
 .md-card-body .md-card-content ul li {
   position: relative;
 }
 
+/* Parent list items: triangle indicator */
 .md-card-body .md-card-content ul li::before {
-  content: "•";
+  content: "▸";
   color: var(--color-accent-400, #f472b6);
   font-weight: bold;
   position: absolute;
   left: -1.25em;
+}
+
+/* Nested list items: bullet indicator, slightly muted */
+.md-card-body .md-card-content ul ul li::before {
+  content: "•";
+  opacity: 0.7;
 }
 
 .md-card-body .md-card-content ol {
