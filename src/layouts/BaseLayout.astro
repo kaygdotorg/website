@@ -805,32 +805,97 @@ import { ClientRouter } from "astro:transitions";
       initGlobalMenu();
       initSearchModal();
 
-      // Update Search Shortcut based on OS
+      // =========================================================================
+      // OS DETECTION UTILITY
+      // =========================================================================
+      //
+      // Detects if the user is on macOS to display appropriate keyboard shortcuts.
+      // Uses the modern User-Agent Client Hints API (navigator.userAgentData) when
+      // available, with a fallback to the deprecated navigator.platform for older
+      // browsers that don't support the new API.
+      //
+      // WHY THIS MATTERS:
+      // - macOS uses CMD (⌘) as the primary modifier key
+      // - Windows/Linux use CTRL as the primary modifier key
+      // - Displaying the correct key helps users discover keyboard shortcuts
+      //
+      // API NOTES:
+      // - navigator.userAgentData.platform: Modern API (Chrome 90+, Edge 90+)
+      //   Returns "macOS", "Windows", "Linux", etc.
+      // - navigator.platform: Deprecated but widely supported fallback
+      //   Returns "MacIntel", "Win32", "Linux x86_64", etc.
+      //
+      // The result is cached to avoid repeated API calls.
+      //
+      // =========================================================================
+      const isMacOS = (function detectMacOS() {
+        // Type guard: navigator.userAgentData is not yet in TypeScript's lib.dom.d.ts
+        // We cast to 'any' to access it safely, with optional chaining for runtime safety
+        const nav = typeof navigator !== "undefined" ? (navigator as any) : null;
+
+        // Try modern User-Agent Client Hints API first (not deprecated)
+        // This API is available in Chromium-based browsers (Chrome 90+, Edge 90+)
+        if (nav?.userAgentData?.platform) {
+          return nav.userAgentData.platform.toLowerCase().includes("mac");
+        }
+
+        // Fallback to deprecated navigator.platform for older browsers
+        // (Safari, Firefox, older Chrome versions)
+        // This is still needed for broad compatibility as of 2025
+        if (nav?.platform) {
+          return nav.platform.toUpperCase().includes("MAC");
+        }
+
+        // Default to non-Mac if detection fails (e.g., SSR environment)
+        return false;
+      })();
+
+      // =========================================================================
+      // KEYBOARD SHORTCUT LABEL UPDATERS
+      // =========================================================================
+      //
+      // These functions update the visible keyboard shortcut hints in the UI
+      // to show CMD (macOS) or CTRL (Windows/Linux) based on the detected OS.
+      //
+      // ELEMENTS UPDATED:
+      // - #search-shortcut-label: Shows "CMD + K" or "CTRL + K"
+      // - #theme-shortcut-label: Shows "CMD + D" or "CTRL + D"
+      // - #menu-shortcut-label: Shows "CMD + /" or "CTRL + /"
+      //
+      // =========================================================================
+
+      /**
+       * Updates the search shortcut label (CMD/CTRL + K) based on detected OS.
+       * The search modal can be opened with this keyboard shortcut.
+       */
       function updateSearchShortcut() {
         const label = document.getElementById("search-shortcut-label");
         if (label) {
-          const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-          label.textContent = isMac ? "CMD + K" : "CTRL + K";
+          label.textContent = isMacOS ? "CMD + K" : "CTRL + K";
         }
       }
       updateSearchShortcut();
 
-      // Update Theme Shortcut based on OS
+      /**
+       * Updates the theme toggle shortcut label (CMD/CTRL + D) based on detected OS.
+       * This shortcut toggles between light and dark themes.
+       */
       function updateThemeShortcut() {
         const label = document.getElementById("theme-shortcut-label");
         if (label) {
-          const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-          label.textContent = isMac ? "CMD + D" : "CTRL + D";
+          label.textContent = isMacOS ? "CMD + D" : "CTRL + D";
         }
       }
       updateThemeShortcut();
 
-      // Update Menu Shortcut based on OS
+      /**
+       * Updates the menu shortcut label (CMD/CTRL + /) based on detected OS.
+       * This shortcut opens the navigation menu overlay.
+       */
       function updateMenuShortcut() {
         const label = document.getElementById("menu-shortcut-label");
         if (label) {
-          const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-          label.textContent = isMac ? "CMD + /" : "CTRL + /";
+          label.textContent = isMacOS ? "CMD + /" : "CTRL + /";
         }
       }
       updateMenuShortcut();

@@ -19,7 +19,6 @@
     "@fontsource/tangerine": "^5.2.8",
     "@pagefind/default-ui": "^1.4.0",
     "@tailwindcss/vite": "^4.1.18",
-    "@tryghost/content-api": "^1.12.3",
     "astro": "^5.16.12",
     "daisyui": "^5.5.14",
     "dotenv": "^17.2.3",
