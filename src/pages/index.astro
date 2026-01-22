@@ -366,8 +366,60 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       updateCardPositions();
     }
 
-    // Obsidian Graph Animation
+    /**
+     * =========================================================================
+     * OBSIDIAN GRAPH ANIMATION
+     * =========================================================================
+     *
+     * Renders an animated node graph visualization simulating an Obsidian-style
+     * knowledge graph. Uses HTML5 Canvas for performant rendering.
+     *
+     * VISUAL BEHAVIOR:
+     * - 25 nodes (small circles) float around the canvas
+     * - Nodes that are close together are connected by semi-transparent lines
+     * - Nodes bounce off the edges to stay within bounds
+     * - The animation runs at 60fps using requestAnimationFrame
+     *
+     * -------------------------------------------------------------------------
+     * PERFORMANCE OPTIMIZATION: IntersectionObserver
+     * -------------------------------------------------------------------------
+     *
+     * PROBLEM: Without optimization, requestAnimationFrame runs continuously
+     * at ~60fps even when the user has scrolled past the graph and it's not
+     * visible. This wastes CPU/GPU cycles and drains battery on mobile.
+     *
+     * SOLUTION: Use IntersectionObserver to detect when the canvas container
+     * enters or leaves the viewport:
+     *
+     *   1. When canvas becomes VISIBLE (isIntersecting: true):
+     *      - Set isAnimating = true
+     *      - Call draw() to start the animation loop
+     *
+     *   2. When canvas becomes HIDDEN (isIntersecting: false):
+     *      - Set isAnimating = false
+     *      - The next draw() call will see isAnimating = false and NOT
+     *        schedule another frame, gracefully stopping the loop
+     *
+     * This pattern ensures:
+     * - Animation runs smoothly when visible
+     * - Zero CPU usage when scrolled away
+     * - No "jump" or visual artifact when returning (nodes continue from
+     *   their last position)
+     *
+     * -------------------------------------------------------------------------
+     * FLICKER PREVENTION
+     * -------------------------------------------------------------------------
+     *
+     * The animation starts paused (isAnimating = false) and only begins when
+     * the observer detects the canvas is visible. This prevents any potential
+     * race conditions between initialization and visibility detection.
+     *
+     * =========================================================================
+     */
     function initObsidianGraph() {
+      // -----------------------------------------------------------------------
+      // CANVAS SETUP
+      // -----------------------------------------------------------------------
       const canvas = document.getElementById(
         "graph-canvas",
       ) as HTMLCanvasElement;
@@ -376,66 +428,141 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
+      // -----------------------------------------------------------------------
+      // ANIMATION STATE
+      // -----------------------------------------------------------------------
+
+      /**
+       * Controls whether the animation loop continues running.
+       * - true: animation is running (canvas is visible)
+       * - false: animation is paused (canvas is off-screen)
+       *
+       * The draw() function checks this flag and only schedules the next
+       * frame if it's true. This is the key mechanism for pausing.
+       */
+      let isAnimating = false;
+
+      // -----------------------------------------------------------------------
+      // CANVAS DIMENSIONS
+      // -----------------------------------------------------------------------
+
+      /** Current canvas width in CSS pixels (not device pixels) */
       let width = 0;
+      /** Current canvas height in CSS pixels (not device pixels) */
       let height = 0;
+
+      // -----------------------------------------------------------------------
+      // NODE CONFIGURATION
+      // -----------------------------------------------------------------------
+
+      /** Array of node objects, each with position (x,y), velocity (vx,vy), and radius */
       const nodes: any[] = [];
-      const links: any[] = [];
+
+      /** Number of nodes in the graph - kept small for performance */
       const numNodes = 25;
+
+      /**
+       * Maximum distance (in pixels) between two nodes for a line to be drawn.
+       * Larger values = more connections but more rendering work.
+       */
       const connectionDistance = 100;
 
+      // -----------------------------------------------------------------------
+      // HELPER FUNCTIONS
+      // -----------------------------------------------------------------------
+
+      /**
+       * Resize the canvas to match its container.
+       *
+       * IMPORTANT: This function accounts for devicePixelRatio to ensure
+       * crisp rendering on high-DPI displays (Retina, etc.). The canvas
+       * is scaled up by the pixel ratio, then the context is scaled to
+       * compensate, so we can draw in CSS pixel coordinates.
+       */
       function resize() {
         const container = canvas.parentElement;
         if (container) {
           width = container.clientWidth;
           height = container.clientHeight;
+          // Scale canvas for high-DPI displays
           canvas.width = width * window.devicePixelRatio;
           canvas.height = height * window.devicePixelRatio;
           ctx?.scale(window.devicePixelRatio, window.devicePixelRatio);
         }
       }
 
+      /**
+       * Initialize or reset all nodes with random positions and velocities.
+       * Called once during setup.
+       */
       function initNodes() {
-        nodes.length = 0;
+        nodes.length = 0; // Clear existing nodes
         for (let i = 0; i < numNodes; i++) {
           nodes.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            vx: (Math.random() - 0.5) * 0.5,
-            vy: (Math.random() - 0.5) * 0.5,
-            radius: Math.random() * 2 + 1,
+            x: Math.random() * width, // Random X position
+            y: Math.random() * height, // Random Y position
+            vx: (Math.random() - 0.5) * 0.5, // Random X velocity (-0.25 to 0.25)
+            vy: (Math.random() - 0.5) * 0.5, // Random Y velocity (-0.25 to 0.25)
+            radius: Math.random() * 2 + 1, // Random radius (1px to 3px)
           });
         }
       }
 
+      /**
+       * Update node positions based on their velocities.
+       * Handles edge bouncing to keep nodes within the canvas bounds.
+       */
       function update() {
-        const padding = 10; // Keep nodes away from edges
+        const padding = 10; // Keep nodes away from edges for visual cleanliness
         nodes.forEach((node) => {
+          // Move node by its velocity
           node.x += node.vx;
           node.y += node.vy;
 
-          // Bounce with padding so nodes don't touch edges
+          // Bounce off edges with padding
           if (node.x < padding || node.x > width - padding) node.vx *= -1;
           if (node.y < padding || node.y > height - padding) node.vy *= -1;
 
-          // Clamp position to stay within bounds
+          // Clamp position to stay within bounds (safety net)
           node.x = Math.max(padding, Math.min(width - padding, node.x));
           node.y = Math.max(padding, Math.min(height - padding, node.y));
         });
       }
 
+      // -----------------------------------------------------------------------
+      // MAIN RENDER LOOP
+      // -----------------------------------------------------------------------
+
+      /**
+       * Main render function - clears the canvas and draws all nodes and links.
+       *
+       * CRITICAL: This function checks isAnimating FIRST. If false, it returns
+       * immediately without scheduling another frame. This is how the animation
+       * pauses when the canvas is off-screen.
+       *
+       * The check happens at the START of the function (not end) to ensure
+       * we don't do any unnecessary work when paused.
+       */
       function draw() {
-        if (!ctx) return;
+        // PERFORMANCE GATE: Exit early if animation is paused
+        // This prevents wasted CPU cycles when canvas is off-screen
+        if (!isAnimating || !ctx) return;
+
+        // Clear the canvas for fresh frame
         ctx.clearRect(0, 0, width, height);
 
-        // Draw links
-        ctx.strokeStyle = "rgba(148, 163, 184, 0.15)";
+        // --- DRAW CONNECTIONS (LINKS) ---
+        // Draw lines between nodes that are close enough to be "connected"
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.15)"; // Light gray, mostly transparent
         ctx.lineWidth = 0.5;
         for (let i = 0; i < nodes.length; i++) {
           for (let j = i + 1; j < nodes.length; j++) {
+            // Calculate distance between nodes
             const dx = nodes[i].x - nodes[j].x;
             const dy = nodes[i].y - nodes[j].y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
+            // Only draw if within connection distance
             if (dist < connectionDistance) {
               ctx.beginPath();
               ctx.moveTo(nodes[i].x, nodes[i].y);
@@ -445,22 +572,106 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
           }
         }
 
-        // Draw nodes
-        ctx.fillStyle = "#6366f1"; // Indigo nodes
+        // --- DRAW NODES ---
+        ctx.fillStyle = "#6366f1"; // Indigo color matching brand
         nodes.forEach((node) => {
           ctx.beginPath();
           ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
           ctx.fill();
         });
 
+        // Update positions for next frame
         update();
-        requestAnimationFrame(draw);
+
+        // Schedule next frame ONLY if still animating
+        // This check prevents orphaned animation loops
+        if (isAnimating) {
+          requestAnimationFrame(draw);
+        }
       }
 
+      // -----------------------------------------------------------------------
+      // ANIMATION CONTROL FUNCTIONS
+      // -----------------------------------------------------------------------
+
+      /**
+       * Start the animation loop.
+       * Called when the canvas becomes visible via IntersectionObserver.
+       *
+       * The guard (if !isAnimating) prevents multiple animation loops
+       * from being started if this is called repeatedly.
+       */
+      function startAnimation() {
+        if (!isAnimating) {
+          isAnimating = true;
+          draw(); // Kick off the animation loop
+        }
+      }
+
+      /**
+       * Stop the animation loop.
+       * Called when the canvas is no longer visible via IntersectionObserver.
+       *
+       * Setting isAnimating = false causes the current animation loop to
+       * stop on its next iteration (when draw() sees the flag is false).
+       * This is a "graceful" stop - no abrupt termination.
+       */
+      function stopAnimation() {
+        isAnimating = false;
+      }
+
+      // -----------------------------------------------------------------------
+      // INITIALIZATION
+      // -----------------------------------------------------------------------
+
+      // Listen for window resize to keep canvas dimensions correct
       window.addEventListener("resize", resize);
+
+      // Initial setup
       resize();
       initNodes();
-      draw();
+
+      // NOTE: We do NOT call draw() here. Animation starts when
+      // IntersectionObserver detects the canvas is visible.
+
+      // -----------------------------------------------------------------------
+      // INTERSECTION OBSERVER - VISIBILITY-BASED ANIMATION CONTROL
+      // -----------------------------------------------------------------------
+
+      /**
+       * IntersectionObserver watches for the canvas container's visibility.
+       *
+       * OPTIONS:
+       * - root: null = use the viewport as the root
+       * - threshold: 0 = callback fires as soon as ANY part is visible/hidden
+       *
+       * This is the key performance optimization: we only animate when visible.
+       */
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              // Canvas is now visible - start animating
+              startAnimation();
+            } else {
+              // Canvas is now hidden - stop to save resources
+              stopAnimation();
+            }
+          });
+        },
+        {
+          root: null, // Observe relative to viewport
+          threshold: 0, // Trigger as soon as any part is visible
+        },
+      );
+
+      // Start observing the canvas container (or canvas itself if no container)
+      const container = canvas.parentElement;
+      if (container) {
+        observer.observe(container);
+      } else {
+        observer.observe(canvas);
+      }
     }
 
     // Scroll-Aware Navigation Logic

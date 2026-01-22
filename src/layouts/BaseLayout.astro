@@ -827,22 +827,81 @@ import { ClientRouter } from "astro:transitions";
         (window as any).__keyboardShortcutsInitialized = true;
       }
 
-      // Initialize Image Zoom
+      /**
+       * =========================================================================
+       * IMAGE ZOOM (LIGHTBOX) FEATURE
+       * =========================================================================
+       *
+       * Provides click-to-zoom functionality for images in content areas.
+       * When an image is clicked, it displays in a full-screen overlay that
+       * can be dismissed by clicking anywhere or pressing Escape.
+       *
+       * SUPPORTED IMAGE SELECTORS:
+       * - .prose img        → Images in markdown/prose content
+       * - .md-card-body img → Images in markdown card components
+       * - .photo-item img   → Images in photo galleries
+       *
+       * -------------------------------------------------------------------------
+       * VIEW TRANSITIONS COMPATIBILITY
+       * -------------------------------------------------------------------------
+       *
+       * PROBLEM: This function is called on initial page load AND on every
+       * astro:page-load event (View Transitions navigation). Without guards,
+       * each call adds ADDITIONAL event listeners, causing:
+       *
+       * - Multiple escape key handlers → multiple close attempts
+       * - Multiple overlay click handlers → memory leaks
+       * - Multiple image click handlers → multiple zoom opens
+       *
+       * SOLUTION: Three different patterns for three different cases:
+       *
+       * 1. INDIVIDUAL IMAGES: Use __zoomInitialized flag on each element
+       *    - Check if img.__zoomInitialized exists before adding listener
+       *    - Set the flag after adding listener
+       *    - Works because images are DOM elements that persist or are new
+       *
+       * 2. OVERLAY CLICK: Clone the overlay element
+       *    - Cloning an element removes all attached event listeners
+       *    - Replace original with clone, then add fresh listener
+       *    - Safe because overlay is a single element we control
+       *
+       * 3. ESCAPE KEY: Use global window flag __imageZoomEscapeInitialized
+       *    - Document keydown listener is global (survives navigation)
+       *    - Only add once, persists throughout session
+       *    - Use dynamic overlay lookup in handler (handles cloning)
+       *
+       * =========================================================================
+       */
       function initImageZoom() {
+        // ---------------------------------------------------------------------
+        // FIND ALL ZOOMABLE IMAGES
+        // ---------------------------------------------------------------------
         const images = document.querySelectorAll(
           ".prose img, .md-card-body img, .photo-item img",
         );
+
+        // ---------------------------------------------------------------------
+        // GET OVERLAY ELEMENTS
+        // ---------------------------------------------------------------------
         const overlay = document.getElementById("zoom-overlay");
         const zoomedImg = document.getElementById(
           "zoomed-image",
         ) as HTMLImageElement;
 
+        // Exit early if overlay structure doesn't exist in DOM
         if (!overlay || !zoomedImg) return;
 
+        // ---------------------------------------------------------------------
+        // ATTACH CLICK HANDLERS TO IMAGES
+        // ---------------------------------------------------------------------
+        // Each image tracks its own initialization state via __zoomInitialized.
+        // This prevents duplicate handlers when images persist across navigations.
         images.forEach((img) => {
-          // If already initialized or has no src, skip
+          // Skip if already initialized OR has no src attribute
           if ((img as any).__zoomInitialized || !img.getAttribute("src"))
             return;
+
+          // Mark as initialized to prevent duplicate handlers
           (img as any).__zoomInitialized = true;
 
           img.addEventListener("click", (e) => {
@@ -855,28 +914,75 @@ import { ClientRouter } from "astro:transitions";
               zoomedImg.src = src;
               zoomedImg.alt = alt || "";
               overlay.classList.add("active");
-              document.body.style.overflow = "hidden";
+              document.body.style.overflow = "hidden"; // Prevent background scroll
             }
           });
         });
 
-        // Close on overlay click
-        overlay.addEventListener("click", () => {
-          overlay.classList.remove("active");
-          document.body.style.overflow = "";
+        // ---------------------------------------------------------------------
+        // OVERLAY CLICK TO CLOSE - Uses Clone Pattern
+        // ---------------------------------------------------------------------
+        //
+        // PATTERN: Clone-and-replace to remove old listeners
+        //
+        // WHY: overlay.addEventListener() would ADD a new listener each time
+        // this function runs. Cloning the element strips all listeners, giving
+        // us a clean slate. The zoomed image inside is also cloned.
+        //
+        // IMPORTANT: After cloning, we must use the NEW overlay reference
+        // for all subsequent operations (including the escape key handler).
+        //
+        const newOverlay = overlay.cloneNode(true) as HTMLElement;
+        overlay.parentNode?.replaceChild(newOverlay, overlay);
+
+        // Re-get the zoomed image reference since we cloned the entire overlay
+        const newZoomedImg = newOverlay.querySelector(
+          "#zoomed-image",
+        ) as HTMLImageElement;
+
+        // Attach click listener to the fresh, listener-free overlay
+        newOverlay.addEventListener("click", () => {
+          newOverlay.classList.remove("active");
+          document.body.style.overflow = ""; // Re-enable background scroll
         });
 
-        // Close on 'Esc' key if active
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && overlay.classList.contains("active")) {
-            overlay.classList.remove("active");
-            document.body.style.overflow = "";
-          }
-        });
+        // ---------------------------------------------------------------------
+        // ESCAPE KEY TO CLOSE - Uses Global Flag Pattern
+        // ---------------------------------------------------------------------
+        //
+        // PATTERN: Single global listener with initialization guard
+        //
+        // WHY: Document-level keydown listeners persist across View Transitions.
+        // Adding a new one each navigation would create duplicates. Instead:
+        // - Check window.__imageZoomEscapeInitialized flag
+        // - If not set, add the listener and set the flag
+        // - If set, skip (listener already exists from previous load)
+        //
+        // IMPORTANT: The handler dynamically looks up the overlay by ID rather
+        // than using a closure. This handles the case where the overlay was
+        // cloned (above) - we always get the current overlay element.
+        //
+        if (!(window as any).__imageZoomEscapeInitialized) {
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+              // Dynamic lookup - handles cloned overlays correctly
+              const currentOverlay = document.getElementById("zoom-overlay");
+              if (currentOverlay?.classList.contains("active")) {
+                currentOverlay.classList.remove("active");
+                document.body.style.overflow = "";
+              }
+            }
+          });
+          // Prevent duplicate registration on future calls
+          (window as any).__imageZoomEscapeInitialized = true;
+        }
       }
+
+      // Run on initial page load
       initImageZoom();
 
-      // Re-init on page transitions
+      // Re-initialize after View Transitions navigation
+      // This ensures newly loaded images get zoom functionality
       document.addEventListener("astro:page-load", () => {
         initImageZoom();
       });
