@@ -32,6 +32,7 @@ const description =
 // Display control logic
 const displayTOC = entry?.data?.["display-table-of-contents"] !== false;
 const displayDates = entry?.data?.["display-dates"] !== false;
+const displayComments = entry?.data?.["display-comments"] !== false;
 
 const relativeLastEdited = lastEdited ? getRelativeTime(lastEdited) : null;
 const formattedLastEdited = lastEdited ? formatDate(lastEdited) : null;
@@ -191,7 +192,22 @@ const displayInProgress = entry?.data?.["display-in-progress"] === true;
           </>
         )
       }
+
     </div>
+
+    <!-- Comments Section - Separate Card -->
+    {
+      displayComments && (
+        <div class="frosted-card md-comments-card">
+          <div class="md-comments-header">
+            <h2>Comments</h2>
+          </div>
+          <div class="md-card-content">
+            <div id="remark42"></div>
+          </div>
+        </div>
+      )
+    }
   </div>
 
   <script is:inline>
@@ -568,6 +584,36 @@ const displayInProgress = entry?.data?.["display-in-progress"] === true;
     // Make toggleCard available globally (safer assignment)
     if (typeof window.toggleCard === "undefined") {
       window.toggleCard = toggleCard;
+    }
+  </script>
+
+  <!-- Remark42 Comments Scripts (only loaded if comments container exists) -->
+  <script is:inline>
+    // Only initialize remark42 if the container exists on this page
+    if (document.getElementById('remark42')) {
+      // Remark42 configuration
+      var remark_config = {
+        host: "https://remark42.kayg.org",
+        site_id: "kayg.org",
+        components: ["embed"],
+        max_shown_comments: 15,
+        theme: document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark",
+        page_title: document.title
+      };
+
+      // Load remark42 embed script
+      !function(e,n){for(var o=0;o<e.length;o++){var r=n.createElement("script"),c=".js",d=n.head||n.body;"noModule"in r?(r.type="module",c=".mjs"):r.async=!0,r.defer=!0,r.src=remark_config.host+"/web/"+e[o]+c,d.appendChild(r)}}(remark_config.components||["embed"],document);
+
+      // Sync theme with remark42
+      const remark42ThemeObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === "data-theme" && window.REMARK42) {
+            const newTheme = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+            window.REMARK42.changeTheme(newTheme);
+          }
+        });
+      });
+      remark42ThemeObserver.observe(document.documentElement, { attributes: true });
     }
   </script>
 </BaseLayout>

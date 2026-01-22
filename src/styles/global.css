@@ -630,17 +630,19 @@ html[data-theme="light"] body {
 }
 
 /* Backlinks Header - non-collapsible */
-.md-backlinks-header {
+.md-backlinks-header,
+.md-comments-header {
   padding: 1rem 2.5rem;
   max-width: 720px;
   margin: 0 auto;
 }
 
-.md-backlinks-header h2 {
+.md-backlinks-header h2,
+.md-comments-header h2 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   font-weight: 600;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.05em;
   color: inherit;
   margin: 0;
 }
@@ -943,6 +945,22 @@ html[data-theme="light"] body {
 .md-card-backlinks .md-card-content {
   max-width: 720px;
   margin: 0 auto;
+}
+
+/* Comments Card - Separate from main content card */
+.md-comments-card {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+}
+
+.md-comments-card .md-comments-header {
+  padding: 0.5rem 2.5rem 1rem;
+}
+
+.md-comments-card .md-card-content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 2.5rem 1rem;
 }
 
 .md-card-backlinks .md-card-content ul {
@@ -2101,45 +2119,102 @@ body {
 /* See "Scroll-Aware Navigation" section for .nav-hidden, .nav-visible, .nav-container */
 
 /* ========================================
-   Progressive Blur Overlay
-   Fades to transparent at bottom, restricted to navbar width on desktop
-
-.navbar-blur-overlay {
-  position: fixed;
+   Progressive Blur Behind Navbar
+   ========================================
+   Creates a soft blur effect for content scrolling behind the navbar.
+   Uses ::before pseudo-element to avoid affecting navbar interactivity.
+   
+   Key techniques to avoid "boxy" appearance:
+   1. Rounded bottom corners (border-radius) matching pill aesthetics
+   2. Horizontal edge fade via radial gradient mask
+   3. Vertical fade from max blur at top to transparent at bottom
+   ======================================== */
+.nav-container::before {
+  content: "";
+  position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  max-width: 36rem;
-  # Match navbar max-width on desktop
-  height: 80px;
-  z-index: 40;
+  /* Match the navbar pills width - slightly narrower than container */
+  width: calc(100% - 3rem);
+  max-width: 45rem;
+  /* Extend from top to just below navbar (accounts for padding + pill height) */
+  height: 100%;
+  z-index: -1;
   pointer-events: none;
-
-  Progressive blur 
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-
-  # Vertical fade: solid at top, transparent at bottom
-  -webkit-mask-image: linear-gradient(to bottom,
+  
+  /* Progressive blur effect */
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  
+  /* Rounded bottom corners to soften appearance */
+  border-radius: 0 0 2rem 2rem;
+  
+  /* Combined mask: vertical fade + horizontal edge softening
+     - Vertical: solid at top (0%), fades to transparent at bottom (100%)
+     - Horizontal: soft edges via radial gradient overlay */
+  -webkit-mask-image: 
+    linear-gradient(to bottom,
       rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.5) 50%,
+      rgba(0, 0, 0, 0.7) 60%,
+      rgba(0, 0, 0, 0) 100%),
+    linear-gradient(to right,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 8%,
+      rgba(0, 0, 0, 1) 92%,
       rgba(0, 0, 0, 0) 100%);
-  mask-image: linear-gradient(to bottom,
+  mask-image: 
+    linear-gradient(to bottom,
       rgba(0, 0, 0, 1) 0%,
-      rgba(0, 0, 0, 0.5) 50%,
+      rgba(0, 0, 0, 0.7) 60%,
+      rgba(0, 0, 0, 0) 100%),
+    linear-gradient(to right,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 1) 8%,
+      rgba(0, 0, 0, 1) 92%,
       rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 
-# Mobile: full width edge-to-edge
+/* Mobile: extend to full width with softer horizontal fade */
 @media (max-width: 768px) {
-  .navbar-blur-overlay {
+  .nav-container::before {
+    width: 100%;
     max-width: none;
-    left: 0;
-    transform: none;
+    border-radius: 0;
+    /* Full width on mobile, just vertical fade */
+    -webkit-mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.6) 50%,
+      rgba(0, 0, 0, 0) 100%);
+    mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.6) 50%,
+      rgba(0, 0, 0, 0) 100%);
+    -webkit-mask-composite: source-over;
+    mask-composite: add;
   }
 }
-   ======================================== */
+
+/* Hide blur when navbar is hidden (during scroll) */
+.nav-hidden::before {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.nav-visible::before {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .nav-container::before {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
 
 /* ========================================
    Expanding Search Bar
@@ -3466,13 +3541,15 @@ html.theme-transitioning *::after {
 /* Title headings are white, only links and callouts have pink */
 .md-card-title h1,
 .md-card-header h2,
-.md-backlinks-header h2 {
+.md-backlinks-header h2,
+.md-comments-header h2 {
   color: #ffffff;
 }
 
 [data-theme="light"] .md-card-title h1,
 [data-theme="light"] .md-card-header h2,
-[data-theme="light"] .md-backlinks-header h2 {
+[data-theme="light"] .md-backlinks-header h2,
+[data-theme="light"] .md-comments-header h2 {
   color: #1a1225;
 }
 
@@ -4174,7 +4251,8 @@ html.theme-transitioning *::after {
 
 .experience-item {
   position: relative;
-  margin-bottom: 4rem;
+  /* Reduced from 4rem for tighter spacing */
+  margin-bottom: 2.5rem;
   transition: transform 0.3s ease;
 }
 
@@ -4188,19 +4266,19 @@ html.theme-transitioning *::after {
 
 .experience-dot-wrapper {
   position: absolute;
-  left: -3rem;
-  top: 0.75rem;
-  width: 1px;
-  display: flex;
-  justify-content: center;
+  /* Center the wrapper on the timeline line */
+  /* Line is at left:0 in timeline, item starts at padding-left:3rem */
+  /* So line is at -3rem from item. Dot is 10px, so offset by half (5px) */
+  left: calc(-3rem - 5px);
+  /* Vertically align with role text center */
+  top: 0.45rem;
 }
 
 .experience-dot {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   background: var(--color-accent-500);
   border-radius: 50%;
-  margin-left: -4px;
   box-shadow: 0 0 10px rgba(236, 72, 153, 0.4);
   transition: all 0.3s ease;
 }
@@ -4260,11 +4338,16 @@ html.theme-transitioning *::after {
 }
 
 .experience-company {
-  font-family: var(--font-heading, serif);
-  font-size: 1.25rem;
-  color: var(--color-accent-500);
-  opacity: 0.9;
-  font-weight: 500;
+  font-family: Cascadia Code, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 1rem;
+  color: var(--fallback-bc, #f8f4fc);
+  opacity: 0.6;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+[data-theme="light"] .experience-company {
+  color: #1a1225;
 }
 
 .experience-time {
