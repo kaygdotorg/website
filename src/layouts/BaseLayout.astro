@@ -513,9 +513,11 @@ import { ClientRouter } from "astro:transitions";
       // Initialize on first load
       initThemeToggle();
 
-      // Re-initialize after View Transitions navigation
-      document.addEventListener("astro:page-load", () => {
-        // Restore theme from localStorage after navigation (View Transitions may reset it)
+      /**
+       * Restore theme from localStorage after View Transitions navigation.
+       * View Transitions may reset the theme attribute, so we reapply it.
+       */
+      function restoreTheme() {
         const savedTheme = localStorage.getItem("theme");
         if (savedTheme) {
           document.documentElement.setAttribute("data-theme", savedTheme);
@@ -529,7 +531,7 @@ import { ClientRouter } from "astro:transitions";
           );
         }
 
-        // Restore theme-color
+        // Restore theme-color meta for Safari
         const currentTheme =
           document.documentElement.getAttribute("data-theme");
         const themeColorMeta = document.querySelector(
@@ -541,9 +543,7 @@ import { ClientRouter } from "astro:transitions";
             currentTheme === "dark" ? "#0d0910" : "#faf8fc",
           );
         }
-
-        initThemeToggle();
-      });
+      }
 
       // Pause animations when tab is hidden (performance)
       document.addEventListener("visibilitychange", () => {
@@ -749,15 +749,6 @@ import { ClientRouter } from "astro:transitions";
       // Initialize all interactive elements
       initGlobalMenu();
       initSearchModal();
-
-      // Re-initialize after View Transitions navigation
-      document.addEventListener("astro:page-load", () => {
-        initGlobalMenu();
-        initSearchModal();
-        updateSearchShortcut();
-        updateThemeShortcut();
-        updateMenuShortcut();
-      });
 
       // Update Search Shortcut based on OS
       function updateSearchShortcut() {
@@ -999,10 +990,37 @@ import { ClientRouter } from "astro:transitions";
       // Run on initial page load
       initImageZoom();
 
-      // Re-initialize after View Transitions navigation
-      // This ensures newly loaded images get zoom functionality
+      // =========================================================================
+      // CONSOLIDATED VIEW TRANSITIONS HANDLER
+      // =========================================================================
+      //
+      // Single listener for astro:page-load that reinitializes all interactive
+      // elements after View Transitions navigation. Consolidating into one
+      // listener is cleaner and ensures consistent initialization order.
+      //
+      // INITIALIZATION ORDER:
+      // 1. restoreTheme() - Restore user's theme preference from localStorage
+      // 2. initThemeToggle() - Re-attach click handlers to theme buttons
+      // 3. initGlobalMenu() - Re-attach menu toggle handlers
+      // 4. initSearchModal() - Re-attach search modal handlers
+      // 5. updateShortcuts() - Update keyboard shortcut labels for OS
+      // 6. initImageZoom() - Attach handlers to newly loaded images
+      //
+      // =========================================================================
       document.addEventListener("astro:page-load", () => {
+        // Restore theme (View Transitions may reset data-theme)
+        restoreTheme();
+
+        // Reinitialize interactive elements
+        initThemeToggle();
+        initGlobalMenu();
+        initSearchModal();
         initImageZoom();
+
+        // Update shortcut labels for current OS
+        updateSearchShortcut();
+        updateThemeShortcut();
+        updateMenuShortcut();
       });
     </script>
   </body>
