@@ -1,9 +1,40 @@
-/* Local fonts via fontsource
-   Only loading weights that are actually used in the codebase:
-   - DM Sans: 400 (body), 500 (labels/UI), 600 (buttons/emphasis), 700 (bold text)
+/* ============================================================================
+   GLOBAL STYLESHEET
+   ============================================================================
+   
+   FONTS (via fontsource):
+   - DM Sans: 400 (body), 500 (labels/UI), 600 (buttons), 700 (bold)
    - Playfair Display: 400/500/600 (headings)
    - Cascadia Code: 400 (code blocks)
    - Tangerine: 700 (nav logo)
+   
+   !IMPORTANT USAGE GUIDE (~230 instances):
+   This codebase uses !important pragmatically in these justified cases:
+   
+   1. PRINT STYLES (@media print) - ~20 instances
+      Required to override all screen styles for proper printing.
+   
+   2. REDUCED MOTION (@media prefers-reduced-motion) - ~25 instances
+      Required to ensure animations are disabled for accessibility.
+   
+   3. @SUPPORTS FALLBACKS - ~10 instances
+      Required to override backdrop-filter for browsers without support.
+   
+   4. THIRD-PARTY OVERRIDES (Pagefind, DaisyUI) - ~40 instances
+      Required to customize third-party component styles.
+   
+   5. THEME OVERRIDES ([data-theme="light/dark"]) - ~30 instances
+      Required to ensure theme-specific colors override base styles.
+   
+   6. TAILWIND UTILITY OVERRIDES (.text-accent, .btn-accent) - ~50 instances
+      Pragmatic solution to override Tailwind's utility specificity.
+      Refactoring would require CSS architecture changes.
+   
+   7. SPECIFICITY BATTLES - ~55 instances
+      Legacy overrides that work but could be refactored with better
+      selector specificity. Low priority since they function correctly.
+   
+   ============================================================================
 */
 @import "@fontsource/dm-sans/latin-400.css";
 @import "@fontsource/dm-sans/latin-500.css";
