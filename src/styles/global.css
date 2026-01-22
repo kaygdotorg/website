@@ -1,11 +1,9 @@
 /* Local fonts via fontsource
    Only loading weights that are actually used in the codebase:
    - DM Sans: 400 (body), 500 (labels/UI), 600 (buttons/emphasis), 700 (bold text)
-   - Playfair Display: 400/500/600 (headings) - 700 removed, not used
+   - Playfair Display: 400/500/600 (headings)
    - Cascadia Code: 400 (code blocks)
-   - Tangerine: 700 only (nav logo) - 400 removed, not used
-   - Dancing Script: REMOVED entirely (--font-cursive was never used)
-   - Nunito: REMOVED from deps (was never imported, just fallback strings)
+   - Tangerine: 700 (nav logo)
 */
 @import "@fontsource/dm-sans/latin-400.css";
 @import "@fontsource/dm-sans/latin-500.css";
@@ -164,7 +162,7 @@ html[data-theme="light"] body {
     radial-gradient(ellipse 35% 45% at 25% 75%, rgba(139, 92, 246, 0.18) 0%, transparent 60%);
   animation: flare-drift 30s ease-in-out infinite;
   will-change: transform;
-  /* Removed expensive blur(80px) filter to prevent scroll lag on Chromium */
+  /* No blur filter - intentionally removed for performance */
 }
 
 .film-flare {
@@ -654,7 +652,7 @@ html[data-theme="light"] body {
   flex-wrap: wrap;
   gap: 1.25rem;
   font-size: 0.8rem;
-  font-family: var(--font-body, "Nunito", sans-serif);
+  font-family: var(--font-body, "DM Sans", sans-serif);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1592,7 +1590,7 @@ html[data-theme="light"] body {
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
-  font-family: var(--font-display, "Nunito", sans-serif);
+  font-family: var(--font-display, "DM Sans", sans-serif);
   font-weight: 500;
   font-size: 0.9rem;
   border: 1px solid rgba(236, 72, 153, 0.3);
@@ -1724,7 +1722,7 @@ html[data-theme="light"] body {
 }
 
 .bento-subtitle {
-  font-family: var(--font-body, "Nunito", sans-serif);
+  font-family: var(--font-body, "DM Sans", sans-serif);
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -3880,16 +3878,6 @@ html.theme-transitioning *::after {
   justify-content: flex-end;
   color: white;
 }
-
-/* ========================================
-   Enhanced Vignette with Color Tint
-   ======================================== */
-
-/* NOTE: .film-flare definition was removed from here.
-   It was a duplicate that re-added filter: blur(100px), overriding
-   the intentional blur removal in the main definition (line ~152).
-   The blur was removed for performance - it caused scroll lag on Chromium.
-   See the main .film-flare definition in the "Animated Film Grain Effect" section. */
 
 /* ========================================
    Photography Gallery Styles

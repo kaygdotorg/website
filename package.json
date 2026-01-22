@@ -11,6 +11,7 @@
     "sync": "node scripts/sync-obsidian.mjs"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.0",
     "@fontsource/cascadia-code": "^5.2.3",
     "@fontsource/dm-sans": "^5.2.8",
     "@fontsource/playfair-display": "^5.2.8",

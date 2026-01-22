@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 import tailwindcss from '@tailwindcss/vite';
 
@@ -9,6 +10,9 @@ import { fromHtml } from 'hast-util-from-html';
 
 // https://astro.build/config
 export default defineConfig({
+  // Site URL required for sitemap generation and canonical URLs
+  site: 'https://kayg.org',
+  integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()]
   },
