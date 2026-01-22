@@ -50,9 +50,9 @@ const sortedEntries = entries.sort((a, b) => b.date.getTime() - a.date.getTime()
                     <div class="w-full mb-6">
                       <div class="aspect-[16/9] rounded-xl overflow-hidden border border-white/10 shadow-lg">
                         {typeof entry.coverImage === 'string' ? (
-                          <img src={entry.coverImage} alt={entry.title} class="w-full h-full object-cover" />
+                          <img src={entry.coverImage} alt={entry.title} class="w-full h-full object-cover" loading="lazy" decoding="async" />
                         ) : (
-                          <img src={entry.coverImage.src} alt={entry.title} class="w-full h-full object-cover" />
+                          <img src={entry.coverImage.src} alt={entry.title} class="w-full h-full object-cover" loading="lazy" decoding="async" />
                         )}
                       </div>
                     </div>

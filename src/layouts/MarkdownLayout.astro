@@ -50,11 +50,13 @@ const displayInProgress = entry?.data?.["display-in-progress"] === true;
         coverImage && (
           <div class="md-card-featured-image">
             {typeof coverImage === "string" ? (
-              <img src={coverImage} alt={title} />
+              <img src={coverImage} alt={title} loading="lazy" decoding="async" />
             ) : (
               <img
                 src={coverImage.src}
                 alt={title}
+                loading="lazy"
+                decoding="async"
                 {...coverImage.attributes}
               />
             )}

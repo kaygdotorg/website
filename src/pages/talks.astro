@@ -46,9 +46,9 @@ const sortedTalks = talks.sort((a, b) => b.data.date.getTime() - a.data.date.get
                     <div class="w-full mb-6">
                       <div class="aspect-[16/9] rounded-xl overflow-hidden border border-white/10 shadow-lg group-hover:shadow-accent-500/20 transition-all">
                         {typeof talk.data["cover-image"] === 'string' ? (
-                          <img src={talk.data["cover-image"]} alt={talk.data.title} class="w-full h-full object-cover" />
+                          <img src={talk.data["cover-image"]} alt={talk.data.title} class="w-full h-full object-cover" loading="lazy" decoding="async" />
                         ) : (
-                          <img src={talk.data["cover-image"].src} alt={talk.data.title} class="w-full h-full object-cover" />
+                          <img src={talk.data["cover-image"].src} alt={talk.data.title} class="w-full h-full object-cover" loading="lazy" decoding="async" />
                         )}
                       </div>
                     </div>

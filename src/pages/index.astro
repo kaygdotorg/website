@@ -127,15 +127,16 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     <section class="hero-section" id="hero-section">
       <div class="frosted-card-homepage hero-card hero-glow">
         <div class="hero-content">
-          <!-- Profile Picture -->
+          <!-- Profile Picture - handles both optimized images (ImageMetadata) and URL strings -->
           {
             profileImage && (
               <div class="hero-profile">
                 <img
-                  src={profileImage}
+                  src={typeof profileImage === 'string' ? profileImage : profileImage.src}
                   alt={`${name || "Profile"} photo`}
                   class="hero-profile-img"
                   fetchpriority="high"
+                  decoding="async"
                 />
               </div>
             )
@@ -169,6 +170,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                           alt={item.label}
                           draggable="false"
                           loading="lazy"
+                          decoding="async"
                         />
                       </div>
                       <div class="card-in-hand-label">
@@ -212,7 +214,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                       <div class="photo-stack">
                         {cardPhotos?.slice(0, 4).map((photo: any) => (
                           <div class="photo-stack-item">
-                            <img src={photo.src} alt="Capture" loading="lazy" />
+                            <img src={photo.src} alt="Capture" loading="lazy" decoding="async" />
                           </div>
                         ))}
                       </div>
@@ -223,7 +225,8 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                     </div>
                   ) : (
                     <div class="bento-image-wrapper">
-                      <img src={card.image} alt={card.title} loading="lazy" />
+                      {/* Handle both optimized images (ImageMetadata with .src) and URL strings */}
+                      <img src={typeof card.image === 'string' ? card.image : card.image.src} alt={card.title} loading="lazy" decoding="async" />
                     </div>
                   )}
                 </div>

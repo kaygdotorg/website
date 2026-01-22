@@ -139,7 +139,7 @@ const isInProgress = entry.data["display-in-progress"] === true;
             data-alt={photo.alt}
             style={`animation-delay: ${index * 0.1}s`}
           >
-            <img src={photo.thumb} alt={photo.alt} loading="lazy" />
+            <img src={photo.thumb} alt={photo.alt} loading="lazy" decoding="async" />
             <div class="photo-overlay">
               <p class="font-medium text-lg">{photo.alt}</p>
               <p class="text-sm opacity-70 mt-1">
