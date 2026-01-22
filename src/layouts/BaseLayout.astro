@@ -880,22 +880,20 @@ import { ClientRouter } from "astro:transitions";
           ".prose img, .md-card-body img, .photo-item img",
         );
 
-        // ---------------------------------------------------------------------
-        // GET OVERLAY ELEMENTS
-        // ---------------------------------------------------------------------
-        const overlay = document.getElementById("zoom-overlay");
-        const zoomedImg = document.getElementById(
-          "zoomed-image",
-        ) as HTMLImageElement;
-
-        // Exit early if overlay structure doesn't exist in DOM
-        if (!overlay || !zoomedImg) return;
+        // Exit early if no overlay exists (safety check)
+        const overlayCheck = document.getElementById("zoom-overlay");
+        if (!overlayCheck) return;
 
         // ---------------------------------------------------------------------
         // ATTACH CLICK HANDLERS TO IMAGES
         // ---------------------------------------------------------------------
         // Each image tracks its own initialization state via __zoomInitialized.
         // This prevents duplicate handlers when images persist across navigations.
+        //
+        // IMPORTANT: Handlers use DYNAMIC lookup (getElementById) instead of
+        // closures. This ensures we always get the current overlay element,
+        // which is essential for View Transitions compatibility.
+        //
         images.forEach((img) => {
           // Skip if already initialized OR has no src attribute
           if ((img as any).__zoomInitialized || !img.getAttribute("src"))
@@ -907,6 +905,15 @@ import { ClientRouter } from "astro:transitions";
           img.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
+
+            // DYNAMIC LOOKUP: Get current overlay and image elements
+            // This handles View Transitions where DOM may have changed
+            const overlay = document.getElementById("zoom-overlay");
+            const zoomedImg = document.getElementById(
+              "zoomed-image",
+            ) as HTMLImageElement;
+
+            if (!overlay || !zoomedImg) return;
 
             const src = img.getAttribute("src");
             const alt = img.getAttribute("alt");
@@ -920,31 +927,29 @@ import { ClientRouter } from "astro:transitions";
         });
 
         // ---------------------------------------------------------------------
-        // OVERLAY CLICK TO CLOSE - Uses Clone Pattern
+        // OVERLAY CLICK TO CLOSE - Uses Global Flag Pattern
         // ---------------------------------------------------------------------
         //
-        // PATTERN: Clone-and-replace to remove old listeners
+        // PATTERN: Single global listener with initialization guard
         //
-        // WHY: overlay.addEventListener() would ADD a new listener each time
-        // this function runs. Cloning the element strips all listeners, giving
-        // us a clean slate. The zoomed image inside is also cloned.
+        // WHY: Overlay click listener must be added only ONCE to prevent
+        // duplicates across View Transitions navigations. We use a window
+        // flag to track whether it's already been added.
         //
-        // IMPORTANT: After cloning, we must use the NEW overlay reference
-        // for all subsequent operations (including the escape key handler).
+        // The handler uses dynamic lookup (getElementById) to get the current
+        // overlay, ensuring it works correctly after any DOM changes.
         //
-        const newOverlay = overlay.cloneNode(true) as HTMLElement;
-        overlay.parentNode?.replaceChild(newOverlay, overlay);
-
-        // Re-get the zoomed image reference since we cloned the entire overlay
-        const newZoomedImg = newOverlay.querySelector(
-          "#zoomed-image",
-        ) as HTMLImageElement;
-
-        // Attach click listener to the fresh, listener-free overlay
-        newOverlay.addEventListener("click", () => {
-          newOverlay.classList.remove("active");
-          document.body.style.overflow = ""; // Re-enable background scroll
-        });
+        if (!(window as any).__imageZoomOverlayInitialized) {
+          overlayCheck.addEventListener("click", () => {
+            // DYNAMIC LOOKUP: Get current overlay
+            const overlay = document.getElementById("zoom-overlay");
+            if (overlay) {
+              overlay.classList.remove("active");
+              document.body.style.overflow = ""; // Re-enable background scroll
+            }
+          });
+          (window as any).__imageZoomOverlayInitialized = true;
+        }
 
         // ---------------------------------------------------------------------
         // ESCAPE KEY TO CLOSE - Uses Global Flag Pattern
@@ -958,22 +963,19 @@ import { ClientRouter } from "astro:transitions";
         // - If not set, add the listener and set the flag
         // - If set, skip (listener already exists from previous load)
         //
-        // IMPORTANT: The handler dynamically looks up the overlay by ID rather
-        // than using a closure. This handles the case where the overlay was
-        // cloned (above) - we always get the current overlay element.
+        // The handler uses dynamic lookup to always get the current overlay.
         //
         if (!(window as any).__imageZoomEscapeInitialized) {
           document.addEventListener("keydown", (e) => {
             if (e.key === "Escape") {
-              // Dynamic lookup - handles cloned overlays correctly
-              const currentOverlay = document.getElementById("zoom-overlay");
-              if (currentOverlay?.classList.contains("active")) {
-                currentOverlay.classList.remove("active");
+              // DYNAMIC LOOKUP: Get current overlay
+              const overlay = document.getElementById("zoom-overlay");
+              if (overlay?.classList.contains("active")) {
+                overlay.classList.remove("active");
                 document.body.style.overflow = "";
               }
             }
           });
-          // Prevent duplicate registration on future calls
           (window as any).__imageZoomEscapeInitialized = true;
         }
       }
