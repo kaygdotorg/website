@@ -188,11 +188,8 @@ html[data-theme="light"] body {
     radial-gradient(ellipse 35% 45% at 25% 75%, rgba(139, 92, 246, 0.18) 0%, transparent 60%);
   animation: flare-drift 30s ease-in-out infinite;
   will-change: transform;
-  /* No blur filter - intentionally removed for performance */
-}
-
-.film-flare {
   opacity: 0.8;
+  /* No blur filter - intentionally removed for performance */
 }
 
 [data-theme="light"] .film-flare {
@@ -2118,23 +2115,7 @@ body {
   letter-spacing: -0.03em;
 }
 
-/* Navbar visibility on scroll */
-.nav-hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-100%);
-}
-
-.nav-visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.nav-container {
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* See "Scroll-Aware Navigation" section for .nav-hidden, .nav-visible, .nav-container */
 
 /* ========================================
    Progressive Blur Overlay
@@ -2867,6 +2848,7 @@ html.theme-transitioning *::after {
   --pagefind-ui-border-width: 0px;
   --pagefind-ui-border-radius: 2rem;
   --pagefind-ui-font: var(--font-body, system-ui, sans-serif);
+  position: relative;
 }
 
 #search-container {
@@ -2893,11 +2875,6 @@ html.theme-transitioning *::after {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   height: 54px !important;
   /* No overflow:hidden - results are siblings, not children */
-}
-
-/* Reset Pagefind wrapper to not affect positioning */
-.pagefind-ui {
-  position: relative;
 }
 
 /* Ensure clear button stays inside the form */
