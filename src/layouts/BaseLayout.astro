@@ -153,42 +153,45 @@ import { ClientRouter } from "astro:transitions";
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
-      <button
-        id="zoom-prev"
-        class="zoom-nav zoom-prev"
-        aria-label="Previous image"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="32"
-          height="32"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-      </button>
       <img id="zoomed-image" class="zoomed-image" src="" alt="" />
-      <button id="zoom-next" class="zoom-nav zoom-next" aria-label="Next image">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="32"
-          height="32"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+      <!-- Navigation controls in flex container for proper alignment -->
+      <div class="zoom-controls">
+        <button
+          id="zoom-prev"
+          class="zoom-nav zoom-prev"
+          aria-label="Previous image"
         >
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      </button>
-      <div id="zoom-counter" class="zoom-counter"></div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <div id="zoom-counter" class="zoom-counter"></div>
+        <button id="zoom-next" class="zoom-nav zoom-next" aria-label="Next image">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <!-- Floating Pill Navigation -->
@@ -1197,13 +1200,18 @@ import { ClientRouter } from "astro:transitions";
 
         // ---------------------------------------------------------------------
         // OVERLAY CLICK TO CLOSE (but not on image or buttons)
+        // Using document delegation to survive View Transitions
         // ---------------------------------------------------------------------
         if (!(window as any).__imageZoomOverlayInitialized) {
-          overlayCheck.addEventListener("click", (e) => {
+          document.addEventListener("click", (e) => {
+            const overlay = document.getElementById("zoom-overlay");
+            if (!overlay?.classList.contains("active")) return;
+            
             const target = e.target as HTMLElement;
-            // Don't close if clicking on the image, nav buttons, or close button
-            if (target.closest(".zoomed-image, .zoom-nav, .zoom-close")) return;
-            closeOverlay();
+            // Only close if clicking directly on the overlay background
+            if (target.id === "zoom-overlay") {
+              closeOverlay();
+            }
           });
           (window as any).__imageZoomOverlayInitialized = true;
         }
@@ -1234,29 +1242,73 @@ import { ClientRouter } from "astro:transitions";
         }
 
         // ---------------------------------------------------------------------
+        // MOUSE WHEEL NAVIGATION (horizontal scroll = navigate gallery)
+        // ---------------------------------------------------------------------
+        if (!(window as any).__imageZoomWheelInitialized) {
+          document.addEventListener("wheel", (e) => {
+            const overlay = document.getElementById("zoom-overlay");
+            if (!overlay?.classList.contains("active")) return;
+            
+            const state = (window as any).__galleryState;
+            if (!state.isGalleryMode) return;
+            
+            // Use horizontal scroll (deltaX) or shift+vertical scroll
+            const delta = e.deltaX !== 0 ? e.deltaX : (e.shiftKey ? e.deltaY : 0);
+            
+            if (Math.abs(delta) > 30) {
+              e.preventDefault();
+              if (delta > 0) {
+                navigateNext();
+              } else {
+                navigatePrev();
+              }
+            }
+          }, { passive: false });
+          (window as any).__imageZoomWheelInitialized = true;
+        }
+
+        // ---------------------------------------------------------------------
         // TOUCH SWIPE SUPPORT & TAP TO CLOSE (Mobile)
+        // Using document delegation to survive View Transitions
+        // Non-passive to allow preventDefault and stop event propagation
         // ---------------------------------------------------------------------
         if (!(window as any).__imageZoomSwipeInitialized) {
           let touchStartX = 0;
           let touchStartY = 0;
           let touchStartTime = 0;
+          let touchStartedOnOverlay = false;
 
-          overlayCheck.addEventListener(
+          document.addEventListener(
             "touchstart",
             (e) => {
-              touchStartX = e.touches[0].clientX;
-              touchStartY = e.touches[0].clientY;
-              touchStartTime = Date.now();
+              const overlay = document.getElementById("zoom-overlay");
+              if (!overlay?.classList.contains("active")) {
+                touchStartedOnOverlay = false;
+                return;
+              }
+              
+              const target = e.target as HTMLElement;
+              // Check if touch started within the overlay
+              touchStartedOnOverlay = !!(target.closest("#zoom-overlay") || target.id === "zoom-overlay");
+              
+              if (touchStartedOnOverlay) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+                touchStartTime = Date.now();
+                // Prevent touch from propagating to page below
+                e.preventDefault();
+              }
             },
-            { passive: true },
+            { passive: false },
           );
 
-          overlayCheck.addEventListener(
+          document.addEventListener(
             "touchend",
             (e) => {
               const overlay = document.getElementById("zoom-overlay");
-              if (!overlay?.classList.contains("active")) return;
+              if (!overlay?.classList.contains("active") || !touchStartedOnOverlay) return;
 
+              const target = e.target as HTMLElement;
               const state = (window as any).__galleryState;
               const touchEndX = e.changedTouches[0].clientX;
               const touchEndY = e.changedTouches[0].clientY;
@@ -1266,15 +1318,14 @@ import { ClientRouter } from "astro:transitions";
               const absDiffY = Math.abs(diffY);
               const duration = Date.now() - touchStartTime;
 
-              // Check if it's a tap (quick, small movement) - close the overlay
-              const target = e.target as HTMLElement;
+              // Prevent touch from propagating to page below
+              e.preventDefault();
+
+              // Check if it's a tap (quick, small movement)
               if (duration < 300 && absDiffX < 15 && absDiffY < 15) {
-                // Tap detected - close if not on image/buttons
-                if (
-                  !target.closest(
-                    ".zoomed-image, .zoom-nav, .zoom-close, .zoom-counter",
-                  )
-                ) {
+                // Close if tapping on overlay background (not on interactive elements)
+                const isInteractive = target.closest(".zoom-controls, .zoomed-image, .zoom-close");
+                if (!isInteractive) {
                   closeOverlay();
                   return;
                 }
@@ -1293,10 +1344,70 @@ import { ClientRouter } from "astro:transitions";
                 }
               }
             },
-            { passive: true },
+            { passive: false },
           );
 
           (window as any).__imageZoomSwipeInitialized = true;
+        }
+
+        // ---------------------------------------------------------------------
+        // MOUSE DRAG NAVIGATION (click and drag to navigate gallery)
+        // ---------------------------------------------------------------------
+        if (!(window as any).__imageZoomMouseDragInitialized) {
+          let isDragging = false;
+          let dragStartX = 0;
+          let dragStartY = 0;
+
+          document.addEventListener("mousedown", (e) => {
+            const overlay = document.getElementById("zoom-overlay");
+            if (!overlay?.classList.contains("active")) return;
+            
+            const state = (window as any).__galleryState;
+            if (!state.isGalleryMode) return;
+            
+            const target = e.target as HTMLElement;
+            // Only start drag on the image itself
+            if (target.classList.contains("zoomed-image")) {
+              isDragging = true;
+              dragStartX = e.clientX;
+              dragStartY = e.clientY;
+              e.preventDefault();
+            }
+          });
+
+          document.addEventListener("mouseup", (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const overlay = document.getElementById("zoom-overlay");
+            if (!overlay?.classList.contains("active")) return;
+            
+            const state = (window as any).__galleryState;
+            if (!state.isGalleryMode) return;
+            
+            const diffX = dragStartX - e.clientX;
+            const diffY = dragStartY - e.clientY;
+            const absDiffX = Math.abs(diffX);
+            const absDiffY = Math.abs(diffY);
+            
+            // Check for horizontal drag (navigate gallery)
+            if (absDiffX > 50 && absDiffX > absDiffY * 1.5) {
+              if (diffX > 0) {
+                navigateNext(); // Drag left = next
+              } else {
+                navigatePrev(); // Drag right = prev
+              }
+            }
+          });
+
+          // Prevent default drag behavior on zoomed image
+          document.addEventListener("dragstart", (e) => {
+            if ((e.target as HTMLElement).classList.contains("zoomed-image")) {
+              e.preventDefault();
+            }
+          });
+
+          (window as any).__imageZoomMouseDragInitialized = true;
         }
       }
 
