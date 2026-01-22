@@ -70,6 +70,32 @@ html[data-theme="dark"] body {
   --fallback-ac: #ffffff;
 }
 
+/* ========================================
+   Accessibility: Skip Link
+   ======================================== */
+
+/* Hidden by default, visible on focus for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  padding: 1rem 2rem;
+  background: var(--color-accent-500, #ec4899);
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 1rem 1rem;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
 /* Light mode background */
 html[data-theme="light"],
 html[data-theme="light"] body {

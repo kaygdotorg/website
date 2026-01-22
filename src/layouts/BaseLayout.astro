@@ -122,6 +122,9 @@ import { ClientRouter } from "astro:transitions";
     </script>
   </head>
   <body class="min-h-screen text-base-content">
+    <!-- Skip to main content link for keyboard/screen reader users -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Animated Film Grain Background -->
     <div class="animated-gradient-bg" aria-hidden="true" transition:persist>
       <!-- Soft color flares (like light leaks) -->
@@ -416,7 +419,7 @@ import { ClientRouter } from "astro:transitions";
     </div>
 
     <!-- Main content -->
-    <main class={`relative z-10 ${hideNavInitially ? "" : "pt-24"}`}>
+    <main id="main-content" class={`relative z-10 ${hideNavInitially ? "" : "pt-24"}`}>
       {displayInProgress ? <InProgressCard title={title} /> : <slot />}
     </main>
 
