@@ -10,7 +10,9 @@ const allHomeEntries = await getCollection("home");
 const homeEntry = allHomeEntries.find((e) => e.id === "index");
 
 if (!homeEntry) {
-  throw new Error("Could not find index.md in home collection (expected id: 'index')");
+  throw new Error(
+    "Could not find index.md in home collection (expected id: 'index')",
+  );
 }
 
 // Astro 5 content layer: use imported render() function instead of entry.render()
@@ -24,10 +26,7 @@ const blogEntries = await getCollection(
   "blog",
   ({ id, data }) => id !== "index" && !data.draft,
 );
-const talksEntries = await getCollection(
-  "talks",
-  ({ id }) => id !== "index",
-);
+const talksEntries = await getCollection("talks", ({ id }) => id !== "index");
 const notesEntries = await getCollection(
   "notes",
   ({ id, data }) => id !== "index" && !data.draft,
@@ -135,7 +134,11 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
             profileImage && (
               <div class="hero-profile">
                 <img
-                  src={typeof profileImage === 'string' ? profileImage : profileImage.src}
+                  src={
+                    typeof profileImage === "string"
+                      ? profileImage
+                      : profileImage.src
+                  }
                   alt={`${name || "Profile"} photo`}
                   class="hero-profile-img"
                   fetchpriority="high"
@@ -169,7 +172,11 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                     >
                       <div class="card-in-hand-image">
                         <img
-                          src={typeof item.src === 'string' ? item.src : item.src.src}
+                          src={
+                            typeof item.src === "string"
+                              ? item.src
+                              : item.src.src
+                          }
                           alt={item.label}
                           draggable="false"
                           loading="lazy"
@@ -217,7 +224,16 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                       <div class="photo-stack">
                         {cardPhotos?.slice(0, 4).map((photo: any) => (
                           <div class="photo-stack-item">
-                            <img src={typeof photo.src === 'string' ? photo.src : photo.src.src} alt="Capture" loading="lazy" decoding="async" />
+                            <img
+                              src={
+                                typeof photo.src === "string"
+                                  ? photo.src
+                                  : photo.src.src
+                              }
+                              alt="Capture"
+                              loading="lazy"
+                              decoding="async"
+                            />
                           </div>
                         ))}
                       </div>
@@ -229,7 +245,16 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                   ) : (
                     <div class="bento-image-wrapper">
                       {/* Handle both optimized images (ImageMetadata with .src) and URL strings */}
-                      <img src={typeof card.image === 'string' ? card.image : card.image.src} alt={card.title} loading="lazy" decoding="async" />
+                      <img
+                        src={
+                          typeof card.image === "string"
+                            ? card.image
+                            : card.image.src
+                        }
+                        alt={card.title}
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </div>
                   )}
                 </div>
@@ -269,54 +294,119 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         <div class="experience-header">
           <div class="experience-header-content">
             <span class="experience-header-label">Comments</span>
-            <h2 class="experience-header-title">What People Say About This Website</h2>
+            <h2 class="experience-header-title">
+              What People Say About This Website
+            </h2>
           </div>
         </div>
-        <div class="remark42-container frosted-card rounded-2xl p-4 md:p-6 mt-8">
+        <div
+          class="remark42-container frosted-card rounded-2xl p-4 md:p-6 mt-8"
+        >
           <div id="remark42"></div>
         </div>
       </div>
     </section>
 
-    <!-- Remark42 Configuration -->
+    <!-- Remark42 Lazy Loader -->
     <script is:inline>
-      // Remark42 configuration - must be defined before loading the embed script
-      // Docs: https://remark42.com/docs/configuration/frontend/
-      var remark_config = {
-        host: "https://remark42.kayg.org",
-        site_id: "kayg.org",
-        components: ["embed"],
-        max_shown_comments: 15,
-        // Theme syncs with site theme
-        theme: document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark",
-        page_title: "Homepage Comments"
-      };
-    </script>
+      // =======================================================================
+      // REMARK42 LAZY LOADING
+      // =======================================================================
+      //
+      // OPTIMIZATION: Only load Remark42 scripts when the comments section
+      // becomes visible. This saves ~50-100KB of initial page load and avoids
+      // unnecessary network requests for users who don't scroll to comments.
+      //
+      // HOW IT WORKS:
+      // 1. IntersectionObserver watches the #remark42 container
+      // 2. When visible (with 100px margin), it loads the scripts
+      // 3. Theme sync observer is set up after Remark42 loads
+      //
+      // =======================================================================
 
-    <!-- Remark42 Embed Script (official loader) -->
-    <script is:inline>
-      !function(e,n){for(var o=0;o<e.length;o++){var r=n.createElement("script"),c=".js",d=n.head||n.body;"noModule"in r?(r.type="module",c=".mjs"):r.async=!0,r.defer=!0,r.src=remark_config.host+"/web/"+e[o]+c,d.appendChild(r)}}(remark_config.components||["embed"],document);
-    </script>
+      (function () {
+        let remark42Loaded = false;
 
-    <!-- Remark42 Theme Sync -->
-    <script is:inline>
-      // Sync theme changes with Remark42 when user toggles site theme
-      function syncRemark42Theme() {
-        if (window.REMARK42) {
-          const currentTheme = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
-          window.REMARK42.changeTheme(currentTheme);
+        function loadRemark42() {
+          if (remark42Loaded) return;
+          remark42Loaded = true;
+
+          // Remark42 configuration
+          window.remark_config = {
+            host: "https://remark42.kayg.org",
+            site_id: "kayg.org",
+            components: ["embed"],
+            max_shown_comments: 15,
+            theme:
+              document.documentElement.getAttribute("data-theme") === "light"
+                ? "light"
+                : "dark",
+            page_title: "Homepage Comments",
+          };
+
+          // Official Remark42 loader script (minified)
+          !(function (e, n) {
+            for (var o = 0; o < e.length; o++) {
+              var r = n.createElement("script"),
+                c = ".js",
+                d = n.head || n.body;
+              ("noModule" in r
+                ? ((r.type = "module"), (c = ".mjs"))
+                : (r.async = !0),
+                (r.defer = !0),
+                (r.src = remark_config.host + "/web/" + e[o] + c),
+                d.appendChild(r));
+            }
+          })(remark_config.components || ["embed"], document);
+
+          // Set up theme sync after loading
+          setupThemeSync();
         }
-      }
 
-      // Watch for theme changes via MutationObserver
-      const themeObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.attributeName === "data-theme") {
-            syncRemark42Theme();
+        function setupThemeSync() {
+          // Sync theme changes with Remark42
+          function syncRemark42Theme() {
+            if (window.REMARK42) {
+              const currentTheme =
+                document.documentElement.getAttribute("data-theme") === "light"
+                  ? "light"
+                  : "dark";
+              window.REMARK42.changeTheme(currentTheme);
+            }
           }
-        });
-      });
-      themeObserver.observe(document.documentElement, { attributes: true });
+
+          // Watch for theme changes via MutationObserver
+          const themeObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.attributeName === "data-theme") {
+                syncRemark42Theme();
+              }
+            });
+          });
+          themeObserver.observe(document.documentElement, { attributes: true });
+        }
+
+        // Use IntersectionObserver to lazy-load when comments section is visible
+        const commentsContainer = document.getElementById("remark42");
+        if (commentsContainer) {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  loadRemark42();
+                  observer.disconnect(); // Only need to load once
+                }
+              });
+            },
+            {
+              root: null,
+              rootMargin: "100px", // Start loading 100px before visible
+              threshold: 0,
+            },
+          );
+          observer.observe(commentsContainer);
+        }
+      })();
     </script>
   </main>
 
@@ -351,7 +441,8 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 
     // Initialize or retrieve the cleanup registry
     const cleanup: HomepageCleanup =
-      (window as any).__homepageCleanup || ((window as any).__homepageCleanup = {});
+      (window as any).__homepageCleanup ||
+      ((window as any).__homepageCleanup = {});
 
     const cardHand = document.getElementById("card-hand");
     const cards = document.querySelectorAll(

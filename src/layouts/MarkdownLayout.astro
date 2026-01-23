@@ -40,9 +40,43 @@ const formattedCreatedDate = createdDate ? formatDate(createdDate) : null;
 
 // In-progress state
 const displayInProgress = entry?.data?.["display-in-progress"] === true;
+
+// Generate Article JSON-LD schema for blog posts (only if we have a date)
+const articleSchema = createdDate ? {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description || "",
+  "datePublished": new Date(createdDate).toISOString(),
+  ...(lastEdited && { "dateModified": new Date(lastEdited).toISOString() }),
+  ...(coverImage && { 
+    "image": typeof coverImage === "string" 
+      ? `https://kayg.org${coverImage}` 
+      : `https://kayg.org${coverImage.src}` 
+  }),
+  "author": {
+    "@type": "Person",
+    "@id": "https://kayg.org/#person",
+    "name": "K Gopal Krishna"
+  },
+  "publisher": {
+    "@type": "Person",
+    "@id": "https://kayg.org/#person",
+    "name": "K Gopal Krishna"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": Astro.url.href
+  }
+} : null;
 ---
 
 <BaseLayout title={title} description={description} displayInProgress={displayInProgress}>
+  {/* Article JSON-LD Schema - only rendered for date-based content like blog posts */}
+  {articleSchema && (
+    <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+  )}
+
   <div class="md-page-container">
     <!-- Unified Single Card for entire page -->
     <div class="frosted-card md-unified-card">
