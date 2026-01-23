@@ -5,6 +5,23 @@ description: A log of notable changes, updates, and improvements to this website
 last edited: 2026-01-23 12:44:23
 ---
 
+## 2026-01-23 Friday
+
+- **SEO Improvements**
+  - Added JSON-LD structured data for Person, WebSite, and BreadcrumbList schemas
+  - Added Article schema with rich snippets for blog posts
+  - Fixed Open Graph image URL to be absolute
+  - Verified robots.txt and sitemap generation
+
+- **Performance**
+  - Implemented lazy-loading for Remark42 comments (saves ~50-100KB initial load)
+  - Updated Astro to v5.16.15
+
+- **Content & Refactoring**
+  - Refactored footer copyright text and social links to be data-driven (in home content)
+  - Moved resume.pdf to public folder for proper static serving
+  - Added Mastodon, Telegram, and LinkedIn icons to UI
+  - Added generic Link icon fallback for future proofing
 ## 2026-01-22 Thursday
 
 - **Remark42 Comment System**
