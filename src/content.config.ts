@@ -8,8 +8,8 @@
  *
  * ARCHITECTURE OVERVIEW:
  * ----------------------
- * Content is stored externally in `/Users/kayg/Developer/website-content/`
- * (separate from the code repository for clean separation of concerns).
+ * Content is stored in `src/content/` within the repository.
+ * The path is computed dynamically relative to this config file.
  *
  * Each collection corresponds to a content type:
  * - blog: Long-form articles
@@ -43,19 +43,24 @@
 
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
 // =============================================================================
 // CONTENT BASE PATH
 // =============================================================================
 
 /**
- * Absolute path to the external content directory.
- * Content is stored separately from code for:
- * - Clean git history (content changes don't pollute code commits)
- * - Potential future CMS integration
- * - Easier content backup/sync workflows
+ * Dynamically computed path to the content directory.
+ *
+ * Uses import.meta.url to get the current file's location, then resolves
+ * the 'content' folder relative to it. This approach:
+ * - Works regardless of where the project is cloned
+ * - Doesn't break when moving/renaming the project folder
+ * - Is the standard ESM way to replace __dirname
  */
-const CONTENT_BASE = "/Users/kayg/Developer/website-content";
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const CONTENT_BASE = join(__dirname, "content");
 
 // =============================================================================
 // SCHEMAS
