@@ -154,6 +154,12 @@ import { ClientRouter } from "astro:transitions";
         </svg>
       </button>
       <img id="zoomed-image" class="zoomed-image" src="" alt="" />
+      <!-- Caption/description display for gallery images -->
+      <div id="zoom-caption" class="zoom-caption">
+        <p id="zoom-caption-title" class="zoom-caption-title"></p>
+        <p id="zoom-caption-description" class="zoom-caption-description"></p>
+        <p id="zoom-caption-meta" class="zoom-caption-meta"></p>
+      </div>
       <!-- Navigation controls in flex container for proper alignment -->
       <div class="zoom-controls">
         <button
@@ -1046,10 +1052,15 @@ import { ClientRouter } from "astro:transitions";
         // ---------------------------------------------------------------------
         function closeOverlay() {
           const overlay = document.getElementById("zoom-overlay");
+          const caption = document.getElementById("zoom-caption");
           if (overlay) {
             overlay.classList.remove("active", "gallery-mode");
             document.body.style.overflow = "";
             (window as any).__galleryState.isGalleryMode = false;
+          }
+          // Hide caption when closing
+          if (caption) {
+            caption.classList.remove("visible");
           }
         }
 
@@ -1065,6 +1076,12 @@ import { ClientRouter } from "astro:transitions";
           const nextBtn = document.getElementById(
             "zoom-next",
           ) as HTMLButtonElement;
+          
+          // Caption elements
+          const caption = document.getElementById("zoom-caption");
+          const captionTitle = document.getElementById("zoom-caption-title");
+          const captionDesc = document.getElementById("zoom-caption-description");
+          const captionMeta = document.getElementById("zoom-caption-meta");
 
           const state = (window as any).__galleryState;
           if (!overlay || !zoomedImg || !state.images || !state.images.length)
@@ -1082,10 +1099,33 @@ import { ClientRouter } from "astro:transitions";
             photoItem?.getAttribute("data-src") || img.getAttribute("src");
           const alt =
             photoItem?.getAttribute("data-alt") || img.getAttribute("alt");
+          
+          // Get description and metadata from photo-item data attributes
+          const description = photoItem?.getAttribute("data-description") || "";
+          const location = photoItem?.getAttribute("data-location") || "";
+          const camera = photoItem?.getAttribute("data-camera") || "";
 
           if (fullSrc) {
             zoomedImg.src = fullSrc;
             zoomedImg.alt = alt || "";
+          }
+
+          // Update caption (only for gallery images with data)
+          if (caption && captionTitle && captionDesc && captionMeta) {
+            const hasCaption = alt || description || location || camera;
+            
+            if (hasCaption && state.isGalleryMode) {
+              captionTitle.textContent = alt || "";
+              captionDesc.textContent = description;
+              
+              // Build meta line (location · camera)
+              const metaParts = [location, camera].filter(Boolean);
+              captionMeta.textContent = metaParts.join(" · ");
+              
+              caption.classList.add("visible");
+            } else {
+              caption.classList.remove("visible");
+            }
           }
 
           // Update counter

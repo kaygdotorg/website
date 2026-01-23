@@ -1,0 +1,299 @@
+import { defineCollection, z } from 'astro:content';
+
+// Base schema for dated entries (now, uses, talks)
+const createDatedEntrySchema = ({ image }: { image: any }) => z.object({
+  title: z.string(),
+  description: z.string().optional(),
+  excerpt: z.string().optional(), // Short summary for timeline view
+  date: z.coerce.date(), // Required for timeline entries - auto-coerces strings to Date
+  "last edited": z.coerce.date().optional(),
+  "cover-image": z.preprocess((val) => {
+    if (typeof val === 'string') {
+      const match = val.match(/\[.*\]\((.*)\)/) || val.match(/\((.*)\)/) || val.match(/<(.*)>/);
+      return match ? match[1].replace(/[<>]/g, '').trim() : val.trim();
+    }
+    return val;
+  }, z.union([image(), z.string().url()]).optional()),
+});
+
+// Collection for /now entries
+const now = defineCollection({
+  type: 'content',
+  schema: createDatedEntrySchema,
+});
+
+// Collection for /uses entries
+const uses = defineCollection({
+  type: 'content',
+  schema: createDatedEntrySchema,
+});
+
+// =============================================================================
+// PAGES SCHEMA
+// =============================================================================
+// 
+// Schema for index.md files in src/content/pages/{pagename}/ folders.
+// These are "landing pages" for sections (e.g., /talks, /blog, /about).
+//
+// DISPLAY PROPERTIES:
+// - display-table-of-contents: Controls TOC visibility (default: false for pages)
+// - display-dates: Controls date metadata visibility (default: false for pages)
+//
+// For regular posts (non-index.md files), these default to TRUE at runtime.
+// This distinction is handled in the rendering logic, not here in the schema.
+//
+// =============================================================================
+const pages = defineCollection({
+  type: 'content',
+  schema: ({ image }) => z.object({
+    // ---------------------------------------------------------------------
+    // Core Properties
+    // ---------------------------------------------------------------------
+    title: z.string(),
+    description: z.string().optional(), // Description for page header and SEO
+    slug: z.string().optional(), // Custom URL slug (e.g., /talks)
+
+    // Obsidian frontmatter compatibility
+    date: z.coerce.date().optional(), // Created/Published date
+    "last edited": z.coerce.date().optional(), // Last Updated date
+    lastUpdated: z.string().optional(), // Legacy field
+
+    // ---------------------------------------------------------------------
+    // Display Control Properties (prefixed with display-)
+    // These control rendering behavior without conflicting with content data
+    // ---------------------------------------------------------------------
+
+    /**
+     * Controls whether Table of Contents is shown.
+     * - Pages (index.md): default false
+     * - Posts (other .md): default true (handled at runtime)
+     */
+    "display-table-of-contents": z.boolean().optional().default(false),
+
+    /**
+     * Controls whether date metadata (created, last edited) is shown.
+     * - Pages (index.md): default false  
+     * - Posts (other .md): default true (handled at runtime)
+     */
+    "display-dates": z.boolean().optional().default(false),
+
+    /**
+     * Shows a "work in progress" card instead of page content.
+     * Useful for pages that are not yet complete.
+     */
+    "display-in-progress": z.boolean().optional().default(false),
+
+    /**
+     * Controls whether comments section (remark42) is shown.
+     * - Pages (index.md): default false
+     * - Posts: default true (set in blog/notes schemas)
+     * - Home page: handled separately in index.astro
+     */
+    "display-comments": z.boolean().optional().default(false),
+
+    /**
+     * Cover image for OG tags and potential hero display.
+     */
+    "cover-image": z.string().optional(),
+
+    /**
+     * Draft mode - hides from production.
+     */
+    draft: z.boolean().optional().default(false),
+
+    // ---------------------------------------------------------------------
+    // Home Page Specific Fields (optional for other pages)
+    // ---------------------------------------------------------------------
+    name: z.string().optional(),
+    tagline: z.string().optional(),
+    // profileImage: local images (relative paths) get optimized, URLs pass through
+    profileImage: z.union([image(), z.string()]).optional(),
+    email: z.string().optional(),
+    quote: z.string().optional(),
+
+    interests: z.array(z.string()).optional(),
+
+    socialLinks: z.array(z.object({
+      label: z.string(),
+      url: z.string(),
+    })).optional(),
+
+    // cardPhotos for hero section - src can be local image or URL
+    cardPhotos: z.array(z.object({
+      src: z.union([image(), z.string()]),
+      label: z.string(),
+      href: z.string(),
+      date: z.string().optional(),
+    })).optional(),
+
+    recentWriting: z.array(z.object({
+      title: z.string(),
+      date: z.string(),
+      href: z.string(),
+    })).optional(),
+
+    projects: z.array(z.object({
+      title: z.string(),
+      description: z.string(),
+      link: z.string(),
+    })).optional(),
+
+    // Bento Grid cards - image can be local (optimized) or URL/special string
+    bentoCards: z.array(z.object({
+      id: z.string(),
+      title: z.string(),
+      category: z.string(),
+      summary: z.string(),
+      href: z.string(),
+      image: z.union([image(), z.string()]),
+    })).optional(),
+    workExperience: z.array(z.object({
+      role: z.string(),
+      company: z.string(),
+      startDate: z.string(),
+      endDate: z.string(),
+      isCurrent: z.boolean().optional(),
+    })).optional(),
+    resumeUrl: z.string().optional(),
+  }),
+});
+
+/**
+ * Photos collection for the photography gallery.
+ * Each markdown file represents one photo with metadata in frontmatter
+ * and an optional description/story in the markdown body.
+ */
+const photos = defineCollection({
+  type: 'content',
+  schema: z.object({
+    // Image URLs (external hosting recommended)
+    src: z.string().url(),           // Full-size image URL
+    thumb: z.string().url().optional(), // Thumbnail URL (falls back to src if not provided)
+    alt: z.string(),                 // Alt text for accessibility
+    
+    // Metadata
+    title: z.string().optional(),    // Optional title (defaults to alt if not set)
+    category: z.string(),            // For filtering (e.g., Landscape, Urban, Portrait)
+    location: z.string().optional(), // Where the photo was taken
+    date: z.coerce.date().optional(), // When the photo was taken
+    camera: z.string().optional(),   // Camera/lens info
+  }),
+});
+
+// Schema for blog posts (from Ghost)
+const blog = defineCollection({
+  type: 'content',
+  schema: ({ image }) => z.object({
+    title: z.string(),
+    slug: z.string().optional(), // Custom URL slug
+    description: z.string().optional(),
+    excerpt: z.string().optional(), // Short summary for page header
+    date: z.coerce.date(),
+    "last edited": z.coerce.date().optional(),
+    tags: z.array(z.string()).nullable().optional(),
+    "cover-image": z.preprocess((val) => {
+      if (typeof val === 'string') {
+        const match = val.match(/\[.*\]\((.*)\)/) || val.match(/\((.*)\)/) || val.match(/<(.*)>/);
+        return match ? match[1].replace(/[<>]/g, '').trim() : val.trim();
+      }
+      return val;
+    }, z.union([image(), z.string().url()]).optional()),
+    draft: z.boolean().optional().default(false),
+    "display-comments": z.boolean().optional().default(true),
+  }),
+});
+
+// Collection for /talks entries
+const talks = defineCollection({
+  type: 'content',
+  schema: createDatedEntrySchema,
+});
+
+// Collection for /notes entries (similar to writing/blog)
+const notes = defineCollection({
+  type: 'content',
+  schema: ({ image }) => z.object({
+    title: z.string(),
+    slug: z.string().optional(),
+    description: z.string().optional(),
+    excerpt: z.string().optional(), // Short summary for page header
+    date: z.coerce.date(),
+    "last edited": z.coerce.date().optional(),
+    tags: z.array(z.string()).nullable().optional(),
+    "cover-image": z.preprocess((val) => {
+      if (typeof val === 'string') {
+        const match = val.match(/\[.*\]\((.*)\)/) || val.match(/\((.*)\)/) || val.match(/<(.*)>/);
+        return match ? match[1].replace(/[<>]/g, '').trim() : val.trim();
+      }
+      return val;
+    }, z.union([image(), z.string().url()]).optional()),
+    draft: z.boolean().optional().default(false),
+    "display-comments": z.boolean().optional().default(true),
+  }),
+});
+
+// =============================================================================
+// HOME COLLECTION
+// =============================================================================
+// 
+// Special collection for the home page content at src/content/home/index.md.
+// This uses the same schema as pages since it has the same frontmatter structure.
+//
+// =============================================================================
+const home = defineCollection({
+  type: 'content',
+  schema: pages.schema,
+});
+
+// =============================================================================
+// CHANGELOG COLLECTION
+// =============================================================================
+// 
+// Collection for the changelog page at src/content/changelog/index.md.
+// Uses a simple schema for changelog entries.
+//
+// =============================================================================
+const changelog = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    slug: z.string().optional(),
+    date: z.coerce.date().optional(),
+    "last edited": z.coerce.date().optional(),
+  }),
+});
+
+const about = defineCollection({
+  type: 'content',
+  schema: pages.schema,
+});
+
+const contact = defineCollection({
+  type: 'content',
+  schema: pages.schema,
+});
+
+const homelab = defineCollection({
+  type: 'content',
+  schema: pages.schema,
+});
+
+const photography = defineCollection({
+  type: 'content',
+  schema: pages.schema,
+});
+
+export const collections = {
+  now,
+  uses,
+  blog,
+  talks,
+  notes,
+  home,
+  changelog,
+  about,
+  contact,
+  homelab,
+  photography,
+  // photos, // Temporarily disabled for debugging
+};

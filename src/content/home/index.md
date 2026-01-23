@@ -5,12 +5,6 @@ tagline: Infrastructure Engineer, dead cinephile, hobbyist bodybuilder.
 profileImage: ./hero-picture.jpeg
 email: mail@kayg.org
 
-interests:
-  - SwiftUI & iOS development
-  - Fitness & health
-  - Personal knowledge management
-  - Photography
-
 socialLinks:
   - label: GitHub
     url: https://github.com
@@ -46,55 +40,13 @@ cardPhotos:
     href: /notes
     date: Jan 2026
 
-recentWriting:
-  - title: Building in public
-    date: Dec 2024
-    href: /blog
-  - title: On digital gardens
-    date: Nov 2024
-    href: /blog
-  - title: Tools for thought
-    date: Oct 2024
-    href: /blog
-
-projects:
-  - title: Project One
-    description: A brief description of what this project does and why it matters.
-    link: "#"
-  - title: Project Two
-    description: Another project showcasing different skills and interests.
-    link: "#"
-
-quote: "The best time to plant a tree was 20 years ago. The second best time is now."
-
-workExperience:
-  - role: Support Engineer
-    company: croit GmbH
-    startDate: Feb 2022
-    endDate: Present
-    isCurrent: true
-  - role: Systemd Unit Translator
-    company: Google Summer of Code
-    startDate: May 2020
-    endDate: Aug 2020
-  - role: Devops Engineer
-    company: IDS Logic
-    startDate: May 2019
-    endDate: Aug 2019
-  - role: Devops Engineer
-    company: IDS Logic
-    startDate: May 2018
-    endDate: Aug 2018
-
-resumeUrl: /resume.pdf
-
 bentoCards:
   - id: talks
     title: Public Speaking
     category: Talks
     summary: Latest presentations at technical conferences and local meetups.
     href: /talks
-    image: ../../images/talks-bento-grid.jpeg
+    image: ./talks-bento-grid.jpeg
   - id: blog
     title: Latest Thinking
     category: Writing
@@ -124,7 +76,7 @@ bentoCards:
     category: Uses
     summary: The hardware and software tools I use to build and create every day.
     href: /uses
-    image: ../../images/uses-bento-grid.jpeg
+    image: ./uses-bento-grid.jpeg
   - id: homelab
     title: Home Lab
     category: Infrastructure
@@ -136,14 +88,36 @@ bentoCards:
     category: Profile
     summary: More about my journey, philosophy, and the things that drive me forward.
     href: /about
-    image: ../../images/hero-picture.jpeg
+    image: ./hero-picture.jpeg
   - id: contact
     title: Say Hello
     category: Contact
     summary: I'm always open to interesting conversations and collaborations. Reach out via email.
     href: /contact
     image: https://images.unsplash.com/photo-1523966211575-eb4a01e7dd51?w=800&q=80
+
+resumeUrl: /resume.pdf
+
+workExperience:
+  - role: Support Engineer
+    company: croit GmbH
+    startDate: Feb 2022
+    endDate: Present
+    isCurrent: true
+  - role: Systemd Unit Translator
+    company: Google Summer of Code
+    startDate: May 2020
+    endDate: Aug 2020
+  - role: Devops Engineer
+    company: IDS Logic
+    startDate: May 2019
+    endDate: Aug 2019
+  - role: Devops Engineer
+    company: IDS Logic
+    startDate: May 2018
+    endDate: Aug 2018
+
+
 date: 2026-01-19 21:02:22
 last edited: 2026-01-23 12:45:07
 ---
-I'm a curious person who enjoys building software, capturing moments through photography, and thinking about how tools shape our minds.

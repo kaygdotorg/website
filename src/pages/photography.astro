@@ -29,7 +29,7 @@
  * - camera: Camera/equipment used (optional)
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 
 // =============================================================================
 // DATA FETCHING
@@ -68,18 +68,30 @@ const photoEntries = allEntries.filter(
 /**
  * Transform photo entries into display format.
  * Normalizes the data structure for consistent template rendering.
+ * Extracts body content as description for hover/zoom display.
  */
-const photos = photoEntries.map((photo) => ({
-  src: photo.data.src,
-  thumb: photo.data.thumb || photo.data.src, // Fallback to full-res if no thumb
-  alt: photo.data.alt,
-  title: photo.data.title || photo.data.alt,
-  category: photo.data.category,
-  location: photo.data.location,
-  date: photo.data.date,
-  camera: photo.data.camera,
-  id: photo.id, // Use entry.id instead of slug (Astro 5 compatibility)
-}));
+const photos = await Promise.all(
+  photoEntries.map(async (photo) => {
+    // Render the markdown body to extract the description
+    const { Content, headings } = await render(photo);
+    // Get raw body text by rendering to string (simple extraction)
+    // The body is the markdown content after frontmatter
+    const bodyText = photo.body?.trim() || "";
+
+    return {
+      src: photo.data.src,
+      thumb: photo.data.thumb || photo.data.src, // Fallback to full-res if no thumb
+      alt: photo.data.alt,
+      title: photo.data.title || photo.data.alt,
+      category: photo.data.category,
+      location: photo.data.location,
+      date: photo.data.date,
+      camera: photo.data.camera,
+      id: photo.id, // Use entry.id instead of slug (Astro 5 compatibility)
+      description: bodyText, // Body content as description
+    };
+  })
+);
 
 /**
  * Sort photos by date (newest first).
@@ -153,6 +165,9 @@ const isInProgress = entry.data["display-in-progress"] === true;
           data-category={photo.category}
           data-src={photo.src}
           data-alt={photo.alt}
+          data-description={photo.description}
+          data-location={photo.location}
+          data-camera={photo.camera}
           style={`animation-delay: ${index * 0.1}s`}
         >
           <img
@@ -163,6 +178,9 @@ const isInProgress = entry.data["display-in-progress"] === true;
           />
           <div class="photo-overlay">
             <p class="font-medium text-lg">{photo.alt}</p>
+            {photo.description && (
+              <p class="text-sm opacity-90 mt-1 line-clamp-2">{photo.description}</p>
+            )}
             <p class="text-sm opacity-70 mt-1">
               {photo.location} · {photo.category}
             </p>
