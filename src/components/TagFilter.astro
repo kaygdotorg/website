@@ -1,125 +1,197 @@
 ---
+/**
+ * =============================================================================
+ * TAG FILTER COMPONENT
+ * =============================================================================
+ *
+ * Interactive tag filter buttons for filtering content cards.
+ * Used on blog and notes list pages to filter entries by tag.
+ *
+ * HOW IT WORKS:
+ * 1. Displays an "All" button plus buttons for each tag (with counts)
+ * 2. Clicking a tag button filters visible cards via CSS class toggle
+ * 3. Cards must have data-tags attribute with JSON array of tags
+ *
+ * USAGE:
+ * ```astro
+ * <TagFilter
+ *   tags={tagCounts}           // Array of { tag: string, count: number }
+ *   totalCount={posts.length}  // Total number of items
+ *   cardSelector=".post-card"  // CSS selector for cards to filter
+ *   maxTags={10}               // Optional: max tags to show (default: 10)
+ * />
+ * ```
+ *
+ * REQUIREMENTS:
+ * - Cards must have data-tags attribute: data-tags={JSON.stringify(tags)}
+ * - Cards must have a class matching cardSelector (e.g., "post-card")
+ * - Page must have .hidden CSS class that hides elements
+ */
+
+// =============================================================================
+// TYPES
+// =============================================================================
+
 interface TagCount {
-    tag: string;
-    count: number;
+  /** Tag name */
+  tag: string;
+  /** Number of items with this tag */
+  count: number;
 }
 
 interface Props {
-    /** Array of tag objects with name and count */
-    tags: TagCount[];
-    /** Total number of items (for "All" button) */
-    totalCount: number;
-    /** CSS selector for cards to filter (e.g., ".post-card" or ".note-card") */
-    cardSelector: string;
-    /** Maximum number of tags to display (default: 10) */
-    maxTags?: number;
+  /** Array of tag objects with name and count */
+  tags: TagCount[];
+
+  /** Total number of items (displayed on "All" button) */
+  totalCount: number;
+
+  /** CSS selector for cards to filter (e.g., ".post-card", ".note-card") */
+  cardSelector: string;
+
+  /** Maximum number of tags to display (default: 10) */
+  maxTags?: number;
 }
 
 const { tags, totalCount, cardSelector, maxTags = 10 } = Astro.props;
 ---
 
-{
-    tags.length > 0 && (
-        <div
-            class="tag-filter-container flex flex-wrap gap-2 mb-10 animate-fade-up stagger-1"
-            data-card-selector={cardSelector}
-        >
-            <button
-                class="tag-filter active px-3 py-1.5 rounded-full text-sm transition-all"
-                data-tag="all"
-            >
-                All ({totalCount})
-            </button>
-            {tags.slice(0, maxTags).map((item) => (
-                <button
-                    class="tag-filter px-3 py-1.5 rounded-full text-sm transition-all"
-                    data-tag={item.tag}
-                >
-                    {item.tag} ({item.count})
-                </button>
-            ))}
-        </div>
-    )
-}
+{/* Only render if there are tags to display */}
+{tags.length > 0 && (
+  <div
+    class="tag-filter-container flex flex-wrap gap-2 mb-10 animate-fade-up stagger-1"
+    data-card-selector={cardSelector}
+  >
+    {/* "All" button - shows total count, always first */}
+    <button
+      class="tag-filter active px-3 py-1.5 rounded-full text-sm transition-all"
+      data-tag="all"
+    >
+      All ({totalCount})
+    </button>
 
+    {/* Individual tag buttons - limited to maxTags */}
+    {tags.slice(0, maxTags).map((item) => (
+      <button
+        class="tag-filter px-3 py-1.5 rounded-full text-sm transition-all"
+        data-tag={item.tag}
+      >
+        {item.tag} ({item.count})
+      </button>
+    ))}
+  </div>
+)}
+
+{/* =============================================================================
+    STYLES
+    Global styles for tag filter buttons with dark/light mode support.
+    Using is:global because the script may clone buttons and we need
+    styles to persist.
+    ============================================================================= */}
 <style is:global>
-    .tag-filter {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: var(--fallback-bc, #f8f4fc);
-        opacity: 0.7;
-    }
+  /* Base tag filter button styles */
+  .tag-filter {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--fallback-bc, #f8f4fc);
+    opacity: 0.7;
+  }
 
-    .tag-filter:hover,
-    .tag-filter.active {
-        background: rgba(244, 114, 182, 0.15);
-        border-color: rgba(244, 114, 182, 0.3);
-        color: var(--color-accent-500, #ec4899);
-        opacity: 1;
-    }
+  /* Hover and active states */
+  .tag-filter:hover,
+  .tag-filter.active {
+    background: rgba(244, 114, 182, 0.15);
+    border-color: rgba(244, 114, 182, 0.3);
+    color: var(--color-accent-500, #ec4899);
+    opacity: 1;
+  }
 
-    [data-theme="light"] .tag-filter {
-        background: rgba(0, 0, 0, 0.03);
-        border-color: rgba(0, 0, 0, 0.1);
-        color: #1a1225;
-    }
+  /* Light mode overrides */
+  [data-theme="light"] .tag-filter {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #1a1225;
+  }
 
-    [data-theme="light"] .tag-filter:hover,
-    [data-theme="light"] .tag-filter.active {
-        background: rgba(236, 72, 153, 0.1);
-        border-color: rgba(236, 72, 153, 0.3);
-        color: var(--color-accent-600, #db2777);
-        opacity: 1;
-    }
+  [data-theme="light"] .tag-filter:hover,
+  [data-theme="light"] .tag-filter.active {
+    background: rgba(236, 72, 153, 0.1);
+    border-color: rgba(236, 72, 153, 0.3);
+    color: var(--color-accent-600, #db2777);
+    opacity: 1;
+  }
 </style>
 
+{/* =============================================================================
+    FILTER SCRIPT
+    Handles tag filter interactions. Designed to work with View Transitions.
+    ============================================================================= */}
 <script>
-    function initTagFilters() {
-        const containers = document.querySelectorAll(".tag-filter-container");
+  /**
+   * Initialize tag filter functionality for all filter containers on the page.
+   *
+   * TECHNICAL NOTES:
+   * - We clone buttons to remove old event listeners (prevents duplicates
+   *   after view transitions)
+   * - Each container tracks its own card selector to support multiple
+   *   independent filters on one page
+   * - Cards are shown/hidden via the "hidden" CSS class
+   */
+  function initTagFilters() {
+    const containers = document.querySelectorAll(".tag-filter-container");
 
-        containers.forEach((container) => {
-            const cardSelector = container.getAttribute("data-card-selector");
-            if (!cardSelector) return;
+    containers.forEach((container) => {
+      // Get the CSS selector for cards this filter controls
+      const cardSelector = container.getAttribute("data-card-selector");
+      if (!cardSelector) return;
 
-            const tagFilters = container.querySelectorAll(".tag-filter");
-            const cards = document.querySelectorAll(cardSelector);
+      const tagFilters = container.querySelectorAll(".tag-filter");
+      const cards = document.querySelectorAll(cardSelector);
 
-            if (!tagFilters.length || !cards.length) return;
+      // Skip if no filters or cards found
+      if (!tagFilters.length || !cards.length) return;
 
-            tagFilters.forEach((btn) => {
-                // Clone to remove old listeners
-                const newBtn = btn.cloneNode(true);
-                btn.parentNode?.replaceChild(newBtn, btn);
+      tagFilters.forEach((btn) => {
+        // Clone button to remove any existing event listeners
+        // This prevents duplicate handlers after view transitions
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode?.replaceChild(newBtn, btn);
 
-                newBtn.addEventListener("click", () => {
-                    // Update active state
-                    container
-                        .querySelectorAll(".tag-filter")
-                        .forEach((b) => b.classList.remove("active"));
-                    newBtn.classList.add("active");
+        newBtn.addEventListener("click", () => {
+          // Update active state on all filter buttons
+          container
+            .querySelectorAll(".tag-filter")
+            .forEach((b) => b.classList.remove("active"));
+          newBtn.classList.add("active");
 
-                    const selectedTag = newBtn.getAttribute("data-tag");
+          // Get the selected tag
+          const selectedTag = newBtn.getAttribute("data-tag");
 
-                    cards.forEach((card) => {
-                        const itemTags = JSON.parse(
-                            card.getAttribute("data-tags") || "[]",
-                        );
+          // Show/hide cards based on tag match
+          cards.forEach((card) => {
+            // Parse the tags array from the card's data attribute
+            const itemTags = JSON.parse(
+              card.getAttribute("data-tags") || "[]"
+            );
 
-                        if (
-                            selectedTag === "all" ||
-                            itemTags.includes(selectedTag)
-                        ) {
-                            card.classList.remove("hidden");
-                        } else {
-                            card.classList.add("hidden");
-                        }
-                    });
-                });
-            });
+            // Show card if "all" selected or tag matches
+            const shouldShow =
+              selectedTag === "all" || itemTags.includes(selectedTag);
+
+            if (shouldShow) {
+              card.classList.remove("hidden");
+            } else {
+              card.classList.add("hidden");
+            }
+          });
         });
-    }
+      });
+    });
+  }
 
-    // Init on first load and on view transitions
-    initTagFilters();
-    document.addEventListener("astro:page-load", initTagFilters);
+  // Initialize on first page load
+  initTagFilters();
+
+  // Re-initialize after Astro view transitions
+  document.addEventListener("astro:page-load", initTagFilters);
 </script>

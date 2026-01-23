@@ -1,119 +1,206 @@
 ---
 /**
- * Unified Dynamic Route for Content Detail Pages
+ * =============================================================================
+ * UNIFIED CONTENT DETAIL PAGE ([collection]/[slug])
+ * =============================================================================
  *
- * This single file handles detail pages for multiple content collections:
- * blog, notes, talks, now, uses. Each page:
- * - Fetches the entry from the appropriate collection
- * - Renders using MarkdownLayout with prev/next navigation
- * - Displays tags if the collection supports them
+ * A single dynamic route that handles detail pages for multiple collections.
+ * This consolidation reduces code duplication - instead of 5 separate files,
+ * we have one unified handler.
  *
- * This consolidation eliminates 5 separate [slug].astro files into one.
+ * SUPPORTED ROUTES:
+ * - /blog/[slug]     → Blog post detail
+ * - /notes/[slug]    → Technical note detail
+ * - /talks/[slug]    → Talk/presentation detail
+ * - /now/[slug]      → "Now" entry detail
+ * - /uses/[slug]     → "Uses" entry detail
  *
- * Supported routes:
- * - /blog/[slug]
- * - /notes/[slug]
- * - /talks/[slug]
- * - /now/[slug]
- * - /uses/[slug]
+ * FEATURES:
+ * - Markdown rendering with MarkdownLayout
+ * - Prev/next navigation (backlinks)
+ * - Tag display (for collections that support tags)
+ * - Reading time calculation
+ * - Cover image support
+ *
+ * HOW IT WORKS:
+ * 1. getStaticPaths() generates all possible routes at build time
+ * 2. For each route, we pass the entry and collection name as props
+ * 3. The page renders the entry using the appropriate configuration
+ *
+ * @see src/utils/content.ts for CONTENT_COLLECTIONS configuration
  */
 import MarkdownLayout from "../../layouts/MarkdownLayout.astro";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 import {
-    calculateReadingTime,
-    getUrlSlug,
-    buildBacklinks,
-    CONTENT_COLLECTIONS,
-    type ContentCollection,
+  calculateReadingTime,
+  getUrlSlug,
+  buildBacklinks,
+  CONTENT_COLLECTIONS,
+  type ContentCollection,
 } from "../../utils/content";
 
+// =============================================================================
+// STATIC PATH GENERATION
+// =============================================================================
+
+/**
+ * Generate all static paths for this dynamic route.
+ *
+ * This runs at build time and creates a page for every entry in every
+ * supported collection. Astro uses this to pre-render all pages.
+ */
 export async function getStaticPaths() {
-    const collections: ContentCollection[] = [
-        "blog",
-        "notes",
-        "talks",
-        "now",
-        "uses",
-    ];
+  // All collections handled by this route
+  const collections: ContentCollection[] = [
+    "blog",
+    "notes",
+    "talks",
+    "now",
+    "uses",
+  ];
 
-    // Generate paths for all entries across all collections
-    const paths = await Promise.all(
-        collections.map(async (collectionName) => {
-            const entries = await getCollection(
-                collectionName,
-                ({ id }) => id !== "index.md",
-            );
-            return entries.map((entry) => ({
-                params: {
-                    collection: collectionName,
-                    slug: getUrlSlug(entry),
-                },
-                props: { entry, collectionName },
-            }));
-        }),
-    );
+  // Generate paths for all entries across all collections
+  const paths = await Promise.all(
+    collections.map(async (collectionName) => {
+      // Fetch all entries except the index (landing page)
+      const entries = await getCollection(
+        collectionName,
+        ({ id }) => id !== "index"
+      );
 
-    return paths.flat();
+      // Map each entry to a route
+      return entries.map((entry) => ({
+        params: {
+          collection: collectionName,
+          slug: getUrlSlug(entry),
+        },
+        props: {
+          entry,
+          collectionName,
+        },
+      }));
+    })
+  );
+
+  // Flatten the nested arrays into a single array of paths
+  return paths.flat();
 }
 
+// =============================================================================
+// PROPS & DATA
+// =============================================================================
+
 interface Props {
-    entry: any;
-    collectionName: ContentCollection;
+  /** The content entry to render */
+  entry: any;
+  /** The collection this entry belongs to */
+  collectionName: ContentCollection;
 }
 
 const { entry, collectionName } = Astro.props;
-const { Content } = await entry.render();
 
-// Get collection config
+// -----------------------------------------------------------------------------
+// RENDER CONTENT
+// -----------------------------------------------------------------------------
+
+/**
+ * Render the markdown content to HTML.
+ *
+ * ASTRO 5 NOTE: We import render() from astro:content and call it with
+ * the entry, rather than calling entry.render() (which was the Astro 4 way).
+ */
+const { Content } = await render(entry);
+
+// -----------------------------------------------------------------------------
+// CONFIGURATION
+// -----------------------------------------------------------------------------
+
+/**
+ * Get collection-specific configuration (labels, base paths, features).
+ */
 const config = CONTENT_COLLECTIONS[collectionName];
 
-// Calculate reading time
+// -----------------------------------------------------------------------------
+// METADATA
+// -----------------------------------------------------------------------------
+
+/**
+ * Calculate reading time from entry body.
+ * Returns minutes (minimum 1).
+ */
 const readingTime = calculateReadingTime(entry.body);
 
-// Get dates
+/**
+ * Extract dates from frontmatter.
+ * - createdDate: When the entry was first published
+ * - lastEdited: When the entry was last modified (optional)
+ */
 const createdDate = entry.data.date;
 const lastEdited = entry.data["last edited"];
 
-// Get all entries for prev/next navigation (exclude index.md, drafts)
+// -----------------------------------------------------------------------------
+// NAVIGATION (BACKLINKS)
+// -----------------------------------------------------------------------------
+
+/**
+ * Fetch all published entries for prev/next navigation.
+ * Excludes:
+ * - Index entries (landing pages)
+ * - Draft entries
+ */
 const allEntries = await getCollection(
-    collectionName,
-    ({ id, data }) => id !== "index.md" && !data.draft,
-);
-const sortedEntries = allEntries.sort(
-    (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+  collectionName,
+  ({ id, data }) => id !== "index" && !data.draft
 );
 
-// Build backlinks
+/**
+ * Sort entries by date (newest first) for chronological navigation.
+ */
+const sortedEntries = allEntries.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+/**
+ * Build navigation backlinks:
+ * - Link back to collection index
+ * - Link to previous entry (older)
+ * - Link to next entry (newer)
+ */
 const backlinks = buildBacklinks(
-    config.basePath,
-    config.label,
-    sortedEntries,
-    entry,
+  config.basePath,
+  config.label,
+  sortedEntries,
+  entry
 );
 ---
 
 <MarkdownLayout
-    title={entry.data.title}
-    description={entry.data.description}
-    entry={entry}
-    createdDate={createdDate}
-    lastEdited={lastEdited}
-    readingTime={readingTime}
-    backlinks={backlinks}
-    coverImage={entry.data["cover-image"]}
+  title={entry.data.title}
+  description={entry.data.description}
+  entry={entry}
+  createdDate={createdDate}
+  lastEdited={lastEdited}
+  readingTime={readingTime}
+  backlinks={backlinks}
+  coverImage={entry.data["cover-image"]}
 >
-    {/* Render tags if collection supports them */}
-    {
-        config.hasTags && entry.data.tags && entry.data.tags.length > 0 && (
-            <div class="flex flex-wrap gap-2 mb-6">
-                {entry.data.tags.map((tag: string) => (
-                    <span class="px-3 py-1 text-xs rounded-full bg-white/10 text-white/80">
-                        {tag}
-                    </span>
-                ))}
-            </div>
-        )
-    }
+  {/* =========================================================================
+      TAGS SECTION
+      Only rendered if the collection supports tags and the entry has tags.
+      ========================================================================= */}
+  {config.hasTags && entry.data.tags && entry.data.tags.length > 0 && (
+    <div class="flex flex-wrap gap-2 mb-6">
+      {entry.data.tags.map((tag: string) => (
+        <span class="px-3 py-1 text-xs rounded-full bg-white/10 text-white/80">
+          {tag}
+        </span>
+      ))}
+    </div>
+  )}
 
-    <Content />
+  {/* =========================================================================
+      RENDERED CONTENT
+      The Content component contains the rendered markdown HTML.
+      ========================================================================= */}
+  <Content />
 </MarkdownLayout>

@@ -1,33 +1,73 @@
 ---
+/**
+ * =============================================================================
+ * NOW LIST PAGE (/now)
+ * =============================================================================
+ *
+ * Displays "What I'm doing now" updates in a timeline format.
+ * Based on the /now movement (https://nownownow.com/).
+ *
+ * FEATURES:
+ * - Page metadata from now/index.md
+ * - Timeline display of all "now" entries
+ * - Each entry shows title, date, and excerpt
+ * - Links to individual entry detail pages
+ *
+ * @see https://nownownow.com/about
+ */
 import TimelineLayout from "../../layouts/TimelineLayout.astro";
 import { getCollection } from "astro:content";
 import { getExcerpt } from "../../utils/markdown";
+import { getUrlSlug } from "../../utils/content";
 
-// Use getCollection and filter for index.md - more reliable than getEntry
+// =============================================================================
+// DATA FETCHING
+// =============================================================================
+
+/**
+ * Fetch all "now" entries from the content collection.
+ */
 const allNowEntries = await getCollection("now");
-const entry = allNowEntries.find((e) => e.id === "index.md");
+
+/**
+ * Get the index entry for page metadata (title, description).
+ */
+const entry = allNowEntries.find((e) => e.id === "index");
 
 if (!entry) {
-  throw new Error("Could not find index.md in src/content/now/");
+  throw new Error(
+    "Missing now/index.md - This file provides the page title and description."
+  );
 }
 
-const { Content } = await entry.render();
+/**
+ * Filter out the index entry to get only the timeline entries.
+ */
+const allEntries = allNowEntries.filter((e) => e.id !== "index");
 
-// Get all now entries, exclude index.md (landing page)
-const allEntries = allNowEntries.filter((e) => e.id !== "index.md");
+// =============================================================================
+// DATA TRANSFORMATION
+// =============================================================================
 
-// Transform entries for the timeline
+/**
+ * Transform entries for the TimelineLayout component.
+ * Uses getUrlSlug() to respect frontmatter slug overrides.
+ */
 const entries = allEntries.map((entry) => {
+  // Ensure date is a Date object
   const rawDate = entry.data.date;
   const date = rawDate instanceof Date ? rawDate : new Date(rawDate);
 
+  // Get URL slug - prefers frontmatter slug, falls back to entry.id
+  const slug = getUrlSlug(entry);
+
   return {
-    slug: entry.slug,
+    slug,
     title: entry.data.title,
     date: date,
     excerpt:
       entry.data.excerpt || entry.data.description || getExcerpt(entry.body),
-    href: `/now/${entry.slug}`,
+    href: `/now/${slug}`,
     coverImage: entry.data["cover-image"],
   };
 });

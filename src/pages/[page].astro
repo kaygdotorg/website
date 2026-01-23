@@ -1,54 +1,104 @@
 ---
 /**
- * Dynamic route for simple markdown pages.
+ * =============================================================================
+ * STATIC PAGE ROUTE ([page])
+ * =============================================================================
  *
- * This single file handles multiple static content pages that share the same
- * structure: about, contact, homelab. Each page:
- * - Fetches its index.md from the corresponding content collection
- * - Renders the markdown content using MarkdownLayout
- * - Displays title, dates, reading time, and cover image
+ * A dynamic route for simple markdown pages that share the same structure.
+ * This consolidates multiple nearly-identical page files into one.
  *
- * This consolidation eliminates 3 nearly-identical page files into one.
- * Note: changelog has custom styling so it remains separate.
+ * SUPPORTED PAGES:
+ * - /about    → About me page
+ * - /contact  → Contact information
+ * - /homelab  → Homelab documentation
  *
- * Supported pages: /about, /contact, /homelab
+ * NOTE: /changelog has custom styling and remains a separate file.
+ *
+ * FEATURES:
+ * - Markdown rendering with MarkdownLayout
+ * - Reading time calculation
+ * - Cover image support
+ * - Created/last edited dates
+ *
+ * HOW IT WORKS:
+ * Each page has a corresponding collection with an index.md file.
+ * The page parameter maps directly to the collection name.
  */
 import MarkdownLayout from "../layouts/MarkdownLayout.astro";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 
+// =============================================================================
+// STATIC PATH GENERATION
+// =============================================================================
+
+/**
+ * Define which collections this route handles.
+ * Each entry here will generate a page at /{name}.
+ *
+ * NOTE: changelog is excluded as it has custom styling.
+ * @see src/pages/changelog.astro
+ */
 export async function getStaticPaths() {
-    // Define which collections this route handles
-    // Note: changelog is excluded as it has custom styling (see changelog.astro)
-    const staticPages = ["about", "contact", "homelab"];
-    return staticPages.map((page) => ({
-        params: { page },
-    }));
+  const staticPages = ["about", "contact", "homelab"];
+
+  return staticPages.map((page) => ({
+    params: { page },
+  }));
 }
 
+// =============================================================================
+// DATA FETCHING
+// =============================================================================
+
+/**
+ * Get the page parameter from the URL.
+ * TypeScript needs help here since the type depends on getStaticPaths.
+ */
 const { page } = Astro.params as { page: "about" | "contact" | "homelab" };
 
-// Fetch the collection for this page
+/**
+ * Fetch the collection for this page.
+ * Each static page has a corresponding content collection.
+ */
 const allEntries = await getCollection(page);
-const entry = allEntries.find((e) => e.id === "index.md");
+
+/**
+ * Get the index entry which contains the page content.
+ * The entry ID is "index" (generated from index.md by our generateId function).
+ */
+const entry = allEntries.find((e) => e.id === "index");
 
 if (!entry) {
-    throw new Error(`Could not find index.md in src/content/${page}/`);
+  throw new Error(
+    `Missing ${page}/index.md - This file provides the page content.`
+  );
 }
 
-const { Content } = await entry.render();
+// =============================================================================
+// RENDER & METADATA
+// =============================================================================
 
-// Calculate reading time
+/**
+ * Render the markdown content to HTML.
+ * ASTRO 5: Use imported render() function instead of entry.render().
+ */
+const { Content } = await render(entry);
+
+/**
+ * Calculate reading time based on word count.
+ * Assumes average reading speed of 200 words per minute.
+ */
 const wordCount = entry.body?.split(/\s+/).length || 0;
 const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 ---
 
 <MarkdownLayout
-    title={entry.data.title}
-    entry={entry}
-    createdDate={entry.data.date}
-    lastEdited={entry.data["last edited"]}
-    readingTime={readingTime}
-    coverImage={entry.data["cover-image"]}
+  title={entry.data.title}
+  entry={entry}
+  createdDate={entry.data.date}
+  lastEdited={entry.data["last edited"]}
+  readingTime={readingTime}
+  coverImage={entry.data["cover-image"]}
 >
-    <Content />
+  <Content />
 </MarkdownLayout>

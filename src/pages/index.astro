@@ -1,33 +1,36 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Timeline from "../components/Timeline.astro";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 import { formatDateWithComma } from "../utils/dates";
 
-// Use getCollection and filter for index.md - more reliable than getEntry
+// Use getCollection and filter for index - more reliable than getEntry
+// Note: generateId in content.config.ts strips the .md extension, so ID is "index" not "index.md"
 const allHomeEntries = await getCollection("home");
-const homeEntry = allHomeEntries.find((e) => e.id === "index.md");
+const homeEntry = allHomeEntries.find((e) => e.id === "index");
 
 if (!homeEntry) {
-  throw new Error("Could not find index.md in src/content/home/");
+  throw new Error("Could not find index.md in home collection (expected id: 'index')");
 }
 
-const { Content } = await homeEntry.render();
+// Astro 5 content layer: use imported render() function instead of entry.render()
+const { Content } = await render(homeEntry);
 
-// Fetch entries from now, uses, and blog collections (exclude index.md landing pages)
-const nowEntries = await getCollection("now", ({ id }) => id !== "index.md");
-const usesEntries = await getCollection("uses", ({ id }) => id !== "index.md");
+// Fetch entries from now, uses, and blog collections (exclude index landing pages)
+// Note: generateId strips .md extension, so filter by "index" not "index.md"
+const nowEntries = await getCollection("now", ({ id }) => id !== "index");
+const usesEntries = await getCollection("uses", ({ id }) => id !== "index");
 const blogEntries = await getCollection(
   "blog",
-  ({ id, data }) => id !== "index.md" && !data.draft,
+  ({ id, data }) => id !== "index" && !data.draft,
 );
 const talksEntries = await getCollection(
   "talks",
-  ({ id }) => id !== "index.md",
+  ({ id }) => id !== "index",
 );
 const notesEntries = await getCollection(
   "notes",
-  ({ id, data }) => id !== "index.md" && !data.draft,
+  ({ id, data }) => id !== "index" && !data.draft,
 );
 
 // Sort to get latest entries

@@ -1,84 +1,128 @@
 ---
 /**
- * Notes List Page (Digital Garden)
+ * =============================================================================
+ * NOTES LIST PAGE (/notes) - Digital Garden
+ * =============================================================================
  *
- * Displays all notes with tag filtering.
- * Uses ContentCard component for consistent card rendering.
- * Includes "Digital Garden" section label to differentiate from blog.
+ * Displays all published notes with tag filtering capability.
+ * Notes are shorter, technical pieces in a "Digital Garden" style.
+ *
+ * FEATURES:
+ * - "Digital Garden" section label to differentiate from blog
+ * - Page metadata from notes/index.md
+ * - List of all published notes (excludes drafts and index)
+ * - Tag filter for narrowing down notes by topic
+ * - Consistent card rendering via ContentCard component
+ *
+ * DATA FLOW:
+ * 1. Fetch all notes entries from content collection
+ * 2. Separate index entry (page metadata) from note entries
+ * 3. Calculate tag frequency for filter display
+ * 4. Render notes using ContentCard component
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ContentCard from "../components/ContentCard.astro";
 import TagFilter from "../components/TagFilter.astro";
 import { getCollection } from "astro:content";
 
-// Get index.md for page metadata
-const allNotesEntries = await getCollection("notes");
-const entry = allNotesEntries.find((e) => e.id === "index.md");
+// =============================================================================
+// DATA FETCHING
+// =============================================================================
 
-if (!entry) {
-    throw new Error("Could not find index.md in src/content/notes/");
+/**
+ * Fetch all notes entries from the content collection.
+ */
+const allNotesEntries = await getCollection("notes");
+
+/**
+ * Get the index entry for page metadata (title, description).
+ */
+const indexEntry = allNotesEntries.find((e) => e.id === "index");
+
+if (!indexEntry) {
+  throw new Error(
+    "Missing notes/index.md - This file provides the page title and description."
+  );
 }
 
-// Get all notes, exclude drafts and index.md, sort by date
+/**
+ * Filter and sort published notes:
+ * - Exclude the index entry
+ * - Exclude drafts
+ * - Sort by date, newest first
+ */
 const notes = allNotesEntries
-    .filter((e) => e.id !== "index.md" && !e.data.draft)
-    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  .filter((entry) => entry.id !== "index" && !entry.data.draft)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-// Calculate tag counts for TagFilter
+// =============================================================================
+// TAG AGGREGATION
+// =============================================================================
+
+/**
+ * Calculate tag frequency for the tag filter.
+ */
 const tagMap = new Map<string, number>();
 notes.forEach((note) => {
-    (note.data.tags || []).forEach((tag) => {
-        tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
-    });
+  const tags = note.data.tags || [];
+  tags.forEach((tag: string) => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  });
 });
-const tagCounts = Array.from(tagMap, ([tag, count]) => ({ tag, count })).sort(
-    (a, b) => b.count - a.count,
-);
+
+const tagCounts = Array.from(tagMap, ([tag, count]) => ({ tag, count }))
+  .sort((a, b) => b.count - a.count);
 ---
 
-<BaseLayout title={entry.data.title} description={entry.data.description}>
-    <section class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
-        {/* Header */}
-        <header class="mb-12 max-w-2xl animate-fade-up">
-            <span
-                class="text-accent font-medium tracking-widest uppercase text-xs mb-3 block"
-            >
-                Digital Garden
-            </span>
-            <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
-                {entry.data.title}
-            </h1>
-            <p class="text-base-content/70 text-lg leading-relaxed">
-                {entry.data.description}
-            </p>
-        </header>
+<BaseLayout title={indexEntry.data.title} description={indexEntry.data.description}>
+  <section class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
+    {/* =====================================================================
+        PAGE HEADER
+        Includes "Digital Garden" label to distinguish from blog posts.
+        ===================================================================== */}
+    <header class="mb-12 max-w-2xl animate-fade-up">
+      <span class="text-accent font-medium tracking-widest uppercase text-xs mb-3 block">
+        Digital Garden
+      </span>
+      <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
+        {indexEntry.data.title}
+      </h1>
+      <p class="text-base-content/70 text-lg leading-relaxed">
+        {indexEntry.data.description}
+      </p>
+    </header>
 
-        {/* Tag Filter */}
-        <TagFilter
-            tags={tagCounts}
-            totalCount={notes.length}
-            cardSelector=".note-card"
+    {/* =====================================================================
+        TAG FILTER
+        Interactive filter buttons for narrowing notes by tag.
+        ===================================================================== */}
+    <TagFilter
+      tags={tagCounts}
+      totalCount={notes.length}
+      cardSelector=".note-card"
+    />
+
+    {/* =====================================================================
+        NOTES LIST
+        Grid of ContentCard components, one per published note.
+        ===================================================================== */}
+    <div class="space-y-6">
+      {notes.map((note, index) => (
+        <ContentCard
+          entry={note}
+          basePath="/notes"
+          index={index}
+          cardClass="note-card"
+          showTags={true}
         />
+      ))}
+    </div>
+  </section>
 
-        {/* Notes List */}
-        <div class="space-y-6">
-            {
-                notes.map((note, index) => (
-                    <ContentCard
-                        entry={note}
-                        basePath="/notes"
-                        index={index}
-                        cardClass="note-card"
-                        showTags={true}
-                    />
-                ))
-            }
-        </div>
-    </section>
-
-    <style>
-        .note-card.hidden {
-            display: none;
-        }
-    </style>
+  {/* Style for hiding filtered cards */}
+  <style>
+    .note-card.hidden {
+      display: none;
+    }
+  </style>
 </BaseLayout>

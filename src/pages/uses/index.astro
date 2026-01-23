@@ -1,33 +1,73 @@
 ---
+/**
+ * =============================================================================
+ * USES LIST PAGE (/uses)
+ * =============================================================================
+ *
+ * Displays "Uses" entries - documentation of tools, gear, and setup.
+ * Part of the /uses movement (https://uses.tech/).
+ *
+ * FEATURES:
+ * - Page metadata from uses/index.md
+ * - Timeline display of all "uses" entries
+ * - Each entry shows title, date, and excerpt
+ * - Links to individual entry detail pages
+ *
+ * @see https://uses.tech/
+ */
 import TimelineLayout from "../../layouts/TimelineLayout.astro";
 import { getCollection } from "astro:content";
 import { getExcerpt } from "../../utils/markdown";
+import { getUrlSlug } from "../../utils/content";
 
-// Use getCollection and filter for index.md - more reliable than getEntry
+// =============================================================================
+// DATA FETCHING
+// =============================================================================
+
+/**
+ * Fetch all "uses" entries from the content collection.
+ */
 const allUsesEntries = await getCollection("uses");
-const entry = allUsesEntries.find((e) => e.id === "index.md");
+
+/**
+ * Get the index entry for page metadata (title, description).
+ */
+const entry = allUsesEntries.find((e) => e.id === "index");
 
 if (!entry) {
-  throw new Error("Could not find index.md in src/content/uses/");
+  throw new Error(
+    "Missing uses/index.md - This file provides the page title and description."
+  );
 }
 
-const { Content } = await entry.render();
+/**
+ * Filter out the index entry to get only the timeline entries.
+ */
+const allEntries = allUsesEntries.filter((e) => e.id !== "index");
 
-// Get all uses entries, exclude index.md (landing page)
-const allEntries = allUsesEntries.filter((e) => e.id !== "index.md");
+// =============================================================================
+// DATA TRANSFORMATION
+// =============================================================================
 
-// Transform entries for the timeline
+/**
+ * Transform entries for the TimelineLayout component.
+ * Uses getUrlSlug() to respect frontmatter slug overrides.
+ */
 const entries = allEntries.map((entry) => {
+  // Ensure date is a Date object
   const rawDate = entry.data.date;
   const date = rawDate instanceof Date ? rawDate : new Date(rawDate);
 
+  // Get URL slug - prefers frontmatter slug, falls back to entry.id
+  const slug = getUrlSlug(entry);
+
   return {
-    slug: entry.slug,
+    slug,
     title: entry.data.title,
     date: date,
     excerpt:
       entry.data.excerpt || entry.data.description || getExcerpt(entry.body),
-    href: `/uses/${entry.slug}`,
+    href: `/uses/${slug}`,
     coverImage: entry.data["cover-image"],
   };
 });

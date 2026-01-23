@@ -1,0 +1,272 @@
+/**
+ * =============================================================================
+ * ASTRO 5 CONTENT COLLECTIONS CONFIGURATION
+ * =============================================================================
+ *
+ * This file defines all content collections for the site using Astro 5's
+ * Content Layer API with the built-in glob() loader.
+ *
+ * ARCHITECTURE OVERVIEW:
+ * ----------------------
+ * Content is stored externally in `/Users/kayg/Developer/website-content/`
+ * (separate from the code repository for clean separation of concerns).
+ *
+ * Each collection corresponds to a content type:
+ * - blog: Long-form articles
+ * - notes: Short technical notes (Digital Garden style)
+ * - talks: Presentation slides and talk content
+ * - now: "What I'm doing now" updates
+ * - uses: Tools and setup documentation
+ * - home/about/contact/homelab/photography/changelog: Static pages
+ * - photos: Photography gallery metadata
+ *
+ * FILE NAMING CONVENTION:
+ * ----------------------
+ * Most content files use the pattern: YYYYMMDD-slug.md
+ * Example: 20240713-my-article-title.md
+ *
+ * The generateId function strips the date prefix for cleaner URLs:
+ * - File: 20240713-my-article-title.md
+ * - Generated ID: my-article-title
+ * - URL: /blog/my-article-title
+ *
+ * ASTRO 5 CHANGES FROM v4:
+ * ------------------------
+ * - Config file location: src/content.config.ts (not src/content/config.ts)
+ * - Uses glob() loader instead of type: 'content'
+ * - render() is imported from astro:content, not called on entry
+ * - Entry IDs are customizable via generateId option
+ *
+ * @see https://docs.astro.build/en/guides/content-collections/
+ * @see https://docs.astro.build/en/reference/content-loader-reference/
+ */
+
+import { defineCollection, z } from "astro:content";
+import { glob } from "astro/loaders";
+
+// =============================================================================
+// CONTENT BASE PATH
+// =============================================================================
+
+/**
+ * Absolute path to the external content directory.
+ * Content is stored separately from code for:
+ * - Clean git history (content changes don't pollute code commits)
+ * - Potential future CMS integration
+ * - Easier content backup/sync workflows
+ */
+const CONTENT_BASE = "/Users/kayg/Developer/website-content";
+
+// =============================================================================
+// SCHEMAS
+// =============================================================================
+
+/**
+ * Schema for static pages (about, contact, homelab, etc.)
+ * These pages have minimal frontmatter requirements.
+ *
+ * .passthrough() allows additional fields in frontmatter without validation,
+ * enabling flexibility for page-specific settings like display-comments.
+ */
+const pageSchema = z
+  .object({
+    /** Page title (required) */
+    title: z.string(),
+
+    /** Page description for SEO/previews (optional) */
+    description: z.string().optional(),
+
+    /** Original creation date (optional, coerced to Date) */
+    date: z.coerce.date().optional(),
+
+    /** Last modification date (optional, coerced to Date) */
+    "last edited": z.coerce.date().optional(),
+
+    /** Whether to hide this page (optional, defaults to false) */
+    draft: z.boolean().optional().default(false),
+  })
+  .passthrough();
+
+/**
+ * Schema for content posts (blog, notes, talks, now, uses)
+ * These have richer metadata including tags, cover images, and excerpts.
+ */
+const postSchema = z
+  .object({
+    /** Post title (required) */
+    title: z.string(),
+
+    /** Post description for SEO/previews (optional) */
+    description: z.string().optional(),
+
+    /** Publication date (required, coerced to Date) */
+    date: z.coerce.date(),
+
+    /** Last modification date (optional, coerced to Date) */
+    "last edited": z.coerce.date().optional(),
+
+    /** Array of tags for categorization (optional, nullable for YAML compatibility) */
+    tags: z.array(z.string()).nullable().optional(),
+
+    /** Cover image path or URL (optional) */
+    "cover-image": z.string().optional(),
+
+    /** Whether to hide this post (optional, defaults to false) */
+    draft: z.boolean().optional().default(false),
+
+    /**
+     * Custom URL slug override (optional, otherwise derived from filename).
+     * Accepts either a string or a Date (YAML parses "2024-04-02" as Date).
+     * Dates are converted to YYYY-MM-DD string format.
+     */
+    slug: z
+      .union([z.string(), z.date()])
+      .optional()
+      .transform((val) => {
+        if (!val) return undefined;
+        if (val instanceof Date) {
+          // Convert Date to YYYY-MM-DD string
+          return val.toISOString().split("T")[0];
+        }
+        return val;
+      }),
+
+    /** Manual excerpt override (optional, otherwise extracted from content) */
+    excerpt: z.string().optional(),
+
+    /** Whether to show comments section (optional) */
+    "display-comments": z.boolean().optional(),
+  })
+  .passthrough();
+
+/**
+ * Schema for photo gallery entries.
+ * Each photo is a markdown file with metadata about the image.
+ */
+const photoSchema = z.object({
+  /** Full-resolution image path/URL (required) */
+  src: z.string(),
+
+  /** Thumbnail image path/URL (optional, falls back to src) */
+  thumb: z.string().optional(),
+
+  /** Alt text for accessibility (required) */
+  alt: z.string(),
+
+  /** Photo title (optional) */
+  title: z.string().optional(),
+
+  /** Category for filtering (required) */
+  category: z.string(),
+
+  /** Location where photo was taken (optional) */
+  location: z.string().optional(),
+
+  /** Date photo was taken (optional) */
+  date: z.coerce.date().optional(),
+
+  /** Camera/equipment used (optional) */
+  camera: z.string().optional(),
+});
+
+// =============================================================================
+// ID GENERATOR
+// =============================================================================
+
+/**
+ * Custom ID generator for content entries.
+ *
+ * Transforms filenames into URL-friendly IDs by:
+ * 1. Removing the .md extension
+ * 2. Stripping the YYYYMMDD- date prefix (if present)
+ *
+ * EXAMPLES:
+ * - "20240713-my-article.md" → "my-article"
+ * - "index.md" → "index"
+ * - "about-page.md" → "about-page"
+ *
+ * @param entry - The file path relative to the collection's base directory
+ * @returns Clean ID suitable for URLs
+ */
+const generateId = ({ entry }: { entry: string }): string => {
+  return entry
+    .replace(/\.md$/, "") // Remove .md extension
+    .replace(/^\d{8}-/, ""); // Remove YYYYMMDD- date prefix
+};
+
+// =============================================================================
+// COLLECTION DEFINITIONS
+// =============================================================================
+
+/**
+ * Helper to create a collection with consistent configuration.
+ * Reduces repetition and ensures all collections use the same settings.
+ *
+ * @param folder - Subfolder name within CONTENT_BASE
+ * @param schema - Zod schema for validation
+ * @returns Collection definition object
+ */
+const createCollection = (folder: string, schema: z.ZodType) =>
+  defineCollection({
+    loader: glob({
+      pattern: "*.md",
+      base: `${CONTENT_BASE}/${folder}`,
+      generateId,
+    }),
+    schema,
+  });
+
+// -----------------------------------------------------------------------------
+// Post Collections (blog, notes, talks, now, uses)
+// These have dates, tags, and full content features
+// -----------------------------------------------------------------------------
+
+const blog = createCollection("blog", postSchema);
+const notes = createCollection("notes", postSchema);
+const talks = createCollection("talks", postSchema);
+const now = createCollection("now", postSchema);
+const uses = createCollection("uses", postSchema);
+
+// -----------------------------------------------------------------------------
+// Page Collections (home, about, contact, homelab, photography, changelog)
+// These are simpler static pages
+// -----------------------------------------------------------------------------
+
+const home = createCollection("home", pageSchema);
+const about = createCollection("about", pageSchema);
+const contact = createCollection("contact", pageSchema);
+const homelab = createCollection("homelab", pageSchema);
+const photography = createCollection("photography", pageSchema);
+const changelog = createCollection("changelog", pageSchema);
+
+// -----------------------------------------------------------------------------
+// Special Collections
+// -----------------------------------------------------------------------------
+
+const photos = createCollection("photos", photoSchema);
+
+// =============================================================================
+// EXPORTS
+// =============================================================================
+
+/**
+ * All collections exported for use throughout the site.
+ * Import in pages/components with: import { getCollection } from "astro:content"
+ */
+export const collections = {
+  // Post collections
+  blog,
+  notes,
+  talks,
+  now,
+  uses,
+  // Page collections
+  home,
+  about,
+  contact,
+  homelab,
+  photography,
+  changelog,
+  // Special collections
+  photos,
+};

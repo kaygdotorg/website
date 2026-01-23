@@ -1,64 +1,139 @@
 ---
+/**
+ * =============================================================================
+ * TALKS LIST PAGE (/talks)
+ * =============================================================================
+ *
+ * Displays all talks/presentations in a timeline format.
+ * Each talk alternates sides on desktop for visual interest.
+ *
+ * FEATURES:
+ * - Page metadata from talks/index.md
+ * - Alternating left/right layout on desktop
+ * - Cover images with hover effects
+ * - Date, title, and description display
+ * - Vertical timeline line connecting entries
+ */
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 import { formatDateWithComma } from "../utils/dates";
 import { getExcerpt } from "../utils/markdown";
+import { getUrlSlug } from "../utils/content";
 
-// Use getCollection and filter for index.md - more reliable than getEntry
+// =============================================================================
+// DATA FETCHING
+// =============================================================================
+
+/**
+ * Fetch all talks entries from the content collection.
+ */
 const allTalksEntries = await getCollection("talks");
-const entry = allTalksEntries.find(e => e.id === "index.md");
+
+/**
+ * Get the index entry for page metadata (title, description).
+ */
+const entry = allTalksEntries.find((e) => e.id === "index");
 
 if (!entry) {
-  throw new Error("Could not find index.md in src/content/talks/");
+  throw new Error(
+    "Missing talks/index.md - This file provides the page title and description."
+  );
 }
 
-const { Content } = await entry.render();
+/**
+ * Render the index content (not currently used in the template,
+ * but available if needed for page description).
+ * ASTRO 5: Use imported render() function.
+ */
+const { Content } = await render(entry);
 
-// Filter out index.md which is the landing page, not a talk entry
-const talks = allTalksEntries.filter(e => e.id !== "index.md");
-const sortedTalks = talks.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+/**
+ * Filter and sort talks:
+ * - Exclude the index entry
+ * - Sort by date, newest first
+ */
+const sortedTalks = allTalksEntries
+  .filter((e) => e.id !== "index")
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
 <BaseLayout title={entry.data.title} description={entry.data.description}>
   <main class="max-w-4xl mx-auto px-6 py-24">
+    {/* =========================================================================
+        PAGE HEADER
+        ========================================================================= */}
     <header class="mb-16 animate-fade-in">
-      <h1 class="text-4xl md:text-5xl font-heading mb-4 text-base-content">{entry.data.title}</h1>
+      <h1 class="text-4xl md:text-5xl font-heading mb-4 text-base-content">
+        {entry.data.title}
+      </h1>
       <p class="text-xl text-base-content/70">
         {entry.data.description}
       </p>
     </header>
 
-
+    {/* =========================================================================
+        TIMELINE
+        Talks displayed in an alternating left/right pattern with a
+        connecting vertical line.
+        ========================================================================= */}
     <div class="relative">
-      <!-- Vertical line -->
-      <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-base-content/10 transform md:translateX(-1/2)"></div>
+      {/* Vertical timeline line - centered on desktop, left-aligned on mobile */}
+      <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-base-content/10 transform md:translateX(-1/2)" />
 
       <div class="space-y-12">
         {sortedTalks.map((talk, index) => (
-          <div class={`relative flex flex-col md:flex-row items-center ${index % 2 === 0 ? 'md:flex-row-reverse' : ''} animate-fade-up`}>
-            <!-- Dot -->
-            <div class="absolute left-0 md:left-1/2 w-3 h-3 bg-accent-500 rounded-full transform -translate-x-1/2 z-10 hidden md:block"></div>
-            
+          <div
+            class={`relative flex flex-col md:flex-row items-center ${
+              index % 2 === 0 ? "md:flex-row-reverse" : ""
+            } animate-fade-up`}
+          >
+            {/* Timeline dot - centered on desktop, hidden on mobile */}
+            <div class="absolute left-0 md:left-1/2 w-3 h-3 bg-accent-500 rounded-full transform -translate-x-1/2 z-10 hidden md:block" />
+
+            {/* Talk card - takes half width on desktop */}
             <div class="w-full md:w-1/2 px-8">
-              <a href={`/talks/${talk.slug}`} class="block frosted-card p-6 hover:scale-[1.02] transition-transform group">
+              {/* Use getUrlSlug to respect frontmatter slug overrides */}
+              <a
+                href={`/talks/${getUrlSlug(talk)}`}
+                class="block frosted-card p-6 hover:scale-[1.02] transition-transform group"
+              >
                 <div class="flex flex-col">
+                  {/* Cover image */}
                   {talk.data["cover-image"] && (
                     <div class="w-full mb-6">
                       <div class="aspect-[16/9] rounded-xl overflow-hidden border border-white/10 shadow-lg group-hover:shadow-accent-500/20 transition-all">
-                        {typeof talk.data["cover-image"] === 'string' ? (
-                          <img src={talk.data["cover-image"]} alt={talk.data.title} class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                        {typeof talk.data["cover-image"] === "string" ? (
+                          <img
+                            src={talk.data["cover-image"]}
+                            alt={talk.data.title}
+                            class="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
                         ) : (
-                          <img src={talk.data["cover-image"].src} alt={talk.data.title} class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                          <img
+                            src={talk.data["cover-image"].src}
+                            alt={talk.data.title}
+                            class="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
                         )}
                       </div>
                     </div>
                   )}
+
+                  {/* Talk info */}
                   <div class="flex-1">
                     <time class="text-sm font-semibold uppercase tracking-wider text-accent-500 mb-2 block">
                       {formatDateWithComma(talk.data.date)}
                     </time>
-                    <h2 class="text-2xl font-heading text-base-content mb-3 group-hover:text-accent-500 transition-colors tracking-tight">{talk.data.title}</h2>
-                    <p class="text-base-content/70 leading-relaxed text-sm line-clamp-3">{talk.data.description || getExcerpt(talk.body)}</p>
+                    <h2 class="text-2xl font-heading text-base-content mb-3 group-hover:text-accent-500 transition-colors tracking-tight">
+                      {talk.data.title}
+                    </h2>
+                    <p class="text-base-content/70 leading-relaxed text-sm line-clamp-3">
+                      {talk.data.description || getExcerpt(talk.body)}
+                    </p>
                     <span class="inline-flex items-center mt-4 text-sm font-medium text-accent-500 group-hover:text-accent-600 transition-colors">
                       View presentation →
                     </span>

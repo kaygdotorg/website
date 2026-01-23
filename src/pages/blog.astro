@@ -1,75 +1,125 @@
 ---
 /**
- * Blog List Page
+ * =============================================================================
+ * BLOG LIST PAGE (/blog)
+ * =============================================================================
  *
- * Displays all blog posts with tag filtering.
- * Uses ContentCard component for consistent card rendering.
+ * Displays all published blog posts with tag filtering capability.
+ *
+ * FEATURES:
+ * - Page metadata from blog/index.md
+ * - List of all published posts (excludes drafts and index)
+ * - Tag filter for narrowing down posts by topic
+ * - Consistent card rendering via ContentCard component
+ *
+ * DATA FLOW:
+ * 1. Fetch all blog entries from content collection
+ * 2. Separate index entry (page metadata) from post entries
+ * 3. Calculate tag frequency for filter display
+ * 4. Render posts using ContentCard component
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ContentCard from "../components/ContentCard.astro";
 import TagFilter from "../components/TagFilter.astro";
 import { getCollection } from "astro:content";
 
-// Get index.md for page metadata
-const allBlogEntries = await getCollection("blog");
-const entry = allBlogEntries.find((e) => e.id === "index.md");
+// =============================================================================
+// DATA FETCHING
+// =============================================================================
 
-if (!entry) {
-  throw new Error("Could not find index.md in src/content/blog/");
+/**
+ * Fetch all blog entries from the content collection.
+ * This includes both the index (landing page) and individual posts.
+ */
+const allBlogEntries = await getCollection("blog");
+
+/**
+ * Get the index entry for page metadata (title, description).
+ * The index.md file in the blog folder serves as the landing page config.
+ */
+const indexEntry = allBlogEntries.find((e) => e.id === "index");
+
+if (!indexEntry) {
+  throw new Error(
+    "Missing blog/index.md - This file provides the page title and description."
+  );
 }
 
-// Get all blog posts, exclude drafts and index.md, sort by date
+/**
+ * Filter and sort published posts:
+ * - Exclude the index entry (it's for page metadata, not a post)
+ * - Exclude drafts (draft: true in frontmatter)
+ * - Sort by date, newest first
+ */
 const posts = allBlogEntries
-  .filter((e) => e.id !== "index.md" && !e.data.draft)
+  .filter((entry) => entry.id !== "index" && !entry.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-// Calculate tag counts for TagFilter
+// =============================================================================
+// TAG AGGREGATION
+// =============================================================================
+
+/**
+ * Calculate tag frequency for the tag filter.
+ * Creates an array of { tag, count } objects sorted by popularity.
+ */
 const tagMap = new Map<string, number>();
 posts.forEach((post) => {
-  (post.data.tags || []).forEach((tag) => {
+  const tags = post.data.tags || [];
+  tags.forEach((tag: string) => {
     tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
   });
 });
-const tagCounts = Array.from(tagMap, ([tag, count]) => ({ tag, count })).sort(
-  (a, b) => b.count - a.count,
-);
+
+const tagCounts = Array.from(tagMap, ([tag, count]) => ({ tag, count }))
+  .sort((a, b) => b.count - a.count);
 ---
 
-<BaseLayout title={entry.data.title} description={entry.data.description}>
+<BaseLayout title={indexEntry.data.title} description={indexEntry.data.description}>
   <section class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
-    {/* Header */}
+    {/* =====================================================================
+        PAGE HEADER
+        Displays the page title and description from index.md frontmatter.
+        ===================================================================== */}
     <header class="mb-12 max-w-2xl animate-fade-up">
       <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
-        {entry.data.title}
+        {indexEntry.data.title}
       </h1>
       <p class="text-base-content/70 text-lg leading-relaxed">
-        {entry.data.description}
+        {indexEntry.data.description}
       </p>
     </header>
 
-    {/* Tag Filter */}
+    {/* =====================================================================
+        TAG FILTER
+        Interactive filter buttons for narrowing posts by tag.
+        The cardSelector prop tells TagFilter which elements to show/hide.
+        ===================================================================== */}
     <TagFilter
       tags={tagCounts}
       totalCount={posts.length}
       cardSelector=".post-card"
     />
 
-    {/* Post List */}
+    {/* =====================================================================
+        POST LIST
+        Grid of ContentCard components, one per published post.
+        Cards have staggered animation based on index.
+        ===================================================================== */}
     <div class="space-y-6">
-      {
-        posts.map((post, index) => (
-          <ContentCard
-            entry={post}
-            basePath="/blog"
-            index={index}
-            cardClass="post-card"
-            showTags={true}
-          />
-        ))
-      }
+      {posts.map((post, index) => (
+        <ContentCard
+          entry={post}
+          basePath="/blog"
+          index={index}
+          cardClass="post-card"
+          showTags={true}
+        />
+      ))}
     </div>
   </section>
 
+  {/* Style for hiding filtered cards */}
   <style>
     .post-card.hidden {
       display: none;

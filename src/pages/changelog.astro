@@ -1,29 +1,65 @@
 ---
+/**
+ * =============================================================================
+ * CHANGELOG PAGE (/changelog)
+ * =============================================================================
+ *
+ * Displays the site changelog - a chronological record of updates and changes.
+ * This page has its own file (rather than using [page].astro) because it may
+ * have custom styling or features in the future.
+ *
+ * FEATURES:
+ * - Markdown rendering with MarkdownLayout
+ * - Reading time calculation
+ * - Created/last edited dates
+ */
 import MarkdownLayout from "../layouts/MarkdownLayout.astro";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 
-// Use getCollection and filter for index.md - more reliable than getEntry
+// =============================================================================
+// DATA FETCHING
+// =============================================================================
+
+/**
+ * Fetch the changelog collection entries.
+ */
 const allEntries = await getCollection("changelog");
-const entry = allEntries.find((e) => e.id === "index.md");
+
+/**
+ * Get the index entry which contains the changelog content.
+ */
+const entry = allEntries.find((e) => e.id === "index");
 
 if (!entry) {
-    throw new Error("Could not find index.md in src/content/changelog/");
+  throw new Error(
+    "Missing changelog/index.md - This file provides the changelog content."
+  );
 }
 
-const { Content } = await entry.render();
+// =============================================================================
+// RENDER & METADATA
+// =============================================================================
 
-// Calculate reading time
+/**
+ * Render the markdown content to HTML.
+ * ASTRO 5: Use imported render() function instead of entry.render().
+ */
+const { Content } = await render(entry);
+
+/**
+ * Calculate reading time based on word count.
+ */
 const wordCount = entry.body?.split(/\s+/).length || 0;
 const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 ---
 
 <MarkdownLayout
-    title={entry.data.title}
-    entry={entry}
-    createdDate={entry.data.date}
-    lastEdited={entry.data["last edited"]}
-    readingTime={readingTime}
-    coverImage={entry.data["cover-image"]}
+  title={entry.data.title}
+  entry={entry}
+  createdDate={entry.data.date}
+  lastEdited={entry.data["last edited"]}
+  readingTime={readingTime}
+  coverImage={entry.data["cover-image"]}
 >
-    <Content />
+  <Content />
 </MarkdownLayout>
