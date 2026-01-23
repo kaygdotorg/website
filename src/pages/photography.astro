@@ -1,92 +1,45 @@
 ---
+/**
+ * Photography Gallery Page
+ * 
+ * Displays photos from the 'photos' content collection. Each photo is a
+ * markdown file with metadata in frontmatter and optional description in body.
+ * Photos are fetched from content/photos/*.md (excluding index.md).
+ */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 
-// Use getCollection and filter for index.md - more reliable than getEntry
-const allEntries = await getCollection("photography");
-const entry = allEntries.find((e) => e.id === "index.md");
+// Get page metadata from photography/index.md
+const allPageEntries = await getCollection("photography");
+const entry = allPageEntries.find((e) => e.id === "index.md");
 
 if (!entry) {
   throw new Error("Could not find index.md in src/content/photography/");
 }
 
-const { Content } = await entry.render();
+// Get all photos from the photos collection
+const photoEntries = await getCollection("photos");
 
-// Photos with more variety for the gallery
-const photos = [
-  {
-    src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80",
-    alt: "Mountain landscape at golden hour",
-    category: "Landscape",
-    location: "Swiss Alps",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=600&q=80",
-    alt: "City skyline at dusk",
-    category: "Urban",
-    location: "New York",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1494500764479-0c8f2919a3d8?w=600&q=80",
-    alt: "Night sky with stars",
-    category: "Landscape",
-    location: "Death Valley",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&q=80",
-    alt: "Snowy mountain peak",
-    category: "Landscape",
-    location: "Mont Blanc",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=600&q=80",
-    alt: "City streets at night",
-    category: "Urban",
-    location: "Tokyo",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=600&q=80",
-    alt: "Bird in flight over ocean",
-    category: "Nature",
-    location: "California Coast",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&q=80",
-    alt: "Misty forest sunrise",
-    category: "Landscape",
-    location: "Pacific Northwest",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=600&q=80",
-    alt: "Urban architecture",
-    category: "Urban",
-    location: "London",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&q=80",
-    alt: "Rolling green hills",
-    category: "Landscape",
-    location: "Tuscany",
-  },
-];
+// Transform entries into the format needed for display
+const photos = photoEntries.map((photo) => ({
+  src: photo.data.src,
+  thumb: photo.data.thumb || photo.data.src, // Fallback to src if no thumb
+  alt: photo.data.alt,
+  title: photo.data.title || photo.data.alt,
+  category: photo.data.category,
+  location: photo.data.location,
+  date: photo.data.date,
+  camera: photo.data.camera,
+  slug: photo.slug,
+}));
+
+// Sort by date (newest first) if dates exist, otherwise keep original order
+photos.sort((a, b) => {
+  if (a.date && b.date) return b.date.getTime() - a.date.getTime();
+  if (a.date) return -1;
+  if (b.date) return 1;
+  return 0;
+});
 
 const categories = [...new Set(photos.map((p) => p.category))];
 const isInProgress = entry.data["display-in-progress"] === true;
@@ -151,14 +104,14 @@ const isInProgress = entry.data["display-in-progress"] === true;
       }
     </div>
 
-    <!-- Note about replacing photos -->
-    <div class="mt-16 p-6 rounded-2xl frosted-card animate-fade-up stagger-3">
-      <p class="text-base-content/70 text-sm text-center">
-        <strong class="text-accent">Note:</strong> These are placeholder images from
-        Unsplash. Replace them with your own photos by updating the paths in this
-        file.
-      </p>
-    </div>
+    <!-- Empty state when no photos -->
+    {photos.length === 0 && (
+      <div class="mt-16 p-6 rounded-2xl frosted-card animate-fade-up stagger-3">
+        <p class="text-base-content/70 text-sm text-center">
+          No photos yet. Add markdown files to <code>content/photos/</code> to populate the gallery.
+        </p>
+      </div>
+    )}
   </section>
 
   <style>
