@@ -20,12 +20,19 @@ export function calculateReadingTime(body: string | undefined): number {
 
 /**
  * Get URL slug from an entry, preferring frontmatter slug over file slug.
+ * Automatically strips YYYYMMDD- date prefix from file-based slugs.
  * 
  * @param entry - Content collection entry
  * @returns URL-safe slug string
  */
 export function getUrlSlug(entry: any): string {
-    return entry.data.slug || entry.slug;
+    // Use explicit frontmatter slug if provided
+    if (entry.data.slug) {
+        return entry.data.slug;
+    }
+    
+    // Strip YYYYMMDD- date prefix from file slug
+    return entry.slug.replace(/^\d{8}-/, '');
 }
 
 /**
