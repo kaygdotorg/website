@@ -4,11 +4,11 @@
  * PHOTOGRAPHY GALLERY PAGE (/photography)
  * =============================================================================
  *
- * Displays photos from the 'photos' content collection in a filterable gallery.
+ * Displays photos from the 'photography' content collection in a filterable gallery.
  *
  * ARCHITECTURE:
  * - Page metadata comes from photography/index.md
- * - Photos come from photos/*.md (each photo is a markdown file with metadata)
+ * - Photos come from photography/*.md (each photo is a markdown file with metadata)
  * - Categories are extracted from photo metadata for filtering
  *
  * FEATURES:
@@ -36,11 +36,16 @@ import { getCollection } from "astro:content";
 // =============================================================================
 
 /**
+ * Get all entries from the photography collection.
+ * This includes both the index.md (page metadata) and photo entries.
+ */
+const allEntries = await getCollection("photography");
+
+/**
  * Get page metadata from photography/index.md.
  * This provides the page title, description, and display settings.
  */
-const allPageEntries = await getCollection("photography");
-const entry = allPageEntries.find((e) => e.id === "index");
+const entry = allEntries.find((e) => e.id === "index");
 
 if (!entry) {
   throw new Error(
@@ -49,10 +54,12 @@ if (!entry) {
 }
 
 /**
- * Get all photos from the photos collection.
- * Each photo is a markdown file with image metadata in frontmatter.
+ * Get photo entries (everything except index.md).
+ * Photos are identified by having a 'src' field in frontmatter.
  */
-const photoEntries = await getCollection("photos");
+const photoEntries = allEntries.filter(
+  (e) => e.id !== "index" && e.data.src
+);
 
 // =============================================================================
 // DATA TRANSFORMATION
@@ -171,7 +178,7 @@ const isInProgress = entry.data["display-in-progress"] === true;
     {photos.length === 0 && (
       <div class="mt-16 p-6 rounded-2xl frosted-card animate-fade-up stagger-3">
         <p class="text-base-content/70 text-sm text-center">
-          No photos yet. Add markdown files to <code>content/photos/</code> to
+          No photos yet. Add markdown files to <code>content/photography/</code> to
           populate the gallery.
         </p>
       </div>

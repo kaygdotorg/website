@@ -17,8 +17,8 @@
  * - talks: Presentation slides and talk content
  * - now: "What I'm doing now" updates
  * - uses: Tools and setup documentation
- * - home/about/contact/homelab/photography/changelog: Static pages
- * - photos: Photography gallery metadata
+ * - home/about/contact/homelab/changelog: Static pages
+ * - photography: Gallery page + photo entries (combined)
  *
  * FILE NAMING CONVENTION:
  * ----------------------
@@ -228,7 +228,7 @@ const now = createCollection("now", postSchema);
 const uses = createCollection("uses", postSchema);
 
 // -----------------------------------------------------------------------------
-// Page Collections (home, about, contact, homelab, photography, changelog)
+// Page Collections (home, about, contact, homelab, changelog)
 // These are simpler static pages
 // -----------------------------------------------------------------------------
 
@@ -236,14 +236,44 @@ const home = createCollection("home", pageSchema);
 const about = createCollection("about", pageSchema);
 const contact = createCollection("contact", pageSchema);
 const homelab = createCollection("homelab", pageSchema);
-const photography = createCollection("photography", pageSchema);
 const changelog = createCollection("changelog", pageSchema);
 
 // -----------------------------------------------------------------------------
-// Special Collections
+// Photography Collection
+// Uses a combined schema - index.md uses pageSchema fields, photos use photoSchema.
+// The union allows both types in the same folder.
 // -----------------------------------------------------------------------------
 
-const photos = createCollection("photos", photoSchema);
+/**
+ * Combined schema for photography collection.
+ * - index.md: Uses title, description (pageSchema-like)
+ * - photo files: Use src, alt, category, etc. (photoSchema)
+ *
+ * Using passthrough() to allow flexible frontmatter across both types.
+ */
+const photographySchema = z
+  .object({
+    // Common fields
+    title: z.string().optional(),
+    description: z.string().optional(),
+    date: z.coerce.date().optional(),
+    "last edited": z.coerce.date().optional(),
+    draft: z.boolean().optional().default(false),
+
+    // Photo-specific fields (optional for index.md)
+    src: z.string().optional(),
+    thumb: z.string().optional(),
+    alt: z.string().optional(),
+    category: z.string().optional(),
+    location: z.string().optional(),
+    camera: z.string().optional(),
+
+    // Page-specific fields
+    "display-in-progress": z.boolean().optional(),
+  })
+  .passthrough();
+
+const photography = createCollection("photography", photographySchema);
 
 // =============================================================================
 // EXPORTS
@@ -265,8 +295,7 @@ export const collections = {
   about,
   contact,
   homelab,
-  photography,
   changelog,
-  // Special collections
-  photos,
+  // Photography (includes both page metadata and photo entries)
+  photography,
 };
