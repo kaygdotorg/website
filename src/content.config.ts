@@ -237,7 +237,98 @@ const uses = createCollection("uses", postSchema);
 // These are simpler static pages
 // -----------------------------------------------------------------------------
 
-const home = createCollection("home", pageSchema);
+/**
+ * Schema for the home page with complex frontmatter structure.
+ *
+ * IMAGE HANDLING:
+ * ---------------
+ * Uses z.union([image(), z.string()]) for image fields to support both:
+ * - Local files (./image.jpeg) → processed by Astro, returns ImageMetadata
+ * - External URLs (https://...) → passed through as strings
+ * - Special identifiers ("obsidian-graph") → passed through as strings
+ *
+ * The page component checks `typeof image === 'string'` to handle both cases.
+ *
+ * NOTE: The schema is a function that receives { image } from Astro.
+ * This is required for the image() helper to work in content collections.
+ */
+const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
+  z
+    .object({
+      title: z.string(),
+      name: z.string().optional(),
+      tagline: z.string().optional(),
+      email: z.string().optional(),
+      date: z.coerce.date().optional(),
+      "last edited": z.coerce.date().optional(),
+
+      /** Profile image - local file or URL */
+      profileImage: z.union([image(), z.string()]).optional(),
+
+      /** Card photos for the hero section polaroid stack */
+      cardPhotos: z
+        .array(
+          z.object({
+            src: z.union([image(), z.string()]),
+            label: z.string(),
+            href: z.string(),
+            date: z.string().optional(),
+          })
+        )
+        .optional(),
+
+      /** Bento grid cards with images */
+      bentoCards: z
+        .array(
+          z.object({
+            id: z.string(),
+            title: z.string(),
+            category: z.string(),
+            summary: z.string(),
+            href: z.string(),
+            image: z.union([image(), z.string()]),
+          })
+        )
+        .optional(),
+
+      interests: z.array(z.string()).optional(),
+      socialLinks: z
+        .array(z.object({ label: z.string(), url: z.string() }))
+        .optional(),
+      recentWriting: z
+        .array(z.object({ title: z.string(), date: z.string(), href: z.string() }))
+        .optional(),
+      projects: z
+        .array(z.object({ title: z.string(), description: z.string(), link: z.string() }))
+        .optional(),
+      quote: z.string().optional(),
+      workExperience: z
+        .array(
+          z.object({
+            role: z.string(),
+            company: z.string(),
+            startDate: z.string(),
+            endDate: z.string(),
+            isCurrent: z.boolean().optional(),
+          })
+        )
+        .optional(),
+      resumeUrl: z.string().optional(),
+    })
+    .passthrough();
+
+/**
+ * Home collection - uses function-form schema to access image() helper.
+ * Cannot use createCollection helper because schema needs to be a function.
+ */
+const home = defineCollection({
+  loader: glob({
+    pattern: "*.md",
+    base: `${CONTENT_BASE}/home`,
+    generateId,
+  }),
+  schema: homeSchema,
+});
 const about = createCollection("about", pageSchema);
 const contact = createCollection("contact", pageSchema);
 const homelab = createCollection("homelab", pageSchema);
