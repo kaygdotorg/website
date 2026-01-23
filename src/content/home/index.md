@@ -4,14 +4,19 @@ name: K Gopal Krishna
 tagline: Infrastructure Engineer, dead cinephile, hobbyist bodybuilder.
 profileImage: ./hero-picture.jpeg
 email: mail@kayg.org
+footerText: Vibe-coded with Antigravity using Astro and Tailwind CSS
 
 socialLinks:
   - label: GitHub
-    url: https://github.com
+    url: https://github.com/kaygdotorg
   - label: Twitter/X
-    url: https://twitter.com
+    url: https://x.com/kaygdotorg
   - label: LinkedIn
-    url: https://linkedin.com
+    url: https://www.linkedin.com/in/k-gopal-krishna-7546b92a2/
+  - label: Mastodon
+    url: https://mas.to/@kayg
+  - label: Telegram
+    url: https://t.me/kaygdotorg
 
 cardPhotos:
   # Photo strip images synced with bento card images for visual consistency

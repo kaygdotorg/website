@@ -2,6 +2,21 @@
 import "../styles/global.css";
 import Icon from "../components/Icon.astro";
 import InProgressCard from "../components/InProgressCard.astro";
+import { getEntry } from "astro:content";
+
+const homeEntry = await getEntry("home", "index");
+const { socialLinks, email, footerText } = homeEntry?.data || {};
+
+// Helper to map social labels to icon names
+const getIconName = (label: string) => {
+  const lower = label.toLowerCase();
+  if (lower.includes("github")) return "github";
+  if (lower.includes("twitter") || lower.includes("x")) return "twitter";
+  if (lower.includes("linkedin")) return "linkedin";
+  if (lower.includes("mastodon")) return "mastodon";
+  if (lower.includes("telegram")) return "telegram";
+  return "link"; // Fallback icon
+};
 
 interface Props {
   title: string;
@@ -517,31 +532,35 @@ import { ClientRouter } from "astro:transitions";
           class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
         >
           <p class="text-sm text-base-content/60">
-            &copy; {new Date().getFullYear()} · Built with curiosity
+            &copy; {new Date().getFullYear()} · {
+              footerText || "Built with curiosity"
+            }
           </p>
           <div class="flex items-center gap-4">
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noopener"
-              class="text-base-content/60 hover:text-base-content transition-colors"
-            >
-              <Icon name="github" class="w-5 h-5" />
-            </a>
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener"
-              class="text-base-content/60 hover:text-base-content transition-colors"
-            >
-              <Icon name="twitter" class="w-5 h-5" />
-            </a>
-            <a
-              href="mailto:hello@example.com"
-              class="text-base-content/60 hover:text-base-content transition-colors"
-            >
-              <Icon name="email" class="w-5 h-5" />
-            </a>
+            {
+              socialLinks?.map((link) => (
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-base-content/60 hover:text-base-content transition-colors"
+                  aria-label={link.label}
+                >
+                  <Icon name={getIconName(link.label)} class="w-5 h-5" />
+                </a>
+              ))
+            }
+            {
+              email && (
+                <a
+                  href={`mailto:${email}`}
+                  class="text-base-content/60 hover:text-base-content transition-colors"
+                  aria-label="Email"
+                >
+                  <Icon name="email" class="w-5 h-5" />
+                </a>
+              )
+            }
           </div>
         </div>
       </div>

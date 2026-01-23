@@ -314,6 +314,7 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
         )
         .optional(),
       resumeUrl: z.string().optional(),
+      footerText: z.string().optional(),
     })
     .passthrough();
 
