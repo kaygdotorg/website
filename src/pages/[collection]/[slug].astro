@@ -65,7 +65,7 @@ export async function getStaticPaths() {
       // Fetch all entries except the index (landing page)
       const entries = await getCollection(
         collectionName,
-        ({ id }) => id !== "index"
+        ({ id }) => id !== "index",
       );
 
       // Map each entry to a route
@@ -79,7 +79,7 @@ export async function getStaticPaths() {
           collectionName,
         },
       }));
-    })
+    }),
   );
 
   // Flatten the nested arrays into a single array of paths
@@ -150,14 +150,14 @@ const lastEdited = entry.data["last edited"];
  */
 const allEntries = await getCollection(
   collectionName,
-  ({ id, data }) => id !== "index" && !data.draft
+  ({ id, data }) => id !== "index" && !data.draft,
 );
 
 /**
  * Sort entries by date (newest first) for chronological navigation.
  */
 const sortedEntries = allEntries.sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );
 
 /**
@@ -170,7 +170,7 @@ const backlinks = buildBacklinks(
   config.basePath,
   config.label,
   sortedEntries,
-  entry
+  entry,
 );
 ---
 
@@ -184,23 +184,11 @@ const backlinks = buildBacklinks(
   backlinks={backlinks}
   coverImage={entry.data["cover-image"]}
 >
-  {/* =========================================================================
-      TAGS SECTION
-      Only rendered if the collection supports tags and the entry has tags.
-      ========================================================================= */}
-  {config.hasTags && entry.data.tags && entry.data.tags.length > 0 && (
-    <div class="flex flex-wrap gap-2 mb-6">
-      {entry.data.tags.map((tag: string) => (
-        <span class="px-3 py-1 text-xs rounded-full bg-white/10 text-white/80">
-          {tag}
-        </span>
-      ))}
-    </div>
-  )}
-
-  {/* =========================================================================
+  {
+    /* =========================================================================
       RENDERED CONTENT
       The Content component contains the rendered markdown HTML.
-      ========================================================================= */}
+      ========================================================================= */
+  }
   <Content />
 </MarkdownLayout>
