@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "a43df083f9d57008",
+        "id": "e5aca805e64415ac",
         "type": "tabs",
         "children": [
           {
-            "id": "f6b9936cb057acc1",
+            "id": "fe53c4badd758aa1",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "home/index.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "index"
+              "title": "New tab"
             }
           }
         ]
@@ -169,16 +165,22 @@
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "bases:Create new base": false
+      "bases:Create new base": false,
+      "pexels-banner:🚩 Pixel Banner Menu": false
     }
   },
-  "active": "f6b9936cb057acc1",
+  "active": "fe53c4badd758aa1",
   "lastOpenFiles": [
+    "blog/20250911-switching-between-safari-profile-windows.md",
+    "talks/20250125-encryption-zfs-and-proxmox-an-unusual-triangle.md",
+    "talks/20250323-learning-the-tools-we-already-possess-bash.md",
+    "talks/20250823-introduction-to-proxmox-9-whats-new-and-why-virtualize-your-projects.md",
+    "talks/20250407-foss-united-talk-migrating-vms-zfs-native-encryption.md",
+    "home/index.md",
     "photography/california-coast-bird.md",
     "home/resume.pdf",
     "photography/index.md",
     "uses/20240402-uses.md",
-    "home/index.md",
     "about/index.md",
     "config.ts.bak",
     "photography/tokyo-streets-night.md",
@@ -194,10 +196,6 @@
     "blog/20170711-the-day-a-pig-fell-into-the-well-review.md",
     "notes/20230904-spurious-read-errors.md",
     "now/index.md",
-    "talks/20250823-introduction-to-proxmox-9-whats-new-and-why-virtualize-your-projects.md",
-    "talks/20250407-foss-united-talk-migrating-vms-zfs-native-encryption.md",
-    "talks/20250323-learning-the-tools-we-already-possess-bash.md",
-    "talks/20250125-encryption-zfs-and-proxmox-an-unusual-triangle.md",
     "talks/20240508-ceph-rgw-multi-site-new-features-and-an-overview.md",
     "talks/20240127-vlans-in-proxmox.md",
     "notes/20240422-key-spam-macos.md",
