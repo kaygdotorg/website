@@ -22,6 +22,7 @@ last edited: 2026-01-23 12:44:23
   - Moved resume.pdf to public folder for proper static serving
   - Added Mastodon, Telegram, and LinkedIn icons to UI
   - Added generic Link icon fallback for future proofing
+
 ## 2026-01-22 Thursday
 
 - **Remark42 Comment System**
