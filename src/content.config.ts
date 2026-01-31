@@ -96,8 +96,8 @@ const pageSchema = z
  * Schema for content posts (blog, notes, talks, now, uses)
  * These have richer metadata including tags, cover images, and excerpts.
  */
-const postSchema = z
-  .object({
+const postSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
+  z.object({
     /** Post title (required) */
     title: z.string(),
 
@@ -114,7 +114,7 @@ const postSchema = z
     tags: z.array(z.string()).nullable().optional(),
 
     /** Cover image path or URL (optional) */
-    "cover-image": z.string().optional(),
+    "cover-image": z.union([image(), z.string()]).optional(),
 
     /** Whether to hide this post (optional, defaults to false) */
     draft: z.boolean().optional().default(false),
@@ -142,7 +142,7 @@ const postSchema = z
     /** Whether to show comments section (optional) */
     "display-comments": z.boolean().optional(),
   })
-  .passthrough();
+    .passthrough();
 
 /**
  * Schema for photo gallery entries.
@@ -211,7 +211,7 @@ const generateId = ({ entry }: { entry: string }): string => {
  * @param schema - Zod schema for validation
  * @returns Collection definition object
  */
-const createCollection = (folder: string, schema: z.ZodType) =>
+const createCollection = (folder: string, schema: any) =>
   defineCollection({
     loader: glob({
       pattern: "*.md",

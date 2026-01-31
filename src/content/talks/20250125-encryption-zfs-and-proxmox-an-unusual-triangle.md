@@ -3,7 +3,7 @@ title: "Encryption, ZFS and Proxmox: An unusual triangle"
 description: Encryption is all the buzz these days. In a hypervisor environment, it is reasonable to have some kind of encryption. Should the hypervisor handle that or should the user? To be more specific, we are talking about server side encryption or SSE or encryption at rest.
 date: 2025-01-25 14:30:00
 last edited: 2026-01-19 21:46:07
-cover-image: "[cover-1768838912832](<./20250125-encryption-zfs-and-proxmox-an-unusual-triangle/cover-1768838912832.jpeg>)"
+cover-image: "./20250125-encryption-zfs-and-proxmox-an-unusual-triangle/cover-1768838912832.jpeg"
 ---
 ## Info
 

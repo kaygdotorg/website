@@ -87,10 +87,9 @@ Now repeat this procedure for however many profiles you have and would like to s
 3. Use the "Wait for Change of Focused Window" as the second action with the "Check Interval" set to 1. Adjust it to 1.25 later if it does not work.
 4. Use the "Menubar-Item" action to trigger the File → Close Tab action.
 
-<video controls width="100%">
-  <source src="./20250911-switching-between-safari-profile-windows-not-creat/safari-btt-config.mp4" type="video/mp4">
-  BetterTouchTool Configuration for Safari Profile Switching
-</video>
+![safari-btt-config](<./20250911-switching-between-safari-profile-windows/safari-btt-config.mp4>)
+
+BetterTouchTool Configuration for Safari Profile Switching
 
 If you don't wanna configure it yourself, use the following preset and import it into BetterTouchTool:
 
@@ -100,10 +99,9 @@ Copy the trigger and change the dummy webpage for as many profiles you have and 
 
 Let's look at the procedure in action. I am using `CTRL X` and `CTRL Z` to switch between Profiles.
 
-<video controls width="100%">
-  <source src="./20250911-switching-between-safari-profile-windows-not-creat/safari-demo.mp4" type="video/mp4">
-  This works even if you spam the same keyboard shortcut multiple times.
-</video>
+![safari-demo](./20250911-switching-between-safari-profile-windows/safari-demo.mp4)
+
+This works even if you spam the same keyboard shortcut multiple times.
 
 If it does not work for you, you can try the following things:
 
