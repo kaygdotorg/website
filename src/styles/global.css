@@ -555,7 +555,7 @@ html[data-theme="light"] body {
 
 .md-page-container {
   width: 100%;
-  max-width: none;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 1rem 0.5rem;
   display: flex;
