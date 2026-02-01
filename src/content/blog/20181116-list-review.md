@@ -5,7 +5,7 @@ last edited: 2025-04-10 15:46
 tags:
   - medium
   - wordpress
-cover-image: "[list-review-cover](<./20181116-list-review/list-review-cover.png>)"
+cover-image: ./20181116-list-review/list-review-cover.png
 ---
 
 ![list-review-cover](<./20181116-list-review/list-review-cover.png>)

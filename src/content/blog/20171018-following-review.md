@@ -2,7 +2,7 @@
 title: Following (1998), dir. Christopher Nolan
 date: 2017-10-18 00:00
 last edited: 2025-04-10 15:44
-cover-image: "[following-review-2](<./20171018-following-review/following-review-2.png>)"
+cover-image: ./20171018-following-review/following-review-2.png
 ---
 Writer-Director Christopher Nolan’s works have ranged from adolescent hormonal epidemics to pure sensory experiences of three-dimensional explanations, but what we have here is a neo-noir experiment that heightens reality in short but effective Danny Boyle-esque adrenaline thrills while delivering stunning results in its tinkering with the medium.
 

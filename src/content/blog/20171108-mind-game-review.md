@@ -5,7 +5,7 @@ last edited: 2025-04-10 15:48
 tags:
   - medium
   - wordpress
-cover-image: "[mind-game-review](<./20171108-mind-game-review/mind-game-review.png>)"
+cover-image: ./20171108-mind-game-review/mind-game-review.png
 ---
 ![mind-game-review](<./20171108-mind-game-review/mind-game-review.png>)
 

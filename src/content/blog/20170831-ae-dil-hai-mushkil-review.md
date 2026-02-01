@@ -5,7 +5,7 @@ last edited: 2026-01-18 15:36:15
 tags:
   - wordpress
   - medium
-cover-image: "[ae-dil-hai-mushkil-review-cover](<./20170831-ae-dil-hai-mushkil-review/ae-dil-hai-mushkil-review-cover.png>)"
+cover-image: ./20170831-ae-dil-hai-mushkil-review/ae-dil-hai-mushkil-review-cover.png
 ---
 ![ae-dil-hai-mushkil-review-cover](<./20170831-ae-dil-hai-mushkil-review/ae-dil-hai-mushkil-review-cover.png>)
 

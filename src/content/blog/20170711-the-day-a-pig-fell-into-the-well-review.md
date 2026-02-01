@@ -5,7 +5,7 @@ last edited: 2025-04-10 15:10
 tags:
   - wordpress
   - medium
-cover-image: "[the-day-a-pig-fell-into-the-well-review-cover](<./20170711-the-day-a-pig-fell-into-the-well-review/the-day-a-pig-fell-into-the-well-review-cover.png>)"
+cover-image: ./20170711-the-day-a-pig-fell-into-the-well-review/the-day-a-pig-fell-into-the-well-review-cover.png
 ---
 ![the-day-a-pig-fell-into-the-well-review-cover](<./20170711-the-day-a-pig-fell-into-the-well-review/the-day-a-pig-fell-into-the-well-review-cover.png>)
 Disappointment as surrealism. Change as bizarre. Love as a temporal function. A twisted crossroad welcomes the eminent boiling down of every human concoction — four poets amidst the ephemeral satisfaction of a seraph thrown into the same cubicle as a strident and idiosyncratic heart — not as thirsty but certainly as callous and indulgent. The question of rightful yearning is not a candid inquisition; the depth of its interrogation asks a what if and a what then. If we all covet intimacy, where is our patience to bear its weight when it reeks of fallacy? If we pen forevers as postscripts to our letters of fervour then why does it feel lonesome after a day of delayed response? All of us go through vacations of radical affection yet loyalty barks attenuation as strings tire of circumstance. A variable need of warmth haunts us and as necessity translates into desperation, our radar points towards inequalities with the destined other, and we fall in and out of love as we please, turning to self-anointed labels and badly published edits of insecurity.

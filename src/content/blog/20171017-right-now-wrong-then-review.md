@@ -5,7 +5,7 @@ last edited: 2025-04-10 15:44
 tags:
   - medium
   - wordpress
-cover-image: "[right-now-wrong-then-review-cover](<./20171017-right-now-wrong-then-review/right-now-wrong-then-review-cover.png>)"
+cover-image: ./20171017-right-now-wrong-then-review/right-now-wrong-then-review-cover.png
 ---
 ![right-now-wrong-then-review-cover](<./20171017-right-now-wrong-then-review/right-now-wrong-then-review-cover.png>)
 

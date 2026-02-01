@@ -5,7 +5,7 @@ last edited: 2026-01-19 22:10:58
 tags:
   - wordpress
   - medium
-cover-image: "[dunkirk-review-cover](<./20170721-dunkirk-review/dunkirk-review-cover.jpeg>)"
+cover-image: ./20170721-dunkirk-review/dunkirk-review-cover.jpeg
 ---
 ![dunkirk-review-cover](<./20170721-dunkirk-review/dunkirk-review-cover.jpeg>)
 

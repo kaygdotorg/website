@@ -5,7 +5,7 @@ last edited: 2026-01-18 15:33:46
 tags:
   - medium
   - wordpress
-cover-image: "[virgin-stripped-bare-by-her-bachelors-review-cover](<./20170716-virgin-stripped-bare-by-her-bachelors-review/virgin-stripped-bare-by-her-bachelors-review-cover.png>)"
+cover-image: ./20170716-virgin-stripped-bare-by-her-bachelors-review/virgin-stripped-bare-by-her-bachelors-review-cover.png
 ---
 ![virgin-stripped-bare-by-her-bachelors-review-cover](<./20170716-virgin-stripped-bare-by-her-bachelors-review/virgin-stripped-bare-by-her-bachelors-review-cover.png>)
 The score is 16 to 9. The frigid winter pilots attire and the monochrome condenses two sides to a story. Title card fades to a classical symphony — three people exit an art exhibit; the producer derides the stagnant linearity of art while the apprentice disagrees, goes on to praise the general idea in the static picture. A small Kyongbokgoong Palace stands before them; the apprentice dispenses an idea of visit but her intent is picayune to the wealth that tries to abuse or the ambition that tries to exploit. However, Hong plays on the measly variation betwixt chance and intent. Lovers walk into dark streets hoping to impress the destined other by ridicule, sweaters sheltering the bleak outskirts of desire in one and discomfort in the other; it does not work so a kiss lands, the polar excess spiraling the insincerity in time. Retake. Professionals talk in the editing room, two more scenes left at the terminal of a long morning. The director turns his eyes away from the screen, to his mentee with a primal gaze, secures the stipulation of time and takes his chance; a kiss lands, gentle and forgiving; the mistress reciprocates. Cut.
