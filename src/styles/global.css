@@ -3487,6 +3487,83 @@ html.theme-transitioning *::after {
 }
 
 /* ========================================
+   Standard backdrop-filter for Chrome/Firefox
+   ======================================== 
+   
+   Tailwind CSS v4 uses Lightning CSS which may strip the standard 
+   `backdrop-filter` property, keeping only `-webkit-backdrop-filter`.
+   This breaks blur effects on desktop Chrome/Firefox.
+   
+   This @supports block explicitly adds the standard property for browsers
+   that support it, ensuring it survives the build process.
+   ======================================== */
+@supports (backdrop-filter: blur(1px)) {
+  .glass-pill {
+    backdrop-filter: blur(16px) saturate(180%);
+  }
+
+  .frosted-card {
+    backdrop-filter: blur(16px);
+  }
+
+  .frosted-card-homepage {
+    backdrop-filter: blur(20px);
+  }
+
+  .md-unified-card {
+    backdrop-filter: blur(20px);
+  }
+
+  .nav-container::before {
+    backdrop-filter: blur(12px) saturate(150%);
+  }
+
+  .mobile-menu-backdrop {
+    backdrop-filter: blur(0px);
+  }
+
+  .menu-open .mobile-menu-backdrop {
+    backdrop-filter: blur(12px);
+  }
+
+  .mobile-menu-card {
+    backdrop-filter: blur(40px) !important;
+  }
+
+  .scroll-progress-btn {
+    backdrop-filter: blur(12px);
+  }
+
+  .zoom-overlay {
+    backdrop-filter: blur(0px);
+  }
+
+  .zoom-overlay.active {
+    backdrop-filter: blur(12px);
+  }
+
+  .search-backdrop {
+    backdrop-filter: blur(12px);
+  }
+
+  .lightbox-overlay {
+    backdrop-filter: blur(20px);
+  }
+
+  .toast-notification {
+    backdrop-filter: blur(16px);
+  }
+
+  .pagefind-ui__results-area {
+    backdrop-filter: blur(40px);
+  }
+
+  .zoom-caption {
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* ========================================
    Safari/WebKit Compatibility Fallbacks
    ======================================== */
 
