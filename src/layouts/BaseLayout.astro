@@ -32,6 +32,9 @@ const {
   hideNavInitially = false,
   displayInProgress = false,
 } = Astro.props;
+
+const siteName = "K Gopal Krishna";
+const ogImage = "https://kayg.org/images/og-image.png";
 const currentPath = Astro.url.pathname;
 
 const visibleNavLinks = [
@@ -85,15 +88,15 @@ import { ClientRouter } from "astro:transitions";
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="https://kayg.org/images/og-image.png" />
+    <meta property="og:image" content={ogImage} />
     <meta property="og:url" content={Astro.url.href} />
-    <meta property="og:site_name" content="K Gopal Krishna" />
+    <meta property="og:site_name" content={siteName} />
 
     <!-- Twitter Card meta tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content="https://kayg.org/images/og-image.png" />
+    <meta name="twitter:image" content={ogImage} />
 
     <!-- Canonical URL to prevent duplicate content issues -->
     <link rel="canonical" href={Astro.url.href} />
@@ -107,14 +110,14 @@ import { ClientRouter } from "astro:transitions";
           {
             "@type": "Person",
             "@id": "https://kayg.org/#person",
-            name: "K Gopal Krishna",
+            name: siteName,
             url: "https://kayg.org",
-            image: "https://kayg.org/images/og-image.png",
+            image: ogImage,
           },
           {
             "@type": "WebSite",
             "@id": "https://kayg.org/#website",
-            name: "K Gopal Krishna",
+            name: siteName,
             url: "https://kayg.org",
             description: description,
             author: { "@id": "https://kayg.org/#person" },
