@@ -16,6 +16,7 @@
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection, render } from "astro:content";
+import { Image } from "astro:assets";
 import { formatDateWithComma } from "../utils/dates";
 import { getExcerpt } from "../utils/markdown";
 import { getUrlSlug } from "../utils/content";
@@ -98,7 +99,7 @@ const sortedTalks = allTalksEntries
                 class="block frosted-card p-6 hover:scale-[1.02] transition-transform group"
               >
                 <div class="flex flex-col">
-                  {/* Cover image */}
+                  {/* Cover image - GIFs preserved, others optimized */}
                   {talk.data["cover-image"] && (
                     <div class="w-full mb-6">
                       <div class="aspect-[16/9] rounded-xl overflow-hidden border border-white/10 shadow-lg group-hover:shadow-accent-500/20 transition-all">
@@ -110,9 +111,17 @@ const sortedTalks = allTalksEntries
                             loading="lazy"
                             decoding="async"
                           />
-                        ) : (
+                        ) : talk.data["cover-image"].format === "gif" ? (
                           <img
                             src={talk.data["cover-image"].src}
+                            alt={talk.data.title}
+                            class="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <Image
+                            src={talk.data["cover-image"]}
                             alt={talk.data.title}
                             class="w-full h-full object-cover"
                             loading="lazy"

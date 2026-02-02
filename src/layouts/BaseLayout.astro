@@ -1648,6 +1648,19 @@ import { ClientRouter } from "astro:transitions";
        *
        * Shows a thumbnail preview when hovering over image links (links with
        * data-asset-type="image"). The preview appears above the cursor.
+       *
+       * OPTIMIZATION:
+       * -------------
+       * Uses the image manifest (/image-manifest.json) to load optimized WebP
+       * versions of images for faster hover previews. The manifest maps original
+       * asset paths to their Astro-optimized URLs.
+       *
+       * - Manifest is fetched once on first hover and cached in window object
+       * - If optimized URL exists in manifest, use it for preview
+       * - Falls back to original href if not in manifest or on error
+       * - Lightbox still uses original full-res images (handled by initImageZoom)
+       *
+       * @see /src/pages/image-manifest.json.ts - generates the manifest
        */
       function initImagePreview() {
         // Create tooltip element if it doesn't exist
@@ -1663,17 +1676,31 @@ import { ClientRouter } from "astro:transitions";
         const imageCache = (window as any).__imagePreviewCache || new Map();
         (window as any).__imagePreviewCache = imageCache;
 
+        // Image manifest promise - cached in window for session reuse
+        // Fetched once on first hover, reused for all subsequent hovers
+        if (!(window as any).__imageManifestPromise) {
+          (window as any).__imageManifestPromise = fetch("/image-manifest.json")
+            .then(r => r.ok ? r.json() : {})
+            .catch(() => ({})); // Fallback to empty manifest on error
+        }
+
         let hideTimeout: ReturnType<typeof setTimeout> | null = null;
         let currentLink: HTMLElement | null = null;
 
-        function showPreview(link: HTMLAnchorElement, e: MouseEvent) {
+        async function showPreview(link: HTMLAnchorElement, e: MouseEvent) {
           if (hideTimeout) {
             clearTimeout(hideTimeout);
             hideTimeout = null;
           }
 
           currentLink = link;
-          const href = link.href;
+          const originalHref = link.href;
+          
+          // Try to get optimized URL from manifest
+          const manifest = await (window as any).__imageManifestPromise;
+          const pathname = new URL(originalHref).pathname;
+          // Use optimized URL if available, otherwise fall back to original
+          const imageSrc = manifest[pathname] || originalHref;
 
           // Position tooltip above cursor
           const updatePosition = (clientX: number, clientY: number) => {
@@ -1697,9 +1724,9 @@ import { ClientRouter } from "astro:transitions";
             tooltip.style.top = `${top}px`;
           };
 
-          // Check cache first
-          if (imageCache.has(href)) {
-            const cachedImg = imageCache.get(href);
+          // Check cache first (cache key is the resolved imageSrc)
+          if (imageCache.has(imageSrc)) {
+            const cachedImg = imageCache.get(imageSrc);
             tooltip.innerHTML = "";
             tooltip.appendChild(cachedImg.cloneNode(true));
             tooltip.classList.remove("loading");
@@ -1713,11 +1740,11 @@ import { ClientRouter } from "astro:transitions";
           tooltip.classList.add("loading", "visible");
           updatePosition(e.clientX, e.clientY);
 
-          // Load image
+          // Load image (optimized version if available)
           const img = document.createElement("img");
           img.onload = () => {
             if (currentLink !== link) return; // User moved to different link
-            imageCache.set(href, img);
+            imageCache.set(imageSrc, img);
             tooltip.innerHTML = "";
             tooltip.appendChild(img.cloneNode(true));
             tooltip.classList.remove("loading");
@@ -1725,9 +1752,14 @@ import { ClientRouter } from "astro:transitions";
           };
           img.onerror = () => {
             if (currentLink !== link) return;
-            tooltip.classList.remove("visible", "loading");
+            // If optimized version fails, try original as fallback
+            if (imageSrc !== originalHref) {
+              img.src = originalHref;
+            } else {
+              tooltip.classList.remove("visible", "loading");
+            }
           };
-          img.src = href;
+          img.src = imageSrc;
         }
 
         function hidePreview() {

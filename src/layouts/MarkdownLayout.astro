@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import { Image } from "astro:assets";
 import { formatDate, getRelativeTime } from "../utils/dates";
 import { getExcerpt } from "../utils/markdown";
 
@@ -88,18 +89,25 @@ const githubUrl = entry?.filePath
     <!-- Unified Single Card for entire page -->
     <div class="frosted-card md-unified-card">
       <!-- Featured Image at top of card -->
+      <!-- GIFs use plain <img> to preserve animation; other formats use <Image /> for optimization -->
       {
         coverImage && (
           <div class="md-card-featured-image">
             {typeof coverImage === "string" ? (
               <img src={coverImage} alt={title} loading="lazy" decoding="async" />
-            ) : (
+            ) : coverImage.format === "gif" ? (
               <img
                 src={coverImage.src}
                 alt={title}
                 loading="lazy"
                 decoding="async"
-                {...coverImage.attributes}
+              />
+            ) : (
+              <Image
+                src={coverImage}
+                alt={title}
+                loading="lazy"
+                decoding="async"
               />
             )}
           </div>

@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Timeline from "../components/Timeline.astro";
 import { getCollection, render } from "astro:content";
+import { Image } from "astro:assets";
 import { formatDateWithComma } from "../utils/dates";
 
 // Use getCollection and filter for index - more reliable than getEntry
@@ -159,20 +160,35 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       <div class="frosted-card-homepage hero-card hero-glow">
         <div class="hero-content">
           <!-- Profile Picture - handles both optimized images (ImageMetadata) and URL strings -->
+          <!-- GIFs use plain <img> to preserve animation; other formats use <Image /> for optimization -->
           {
             profileImage && (
               <div class="hero-profile">
-                <img
-                  src={
-                    typeof profileImage === "string"
-                      ? profileImage
-                      : profileImage.src
-                  }
-                  alt={`${name || "Profile"} photo`}
-                  class="hero-profile-img"
-                  fetchpriority="high"
-                  decoding="async"
-                />
+                {typeof profileImage === "string" ? (
+                  <img
+                    src={profileImage}
+                    alt={`${name || "Profile"} photo`}
+                    class="hero-profile-img"
+                    fetchpriority="high"
+                    decoding="async"
+                  />
+                ) : profileImage.format === "gif" ? (
+                  <img
+                    src={profileImage.src}
+                    alt={`${name || "Profile"} photo`}
+                    class="hero-profile-img"
+                    fetchpriority="high"
+                    decoding="async"
+                  />
+                ) : (
+                  <Image
+                    src={profileImage}
+                    alt={`${name || "Profile"} photo`}
+                    class="hero-profile-img"
+                    loading="eager"
+                    decoding="async"
+                  />
+                )}
               </div>
             )
           }
@@ -199,18 +215,33 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                       data-index={index}
                       data-position={index}
                     >
+                      <!-- Card photo images - GIFs preserved, others optimized -->
                       <div class="card-in-hand-image">
-                        <img
-                          src={
-                            typeof item.src === "string"
-                              ? item.src
-                              : item.src.src
-                          }
-                          alt={item.label}
-                          draggable="false"
-                          loading="lazy"
-                          decoding="async"
-                        />
+                        {typeof item.src === "string" ? (
+                          <img
+                            src={item.src}
+                            alt={item.label}
+                            draggable="false"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : item.src.format === "gif" ? (
+                          <img
+                            src={item.src.src}
+                            alt={item.label}
+                            draggable="false"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <Image
+                            src={item.src}
+                            alt={item.label}
+                            draggable="false"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        )}
                       </div>
                       <div class="card-in-hand-label">
                         <div class="card-in-hand-slug">{item.href}</div>
@@ -252,21 +283,34 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                     - "graph": Canvas animation (was: card.image === "obsidian-graph")
                     - "default": Standard image (fallback)
                   */}
+                  {/* Photo stack - GIFs preserved, others optimized */}
                   {card.layoutVariant === "photostack" ? (
                     <div class="photo-grid-feature">
                       <div class="photo-stack">
                         {cardPhotos?.slice(0, 4).map((photo: any) => (
                           <div class="photo-stack-item">
-                            <img
-                              src={
-                                typeof photo.src === "string"
-                                  ? photo.src
-                                  : photo.src.src
-                              }
-                              alt="Capture"
-                              loading="lazy"
-                              decoding="async"
-                            />
+                            {typeof photo.src === "string" ? (
+                              <img
+                                src={photo.src}
+                                alt="Capture"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            ) : photo.src.format === "gif" ? (
+                              <img
+                                src={photo.src.src}
+                                alt="Capture"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            ) : (
+                              <Image
+                                src={photo.src}
+                                alt="Capture"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            )}
                           </div>
                         ))}
                       </div>
@@ -277,17 +321,29 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                     </div>
                   ) : (
                     <div class="bento-image-wrapper">
-                      {/* Handle both optimized images (ImageMetadata with .src) and URL strings */}
-                      <img
-                        src={
-                          typeof card.image === "string"
-                            ? card.image
-                            : card.image.src
-                        }
-                        alt={card.title}
-                        loading="lazy"
-                        decoding="async"
-                      />
+                      {/* Bento card images - GIFs preserved, others optimized */}
+                      {typeof card.image === "string" ? (
+                        <img
+                          src={card.image}
+                          alt={card.title}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : card.image.format === "gif" ? (
+                        <img
+                          src={card.image.src}
+                          alt={card.title}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <Image
+                          src={card.image}
+                          alt={card.title}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
                     </div>
                   )}
                 </div>

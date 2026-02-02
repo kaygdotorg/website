@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import { Image } from 'astro:assets';
 import { formatDate, formatMonth, getRelativeTime } from '../utils/dates';
 
 interface TimelineEntry {
@@ -46,13 +47,16 @@ const sortedEntries = entries.sort((a, b) => b.date.getTime() - a.date.getTime()
             <div class="w-full md:w-1/2 px-8">
               <a href={entry.href} class="block frosted-card p-6 h-full hover:scale-[1.02] transition-all duration-300">
                 <div class="flex flex-col h-full">
+                  {/* Cover image - GIFs preserved, others optimized */}
                   {entry.coverImage && (
                     <div class="w-full mb-6">
                       <div class="aspect-[16/9] rounded-xl overflow-hidden border border-white/10 shadow-lg">
                         {typeof entry.coverImage === 'string' ? (
                           <img src={entry.coverImage} alt={entry.title} class="w-full h-full object-cover" loading="lazy" decoding="async" />
-                        ) : (
+                        ) : entry.coverImage.format === 'gif' ? (
                           <img src={entry.coverImage.src} alt={entry.title} class="w-full h-full object-cover" loading="lazy" decoding="async" />
+                        ) : (
+                          <Image src={entry.coverImage} alt={entry.title} class="w-full h-full object-cover" loading="lazy" decoding="async" />
                         )}
                       </div>
                     </div>
