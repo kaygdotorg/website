@@ -22,6 +22,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeAssetLinks from "./src/plugins/rehype-asset-links.mjs";
 import rehypeInternalLinks from "./src/plugins/rehype-internal-links.mjs";
+import rehypeImageOriginals from "./src/plugins/rehype-image-originals.mjs";
 import remarkMdLinks from "./src/plugins/remark-md-links.mjs";
 import { fromHtml } from "hast-util-from-html";
 
@@ -83,6 +84,9 @@ export default defineConfig({
 
       // Transform relative asset links (images, videos, docs) for proper handling
       rehypeAssetLinks,
+
+      // Add data-original-src to embedded images for lightbox access to originals
+      rehypeImageOriginals,
 
       // Mark internal page links for preview feature
       rehypeInternalLinks,

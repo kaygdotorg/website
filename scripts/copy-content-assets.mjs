@@ -101,27 +101,44 @@ function stripDatePrefix(name) {
 
 /**
  * Get the public URL path for an asset.
- * Handles the date prefix stripping to match how URLs are generated.
+ * 
+ * Uses the entry's slug for the path, so assets are accessible at:
+ * /collection/slug/filename.ext
+ * 
+ * Example: /uses/2024-04-02/macbook-lid-closed.jpg
+ * 
+ * @param {string} collection - The collection name (e.g., 'uses')
+ * @param {string} slug - The entry slug from frontmatter or derived from filename
+ * @param {string} relativePath - The relative path from markdown (e.g., './20240402-uses/image.jpg')
  */
-function getPublicPath(collection, mdFilePath, relativePath) {
-  // Get the directory containing the markdown file
-  const mdDir = path.dirname(mdFilePath);
+function getPublicPath(collection, slug, relativePath) {
+  // Extract just the filename from the relative path
+  const filename = path.basename(relativePath);
   
-  // Resolve the relative path from the markdown file's directory
-  const absoluteAssetPath = path.resolve(mdDir, relativePath);
-  
-  // Get the path relative to the collection directory
-  const collectionDir = path.join(CONTENT_DIR, collection);
-  const relativeToCollection = path.relative(collectionDir, absoluteAssetPath);
-  
-  // For the public URL, we need to handle the entry slug (with date stripped)
-  // If the asset is in a dated directory, strip the date from the directory name
-  const parts = relativeToCollection.split(path.sep);
-  if (parts.length > 0 && /^\d{8}-/.test(parts[0])) {
-    parts[0] = stripDatePrefix(parts[0]);
+  // Use slug for the directory structure
+  return path.join(collection, slug, filename);
+}
+
+/**
+ * Get the entry slug from frontmatter or derive from filename.
+ * 
+ * Priority:
+ * 1. Explicit slug field in frontmatter
+ * 2. Derived from filename by stripping date prefix (YYYYMMDD-)
+ */
+function getEntrySlug(frontmatter, mdFilePath) {
+  // Check for explicit slug in frontmatter
+  if (frontmatter.slug) {
+    // Handle Date objects (YAML parses dates)
+    if (frontmatter.slug instanceof Date) {
+      return frontmatter.slug.toISOString().split('T')[0];
+    }
+    return String(frontmatter.slug);
   }
   
-  return path.join(collection, ...parts);
+  // Derive from filename: 20240402-uses.md → uses
+  const filename = path.basename(mdFilePath, '.md');
+  return stripDatePrefix(filename);
 }
 
 /**
@@ -131,6 +148,9 @@ async function processMarkdownFile(mdFilePath, collection) {
   try {
     const content = await fs.readFile(mdFilePath, 'utf-8');
     const { data: frontmatter, content: body } = matter(content);
+    
+    // Get the entry slug for public paths
+    const slug = getEntrySlug(frontmatter, mdFilePath);
     
     // Extract paths from frontmatter
     const frontmatterPaths = extractRelativePaths(frontmatter);
@@ -150,8 +170,8 @@ async function processMarkdownFile(mdFilePath, collection) {
       try {
         await fs.access(absoluteAssetPath);
         
-        // Calculate the public destination path
-        const publicPath = getPublicPath(collection, mdFilePath, relativePath);
+        // Calculate the public destination path using the slug
+        const publicPath = getPublicPath(collection, slug, relativePath);
         
         discoveredAssets.add({
           src: absoluteAssetPath,

@@ -1136,6 +1136,21 @@ import { ClientRouter } from "astro:transitions";
        */
       function initImageZoom() {
         // ---------------------------------------------------------------------
+        // FETCH MANIFEST - Needed for reverse lookup (optimized → original)
+        // ---------------------------------------------------------------------
+        // Fetch manifest early so it's ready when lightbox opens
+        if (!(window as any).__imageManifestPromise) {
+          (window as any).__imageManifestPromise = fetch("/image-manifest.json")
+            .then(r => r.ok ? r.json() : {})
+            .then((manifest: Record<string, string>) => {
+              // Store manifest for lightbox to use (original → optimized)
+              (window as any).__imageManifest = manifest;
+              return manifest;
+            })
+            .catch(() => ({}));
+        }
+        
+        // ---------------------------------------------------------------------
         // GALLERY STATE - Tracks current gallery and index for navigation
         // ---------------------------------------------------------------------
         // Store state on window to persist across View Transitions
@@ -1165,7 +1180,7 @@ import { ClientRouter } from "astro:transitions";
           }
         }
 
-        function showImage(index: number) {
+        async function showImage(index: number) {
           const overlay = document.getElementById("zoom-overlay");
           const zoomedImg = document.getElementById(
             "zoomed-image",
@@ -1196,10 +1211,61 @@ import { ClientRouter } from "astro:transitions";
 
           const img = state.images[index];
           if (!img) return;
-          // Use data-src from parent .photo-item if available (for full-size), else use img src
+          
+          // Get the current src (may be optimized WebP)
+          const currentSrc = img.getAttribute("src") || "";
           const photoItem = img.closest ? img.closest(".photo-item") : null;
-          const fullSrc =
-            photoItem?.getAttribute("data-src") || img.getAttribute("src");
+          
+          // Priority for full-size image source:
+          // 1. data-original-src attribute (explicitly set)
+          // 2. data-src from parent .photo-item (for photo galleries)
+          // 3. data-image-src from parent link (for linked images)
+          // 4. Derive from optimized path + page URL (for embedded images)
+          // 5. img src (fallback to current version)
+          let fullSrc = img.getAttribute("data-original-src") ||
+            photoItem?.getAttribute("data-src");
+          
+          // For linked images inside <a> tags, use the link's data-image-src
+          if (!fullSrc) {
+            const parentLink = img.closest("a[data-image-src]");
+            if (parentLink) {
+              fullSrc = parentLink.getAttribute("data-image-src");
+            }
+          }
+          
+          // For embedded images with /_astro/ paths, derive original from manifest
+          if (!fullSrc && currentSrc.includes("/_astro/")) {
+            // Extract base filename from optimized path (e.g., "workspace" from "workspace.hash.webp")
+            const match = currentSrc.match(/\/_astro\/([^.]+)\./);
+            if (match) {
+              const baseName = match[1];
+              // Get current page path to construct original URL
+              const pagePath = window.location.pathname.replace(/\/$/, '');
+              
+              // Wait for manifest if still loading
+              const manifestPromise = (window as any).__imageManifestPromise;
+              if (manifestPromise) {
+                try {
+                  const manifest = await manifestPromise;
+                  for (const [original] of Object.entries(manifest)) {
+                    // Check if this manifest entry's original path matches our page and filename
+                    if (original.startsWith(pagePath + '/') && 
+                        original.includes('/' + baseName + '.')) {
+                      fullSrc = original;
+                      break;
+                    }
+                  }
+                } catch (e) {
+                  // Manifest fetch failed, fallback to current src
+                }
+              }
+            }
+          }
+          
+          // Fallback to current src
+          if (!fullSrc) {
+            fullSrc = currentSrc;
+          }
           const alt =
             photoItem?.getAttribute("data-alt") || img.getAttribute("alt");
 
@@ -1681,6 +1747,11 @@ import { ClientRouter } from "astro:transitions";
         if (!(window as any).__imageManifestPromise) {
           (window as any).__imageManifestPromise = fetch("/image-manifest.json")
             .then(r => r.ok ? r.json() : {})
+            .then((manifest: Record<string, string>) => {
+              // Store manifest for lightbox to use
+              (window as any).__imageManifest = manifest;
+              return manifest;
+            })
             .catch(() => ({})); // Fallback to empty manifest on error
         }
 
@@ -1752,12 +1823,8 @@ import { ClientRouter } from "astro:transitions";
           };
           img.onerror = () => {
             if (currentLink !== link) return;
-            // If optimized version fails, try original as fallback
-            if (imageSrc !== originalHref) {
-              img.src = originalHref;
-            } else {
-              tooltip.classList.remove("visible", "loading");
-            }
+            // Hide tooltip on error - don't fallback to original
+            tooltip.classList.remove("visible", "loading");
           };
           img.src = imageSrc;
         }

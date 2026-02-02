@@ -24,12 +24,44 @@
  */
 
 import { visit } from "unist-util-visit";
+import path from "path";
+import fs from "fs";
 
 // Asset type detection patterns
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|gif|webp|svg|avif|heic|bmp|tiff?)$/i;
 const VIDEO_EXTENSIONS = /\.(mp4|webm|mov|avi|mkv|m4v)$/i;
 const DOCUMENT_EXTENSIONS = /\.(pdf|docx?|xlsx?|pptx?|txt|md|csv|rtf)$/i;
 const AUDIO_EXTENSIONS = /\.(mp3|wav|flac|ogg|m4a|aac)$/i;
+
+/**
+ * Strip date prefix from a string (YYYYMMDD-).
+ */
+function stripDatePrefix(name) {
+  return name.replace(/^\d{8}-/, '');
+}
+
+/**
+ * Extract slug from frontmatter by reading the raw file.
+ * Returns explicit slug if present, otherwise null.
+ */
+function extractSlugFromFile(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!frontmatterMatch) return null;
+    
+    const frontmatter = frontmatterMatch[1];
+    const slugMatch = frontmatter.match(/^slug:\s*(.+)$/m);
+    if (!slugMatch) return null;
+    
+    let slug = slugMatch[1].trim();
+    slug = slug.replace(/^["']|["']$/g, '');
+    
+    return slug;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Determines the asset type from a URL/path
@@ -62,13 +94,38 @@ function isLocalPath(href) {
 }
 
 /**
+ * Transform a relative asset href to use the proper slug-based public path.
+ * 
+ * Input: ./20240402-uses/macbook.jpg (with collection: uses, slug: 2024-04-02)
+ * Output: /uses/2024-04-02/macbook.jpg
+ */
+function transformAssetHref(href, collection, slug) {
+  if (!href.startsWith("./")) return href;
+  
+  // Extract just the filename from the relative path
+  const filename = path.basename(href);
+  
+  // Construct the public path using the slug
+  return `/${collection}/${slug}/${filename}`;
+}
+
+/**
  * Rehype plugin to transform asset links
  */
 export default function rehypeAssetLinks() {
   return (tree, file) => {
     // Get the file's directory path from Astro's file data
-    // This helps us understand where the markdown file is located
     const filePath = file.history?.[0] || "";
+    
+    // Extract collection and filename from file path
+    const contentMatch = filePath.match(/src\/content\/([^/]+)\/([^/]+)\.md$/);
+    if (!contentMatch) return; // Not a content collection file
+    
+    const [, collection, filename] = contentMatch;
+    
+    // Get slug from frontmatter (read raw file) or derive from filename
+    const explicitSlug = extractSlugFromFile(filePath);
+    const slug = explicitSlug || stripDatePrefix(filename);
 
     visit(tree, "element", (node) => {
       // Only process <a> tags
@@ -83,15 +140,19 @@ export default function rehypeAssetLinks() {
       const assetType = getAssetType(href);
       if (!assetType) return;
 
+      // Transform the href to use the slug-based public path
+      const publicHref = transformAssetHref(href, collection, slug);
+      node.properties.href = publicHref;
+
       // Add data attribute for CSS styling (per-asset-type icons)
       node.properties["data-asset-type"] = assetType;
 
-      // For images, add data-image-src so the lightbox JS can intercept clicks
+      // For images, add data-image-src for lightbox
       if (assetType === "image") {
-        // Store the original href for the lightbox to use
-        // The JS will need to resolve this relative path
-        node.properties["data-image-src"] = href;
+        node.properties["data-image-src"] = publicHref;
         node.properties["data-lightbox"] = "true";
+        // Disable Astro's View Transitions prefetch - we use manifest for hover preview
+        node.properties["data-astro-prefetch"] = "false";
       }
 
       // Mark as internal asset link for CSS styling

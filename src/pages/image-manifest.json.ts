@@ -34,181 +34,135 @@
  */
 
 import type { APIRoute } from "astro";
-import { getCollection } from "astro:content";
 import { getImage } from "astro:assets";
-
-/**
- * Collections that may contain images in their frontmatter.
- * These are scanned to build the manifest.
- */
-const COLLECTIONS_WITH_IMAGES = [
-  "blog",
-  "notes", 
-  "talks",
-  "now",
-  "uses",
-  "home",
-  "photography",
-] as const;
 
 /**
  * Image extensions that should be optimized.
  * GIFs are excluded to preserve animation.
- * Note: In dev mode, imageMetadata.src includes query params, so we match before the ?
  */
-const OPTIMIZABLE_EXTENSIONS = /\.(jpe?g|png|webp|avif|tiff?)(\?|$)/i;
+const OPTIMIZABLE_EXTENSIONS = /\.(jpe?g|png|webp|avif|tiff?)$/i;
 
 /**
- * Extract the public URL path from an ImageMetadata src.
- * Astro's ImageMetadata.src contains the path like "/@fs/..." in dev
- * or "/_astro/..." in production. We need the original relative path
- * that was used in frontmatter to create the manifest mapping.
- *
- * Since we don't have direct access to the original path, we'll use
- * the collection structure to reconstruct it.
+ * Import all images from content directories using Vite's glob import.
  */
-function getPublicPath(collection: string, entryId: string, filename: string): string {
-  // For blog entries, the path structure is /blog/[entry-id]/[filename]
-  // The entry ID already has the date prefix stripped by generateId
-  // But the original files use the full directory name with date prefix
-  // 
-  // We need to match what copy-content-assets.mjs produces in public/
-  // which preserves the original directory structure
-  return `/${collection}/${entryId}/${filename}`;
+const contentImages = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/content/**/*.{jpg,jpeg,png,webp,avif,tiff}",
+  { eager: true }
+);
+
+/**
+ * Import all markdown files to read their frontmatter for slugs.
+ */
+const contentMarkdown = import.meta.glob<string>(
+  "/src/content/**/*.md",
+  { eager: true, query: "?raw", import: "default" }
+);
+
+/**
+ * Strip date prefix from a string (YYYYMMDD-).
+ */
+function stripDatePrefix(name: string): string {
+  return name.replace(/^\d{8}-/, '');
+}
+
+/**
+ * Extract slug from markdown frontmatter content.
+ * Returns explicit slug if present, otherwise null.
+ */
+function extractSlugFromFrontmatter(content: string): string | null {
+  // Simple frontmatter parsing - find slug field
+  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+  if (!frontmatterMatch) return null;
+  
+  const frontmatter = frontmatterMatch[1];
+  const slugMatch = frontmatter.match(/^slug:\s*(.+)$/m);
+  if (!slugMatch) return null;
+  
+  let slug = slugMatch[1].trim();
+  // Remove quotes if present
+  slug = slug.replace(/^["']|["']$/g, '');
+  
+  // Handle date format (YAML may parse as date string)
+  return slug;
+}
+
+/**
+ * Build a map from directory names to their proper slugs.
+ * This reads frontmatter from all markdown files to get explicit slugs.
+ */
+function buildSlugMap(): Map<string, string> {
+  const slugMap = new Map<string, string>();
+  
+  for (const [mdPath, content] of Object.entries(contentMarkdown)) {
+    // Extract collection and filename from path
+    // Path: /src/content/{collection}/{filename}.md
+    const match = mdPath.match(/\/src\/content\/([^/]+)\/([^/]+)\.md$/);
+    if (!match) continue;
+    
+    const [, collection, filename] = match;
+    
+    // Try to get explicit slug from frontmatter
+    const explicitSlug = extractSlugFromFrontmatter(content);
+    
+    // Determine the slug (explicit or derived)
+    const slug = explicitSlug || stripDatePrefix(filename);
+    
+    // Map the directory key to the slug
+    // Key format: collection/filename (without .md)
+    slugMap.set(`${collection}/${filename}`, slug);
+  }
+  
+  return slugMap;
+}
+
+/**
+ * Convert a glob import path to the public URL path.
+ * Uses the slug map to get proper slugs from frontmatter.
+ */
+function globPathToPublicPath(globPath: string, slugMap: Map<string, string>): string | null {
+  // Match: /src/content/{collection}/{dirname}/{filename}
+  const match = globPath.match(/\/src\/content\/([^/]+)\/([^/]+)\/([^/]+)$/);
+  if (!match) return null;
+  
+  const [, collection, dirname, filename] = match;
+  
+  // Look up the slug for this entry
+  const mapKey = `${collection}/${dirname}`;
+  const slug = slugMap.get(mapKey) || stripDatePrefix(dirname);
+  
+  return `/${collection}/${slug}/${filename}`;
 }
 
 export const GET: APIRoute = async () => {
   const manifest: Record<string, string> = {};
 
   try {
-    for (const collectionName of COLLECTIONS_WITH_IMAGES) {
+    // Build slug map from frontmatter
+    const slugMap = buildSlugMap();
+    
+    // Process all images from content directories
+    for (const [globPath, imageModule] of Object.entries(contentImages)) {
+      const imageMetadata = imageModule.default;
+      
+      // Skip if not optimizable
+      if (!OPTIMIZABLE_EXTENSIONS.test(globPath)) continue;
+      
+      // Get the public path for this image using the slug map
+      const publicPath = globPathToPublicPath(globPath, slugMap);
+      if (!publicPath) continue;
+      
       try {
-        const entries = await getCollection(collectionName);
-
-        for (const entry of entries) {
-          const data = entry.data as Record<string, any>;
-
-          // Check for cover-image field (common in blog, talks, notes)
-          if (data["cover-image"]) {
-            if (typeof data["cover-image"] === "string") continue;
-            
-            const imageMetadata = data["cover-image"];
-            
-            // Skip GIFs to preserve animation
-            if (imageMetadata.format === "gif") continue;
-            
-            // Skip if not an optimizable format
-            if (!OPTIMIZABLE_EXTENSIONS.test(imageMetadata.src)) continue;
-
-            try {
-              // Generate optimized version
-              const optimized = await getImage({
-                src: imageMetadata,
-                format: "webp",
-                quality: 80,
-              });
-
-              // The original path needs to match what the browser will request
-              // when clicking a link like [text](./image.jpg)
-              // This is tricky because we need to know the original filename
-              // For now, we'll extract it from the ImageMetadata.src
-              const srcPath = imageMetadata.src;
-              
-              // ImageMetadata.src in dev is like "/@fs/absolute/path/image.jpg"
-              // In build it's the hashed path. We need the public URL.
-              // The copy script creates /blog/entry-id/image.jpg
-              // So we need to map that path to the optimized URL.
-              
-              // Extract filename from the metadata (strip query params)
-              const rawFilename = srcPath.split("/").pop() || "";
-              const filename = rawFilename.split("?")[0]; // Remove query params
-              if (filename) {
-                const publicPath = `/${collectionName}/${entry.id}/${filename}`;
-                manifest[publicPath] = optimized.src;
-              }
-            } catch (e) {
-              // Skip images that fail to optimize
-              console.warn(`Failed to optimize image for ${entry.id}:`, e);
-            }
-          }
-
-          // Check for profile-image (home collection)
-          if (data["profile-image"] && typeof data["profile-image"] !== "string") {
-            const imageMetadata = data["profile-image"];
-            if (imageMetadata.format !== "gif" && OPTIMIZABLE_EXTENSIONS.test(imageMetadata.src)) {
-              try {
-                const optimized = await getImage({
-                  src: imageMetadata,
-                  format: "webp",
-                  quality: 80,
-                });
-                const rawFilename = imageMetadata.src.split("/").pop() || "";
-                const filename = rawFilename.split("?")[0];
-                if (filename) {
-                  const publicPath = `/${collectionName}/${entry.id}/${filename}`;
-                  manifest[publicPath] = optimized.src;
-                }
-              } catch (e) {
-                console.warn(`Failed to optimize profile-image for ${entry.id}:`, e);
-              }
-            }
-          }
-
-          // Check for card-photos array (home collection)
-          if (Array.isArray(data["card-photos"])) {
-            for (const card of data["card-photos"]) {
-              if (card.src && typeof card.src !== "string") {
-                const imageMetadata = card.src;
-                if (imageMetadata.format !== "gif" && OPTIMIZABLE_EXTENSIONS.test(imageMetadata.src)) {
-                  try {
-                    const optimized = await getImage({
-                      src: imageMetadata,
-                      format: "webp",
-                      quality: 80,
-                    });
-                    const rawFilename = imageMetadata.src.split("/").pop() || "";
-                    const filename = rawFilename.split("?")[0];
-                    if (filename) {
-                      const publicPath = `/${collectionName}/${entry.id}/${filename}`;
-                      manifest[publicPath] = optimized.src;
-                    }
-                  } catch (e) {
-                    console.warn(`Failed to optimize card-photo:`, e);
-                  }
-                }
-              }
-            }
-          }
-
-          // Check for bento-cards array (home collection)
-          if (Array.isArray(data["bento-cards"])) {
-            for (const card of data["bento-cards"]) {
-              if (card.image && typeof card.image !== "string") {
-                const imageMetadata = card.image;
-                if (imageMetadata.format !== "gif" && OPTIMIZABLE_EXTENSIONS.test(imageMetadata.src)) {
-                  try {
-                    const optimized = await getImage({
-                      src: imageMetadata,
-                      format: "webp",
-                      quality: 80,
-                    });
-                    const rawFilename = imageMetadata.src.split("/").pop() || "";
-                    const filename = rawFilename.split("?")[0];
-                    if (filename) {
-                      const publicPath = `/${collectionName}/${entry.id}/${filename}`;
-                      manifest[publicPath] = optimized.src;
-                    }
-                  } catch (e) {
-                    console.warn(`Failed to optimize bento-card image:`, e);
-                  }
-                }
-              }
-            }
-          }
-        }
+        // Generate optimized version
+        const optimized = await getImage({
+          src: imageMetadata,
+          format: "webp",
+          quality: 80,
+        });
+        
+        manifest[publicPath] = optimized.src;
       } catch (e) {
-        // Collection might not exist, skip it
-        console.warn(`Skipping collection ${collectionName}:`, e);
+        // Skip images that fail to optimize
+        console.warn(`Failed to optimize ${globPath}:`, e);
       }
     }
   } catch (e) {
