@@ -18,11 +18,13 @@ const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, "..");
 
 // Content collections to process
-const COLLECTIONS = ["blog", "uses", "changelog", "now", "about", "home"];
+const COLLECTIONS = ["blog", "notes", "talks", "uses", "changelog", "now", "about", "home"];
 
 // Map collection folders to URL paths
 const COLLECTION_URL_MAP = {
   blog: "/blog",
+  notes: "/notes",
+  talks: "/talks",
   uses: "/uses", 
   changelog: "/changelog",
   now: "/now",
@@ -66,13 +68,13 @@ function getSlugFromFilename(filename, collection) {
   }
   
   // Extract date and slug from filename patterns like:
-  // 20240402-uses.md -> 2024-04-02
-  // 20250911-switching-between-safari.md -> 2025-09-11
-  const dateMatch = base.match(/^(\d{4})(\d{2})(\d{2})-(.+)$/);
+  // 20240402-uses.md -> uses (slug only, date stripped)
+  // 20240713-x-forwarded-for.md -> x-forwarded-for
+  const dateMatch = base.match(/^\d{8}-(.+)$/);
   if (dateMatch) {
-    const [, year, month, day] = dateMatch;
+    const slug = dateMatch[1];
     const baseUrl = COLLECTION_URL_MAP[collection] || `/${collection}`;
-    return `${baseUrl}/${year}-${month}-${day}`;
+    return `${baseUrl}/${slug}`;
   }
   
   // Default: use filename as slug
