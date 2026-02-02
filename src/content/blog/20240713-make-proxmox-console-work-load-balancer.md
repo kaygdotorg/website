@@ -1,7 +1,8 @@
 ---
-date: 2024-07-13 19:36
+date: 2024-07-13 19:36:00
 last-edited: 2025-01-05 20:22
 title: Make Proxmox Console Work Reliably with a Load Balancer
+last edited: 2026-02-02 16:06:19
 ---
 
 > [!NOTE] Now on YouTube
@@ -25,7 +26,7 @@ The solution is simple: make caddy map one backend to one client IP for the dura
 [...]
 ```
 
-`ip_hash` also works IF the load balancer is talking to the client directly and not through a proxy such as Cloudflare. Since my load balancer talks to me through Cloudflare, there is one prerequisite which is to make sure the `X-Forwarded-For` header is being set properly. That prerequisite belongs in a [separate document](<./20240713-forwarded-ip-cloudflare.md>).
+`ip_hash` also works IF the load balancer is talking to the client directly and not through a proxy such as Cloudflare. Since my load balancer talks to me through Cloudflare, there is one prerequisite which is to make sure the `X-Forwarded-For` header is being set properly. That prerequisite belongs in a [separate document](./20240713-forwarded-ip-cloudflare.md).
 
 And that's it. Now connections to VM/CT consoles work flawlessly. 
 

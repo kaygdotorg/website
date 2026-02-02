@@ -20,8 +20,23 @@
               "icon": "lucide-file",
               "title": "index"
             }
+          },
+          {
+            "id": "16d2621a745ea6db",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "src/content/blog/20240713-forwarded-ip-cloudflare.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "20240713-forwarded-ip-cloudflare"
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -173,9 +188,31 @@
       "pexels-banner:🚩 Pixel Banner Menu": false
     }
   },
-  "active": "d8788d507f6aa92e",
+  "active": "16d2621a745ea6db",
   "lastOpenFiles": [
-    "src/content/home/resume.pdf",
+    "dist/pagefind/fragment/en_fe6367e.pf_fragment",
+    "dist/pagefind/fragment/en_fa728a6.pf_fragment",
+    "dist/pagefind/fragment/en_f58d337.pf_fragment",
+    "dist/pagefind/fragment/en_f44246f.pf_fragment",
+    "dist/pagefind/fragment/en_f271557.pf_fragment",
+    "dist/pagefind/fragment/en_f0662a7.pf_fragment",
+    "dist/pagefind/fragment/en_ee2bc59.pf_fragment",
+    "dist/pagefind/fragment/en_ebbddaa.pf_fragment",
+    "dist/pagefind/fragment/en_e41e1ba.pf_fragment",
+    "dist/pagefind/fragment/en_e29274b.pf_fragment",
+    "dist/pagefind/fragment/en_e234c5e.pf_fragment",
+    "dist/_astro/workspace.tA0ta2hv_Z1of8Sn.webp",
+    "dist/_astro/wordpress-unavailable-different-domain.CQZXe66m_Zdx2tG.webp",
+    "dist/_astro/virtual-router-poc.BNsTW9IZ_wu03p.webp",
+    "dist/_astro/virtual-router-openwrt-interfaces-overview.COSz3e_W_Z15xJer.webp",
+    "dist/_astro/virtual-router-openwrt-configuration.gjlLRuzk_Z1egqAQ.webp",
+    "dist/_astro/virtual-router-openwrt-br-lan-dhcp.CUFBczLf_ZpoBLU.webp",
+    "dist/_astro/virtual-router-nic-passthrough.Bdu29Dl9_ZuaDpy.webp",
+    "dist/_astro/virtual-router-goal.BZmmRL-3_Z2k5GoY.webp",
+    "dist/_astro/virgin-stripped-bare-by-her-bachelors-review-cover.9KE3BVUP.png",
+    "dist/_astro/virgin-stripped-bare-by-her-bachelors-review-2.CztxKsmH_Z10Vv8l.webp",
+    "src/content/blog/20240713-make-proxmox-console-work-load-balancer.md",
+    "<./20240713-forwarded-ip-cloudflare.md",
     "src/content/home/index.md",
     "blog/20250911-switching-between-safari-profile-windows.md",
     "talks/20250125-encryption-zfs-and-proxmox-an-unusual-triangle.md",
@@ -184,26 +221,20 @@
     "talks/20250407-foss-united-talk-migrating-vms-zfs-native-encryption.md",
     "home/index.md",
     "photography/california-coast-bird.md",
-    "home/resume.pdf",
     "photography/index.md",
     "uses/20240402-uses.md",
     "about/index.md",
-    "config.ts.bak",
     "photography/tokyo-streets-night.md",
     "photography/swiss-alps-golden-hour.md",
-    "photos",
     "photos-backup/tokyo-streets-night.md",
     "photos-backup/swiss-alps-golden-hour.md",
     "photos-backup/california-coast-bird.md",
-    "photos-backup",
     "blog/20170721-dunkirk-review.md",
     "blog/20170716-virgin-stripped-bare-by-her-bachelors-review.md",
     "blog/20170711-the-power-of-kangwon-province-review.md",
     "blog/20170711-the-day-a-pig-fell-into-the-well-review.md",
     "notes/20230904-spurious-read-errors.md",
     "now/index.md",
-    "talks/20240508-ceph-rgw-multi-site-new-features-and-an-overview.md",
-    "talks/20240127-vlans-in-proxmox.md",
-    "notes/20240422-key-spam-macos.md"
+    "talks/20240508-ceph-rgw-multi-site-new-features-and-an-overview.md"
   ]
 }
