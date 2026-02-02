@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "src/content/blog/20240713-forwarded-ip-cloudflare.md",
+                "file": "src/content/blog/20250911-switching-between-safari-profile-windows.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "20240713-forwarded-ip-cloudflare"
+              "title": "20250911-switching-between-safari-profile-windows"
             }
           }
         ],
@@ -68,7 +68,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "bttpres",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -79,7 +79,8 @@
               "title": "Search"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -190,29 +191,41 @@
   },
   "active": "16d2621a745ea6db",
   "lastOpenFiles": [
-    "dist/pagefind/fragment/en_fe6367e.pf_fragment",
-    "dist/pagefind/fragment/en_fa728a6.pf_fragment",
-    "dist/pagefind/fragment/en_f58d337.pf_fragment",
-    "dist/pagefind/fragment/en_f44246f.pf_fragment",
-    "dist/pagefind/fragment/en_f0662a7.pf_fragment",
-    "dist/pagefind/fragment/en_ee2bc59.pf_fragment",
-    "dist/pagefind/fragment/en_ebbddaa.pf_fragment",
-    "dist/pagefind/fragment/en_e41e1ba.pf_fragment",
-    "dist/pagefind/fragment/en_e29274b.pf_fragment",
-    "dist/pagefind/fragment/en_e234c5e.pf_fragment",
-    "dist/pagefind/fragment/en_d937de2.pf_fragment",
+    "dist/pagefind/pagefind-modular-ui.css",
+    "dist/pagefind/pagefind-entry.json",
+    "dist/pagefind/pagefind.js",
+    "dist/pagefind/wasm.unknown.pagefind",
+    "dist/pagefind/pagefind-ui.css",
+    "dist/pagefind/pagefind-modular-ui.js",
+    "dist/pagefind/pagefind-ui.js",
+    "dist/pagefind/pagefind-highlight.js",
+    "dist/pagefind/index/en_38898f2.pf_index",
+    "dist/pagefind/index/en_5e76427.pf_index",
+    "dist/pagefind/index/en_7b43dbe.pf_index",
+    "dist/_astro/fantastical-add-event.BQ4dILv3_Zo21DA.webp",
     "dist/_astro/workspace.tA0ta2hv_Z1of8Sn.webp",
-    "dist/_astro/wordpress-unavailable-different-domain.CQZXe66m_Zdx2tG.webp",
-    "dist/_astro/virtual-router-poc.BNsTW9IZ_wu03p.webp",
-    "dist/_astro/virtual-router-openwrt-interfaces-overview.COSz3e_W_Z15xJer.webp",
-    "dist/_astro/virtual-router-openwrt-configuration.gjlLRuzk_Z1egqAQ.webp",
-    "dist/_astro/virtual-router-openwrt-br-lan-dhcp.CUFBczLf_ZpoBLU.webp",
-    "dist/_astro/virtual-router-nic-passthrough.Bdu29Dl9_ZuaDpy.webp",
-    "dist/_astro/virtual-router-goal.BZmmRL-3_Z2k5GoY.webp",
-    "dist/_astro/virgin-stripped-bare-by-her-bachelors-review-cover.9KE3BVUP.png",
-    "dist/_astro/virgin-stripped-bare-by-her-bachelors-review-2.CztxKsmH_Z10Vv8l.webp",
-    "src/content/blog/20240713-make-proxmox-console-work-load-balancer.md",
+    "dist/_astro/busycal-navigating-between-views.CUy3dW47_Z166JDl.webp",
+    "dist/_astro/setapp.CL95y4EG_Z29NRYe.webp",
+    "dist/_astro/workspace.tA0ta2hv_Z19GEGW.webp",
+    "dist/_astro/sony-wh1000xm5.D5ByaXel_ZIAlPd.webp",
+    "dist/_astro/macbook-lid-closed.CkG1BjDZ_Z1zDbBD.webp",
+    "dist/_astro/busycal-account-sidebar-pill.CvJklueC_1Nu8j4.webp",
+    "dist/_astro/macbook-lid-open.BoWKaff9_ZGt2N3.webp",
+    "dist/_astro/parallels-windows-paint.D3M2PM2Y_ZN2Grg.webp",
     "src/content/blog/20240713-forwarded-ip-cloudflare.md",
+    "node_modules/@fontsource/mrs-saint-delafield/README.md",
+    "node_modules/@fontsource/mrs-saint-delafield/CHANGELOG.md",
+    "node_modules/@fontsource/outfit/README.md",
+    "node_modules/@fontsource/outfit/CHANGELOG.md",
+    "node_modules/@fontsource/sn-pro/README.md",
+    "node_modules/@fontsource/sn-pro/CHANGELOG.md",
+    "node_modules/@fontsource/source-serif-4/README.md",
+    "node_modules/@fontsource/source-serif-4/CHANGELOG.md",
+    "node_modules/@fontsource/sora/README.md",
+    "node_modules/@fontsource/sora/CHANGELOG.md",
+    "node_modules/@fontsource/space-grotesk/README.md",
+    "node_modules/@fontsource/space-grotesk/CHANGELOG.md",
+    "src/content/blog/20240713-make-proxmox-console-work-load-balancer.md",
     "<./20240713-forwarded-ip-cloudflare.md",
     "src/content/home/index.md",
     "blog/20250911-switching-between-safari-profile-windows.md",
@@ -223,18 +236,6 @@
     "home/index.md",
     "photography/california-coast-bird.md",
     "photography/index.md",
-    "uses/20240402-uses.md",
-    "about/index.md",
-    "photography/tokyo-streets-night.md",
-    "photography/swiss-alps-golden-hour.md",
-    "photos-backup/tokyo-streets-night.md",
-    "photos-backup/swiss-alps-golden-hour.md",
-    "photos-backup/california-coast-bird.md",
-    "blog/20170721-dunkirk-review.md",
-    "blog/20170716-virgin-stripped-bare-by-her-bachelors-review.md",
-    "blog/20170711-the-power-of-kangwon-province-review.md",
-    "blog/20170711-the-day-a-pig-fell-into-the-well-review.md",
-    "notes/20230904-spurious-read-errors.md",
-    "now/index.md"
+    "uses/20240402-uses.md"
   ]
 }

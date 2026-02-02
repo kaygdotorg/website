@@ -81,7 +81,11 @@ const rawCardPhotos = homeData["card-photos"];
 const rawBentoCards = homeData["bento-cards"];
 const quote = homeData.quote;
 const rawWorkExperience = homeData["work-experience"];
-const resumeUrl = homeData["resume-url"];
+// Resolve resume-url: if relative (./), convert to root path (home assets go to /)
+const rawResumeUrl = homeData["resume-url"];
+const resumeUrl = rawResumeUrl?.startsWith("./") 
+  ? `/${rawResumeUrl.slice(2)}`
+  : rawResumeUrl;
 // Content-driven UI text fields - replace hardcoded strings in template
 const heroHint = homeData["hero-hint"];
 const bentoSectionLabel = homeData["bento-section-label"];

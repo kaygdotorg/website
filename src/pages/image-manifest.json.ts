@@ -35,6 +35,7 @@
 
 import type { APIRoute } from "astro";
 import { getImage } from "astro:assets";
+import { IMAGE_QUALITY } from "../config/images";
 
 /**
  * Image extensions that should be optimized.
@@ -156,7 +157,7 @@ export const GET: APIRoute = async () => {
         const optimized = await getImage({
           src: imageMetadata,
           format: "webp",
-          quality: 80,
+          quality: IMAGE_QUALITY,
         });
         
         manifest[publicPath] = optimized.src;

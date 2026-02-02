@@ -105,7 +105,10 @@ function stripDatePrefix(name) {
  * Uses the entry's slug for the path, so assets are accessible at:
  * /collection/slug/filename.ext
  * 
+ * Special case: 'home' collection assets go to root (/) since home is the site root.
+ * 
  * Example: /uses/2024-04-02/macbook-lid-closed.jpg
+ * Example (home): /resume.pdf
  * 
  * @param {string} collection - The collection name (e.g., 'uses')
  * @param {string} slug - The entry slug from frontmatter or derived from filename
@@ -114,6 +117,11 @@ function stripDatePrefix(name) {
 function getPublicPath(collection, slug, relativePath) {
   // Extract just the filename from the relative path
   const filename = path.basename(relativePath);
+  
+  // Home collection assets go to root since home represents site root
+  if (collection === 'home') {
+    return filename;
+  }
   
   // Use slug for the directory structure
   return path.join(collection, slug, filename);

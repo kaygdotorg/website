@@ -88,9 +88,10 @@ function extractSlugFromFile(filePath) {
 }
 
 /**
- * Rehype plugin to add data-original-src to embedded images.
+ * Rehype plugin to add data-original-src to embedded images and wrap in figure.
  * 
  * Reads frontmatter to get the proper slug for constructing public paths.
+ * Also wraps images with alt text in figure/figcaption for captions.
  */
 export default function rehypeImageOriginals() {
   return (tree, file) => {
@@ -108,47 +109,60 @@ export default function rehypeImageOriginals() {
     const explicitSlug = extractSlugFromFile(filePath);
     const slug = explicitSlug || stripDatePrefix(filename);
     
-    visit(tree, "element", (node) => {
+    // Collect replacements to apply after traversal (avoids mutation issues)
+    const replacements = [];
+    
+    visit(tree, "element", (node, index, parent) => {
       // Only process <img> tags
       if (node.tagName !== "img") return;
       
       const src = node.properties?.src;
       if (!src || typeof src !== "string") return;
       
-      // Check if this is an Astro-optimized image
-      const isAstroOptimized = src.includes("/_astro/") || src.includes("/@fs/");
-      if (!isAstroOptimized) return;
+      // Check if this is a local image (relative path starting with ./)
+      // Rehype runs BEFORE Astro's image optimization, so we see original paths
+      const isLocalImage = src.startsWith("./");
+      if (!isLocalImage) return;
       
-      // Extract the original filename
-      const baseName = extractOriginalFilename(src);
-      if (!baseName) return;
+      // Skip video files (handled by rehype-video-embeds)
+      if (/\.(mp4|webm|mov|avi|mkv|m4v)$/i.test(src)) return;
       
-      // Try to find the original extension from the src path
-      // In dev mode, the original extension is preserved
-      let originalExt = "jpg"; // Default fallback
-      
-      // Check for original extension in query params (dev mode)
-      const origFormatMatch = src.match(/origFormat=(\w+)/);
-      if (origFormatMatch) {
-        const format = origFormatMatch[1];
-        // Map format names to extensions
-        const formatToExt = { jpg: "jpg", jpeg: "jpg", png: "png", gif: "gif", webp: "webp" };
-        originalExt = formatToExt[format] || format;
-      } else {
-        // Try to extract from the path itself (dev mode shows original path)
-        const pathExtMatch = src.match(/\.(\w+)\?/);
-        if (pathExtMatch) {
-          originalExt = pathExtMatch[1];
-        }
-      }
+      // Extract the filename from the path
+      const filename = src.split("/").pop() || "";
       
       // Construct the public path to the original
-      // Format: /collection/slug/filename.ext
-      const originalPath = `/${collection}/${slug}/${baseName}.${originalExt}`;
+      // Format: /collection/slug/filename
+      const originalPath = `/${collection}/${slug}/${filename}`;
       
-      // Add the data attribute
+      // Add the data attribute for lightbox to access original
       node.properties["data-original-src"] = originalPath;
       node.properties["data-lightbox"] = "true";
+      
+      // Queue figure wrapper if alt text exists
+      const alt = node.properties?.alt;
+      if (alt && parent && typeof index === "number") {
+        replacements.push({ parent, index, node, alt });
+      }
     });
+    
+    // Apply replacements in reverse order to preserve indices
+    for (let i = replacements.length - 1; i >= 0; i--) {
+      const { parent, index, node, alt } = replacements[i];
+      const figureNode = {
+        type: "element",
+        tagName: "figure",
+        properties: { class: "image-figure" },
+        children: [
+          node,
+          {
+            type: "element",
+            tagName: "figcaption",
+            properties: {},
+            children: [{ type: "text", value: alt }],
+          },
+        ],
+      };
+      parent.children[index] = figureNode;
+    }
   };
 }

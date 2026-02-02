@@ -19,7 +19,7 @@
  * SUPPORTED ASSET TYPES:
  * - Images: jpg, jpeg, png, gif, webp, svg, avif, heic
  * - Videos: mp4, webm, mov, avi, mkv
- * - Documents: pdf, doc, docx, xls, xlsx, ppt, pptx, txt, md
+ * - Documents: pdf, doc, docx, xls, xlsx, ppt, pptx, txt, md, bttpreset
  * - Audio: mp3, wav, flac, ogg, m4a
  */
 
@@ -30,7 +30,7 @@ import fs from "fs";
 // Asset type detection patterns
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|gif|webp|svg|avif|heic|bmp|tiff?)$/i;
 const VIDEO_EXTENSIONS = /\.(mp4|webm|mov|avi|mkv|m4v)$/i;
-const DOCUMENT_EXTENSIONS = /\.(pdf|docx?|xlsx?|pptx?|txt|md|csv|rtf)$/i;
+const DOCUMENT_EXTENSIONS = /\.(pdf|docx?|xlsx?|pptx?|txt|md|csv|rtf|bttpreset)$/i;
 const AUDIO_EXTENSIONS = /\.(mp3|wav|flac|ogg|m4a|aac)$/i;
 
 /**

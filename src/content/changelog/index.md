@@ -2,8 +2,39 @@
 title: Changelog
 date: 2026-01-22 00:00:00
 description: A log of notable changes, updates, and improvements to this website.
-last-edited: 2026-01-23 12:44:23
+last-edited: 2026-02-02 23:15:00
 ---
+
+## 2026-02-02 Sunday
+
+- **Image Captions**
+  - Markdown image descriptions now display as captions below images
+  - Uses semantic `<figure>` and `<figcaption>` HTML elements
+  - Matches the existing video caption styling
+
+- **Video Embed Support**
+  - New rehype plugin converts `![alt](video.mp4)` syntax to proper `<video>` elements
+  - Supports mp4, webm, mov, avi, mkv, m4v formats
+  - Videos include controls, metadata preloading, and optional captions
+
+- **Shared Image Quality Setting**
+  - Centralized image quality constant (70) in `src/config/images.ts`
+  - Used by both Astro's global config and the image manifest endpoint
+  - Ensures consistent WebP output quality across the site
+
+- **OG Image Optimization**
+  - Homepage cover image now properly optimized for social sharing
+  - Converted from 1.4MB PNG to ~73KB WebP automatically
+  - Fixed OG image resolution in BaseLayout to use `getImage()`
+
+- **Home Collection Asset Handling**
+  - Assets in `src/content/home/` now resolve to root path (`/resume.pdf` not `/home/index/resume.pdf`)
+  - Resume download link works correctly
+  - Reorganized home assets into `assets/` subdirectory
+
+- **Asset Link Fixes**
+  - Added `.bttpreset` to recognized document extensions
+  - Fixed broken download links for custom file types
 
 ## 2026-01-23 Friday
 

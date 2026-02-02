@@ -3,7 +3,7 @@ title: Home
 description: Personal website and digital garden
 name: K Gopal Krishna
 tagline: Infrastructure Engineer, dead cinephile, hobbyist bodybuilder.
-profile-image: ./hero-picture.jpeg
+profile-image: ./assets/hero-picture.jpeg
 email: mail@kayg.org
 footer-text: Vibe-coded with Antigravity using Astro and Tailwind CSS
 
@@ -13,7 +13,7 @@ footer-text: Vibe-coded with Antigravity using Astro and Tailwind CSS
 # Moving these from hardcoded Astro files enables content-driven configuration.
 # =============================================================================
 site-name: "kayg's public repertoire"
-cover-image: "https://kayg.org/images/og-image.webp"
+cover-image: ./assets/home-og-image.png
 
 # =============================================================================
 # NAVIGATION LINKS
@@ -73,7 +73,7 @@ card-photos:
     label: Photography
     href: /photography
     date: Dec 2024
-  - src: ./uses-bento-grid.jpeg
+  - src: ./assets/uses-bento-grid.jpeg
     label: Uses
     href: /uses
     date: Dec 2024
@@ -85,7 +85,7 @@ card-photos:
     label: Writing
     href: /blog
     date: Nov 2024
-  - src: ./talks-bento-grid.jpeg
+  - src: ./assets/talks-bento-grid.jpeg
     label: Talks
     href: /talks
     date: Jan 2026
@@ -100,7 +100,7 @@ bento-cards:
     category: Talks
     summary: Latest presentations at technical conferences and local meetups.
     href: /talks
-    image: ./talks-bento-grid.jpeg
+    image: ./assets/talks-bento-grid.jpeg
   - id: blog
     title: Latest Thinking
     category: Writing
@@ -143,7 +143,7 @@ bento-cards:
     category: Uses
     summary: The hardware and software tools I use to build and create every day.
     href: /uses
-    image: ./uses-bento-grid.jpeg
+    image: ./assets/uses-bento-grid.jpeg
   - id: homelab
     title: Home Lab
     category: Infrastructure
@@ -155,7 +155,7 @@ bento-cards:
     category: Profile
     summary: More about my journey, philosophy, and the things that drive me forward.
     href: /about
-    image: ./hero-picture.jpeg
+    image: ./assets/hero-picture.jpeg
   - id: contact
     title: Say Hello
     category: Contact
@@ -163,7 +163,7 @@ bento-cards:
     href: /contact
     image: https://images.unsplash.com/photo-1523966211575-eb4a01e7dd51?w=800&q=80
 
-resume-url: /resume.pdf
+resume-url: ./resume.pdf
 
 work-experience:
   - role: Support Engineer

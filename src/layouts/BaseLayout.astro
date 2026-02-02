@@ -3,6 +3,8 @@ import "../styles/global.css";
 import Icon from "../components/Icon.astro";
 import InProgressCard from "../components/InProgressCard.astro";
 import { getEntry } from "astro:content";
+import { getImage } from "astro:assets";
+import { IMAGE_QUALITY } from "../config/images";
 
 // Fetch home entry for site-wide configuration.
 // Content-driven approach: site metadata, navigation, and footer content
@@ -84,8 +86,17 @@ const currentPath = Astro.url.pathname;
 // Page-specific cover-image takes priority over home entry default.
 // Falls back to home entry cover-image, then hardcoded default.
 const resolvedSiteName = siteName || "kayg's public repertoire";
-// cover-image can be ImageMetadata (has .src) or string URL
-const homeCoverImage = typeof coverImage === "object" ? coverImage?.src : coverImage;
+
+// Optimize cover images for OG meta tags (convert to WebP with quality setting)
+// cover-image can be ImageMetadata (needs optimization) or string URL (already optimized)
+let homeCoverImage: string | undefined;
+if (typeof coverImage === "object" && coverImage) {
+  const optimized = await getImage({ src: coverImage, format: "webp", quality: IMAGE_QUALITY });
+  homeCoverImage = optimized.src;
+} else if (typeof coverImage === "string") {
+  homeCoverImage = coverImage;
+}
+
 const resolvedOgImage =
   pageOgImage || homeCoverImage || `${Astro.url.origin}/images/og-image.webp`;
 

@@ -23,8 +23,10 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeAssetLinks from "./src/plugins/rehype-asset-links.mjs";
 import rehypeInternalLinks from "./src/plugins/rehype-internal-links.mjs";
 import rehypeImageOriginals from "./src/plugins/rehype-image-originals.mjs";
+import rehypeVideoEmbeds from "./src/plugins/rehype-video-embeds.mjs";
 import remarkMdLinks from "./src/plugins/remark-md-links.mjs";
 import { fromHtml } from "hast-util-from-html";
+import { IMAGE_QUALITY } from "./src/config/images.ts";
 
 // =============================================================================
 // CONFIGURATION
@@ -37,6 +39,15 @@ export default defineConfig({
   // Required for sitemap generation and canonical URL creation.
   // Should match your production domain.
   site: "https://kayg.org",
+
+  // ---------------------------------------------------------------------------
+  // IMAGE OPTIMIZATION
+  // ---------------------------------------------------------------------------
+  // Global settings for Astro's image processing pipeline.
+  // Quality constant defined in src/config/images.ts for consistency.
+  image: {
+    quality: IMAGE_QUALITY,
+  },
 
   // ---------------------------------------------------------------------------
   // INTEGRATIONS
@@ -84,6 +95,9 @@ export default defineConfig({
 
       // Transform relative asset links (images, videos, docs) for proper handling
       rehypeAssetLinks,
+
+      // Convert video embeds (using image syntax) to proper <video> elements
+      rehypeVideoEmbeds,
 
       // Add data-original-src to embedded images for lightbox access to originals
       rehypeImageOriginals,
