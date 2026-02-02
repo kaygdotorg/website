@@ -276,7 +276,7 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
 
         <div class="bento-grid">
           {
-            bentoCards?.map((card: any) => (
+            bentoCards?.map((card: any, cardIndex: number) => (
               <a href={card.href} class={`bento-card bento-${card.id}`}>
                 {/* 1. Image / Visual (Top) */}
                 <div class="bento-visual-container">
@@ -326,25 +326,28 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                   ) : (
                     <div class="bento-image-wrapper">
                       {/* Bento card images - GIFs preserved, others optimized */}
+                      {/* First 3 cards are above-the-fold: use eager loading + fetchpriority for LCP */}
                       {typeof card.image === "string" ? (
                         <img
                           src={card.image}
                           alt={card.title}
-                          loading="lazy"
+                          loading={cardIndex < 3 ? "eager" : "lazy"}
+                          fetchpriority={cardIndex < 3 ? "high" : "auto"}
                           decoding="async"
                         />
                       ) : card.image.format === "gif" ? (
                         <img
                           src={card.image.src}
                           alt={card.title}
-                          loading="lazy"
+                          loading={cardIndex < 3 ? "eager" : "lazy"}
+                          fetchpriority={cardIndex < 3 ? "high" : "auto"}
                           decoding="async"
                         />
                       ) : (
                         <Image
                           src={card.image}
                           alt={card.title}
-                          loading="lazy"
+                          loading={cardIndex < 3 ? "eager" : "lazy"}
                           decoding="async"
                         />
                       )}

@@ -1182,6 +1182,7 @@ import { ClientRouter } from "astro:transitions";
           const caption = document.getElementById("zoom-caption");
           if (overlay) {
             overlay.classList.remove("active", "gallery-mode");
+            overlay.setAttribute("aria-hidden", "true"); // a11y: hide from screen readers when closed
             document.body.style.overflow = "";
             (window as any).__galleryState.isGalleryMode = false;
           }
@@ -1383,6 +1384,7 @@ import { ClientRouter } from "astro:transitions";
 
             showImage(state.currentIndex);
             overlay.classList.add("active");
+            overlay.setAttribute("aria-hidden", "false"); // a11y: expose to screen readers when open
             document.body.style.overflow = "hidden";
           });
         });
@@ -1454,6 +1456,7 @@ import { ClientRouter } from "astro:transitions";
             if (caption) caption.classList.remove("visible");
 
             overlay.classList.add("active");
+            overlay.setAttribute("aria-hidden", "false"); // a11y: expose to screen readers when open
             document.body.style.overflow = "hidden";
           });
         });
