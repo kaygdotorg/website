@@ -1,6 +1,6 @@
 ---
 date: 2024-04-28 17:49:00
-last edited: 2026-01-18 15:33:12
+last-edited: 2026-01-18 15:33:12
 title: Hidden Folders in Finder
 ---
 ## ❓ What?

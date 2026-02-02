@@ -51,17 +51,17 @@ const articleSchema = createdDate ? {
   ...(lastEdited && { "dateModified": new Date(lastEdited).toISOString() }),
   ...(coverImage && { 
     "image": typeof coverImage === "string" 
-      ? `https://kayg.org${coverImage}` 
-      : `https://kayg.org${coverImage.src}` 
+      ? `${Astro.url.origin}${coverImage}` 
+      : `${Astro.url.origin}${coverImage.src}` 
   }),
   "author": {
     "@type": "Person",
-    "@id": "https://kayg.org/#person",
+    "@id": `${Astro.url.origin}/#person`,
     "name": "K Gopal Krishna"
   },
   "publisher": {
     "@type": "Person",
-    "@id": "https://kayg.org/#person",
+    "@id": `${Astro.url.origin}/#person`,
     "name": "K Gopal Krishna"
   },
   "mainEntityOfPage": {

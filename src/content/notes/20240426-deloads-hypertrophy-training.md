@@ -1,6 +1,6 @@
 ---
 date: 2024-04-26 12:25
-last edited: 2025-01-05 18:45
+last-edited: 2025-01-05 18:45
 title: Deloading in Hypertrophy Training
 ---
 ## ❓ What?

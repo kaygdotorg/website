@@ -1,6 +1,6 @@
 ---
 date: 2024-06-07 12:27
-last edited: 2025-04-10 16:01
+last-edited: 2025-04-10 16:01
 title: Using Caps Lock as NOT the Hyper Key
 ---
 ## ❓ What?

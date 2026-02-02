@@ -186,5 +186,5 @@ workExperience:
 
 
 date: 2026-01-19 21:02:22
-last edited: 2026-01-23 12:45:07
+last-edited: 2026-01-23 12:45:07
 ---

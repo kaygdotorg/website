@@ -1,13 +1,12 @@
 ---
 title: Right Now, Wrong Then (2015), dir Hong Sang-Soo
 date: 2017-10-17 00:00
-last edited: 2025-04-10 15:44
+last-edited: 2025-04-10 15:44
 tags:
   - medium
   - wordpress
 cover-image: ./20171017-right-now-wrong-then-review/right-now-wrong-then-review-cover.png
 ---
-![right-now-wrong-then-review-cover](<./20171017-right-now-wrong-then-review/right-now-wrong-then-review-cover.png>)
 
 Windows open, angel outside. Should I be careful or should I be honest? Pretense first, candour later. The first time Hong uses reflections for inquisition wherein the _wrong_ segment, Ham is the only one who looks in the mirror; a stance as of reminiscing how far-flung has his self-deception grown, a manufactured stew of despondency. This despondency, quite visible, in the the awkward silences of the bar; seems to be the suppressed recoil of personal ebullience, its cost apparently negligible until later reassessed. Dire recalls of hysteria appear in the later _friends_ sequence, to further the universal ignorance of spreading moral decay. Improvisation supersedes admittance wherein here, even that is rare, covered by later attempts to pursue what the delusion believes is still probable.
 

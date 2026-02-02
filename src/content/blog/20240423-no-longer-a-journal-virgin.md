@@ -1,6 +1,6 @@
 ---
 date: 2024-04-23 22:31
-last edited: 2025-01-05 20:19
+last-edited: 2025-01-05 20:19
 title: No Longer a Journal Virgin
 ---
 ## Some Context

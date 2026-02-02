@@ -1,13 +1,13 @@
 ---
 title: The Power of Kangwon Province (1998), dir. Hong Sang-soo
 date: 2017-07-11 00:00:00
-last edited: 2026-01-18 15:34:08
+last-edited: 2026-01-18 15:34:08
 tags:
   - wordpress
   - medium
 cover-image: ./20170711-the-power-of-kangwon-province-review/the-power-of-kangwon-province-review-cover.png
 ---
-![the-power-of-kangwon-province-review-cover](<./20170711-the-power-of-kangwon-province-review/the-power-of-kangwon-province-review-cover.png>)
+
 A svelte lady waits in a phlegmatic fashion as the wheels carry her and her undisputed weight to a mountain retreat. Although her destined other would carry a two man exposition to the same height but their roads would be dramatically diverse, a symbolic verse to the contrast of their ages. The married one would search for a replacement and delve into an ungrateful sensual paralysis; but as splits of the image fail to capture the allure of the biased pristine, the realization dawned would result in further despondence. Hong pictures a bleaker portrait of our translation into turpitude; betrayal leads to malice, pride excesses birth scoff and their alloy forms a handicap of reciprocation.
 
 ![the-power-of-kangwon-province-review-1](<./20170711-the-power-of-kangwon-province-review/the-power-of-kangwon-province-review-1.jpeg>)

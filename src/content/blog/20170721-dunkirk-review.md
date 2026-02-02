@@ -1,13 +1,12 @@
 ---
 title: Dunkirk (2017), dir. Christopher Nolan
 date: 2017-07-21 00:00:00
-last edited: 2026-01-19 22:10:58
+last-edited: 2026-01-19 22:10:58
 tags:
   - wordpress
   - medium
 cover-image: ./20170721-dunkirk-review/dunkirk-review-cover.jpeg
 ---
-![dunkirk-review-cover](<./20170721-dunkirk-review/dunkirk-review-cover.jpeg>)
 
 No, it neither is the greatest magic trick nor is it Michael Caine’s advice that eschews violence for the day’s liberation. Nolan advances into the beach of sterile hope with honesty, and deviates from his imposition of cheap convention that would normally shatter the religious architecture into cumbersome fragments of blatant exposition. In this meditative survival epic, Nolan bisects the horizon as the security of shelter which every soul yearns for (“_You can practically see it from here_”) and as an uncharted jungle where the lush is the waters and the Germans are the wilder peril referred to as “enemies”. However, you never see the enemies. Betwixt the rapid homecoming of ordnance that recoils on every vessel to home, a survival instinct invades the human singularity and converts kindness into cowardice and affection into self-preservation.
 

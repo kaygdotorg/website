@@ -1,6 +1,6 @@
 ---
 date: 2024-08-09 17:14:00
-last edited: 2026-01-19 22:10:50
+last-edited: 2026-01-19 22:10:50
 title: Bridge MTUs in Proxmox
 ---
 ## ❓ What?

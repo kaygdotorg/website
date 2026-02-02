@@ -1,14 +1,12 @@
 ---
 title: List (2011), dir. Hong Sang-soo
 date: 2018-11-16 00:00
-last edited: 2025-04-10 15:46
+last-edited: 2025-04-10 15:46
 tags:
   - medium
   - wordpress
 cover-image: ./20181116-list-review/list-review-cover.png
 ---
-
-![list-review-cover](<./20181116-list-review/list-review-cover.png>)
 
 The typical nature of a Hong zoom is provocative, with each inspection resulting in a separate personal narrative. In the following shots, a distrust of relatives drives our characters, if not into another country, at least into another place temporarily until the scandalous uncle has turned himself in; hinting slightly at a case similar to Hong’s own _Night and Day (2008)_. If not entirely true, it can be said that all of Hong’s characters share a polymorphic existence across the same universe, living time and again; sometimes as free-spirited women who are foreign to the way of cinema’s scale and sometimes as married directors who frequent showers of unrequited love and desert affection for flings of cyclic infidelity. Although the description might be one-note, his films are not. Shortly after the completion of his film, _In Another Country (2012)_, Hong was given total freedom by the production to make a short with a third of the same cast.
 

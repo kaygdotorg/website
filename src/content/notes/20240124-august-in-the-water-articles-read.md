@@ -1,6 +1,6 @@
 ---
 date: 2024-01-24 21:45:00
-last edited: 2026-01-19 22:10:53
+last-edited: 2026-01-19 22:10:53
 title: August in the Water
 ---
 Articles read:

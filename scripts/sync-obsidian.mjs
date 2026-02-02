@@ -62,8 +62,8 @@ async function processFile(filePath, itemRelativePath, collectionName) {
             data.date = data.created;
             delete data.created;
         }
-        if (data.updated && !data['last edited']) {
-            data['last edited'] = data.updated;
+        if (data.updated && !data['last-edited']) {
+            data['last-edited'] = data.updated;
             delete data.updated;
         }
 

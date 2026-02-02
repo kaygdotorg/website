@@ -1,6 +1,6 @@
 ---
 date: 2025-01-11 17:52:07
-last edited: 2026-01-18 15:33:48
+last-edited: 2026-01-18 15:33:48
 title: Things to do after installing Proxmox
 ---
 ## ❓ What?

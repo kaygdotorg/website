@@ -1,6 +1,6 @@
 ---
 date: 2024-02-06 14:53
-last edited: 2026-01-18 15:33:26
+last-edited: 2026-01-18 15:33:26
 title: Querying Ceph Configuration
 ---
 [ceph](<./20240125-ceph.md>)'s configuration can be queried in quite a few ways:

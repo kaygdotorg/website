@@ -1,6 +1,6 @@
 ---
 date: 2024-01-25 11:25
-last edited: 2025-04-10 13:26
+last-edited: 2025-04-10 13:26
 title: Nearfull Ratio
 ---
 ## ❓ What? 

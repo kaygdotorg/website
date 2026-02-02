@@ -86,7 +86,8 @@ const currentPath = Astro.url.pathname;
 const resolvedSiteName = siteName || "kayg's public repertoire";
 // cover-image can be ImageMetadata (has .src) or string URL
 const homeCoverImage = typeof coverImage === "object" ? coverImage?.src : coverImage;
-const resolvedOgImage = pageOgImage || homeCoverImage || "https://kayg.org/images/og-image.webp";
+const resolvedOgImage =
+  pageOgImage || homeCoverImage || `${Astro.url.origin}/images/og-image.webp`;
 
 import { ClientRouter } from "astro:transitions";
 ---

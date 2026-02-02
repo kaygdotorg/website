@@ -1,6 +1,6 @@
 ---
 date: 2024-01-17 17:43
-last edited: 2026-01-18 15:33:11
+last-edited: 2026-01-18 15:33:11
 title: Full Ratio
 ---
 ## ❓ What?

@@ -1,6 +1,6 @@
 ---
 date: 2024-10-26 22:11:00
-last edited: 2026-01-18 15:32:35
+last-edited: 2026-01-18 15:32:35
 title: BusyCal vs Fantastical
 ---
 ## TLDR

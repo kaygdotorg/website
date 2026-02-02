@@ -1,6 +1,6 @@
 ---
 date: 2024-09-09 16:10
-last edited: 2025-01-05 20:19
+last-edited: 2025-01-05 20:19
 title: Stop Whining, Instead Explore
 ---
 It's in trend, especially as you browse X, to come across statements like, "How do people use software A? It doesn't even let you do B. It literally gives me a migraine everyday to do C," and a community notes entry that gets appended as more and more people lay eyes on the post that goes, "ackshually..."

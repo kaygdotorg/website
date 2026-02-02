@@ -1,6 +1,6 @@
 ---
 date: 2024-03-06 23:30:00
-last edited: 2026-01-19 22:10:57
+last-edited: 2026-01-19 22:10:57
 title: Increase Disk Space on Proxmox VM
 ---
 ## Overview

@@ -1,6 +1,6 @@
 ---
 date: 2024-02-05 14:00
-last edited: 2025-01-05 18:46
+last-edited: 2025-01-05 18:46
 title: Difference Between OSD Reweight and CRUSH Reweight
 ---
 ## TLDR

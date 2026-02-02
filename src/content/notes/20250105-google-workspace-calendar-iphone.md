@@ -1,6 +1,6 @@
 ---
 date: 2025-01-05 18:48:00
-last edited: 2026-01-18 15:33:11
+last-edited: 2026-01-18 15:33:11
 title: Google Workspace Delegate Calendars on iPhone
 ---
 ## ❓ What?

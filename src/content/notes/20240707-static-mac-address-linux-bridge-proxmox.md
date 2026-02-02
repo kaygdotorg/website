@@ -1,6 +1,6 @@
 ---
 date: 2024-07-07 15:01
-last edited: 2025-01-05 19:07
+last-edited: 2025-01-05 19:07
 title: Static MAC Address for a Linux Bridge on Debian or Proxmox
 ---
 ## ❓ What?

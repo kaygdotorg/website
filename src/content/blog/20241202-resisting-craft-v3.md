@@ -1,6 +1,6 @@
 ---
 date: 2024-12-02 10:34
-last edited: 2025-01-05 20:27
+last-edited: 2025-01-05 20:27
 title: Resisting Craft V3
 ---
 ## Preface

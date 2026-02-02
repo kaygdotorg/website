@@ -1,6 +1,6 @@
 ---
 date: 2025-01-05 19:08:00
-last edited: 2026-01-18 15:33:47
+last-edited: 2026-01-18 15:33:47
 title: Unsupported File Formats in iOS Photos - H264 Main-L6
 ---
 

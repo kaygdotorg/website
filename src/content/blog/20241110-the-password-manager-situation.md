@@ -1,6 +1,6 @@
 ---
 date: 2024-11-10 20:22
-last edited: 2025-01-05 20:20
+last-edited: 2025-01-05 20:20
 title: The Password Manager Situation
 ---
 ## 👓 Some Context

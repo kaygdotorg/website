@@ -1,6 +1,6 @@
 ---
 date: 2024-03-08 00:03:00
-last edited: 2026-01-19 22:11:12
+last-edited: 2026-01-19 22:11:12
 title: Firefox Profile Downgrade
 ---
 ## ❓ What?

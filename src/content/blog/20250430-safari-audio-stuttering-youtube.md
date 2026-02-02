@@ -1,6 +1,6 @@
 ---
 date: 2025-04-30 15:48:00
-last edited: 2026-01-18 15:33:27
+last-edited: 2026-01-18 15:33:27
 title: Safari goes nuts everytime I watch a YouTube Video
 ---
 ## The Problem

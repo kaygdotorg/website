@@ -1,6 +1,6 @@
 ---
 date: 2024-04-22 13:20:00
-last edited: 2026-01-18 15:33:18
+last-edited: 2026-01-18 15:33:18
 title: Enable Key Spam or Disable Special Characters on MacOS
 ---
 ## ❓ What?

@@ -1,6 +1,6 @@
 ---
 date: 2024-07-13 19:08
-last edited: 2025-01-05 18:48
+last-edited: 2025-01-05 18:48
 title: Getting Forwarded IPs Right with Cloudflare
 ---
 ## ❓ What?

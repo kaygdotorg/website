@@ -6,7 +6,7 @@ description: A little more about who I am, what I do, and the journey so far.
 display-table-of-contents: false
 display-dates: false
 display-in-progress: true
-last edited: 2026-01-23 13:11:35
+last-edited: 2026-01-23 13:11:35
 ---
 Hey, I'm **K Gopal Krishna** — a DevOps engineer, systems enthusiast, and occasional writer based in India.
 

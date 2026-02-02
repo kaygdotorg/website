@@ -1,6 +1,6 @@
 ---
 date: 2023-09-09 15:52
-last edited: 2025-01-02 20:02
+last-edited: 2025-01-02 20:02
 title: Ceph OSD Memory Usage
 ---
 ## Overview

@@ -1,6 +1,6 @@
 ---
 date: 2024-01-17 16:02
-last edited: 2025-01-05 19:06
+last-edited: 2025-01-05 19:06
 title: Replacing a failed drive in a Ceph Cluster
 ---
 ## ❓ What?

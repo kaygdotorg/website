@@ -1,6 +1,6 @@
 ---
 date: 2024-02-12 00:32
-last edited: 2025-01-05 19:19
+last-edited: 2025-01-05 19:19
 title: Changing Wordpress URL
 ---
 ## ❓ What happened?

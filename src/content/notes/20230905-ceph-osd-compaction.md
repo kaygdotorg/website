@@ -1,6 +1,6 @@
 ---
 date: 2023-09-05 19:54:00
-last edited: 2026-01-19 22:10:49
+last-edited: 2026-01-19 22:10:49
 title: Compacting Ceph OSDs
 ---
 ## Overview

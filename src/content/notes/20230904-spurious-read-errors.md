@@ -1,6 +1,6 @@
 ---
 date: 2023-09-04 20:42
-last edited: 2025-01-02 22:50
+last-edited: 2025-01-02 22:50
 title: Ceph Spurious Read Errors
 ---
 ## Overview

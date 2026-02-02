@@ -1,6 +1,6 @@
 ---
 date: 2024-06-04 19:11
-last edited: 2025-01-05 18:48
+last-edited: 2025-01-05 18:48
 title: Getting Rid of fwbr- Interfaces on Proxmox
 ---
 ## ❓ What?

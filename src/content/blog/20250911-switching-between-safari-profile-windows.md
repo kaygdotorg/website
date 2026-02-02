@@ -3,7 +3,7 @@ title: Switching between Safari Profile Windows - Not Creating New Ones
 slug: switching-between-safari-profile-windows-not-creating-new-ones
 description: Safari Profiles are a great power user tool. If you'd like to separate concerns like between work, personal, side projects – make a profile for each one.
 date: 2025-09-11 11:05:21
-last edited: 2026-01-19 21:58:20
+last-edited: 2026-01-19 21:58:20
 tags:
   - Blog
   - MacOS

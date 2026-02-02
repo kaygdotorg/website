@@ -1,6 +1,6 @@
 ---
 date: 2024-09-09 16:35
-last edited: 2025-01-05 18:50
+last-edited: 2025-01-05 18:50
 title: Keep Playing Audio in Safari When Switching to Another Tab Group
 ---
 ## ❓ What?

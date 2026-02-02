@@ -1,13 +1,12 @@
 ---
 title: Mind Game (2004), dir. Masaaki Yuasa
 date: 2017-11-08 00:00
-last edited: 2025-04-10 15:48
+last-edited: 2025-04-10 15:48
 tags:
   - medium
   - wordpress
 cover-image: ./20171108-mind-game-review/mind-game-review.png
 ---
-![mind-game-review](<./20171108-mind-game-review/mind-game-review.png>)
 
 Minuscule, misleading assumptions tease our confused capacity amidst self-doubt, we adopt habits but change very little, only for a point of saturation to illusion a state of betterment. In all truth, it is the same world, yesterday and today, all that has materialized itself is a suspension of disappearing energy. Dreams melt to disappointment and desires sublimate to compromises; some of these even self-caused, partially or wholly, manipulation. Sources to inspire are many but so are the fears that we, artists and survivors of an increasingly fallible life, permit shapes to; various concatenations of our insecurities and sullen thoughts of what could-be(s). Yuasa here is eccentrically obvious and gleefully voracious, so much so that by the end of the 90 minute explosive implosion of passion, change and existentialism, I am rendered utterly speechless and thoughtless — stolen of my capability of self-evaluation and more so, bereft of any inherited lessons, of the many he is concerned with — the experience remains just as cathartic as when I first laid eyes on this blessing of a director.
 

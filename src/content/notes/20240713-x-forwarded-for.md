@@ -1,6 +1,6 @@
 ---
 date: 2024-07-13 19:00
-last edited: 2026-01-18 15:33:44
+last-edited: 2026-01-18 15:33:44
 title: The X-Forwarded-For HTTP Header
 ---
 ## ❓ What?

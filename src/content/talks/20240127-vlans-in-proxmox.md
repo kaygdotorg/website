@@ -2,7 +2,7 @@
 type:
   - Permanent Note
 date: 2024-01-27 12:18:00
-last edited: 2026-01-19 21:45:42
+last-edited: 2026-01-19 21:45:42
 title: VLANs in Proxmox
 ---
 ## Info

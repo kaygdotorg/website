@@ -1,6 +1,6 @@
 ---
 date: 2025-07-29 22:31:14
-last edited: 2026-01-18 15:33:23
+last-edited: 2026-01-18 15:33:23
 title: Placement Rules in Ceph S3
 ---
 ## ❓ What?

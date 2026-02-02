@@ -85,7 +85,7 @@ const pageSchema = z
     date: z.coerce.date().optional(),
 
     /** Last modification date (optional, coerced to Date) */
-    "last edited": z.coerce.date().optional(),
+    "last-edited": z.coerce.date().optional(),
 
     /** Whether to hide this page (optional, defaults to false) */
     draft: z.boolean().optional().default(false),
@@ -108,7 +108,7 @@ const postSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
     date: z.coerce.date(),
 
     /** Last modification date (optional, coerced to Date) */
-    "last edited": z.coerce.date().optional(),
+    "last-edited": z.coerce.date().optional(),
 
     /** Array of tags for categorization (optional, nullable for YAML compatibility) */
     tags: z.array(z.string()).nullable().optional(),
@@ -260,7 +260,7 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
       tagline: z.string().optional(),
       email: z.string().optional(),
       date: z.coerce.date().optional(),
-      "last edited": z.coerce.date().optional(),
+      "last-edited": z.coerce.date().optional(),
 
       /** Profile image - local file or URL */
       profileImage: z.union([image(), z.string()]).optional(),
@@ -405,7 +405,7 @@ const photographySchema = z
     title: z.string().optional(),
     description: z.string().optional(),
     date: z.coerce.date().optional(),
-    "last edited": z.coerce.date().optional(),
+    "last-edited": z.coerce.date().optional(),
     draft: z.boolean().optional().default(false),
 
     // Photo-specific fields (optional for index.md)

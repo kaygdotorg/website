@@ -1,6 +1,6 @@
 ---
 date: 2024-04-21 21:51
-last edited: 2025-01-05 20:18
+last-edited: 2025-01-05 20:18
 title: Long Live Wordpress
 ---
 ## Wordpress → Quartz

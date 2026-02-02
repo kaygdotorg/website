@@ -1,6 +1,6 @@
 ---
 date: 2024-02-12 14:30
-last edited: 2025-01-05 19:21
+last-edited: 2025-01-05 19:21
 title: Moving from Wordpress to Quartz
 ---
 ## ❔ Why do it?

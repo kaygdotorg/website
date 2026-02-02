@@ -1,7 +1,7 @@
 ---
 title: OSD Scrubs on HDD v/s SSD
 date: 2024-02-14 22:23
-last edited: 2026-01-18 15:33:22
+last-edited: 2026-01-18 15:33:22
 ---
 ## Overview
 

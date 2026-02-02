@@ -1,6 +1,6 @@
 ---
 date: 2024-04-27 02:43
-last edited: 2025-01-05 19:07
+last-edited: 2025-01-05 19:07
 title: Storage Classes in Ceph S3
 ---
 ## ❓ What?

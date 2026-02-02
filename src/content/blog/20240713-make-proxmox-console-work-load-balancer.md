@@ -1,6 +1,6 @@
 ---
 date: 2024-07-13 19:36
-last edited: 2025-01-05 20:22
+last-edited: 2025-01-05 20:22
 title: Make Proxmox Console Work Reliably with a Load Balancer
 ---
 

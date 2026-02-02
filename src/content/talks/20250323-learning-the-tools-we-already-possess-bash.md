@@ -2,7 +2,7 @@
 title: "Learning the tools we already possess: Bash"
 description: This presentation will contain lots of tips and tricks from the book, “Learn Bash the Hard Way.” We’ll explore Bash—a powerful shell you’ll encounter frequently in Linux. Rather than just memorizing commands, we’ll focus on learning by doing, making sure you feel confident experimenting on your own.
 date: 2025-03-23 13:31:00
-last edited: 2026-01-19 22:07:11
+last-edited: 2026-01-19 22:07:11
 cover-image: "./20250323-learning-the-tools-we-already-possess-bash/cover-1768838912634.png"
 ---
 ## Info

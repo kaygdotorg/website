@@ -1,6 +1,6 @@
 ---
 date: 2024-05-17 22:59:00
-last edited: 2026-01-19 22:11:00
+last-edited: 2026-01-19 22:11:00
 title: EVPN + VXLAN in Proxmox SDN
 ---
 ## ❓ What?

@@ -1,6 +1,6 @@
 ---
 date: 2024-06-02 21:40
-last edited: 2025-01-05 20:21
+last-edited: 2025-01-05 20:21
 title: Virtual Router in Proxmox with the Skullsaints Onyx
 ---
 ANOTHER EDIT: Apparently the [hookscript section](<#Proxmox VM Hookscripts>) is what causes me the most headache and is not needed. Since the tap interface is bridged with `vmbr0`, it should not be configured to get an IP. The correct way to do it is to configure an IP and gateway on the bridge `vmbr0` itself like so:

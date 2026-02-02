@@ -1,6 +1,6 @@
 ---
 date: 2024-05-12 21:17
-last edited: 2025-01-05 20:18
+last-edited: 2025-01-05 20:18
 title: Migrating VMs on Encrypted Proxmox
 ---
 ## The Problem

@@ -1,7 +1,7 @@
 ---
 title: Obsidian vs Calendar Reminders and Obsidian
 date: 2025-04-02 16:03
-last edited: 2025-04-02 17:12
+last-edited: 2025-04-02 17:12
 ---
 ## ❓The Problem
 

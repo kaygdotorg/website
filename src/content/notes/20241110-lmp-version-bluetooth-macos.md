@@ -1,6 +1,6 @@
 ---
 date: 2024-11-10 19:53
-last edited: 2025-04-10 15:58
+last-edited: 2025-04-10 15:58
 title: Finding Bluetooth LMP version on MacOS
 ---
 ## 👓 Context

@@ -1,9 +1,10 @@
 ---
 title: Following (1998), dir. Christopher Nolan
 date: 2017-10-18 00:00
-last edited: 2025-04-10 15:44
+last-edited: 2025-04-10 15:44
 cover-image: ./20171018-following-review/following-review-2.png
 ---
+
 Writer-Director Christopher Nolan’s works have ranged from adolescent hormonal epidemics to pure sensory experiences of three-dimensional explanations, but what we have here is a neo-noir experiment that heightens reality in short but effective Danny Boyle-esque adrenaline thrills while delivering stunning results in its tinkering with the medium.
 
 The often pondering Bill and his transitions of insecurity caught my eye; the camera insulates characters and especially Bill (and his conversations with the characters) by repeatedly drawing focus to very personal moments as the daft theft of underwear, inquisitive interludes or adapting imposed lifestyles caused by fright or mere manipulation. It’s also because Bill is timid that his timidness rules his decisions. More often than not boredom leads to a singular obsession and then that obsession parents many others. _**Following**_ plays out like a simple account on the events surrounding the fixation but then there are the organic intercepts that furloughs gimmicks and introduces additional powerful layers.

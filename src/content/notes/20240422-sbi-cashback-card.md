@@ -1,6 +1,6 @@
 ---
 date: 2024-04-22 20:03
-last edited: 2025-01-05 19:06
+last-edited: 2025-01-05 19:06
 title: SBI Cashback Card
 ---
 ## ❓ What?

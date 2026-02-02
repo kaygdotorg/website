@@ -1,6 +1,6 @@
 ---
 date: 2025-05-04 13:23
-last edited: 2025-05-05 10:30
+last-edited: 2025-05-05 10:30
 title: Fix Login Delay on Debian LXC on Proxmox
 ---
 ### The Initial Setup and Challenges

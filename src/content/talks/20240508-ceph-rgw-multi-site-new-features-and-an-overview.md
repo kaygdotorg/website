@@ -1,7 +1,7 @@
 ---
 title: Ceph RGW Multi-Site - New Features and An Overview
 date: 2024-05-08 17:37:00
-last edited: 2026-01-19 21:45:32
+last-edited: 2026-01-19 21:45:32
 ---
 ## Intro
 

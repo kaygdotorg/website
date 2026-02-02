@@ -2,7 +2,7 @@
 title: Changelog
 date: 2026-01-22 00:00:00
 description: A log of notable changes, updates, and improvements to this website.
-last edited: 2026-01-23 12:44:23
+last-edited: 2026-01-23 12:44:23
 ---
 
 ## 2026-01-23 Friday

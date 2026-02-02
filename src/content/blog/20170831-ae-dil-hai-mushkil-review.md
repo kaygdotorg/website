@@ -1,13 +1,12 @@
 ---
 title: Ae Dil Hai Mushkil (2016), dir. Karan Johar
 date: 2017-08-31 00:00:00
-last edited: 2026-01-18 15:36:15
+last-edited: 2026-01-18 15:36:15
 tags:
   - wordpress
   - medium
 cover-image: ./20170831-ae-dil-hai-mushkil-review/ae-dil-hai-mushkil-review-cover.png
 ---
-![ae-dil-hai-mushkil-review-cover](<./20170831-ae-dil-hai-mushkil-review/ae-dil-hai-mushkil-review-cover.png>)
 
 Flowers are overrated. Happiness is over-sought. A removed line from Johar’s screenplay reads “\[1\]_Khushi ka kya hai? Gham ke aas paas hi to bhatakti hai_.” Alizeh’s gift to Ayan is a literal bed of thorns, capsizing any tincture of lust or leading attraction in their vessel of hugs, but Ayan, although subconsciously aware of the kinesis, is not ready for the its materiality. Thereby, denial and rebellion ignite the man-child envy. “\[2\]_Tum meri nahi ho sakti toh kiski bhi nahi hosakti_”, says Ayan, wishing fatalities on both Alizeh and her fiancé, hours before their wedding ceremony, looking past the establishment of him being the sole bolster from Alizeh’s side, and that, silence’s precedence over angst may have been better expression.
 

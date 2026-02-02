@@ -1,7 +1,7 @@
 ---
 title: Ceph Operation v/s Subop Latency
 date: 2023-09-12 01:23
-last edited: 2024-12-27 23:10
+last-edited: 2024-12-27 23:10
 ---
 In Ceph, operation latency and subop latency measure different aspects of I/O processing:
 

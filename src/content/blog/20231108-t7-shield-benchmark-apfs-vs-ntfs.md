@@ -1,6 +1,6 @@
 ---
 date: 2023-11-08 07:04
-last edited: 2025-01-05 20:19
+last-edited: 2025-01-05 20:19
 title: T7 Shield - APFS vs NTFS
 ---
 ## Intro

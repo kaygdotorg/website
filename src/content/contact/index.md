@@ -3,7 +3,7 @@ title: Contact
 slug: /contact
 date: 2026-01-22 00:00:00
 description: Here are a few ways you can get in touch with me.
-last edited: 2026-01-23 12:48:14
+last-edited: 2026-01-23 12:48:14
 ---
 ## Socials
 

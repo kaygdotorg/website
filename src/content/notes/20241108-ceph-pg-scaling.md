@@ -1,6 +1,6 @@
 ---
 date: 2024-11-08 21:23
-last edited: 2025-01-05 18:45
+last-edited: 2025-01-05 18:45
 title: Ceph PG Scaling
 ---
 ## Overview
