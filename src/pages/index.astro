@@ -66,34 +66,43 @@ if (latestNote) {
   pageLastUpdated.set("/notes", latestNote.data.date);
 }
 
-// Extract all the data from frontmatter
-// UI text fields added to enable content-driven configuration.
-// Previously these were hardcoded in the template; now they live in markdown.
-const {
-  title,
-  description,
-  name,
-  tagline,
-  profileImage,
-  email,
-  cardPhotos: rawCardPhotos,
-  bentoCards: rawBentoCards,
-  quote,
-  workExperience,
-  resumeUrl,
-  // Content-driven UI text fields - replace hardcoded strings in template
-  heroHint,
-  bentoSectionLabel,
-  bentoSectionTitle,
-  commentsSectionLabel,
-  commentsSectionTitle,
-} = homeEntry.data;
+// Extract all the data from frontmatter.
+// NOTE: Frontmatter keys are kebab-case; we normalize them into camelCase
+// variables here so the template can avoid bracket-notation everywhere.
+const homeData = homeEntry.data;
+const title = homeData.title;
+const description = homeData.description;
+const name = homeData.name;
+const tagline = homeData.tagline;
+const profileImage = homeData["profile-image"];
+const email = homeData.email;
+const rawCardPhotos = homeData["card-photos"];
+const rawBentoCards = homeData["bento-cards"];
+const quote = homeData.quote;
+const rawWorkExperience = homeData["work-experience"];
+const resumeUrl = homeData["resume-url"];
+// Content-driven UI text fields - replace hardcoded strings in template
+const heroHint = homeData["hero-hint"];
+const bentoSectionLabel = homeData["bento-section-label"];
+const bentoSectionTitle = homeData["bento-section-title"];
+const commentsSectionLabel = homeData["comments-section-label"];
+const commentsSectionTitle = homeData["comments-section-title"];
 
-// Enhance bento cards with actual latest content where applicable
+// Enhance bento cards with actual latest content where applicable.
+// Also normalize kebab-case config keys into camelCase properties used
+// throughout the template.
 const bentoCards = rawBentoCards?.map((card: any) => {
+  const normalizedCard = {
+    ...card,
+    layoutVariant: card["layout-variant"],
+    showPulse: card["show-pulse"],
+    displayCategory: card["display-category"],
+    titleInMeta: card["title-in-meta"],
+  };
+
   if (card.id === "blog" && latestBlog) {
     return {
-      ...card,
+      ...normalizedCard,
       title: latestBlog.data.title,
       summary: latestBlog.data.description || card.summary,
       image: latestBlog.data["cover-image"] || card.image,
@@ -101,23 +110,23 @@ const bentoCards = rawBentoCards?.map((card: any) => {
   }
   if (card.id === "talks" && latestTalk) {
     return {
-      ...card,
+      ...normalizedCard,
       title: latestTalk.data.title,
     };
   }
   if (card.id === "notes" && latestNote) {
     return {
-      ...card,
+      ...normalizedCard,
       summary: `Latest: ${latestNote.data.title}`,
     };
   }
   if (card.id === "now" && latestNow) {
     return {
-      ...card,
+      ...normalizedCard,
       summary: `Focused on: ${latestNow.data.title}`,
     };
   }
-  return card;
+  return normalizedCard;
 });
 
 // Enhance cardPhotos with dynamic dates from page metadata
@@ -128,6 +137,15 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
     date: pageDate ? formatDateWithComma(pageDate) : card.date || "Unknown",
   };
 });
+
+// Normalize work-experience nested keys (kebab-case) into camelCase
+// expected by the Timeline component.
+const workExperience = rawWorkExperience?.map((item: any) => ({
+  ...item,
+  startDate: item["start-date"],
+  endDate: item["end-date"],
+  isCurrent: item["is-current"],
+}));
 ---
 
 <BaseLayout

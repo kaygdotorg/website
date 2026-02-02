@@ -3,9 +3,9 @@ title: Home
 description: Personal website and digital garden
 name: K Gopal Krishna
 tagline: Infrastructure Engineer, dead cinephile, hobbyist bodybuilder.
-profileImage: ./hero-picture.jpeg
+profile-image: ./hero-picture.jpeg
 email: mail@kayg.org
-footerText: Vibe-coded with Antigravity using Astro and Tailwind CSS
+footer-text: Vibe-coded with Antigravity using Astro and Tailwind CSS
 
 # =============================================================================
 # SITE METADATA
@@ -20,7 +20,7 @@ cover-image: "https://kayg.org/images/og-image.webp"
 # Replaces hardcoded navLinks arrays in BaseLayout.astro.
 # Set visible: false to hide from main nav (will still appear in mobile menu).
 # =============================================================================
-navLinks:
+nav-links:
   - href: /
     label: Home
     visible: false # Home is accessed via logo, not nav
@@ -49,13 +49,13 @@ navLinks:
 # Section headings and labels previously hardcoded in index.astro.
 # Content-driven approach enables editing without touching code.
 # =============================================================================
-heroHint: "swipe to shuffle · tap to navigate · scroll to explore"
-bentoSectionLabel: "Explore"
-bentoSectionTitle: "A little bit about me"
-commentsSectionLabel: "Comments"
-commentsSectionTitle: "What People Say About This Website"
+hero-hint: "swipe to shuffle · tap to navigate · scroll to explore"
+bento-section-label: "Explore"
+bento-section-title: "A little bit about me"
+comments-section-label: "Comments"
+comments-section-title: "What People Say About This Website"
 
-socialLinks:
+social-links:
   - label: GitHub
     url: https://github.com/kaygdotorg
   - label: Twitter/X
@@ -67,7 +67,7 @@ socialLinks:
   - label: Telegram
     url: https://t.me/kaygdotorg
 
-cardPhotos:
+card-photos:
   # Photo strip images synced with bento card images for visual consistency
   - src: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&q=80
     label: Photography
@@ -94,7 +94,7 @@ cardPhotos:
     href: /notes
     date: Jan 2026
 
-bentoCards:
+bento-cards:
   - id: talks
     title: Public Speaking
     category: Talks
@@ -116,10 +116,10 @@ bentoCards:
     # The layoutVariant: graph flag tells the template to render the canvas animation
     # instead of a static image. No special string matching required.
     image: obsidian-graph
-    layoutVariant: graph
+    layout-variant: graph
     # titleInMeta moves the title to the category row, matching previous hardcoded
     # behavior for the notes card. Content now controls layout, not template logic.
-    titleInMeta: true
+    title-in-meta: true
   - id: now
     title: What I'm doing
     category: Now
@@ -128,7 +128,7 @@ bentoCards:
     image: https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80
     # showPulse adds the animated pulsing dot indicator next to the category.
     # Previously hardcoded for card.id === "now", now content-driven.
-    showPulse: true
+    show-pulse: true
   - id: photography
     title: Moments Captured
     category: Photography
@@ -137,7 +137,7 @@ bentoCards:
     image: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80
     # layoutVariant: photostack tells the template to render the photo stack
     # instead of a single image. Previously hardcoded for card.id === "photography".
-    layoutVariant: photostack
+    layout-variant: photostack
   - id: uses
     title: My Setup
     category: Uses
@@ -163,26 +163,26 @@ bentoCards:
     href: /contact
     image: https://images.unsplash.com/photo-1523966211575-eb4a01e7dd51?w=800&q=80
 
-resumeUrl: /resume.pdf
+resume-url: /resume.pdf
 
-workExperience:
+work-experience:
   - role: Support Engineer
     company: croit GmbH
-    startDate: Feb 2022
-    endDate: Present
-    isCurrent: true
+    start-date: Feb 2022
+    end-date: Present
+    is-current: true
   - role: Systemd Unit Translator
     company: Google Summer of Code
-    startDate: May 2020
-    endDate: Aug 2020
+    start-date: May 2020
+    end-date: Aug 2020
   - role: Devops Engineer
     company: IDS Logic
-    startDate: May 2019
-    endDate: Aug 2019
+    start-date: May 2019
+    end-date: Aug 2019
   - role: Devops Engineer
     company: IDS Logic
-    startDate: May 2018
-    endDate: Aug 2018
+    start-date: May 2018
+    end-date: Aug 2018
 
 
 date: 2026-01-19 21:02:22

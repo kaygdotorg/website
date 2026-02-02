@@ -263,10 +263,10 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
       "last-edited": z.coerce.date().optional(),
 
       /** Profile image - local file or URL */
-      profileImage: z.union([image(), z.string()]).optional(),
+      "profile-image": z.union([image(), z.string()]).optional(),
 
       /** Card photos for the hero section polaroid stack */
-      cardPhotos: z
+      "card-photos": z
         .array(
           z.object({
             src: z.union([image(), z.string()]),
@@ -278,7 +278,7 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
         .optional(),
 
       /** Bento grid cards with images and display configuration */
-      bentoCards: z
+      "bento-cards": z
         .array(
           z.object({
             id: z.string(),
@@ -293,19 +293,22 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
              * "graph" - Canvas animation instead of static image
              * "photostack" - Stack of photos (auto-selected for photography card)
              */
-            layoutVariant: z.enum(["default", "graph", "photostack"]).optional().default("default"),
+            "layout-variant": z
+              .enum(["default", "graph", "photostack"])
+              .optional()
+              .default("default"),
             /** Show pulsing dot indicator (for "now" style cards) */
-            showPulse: z.boolean().optional().default(false),
+            "show-pulse": z.boolean().optional().default(false),
             /** Override the displayed category text (optional) */
-            displayCategory: z.string().optional(),
+            "display-category": z.string().optional(),
             /** Show title in meta area instead of main heading area */
-            titleInMeta: z.boolean().optional().default(false),
+            "title-in-meta": z.boolean().optional().default(false),
           })
         )
         .optional(),
 
       interests: z.array(z.string()).optional(),
-      socialLinks: z
+      "social-links": z
         .array(z.object({ label: z.string(), url: z.string() }))
         .optional(),
       recentWriting: z
@@ -315,19 +318,19 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
         .array(z.object({ title: z.string(), description: z.string(), link: z.string() }))
         .optional(),
       quote: z.string().optional(),
-      workExperience: z
+      "work-experience": z
         .array(
           z.object({
             role: z.string(),
             company: z.string(),
-            startDate: z.string(),
-            endDate: z.string(),
-            isCurrent: z.boolean().optional(),
+            "start-date": z.string(),
+            "end-date": z.string(),
+            "is-current": z.boolean().optional(),
           })
         )
         .optional(),
-      resumeUrl: z.string().optional(),
-      footerText: z.string().optional(),
+      "resume-url": z.string().optional(),
+      "footer-text": z.string().optional(),
 
       /**
        * Cover image for the home page, usable as OG image.
@@ -346,7 +349,7 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
        * Navigation configuration for the site header.
        * Replaces hardcoded navLinks arrays in BaseLayout.astro.
        */
-      navLinks: z
+      "nav-links": z
         .array(
           z.object({
             href: z.string(),
@@ -361,11 +364,11 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
        * Homepage section labels and headings.
        * Content-driven UI text replaces hardcoded strings in index.astro.
        */
-      heroHint: z.string().optional(),
-      bentoSectionLabel: z.string().optional(),
-      bentoSectionTitle: z.string().optional(),
-      commentsSectionLabel: z.string().optional(),
-      commentsSectionTitle: z.string().optional(),
+      "hero-hint": z.string().optional(),
+      "bento-section-label": z.string().optional(),
+      "bento-section-title": z.string().optional(),
+      "comments-section-label": z.string().optional(),
+      "comments-section-title": z.string().optional(),
     })
     .passthrough();
 

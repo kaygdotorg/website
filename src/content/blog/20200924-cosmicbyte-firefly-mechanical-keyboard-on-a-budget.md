@@ -2,11 +2,13 @@
 title: "CosmicByte Firefly: Mechanical Keyboard on a Budget - First Impressions"
 date: 2020-09-24 00:00
 last-edited: 2025-04-10 15:53
+cover-image: /20200924-cosmicbyte-firefly-mechanical-keyboard-on-a-budget/cosmicbyte-firefly-mechanical-keyboard-on-a-budget-cover.jpg
 ---
-![cosmicbyte-firefly-mechanical-keyboard-on-a-budget-cover](<./20200924-cosmicbyte-firefly-mechanical-keyboard-on-a-budget/cosmicbyte-firefly-mechanical-keyboard-on-a-budget-cover.jpg>)
+
 ## Background
 
 Having bought my first mechanical keyboard, it felt apt that I get into the unboxing game but when I noticed that the chaotic packaging containing just the keyboard, an unboxing video would have just been me opening the box. More-so that uploading on YouTube would have been an undesirable slap to reality. So when I realized remembered that I have a blog I seldom use, this seemed like the perfect opportunity to make a new post.
+
 ## Introduction
 
 CosmicByte's Firefly is an ultra budget tenkeyless (87 keys) mechanical keyboard which costs 2237 INR (translates to 30.42 USD at the time of writing this) and is available on [Amazon India](https://www.amazon.in/dp/B08G1QVK9D). It's also available on their [official site](https://www.thecosmicbyte.com/cosmic-byte-cb-gk-16-firefly-rgb-ten-keyless-keyboard-with-outemu-blue-switch) at 2199 INR (translates to 29.90 USD).

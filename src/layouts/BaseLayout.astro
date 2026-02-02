@@ -9,14 +9,14 @@ import { getEntry } from "astro:content";
 // now live in src/content/home/index.md instead of being hardcoded.
 const homeEntry = await getEntry("home", "index");
 const {
-  socialLinks,
+  "social-links": socialLinks,
   email,
-  footerText,
+  "footer-text": footerText,
   // Site metadata previously hardcoded in this file
   "site-name": siteName,
   "cover-image": coverImage,
   // Navigation links previously hardcoded as const arrays
-  navLinks,
+  "nav-links": navLinks,
 } = homeEntry?.data || {};
 
 // Derive navigation arrays from content-driven navLinks.
