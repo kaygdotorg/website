@@ -1,7 +1,8 @@
 ---
-date: 2024-07-13 19:08
+date: 2024-07-13 19:08:00
 last-edited: 2025-01-05 18:48
 title: Getting Forwarded IPs Right with Cloudflare
+last edited: 2026-02-02 16:54:26
 ---
 ## ❓ What?
 
@@ -54,7 +55,7 @@ Once the image is built, all that needs to be done is adding a new line that say
     [...]
 ```
 
-And once Caddy is restarted, our `X-Forwarded-For` should have IPs in [the format we expect](<./20240402-x-forwarded-for.md>). 
+And once Caddy is restarted, our `X-Forwarded-For` should have IPs in [the format we expect](../notes/20240713-x-forwarded-for.md). 
 
 ### Stop Clients from spoofing X-Forwarded-For
 

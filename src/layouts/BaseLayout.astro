@@ -1750,45 +1750,48 @@ import { ClientRouter } from "astro:transitions";
         }
 
         // Use event delegation for hover events
-        if (!(window as any).__imagePreviewInitialized) {
-          document.addEventListener("mouseover", (e) => {
-            const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]') as HTMLAnchorElement;
-            if (link) {
-              showPreview(link, e);
-            }
-          });
-
-          document.addEventListener("mouseout", (e) => {
-            const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]');
-            if (link) {
-              hidePreview();
-            }
-          });
-
-          document.addEventListener("mousemove", (e) => {
-            if (!currentLink || !tooltip.classList.contains("visible")) return;
-            
-            const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]');
-            if (link === currentLink) {
-              const tooltipRect = tooltip.getBoundingClientRect();
-              const padding = 15;
-              
-              let top = e.clientY - tooltipRect.height - padding;
-              let left = e.clientX - tooltipRect.width / 2;
-
-              if (top < padding) top = e.clientY + padding + 20;
-              if (left < padding) left = padding;
-              if (left + tooltipRect.width > window.innerWidth - padding) {
-                left = window.innerWidth - tooltipRect.width - padding;
-              }
-
-              tooltip.style.left = `${left}px`;
-              tooltip.style.top = `${top}px`;
-            }
-          });
-
-          (window as any).__imagePreviewInitialized = true;
+        // Use AbortController to properly manage event listeners across View Transitions
+        if ((window as any).__imagePreviewController) {
+          (window as any).__imagePreviewController.abort();
         }
+        const controller = new AbortController();
+        (window as any).__imagePreviewController = controller;
+
+        document.addEventListener("mouseover", (e) => {
+          const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]') as HTMLAnchorElement;
+          if (link) {
+            showPreview(link, e);
+          }
+        }, { signal: controller.signal });
+
+        document.addEventListener("mouseout", (e) => {
+          const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]');
+          if (link) {
+            hidePreview();
+          }
+        }, { signal: controller.signal });
+
+        document.addEventListener("mousemove", (e) => {
+          if (!currentLink || !tooltip.classList.contains("visible")) return;
+          
+          const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]');
+          if (link === currentLink) {
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const padding = 15;
+            
+            let top = e.clientY - tooltipRect.height - padding;
+            let left = e.clientX - tooltipRect.width / 2;
+
+            if (top < padding) top = e.clientY + padding + 20;
+            if (left < padding) left = padding;
+            if (left + tooltipRect.width > window.innerWidth - padding) {
+              left = window.innerWidth - tooltipRect.width - padding;
+            }
+
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+          }
+        }, { signal: controller.signal });
       }
 
       // Run image preview on initial load

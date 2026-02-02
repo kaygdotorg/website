@@ -22,6 +22,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeAssetLinks from "./src/plugins/rehype-asset-links.mjs";
 import rehypeInternalLinks from "./src/plugins/rehype-internal-links.mjs";
+import remarkMdLinks from "./src/plugins/remark-md-links.mjs";
 import { fromHtml } from "hast-util-from-html";
 
 // =============================================================================
@@ -68,8 +69,14 @@ export default defineConfig({
   // ---------------------------------------------------------------------------
   // MARKDOWN PROCESSING
   // ---------------------------------------------------------------------------
-  // Rehype plugins for transforming markdown HTML output.
+  // Remark and Rehype plugins for transforming markdown.
   markdown: {
+    // Remark plugins (run on markdown AST, before HTML conversion)
+    remarkPlugins: [
+      // Transform .md links to correct URL slugs (strips date prefix and .md extension)
+      remarkMdLinks,
+    ],
+    // Rehype plugins (run on HTML AST, after conversion)
     rehypePlugins: [
       // Add id attributes to headings for anchor links
       rehypeSlug,
