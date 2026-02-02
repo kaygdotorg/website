@@ -78,7 +78,7 @@ const githubUrl = entry?.filePath
 
 ---
 
-<BaseLayout title={title} description={description} displayInProgress={displayInProgress}>
+<BaseLayout title={title} description={description} displayInProgress={displayInProgress} ogImage={typeof coverImage === "string" ? coverImage : coverImage?.src}>
   {/* Article JSON-LD Schema - only rendered for date-based content like blog posts */}
   {articleSchema && (
     <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />

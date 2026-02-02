@@ -12,7 +12,7 @@ footerText: Vibe-coded with Antigravity using Astro and Tailwind CSS
 # Used in BaseLayout.astro for SEO, social sharing, and navigation.
 # Moving these from hardcoded Astro files enables content-driven configuration.
 # =============================================================================
-siteName: "kayg's public repertoire"
+site-name: "kayg's public repertoire"
 cover-image: "https://kayg.org/images/og-image.webp"
 
 # =============================================================================

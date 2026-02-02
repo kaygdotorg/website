@@ -340,7 +340,7 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
        * Site-wide metadata for SEO and social sharing.
        * cover-image is used as the default OG image for pages that don't specify one.
        */
-      siteName: z.string().optional(),
+      "site-name": z.string().optional(),
 
       /**
        * Navigation configuration for the site header.
