@@ -21,8 +21,9 @@ const {
 
 // Derive navigation arrays from content-driven navLinks.
 // Fallback to sensible defaults if navLinks is not defined in markdown.
+// Home (href: "/") is excluded from visibleNavLinks because it's accessed via logo.
 const visibleNavLinks =
-  navLinks?.filter((link) => link.visible !== false).slice(1) || // Skip home (index 0)
+  navLinks?.filter((link) => link.visible !== false && link.href !== "/") ||
   [
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
