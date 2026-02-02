@@ -62,6 +62,12 @@ interface Props {
   hideNavInitially?: boolean;
   /** Show in-progress card instead of content */
   displayInProgress?: boolean;
+  /**
+   * Page-specific OG image for social sharing.
+   * Falls back to home entry's ogImage if not provided.
+   * Can be set from entry's cover-image frontmatter.
+   */
+  ogImage?: string;
 }
 
 const {
@@ -69,14 +75,16 @@ const {
   description = "Personal website",
   hideNavInitially = false,
   displayInProgress = false,
+  ogImage: pageOgImage,
 } = Astro.props;
 
 const currentPath = Astro.url.pathname;
 
 // Content-driven site metadata with fallback defaults.
-// These values previously lived as hardcoded consts; now they come from markdown.
+// Page-specific ogImage takes priority over home entry default.
+// Falls back to home entry ogImage, then hardcoded default.
 const resolvedSiteName = siteName || "kayg's public repertoire";
-const resolvedOgImage = ogImage || "https://kayg.org/images/og-image.webp";
+const resolvedOgImage = pageOgImage || ogImage || "https://kayg.org/images/og-image.webp";
 
 import { ClientRouter } from "astro:transitions";
 ---

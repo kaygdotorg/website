@@ -330,6 +330,13 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
       footerText: z.string().optional(),
 
       /**
+       * Cover image for the home page, usable as OG image.
+       * Provides consistency with postSchema's cover-image field.
+       * Can be used as pageOgImage source in index.astro.
+       */
+      "cover-image": z.union([image(), z.string()]).optional(),
+
+      /**
        * Site-wide metadata for SEO and social sharing.
        * These replace hardcoded values in BaseLayout.astro.
        */
