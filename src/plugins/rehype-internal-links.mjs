@@ -3,17 +3,69 @@
  * REHYPE INTERNAL LINKS PLUGIN
  * =============================================================================
  *
- * Adds data attributes for the internal link preview feature:
- * - data-internal-link="true" for CSS styling and JS targeting
- * - data-link-path for manifest lookup
+ * 1. Transforms .md links to correct URL slugs:
+ *    - Strips date prefix (YYYYMMDD-) and .md extension
+ *    - Converts cross-collection links to absolute paths
  *
- * NOTE: .md link transformation is handled by remark-md-links.mjs
+ * 2. Adds data attributes for the internal link preview feature:
+ *    - data-internal-link="true" for CSS styling and JS targeting
+ *    - data-link-path for manifest lookup
  */
 
 import { visit } from "unist-util-visit";
 
-// Asset extensions to exclude
-const ASSET_EXTENSIONS = /\.(jpe?g|png|gif|webp|svg|avif|heic|bmp|tiff?|mp4|webm|mov|avi|mkv|m4v|pdf|docx?|xlsx?|pptx?|txt|md|csv|rtf|mp3|wav|flac|ogg|m4a|aac)$/i;
+// Asset extensions to exclude (note: .md is handled specially, not excluded here)
+const ASSET_EXTENSIONS = /\.(jpe?g|png|gif|webp|svg|avif|heic|bmp|tiff?|mp4|webm|mov|avi|mkv|m4v|pdf|docx?|xlsx?|pptx?|txt|csv|rtf|mp3|wav|flac|ogg|m4a|aac)$/i;
+
+// Known content collections for cross-collection link detection
+const COLLECTIONS = ["blog", "notes", "uses", "now", "talks", "changelog", "about", "contact", "homelab", "photography"];
+
+/**
+ * Transforms a .md link to the correct URL slug.
+ * - Strips date prefix (YYYYMMDD-) and .md extension
+ * - Converts cross-collection links (../notes/file.md) to absolute paths (/notes/file)
+ *
+ * @param {string} href - The original href value
+ * @returns {string} - The transformed href
+ */
+function transformMdLink(href) {
+  if (!href || !href.endsWith(".md")) return href;
+  
+  // Skip external URLs
+  if (href.startsWith("http://") || href.startsWith("https://")) return href;
+
+  // Parse the path to extract directory and filename
+  const isAbsolute = href.startsWith("/");
+  const hrefForParsing = isAbsolute ? href.slice(1) : href;
+  
+  // Get the filename part
+  const lastSlash = hrefForParsing.lastIndexOf("/");
+  const dirPart = lastSlash >= 0 ? hrefForParsing.substring(0, lastSlash + 1) : "";
+  const filename = lastSlash >= 0 ? hrefForParsing.substring(lastSlash + 1) : hrefForParsing;
+  
+  // Remove .md extension
+  let slug = filename.replace(/\.md$/, "");
+  
+  // Strip date prefix if present (YYYYMMDD-)
+  const dateMatch = slug.match(/^\d{8}-(.+)$/);
+  if (dateMatch) {
+    slug = dateMatch[1];
+  }
+
+  // Check if link targets a known collection (handles ../notes/, ./notes/, notes/)
+  // Strip leading ./ and ../ segments to find the first real directory name
+  const cleanedPath = hrefForParsing.replace(/^(\.\.\/)+/, "").replace(/^\.\//, "");
+  const firstDir = cleanedPath.split("/")[0];
+  
+  if (firstDir && COLLECTIONS.includes(firstDir)) {
+    // Convert to absolute path to avoid incorrect relative resolution
+    return `/${firstDir}/${slug}`;
+  }
+
+  // Same-folder relative link: keep relative form but with transformed slug
+  const rebuilt = dirPart + slug;
+  return isAbsolute ? `/${rebuilt}` : rebuilt;
+}
 
 // Site domains to treat as internal
 const SITE_DOMAINS = ["kayg.org", "www.kayg.org", "localhost"];
@@ -86,10 +138,16 @@ export default function rehypeInternalLinks() {
     visit(tree, "element", (node) => {
       if (node.tagName !== "a") return;
       
-      const href = node.properties?.href;
+      let href = node.properties?.href;
       if (!href || typeof href !== "string") return;
       
-      // Add data attributes for internal link preview feature
+      // Step 1: Transform .md links to URL slugs (backup for any missed by remark)
+      if (href.endsWith(".md")) {
+        href = transformMdLink(href);
+        node.properties.href = href;
+      }
+      
+      // Step 2: Add data attributes for internal link preview feature
       const { isInternal, path } = parseInternalLink(href);
       
       if (isInternal && path) {
