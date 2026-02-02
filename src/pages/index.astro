@@ -68,6 +68,8 @@ if (latestNote) {
 
 // Extract all the data from frontmatter
 const {
+  title,
+  description,
   name,
   tagline,
   profileImage,
@@ -121,8 +123,8 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
 ---
 
 <BaseLayout
-  title="Home"
-  description="Personal website and digital garden"
+  title={title || "Home"}
+  description={description || "Personal website and digital garden"}
   hideNavInitially={true}
 >
   <main class="homepage">

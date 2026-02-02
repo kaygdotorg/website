@@ -1,5 +1,6 @@
 ---
 title: Home
+description: Personal website and digital garden
 name: K Gopal Krishna
 tagline: Infrastructure Engineer, dead cinephile, hobbyist bodybuilder.
 profileImage: ./hero-picture.jpeg
