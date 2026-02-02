@@ -674,31 +674,83 @@ const githubUrl = entry?.filePath
 
   <!-- Remark42 Comments Scripts (only loaded if comments container exists) -->
   <script is:inline>
-    // Only initialize remark42 if the container exists on this page
-    if (document.getElementById('remark42')) {
-      // Remark42 configuration
-      var remark_config = {
-        host: "https://remark42.kayg.org",
-        site_id: "kayg.org",
-        components: ["embed"],
-        max_shown_comments: 15,
-        theme: document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark",
-        page_title: document.title
-      };
+    (function () {
+      const STATE_KEY = "__remark42State";
+      const state = (window[STATE_KEY] = window[STATE_KEY] || {
+        scriptsLoaded: false,
+        themeObserver: null,
+      });
 
-      // Load remark42 embed script
-      !function(e,n){for(var o=0;o<e.length;o++){var r=n.createElement("script"),c=".js",d=n.head||n.body;"noModule"in r?(r.type="module",c=".mjs"):r.async=!0,r.defer=!0,r.src=remark_config.host+"/web/"+e[o]+c,d.appendChild(r)}}(remark_config.components||["embed"],document);
+      function currentTheme() {
+        return document.documentElement.getAttribute("data-theme") === "light"
+          ? "light"
+          : "dark";
+      }
 
-      // Sync theme with remark42
-      const remark42ThemeObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.attributeName === "data-theme" && window.REMARK42) {
-            const newTheme = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
-            window.REMARK42.changeTheme(newTheme);
+      function setRemarkConfig() {
+        window.remark_config = {
+          host: "https://remark42.kayg.org",
+          site_id: "kayg.org",
+          components: ["embed"],
+          max_shown_comments: 15,
+          theme: currentTheme(),
+          page_title: document.title,
+        };
+      }
+
+      function loadScriptsOnce() {
+        if (state.scriptsLoaded) return;
+        state.scriptsLoaded = true;
+
+        // Load remark42 embed script (official loader, minified)
+        !(function (e, n) {
+          for (var o = 0; o < e.length; o++) {
+            var r = n.createElement("script"),
+              c = ".js",
+              d = n.head || n.body;
+            ("noModule" in r
+              ? ((r.type = "module"), (c = ".mjs"))
+              : (r.async = !0),
+              (r.defer = !0),
+              (r.src = remark_config.host + "/web/" + e[o] + c),
+              d.appendChild(r));
+          }
+        })(remark_config.components || ["embed"], document);
+      }
+
+      function ensureThemeSync() {
+        if (state.themeObserver) return;
+        state.themeObserver = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            if (mutation.attributeName === "data-theme" && window.REMARK42) {
+              window.REMARK42.changeTheme(currentTheme());
+            }
           }
         });
-      });
-      remark42ThemeObserver.observe(document.documentElement, { attributes: true });
-    }
+        state.themeObserver.observe(document.documentElement, { attributes: true });
+      }
+
+      function mountIfPossible() {
+        const container = document.getElementById("remark42");
+        if (!container) return;
+
+        // View Transitions can swap the container while keeping scripts.
+        // If Remark42 is already loaded, remount into the new container.
+        if (window.REMARK42 && typeof window.REMARK42.createInstance === "function") {
+          window.REMARK42.createInstance(window.remark_config);
+        }
+      }
+
+      function initRemark42() {
+        if (!document.getElementById("remark42")) return;
+        setRemarkConfig();
+        loadScriptsOnce();
+        ensureThemeSync();
+        mountIfPossible();
+      }
+
+      document.addEventListener("astro:page-load", initRemark42);
+      initRemark42();
+    })();
   </script>
 </BaseLayout>

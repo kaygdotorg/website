@@ -366,24 +366,46 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       // =======================================================================
 
       (function () {
-        let remark42Loaded = false;
+        const STATE_KEY = "__remark42State";
+        const state = (window[STATE_KEY] = window[STATE_KEY] || {
+          scriptsLoaded: false,
+          themeObserver: null,
+          io: null,
+        });
 
-        function loadRemark42() {
-          if (remark42Loaded) return;
-          remark42Loaded = true;
+        function currentTheme() {
+          return document.documentElement.getAttribute("data-theme") === "light"
+            ? "light"
+            : "dark";
+        }
 
-          // Remark42 configuration
+        function ensureThemeSync() {
+          if (state.themeObserver) return;
+
+          state.themeObserver = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+              if (mutation.attributeName === "data-theme" && window.REMARK42) {
+                window.REMARK42.changeTheme(currentTheme());
+              }
+            }
+          });
+          state.themeObserver.observe(document.documentElement, { attributes: true });
+        }
+
+        function setRemarkConfig() {
           window.remark_config = {
             host: "https://remark42.kayg.org",
             site_id: "kayg.org",
             components: ["embed"],
             max_shown_comments: 15,
-            theme:
-              document.documentElement.getAttribute("data-theme") === "light"
-                ? "light"
-                : "dark",
+            theme: currentTheme(),
             page_title: "Homepage Comments",
           };
+        }
+
+        function loadScriptsOnce() {
+          if (state.scriptsLoaded) return;
+          state.scriptsLoaded = true;
 
           // Official Remark42 loader script (minified)
           !(function (e, n) {
@@ -399,54 +421,68 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                 d.appendChild(r));
             }
           })(remark_config.components || ["embed"], document);
-
-          // Set up theme sync after loading
-          setupThemeSync();
         }
 
-        function setupThemeSync() {
-          // Sync theme changes with Remark42
-          function syncRemark42Theme() {
-            if (window.REMARK42) {
-              const currentTheme =
-                document.documentElement.getAttribute("data-theme") === "light"
-                  ? "light"
-                  : "dark";
-              window.REMARK42.changeTheme(currentTheme);
-            }
+        function mountIfPossible() {
+          const container = document.getElementById("remark42");
+          if (!container) return;
+
+          // When navigating with View Transitions, the scripts may already be
+          // loaded but the container is replaced. If Remark42 is available,
+          // ask it to mount into the current container.
+          if (window.REMARK42 && typeof window.REMARK42.createInstance === "function") {
+            window.REMARK42.createInstance(window.remark_config);
+            return;
           }
-
-          // Watch for theme changes via MutationObserver
-          const themeObserver = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-              if (mutation.attributeName === "data-theme") {
-                syncRemark42Theme();
-              }
-            });
-          });
-          themeObserver.observe(document.documentElement, { attributes: true });
         }
 
-        // Use IntersectionObserver to lazy-load when comments section is visible
-        const commentsContainer = document.getElementById("remark42");
-        if (commentsContainer) {
-          const observer = new IntersectionObserver(
+        function initObserver() {
+          const container = document.getElementById("remark42");
+          if (!container) return;
+
+          if (state.io) state.io.disconnect();
+          state.io = new IntersectionObserver(
             (entries) => {
-              entries.forEach((entry) => {
+              for (const entry of entries) {
                 if (entry.isIntersecting) {
-                  loadRemark42();
-                  observer.disconnect(); // Only need to load once
+                  setRemarkConfig();
+                  loadScriptsOnce();
+                  ensureThemeSync();
+                  mountIfPossible();
+                  state.io.disconnect();
+                  state.io = null;
                 }
-              });
+              }
             },
             {
               root: null,
-              rootMargin: "100px", // Start loading 100px before visible
+              rootMargin: "200px",
               threshold: 0,
             },
           );
-          observer.observe(commentsContainer);
+          state.io.observe(container);
+
+          // Fallback: if already visible (or IO is flaky after swaps), try once
+          // shortly after init.
+          setTimeout(() => {
+            const rect = container.getBoundingClientRect();
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            if (rect.top < vh + 200) {
+              setRemarkConfig();
+              loadScriptsOnce();
+              ensureThemeSync();
+              mountIfPossible();
+              if (state.io) {
+                state.io.disconnect();
+                state.io = null;
+              }
+            }
+          }, 300);
         }
+
+        // Re-init on View Transitions navigations.
+        document.addEventListener("astro:page-load", initObserver);
+        initObserver();
       })();
     </script>
   </main>
