@@ -190,6 +190,8 @@
   },
   "active": "16d2621a745ea6db",
   "lastOpenFiles": [
+    "scripts/fix-internal-links.mjs",
+    "scripts/scan-internal-links.mjs",
     "dist/pagefind/fragment/en_fe6367e.pf_fragment",
     "dist/pagefind/fragment/en_fa728a6.pf_fragment",
     "dist/pagefind/fragment/en_f58d337.pf_fragment",
@@ -199,8 +201,6 @@
     "dist/pagefind/fragment/en_ee2bc59.pf_fragment",
     "dist/pagefind/fragment/en_ebbddaa.pf_fragment",
     "dist/pagefind/fragment/en_e41e1ba.pf_fragment",
-    "dist/pagefind/fragment/en_e29274b.pf_fragment",
-    "dist/pagefind/fragment/en_e234c5e.pf_fragment",
     "dist/_astro/workspace.tA0ta2hv_Z1of8Sn.webp",
     "dist/_astro/wordpress-unavailable-different-domain.CQZXe66m_Zdx2tG.webp",
     "dist/_astro/virtual-router-poc.BNsTW9IZ_wu03p.webp",

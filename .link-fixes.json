@@ -1,0 +1,20 @@
+[
+  {
+    "file": "/Users/kayg/Developer/website/src/content/blog/20240713-make-proxmox-console-work-load-balancer.md",
+    "fullMatch": "[separate document](./20240713-forwarded-ip-cloudflare.md)",
+    "text": "separate document",
+    "url": "./20240713-forwarded-ip-cloudflare.md",
+    "index": 1832,
+    "targetInfo": {
+      "path": "/Users/kayg/Developer/website/src/content/blog/20240713-forwarded-ip-cloudflare.md",
+      "collection": "blog",
+      "filename": "20240713-forwarded-ip-cloudflare.md"
+    },
+    "correctUrl": "./20240713-forwarded-ip-cloudflare",
+    "dateInfo": {
+      "date": "2024-07-13",
+      "slug": "forwarded-ip-cloudflare",
+      "urlSlug": "/2024-07-13"
+    }
+  }
+]
