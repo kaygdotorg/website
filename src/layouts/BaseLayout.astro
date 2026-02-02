@@ -1653,6 +1653,147 @@ import { ClientRouter } from "astro:transitions";
       // Run on initial page load
       initImageZoom();
 
+      /**
+       * =========================================================================
+       * IMAGE LINK HOVER PREVIEW
+       * =========================================================================
+       *
+       * Shows a thumbnail preview when hovering over image links (links with
+       * data-asset-type="image"). The preview appears above the cursor.
+       */
+      function initImagePreview() {
+        // Create tooltip element if it doesn't exist
+        let tooltip = document.getElementById("image-preview-tooltip") as HTMLDivElement;
+        if (!tooltip) {
+          tooltip = document.createElement("div");
+          tooltip.id = "image-preview-tooltip";
+          tooltip.className = "image-preview-tooltip";
+          document.body.appendChild(tooltip);
+        }
+
+        // Cache for preloaded images
+        const imageCache = (window as any).__imagePreviewCache || new Map();
+        (window as any).__imagePreviewCache = imageCache;
+
+        let hideTimeout: ReturnType<typeof setTimeout> | null = null;
+        let currentLink: HTMLElement | null = null;
+
+        function showPreview(link: HTMLAnchorElement, e: MouseEvent) {
+          if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+          }
+
+          currentLink = link;
+          const href = link.href;
+
+          // Position tooltip above cursor
+          const updatePosition = (clientX: number, clientY: number) => {
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const padding = 15;
+            
+            // Position above cursor by default
+            let top = clientY - tooltipRect.height - padding;
+            let left = clientX - tooltipRect.width / 2;
+
+            // Keep within viewport
+            if (top < padding) {
+              top = clientY + padding + 20; // Show below if no room above
+            }
+            if (left < padding) left = padding;
+            if (left + tooltipRect.width > window.innerWidth - padding) {
+              left = window.innerWidth - tooltipRect.width - padding;
+            }
+
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+          };
+
+          // Check cache first
+          if (imageCache.has(href)) {
+            const cachedImg = imageCache.get(href);
+            tooltip.innerHTML = "";
+            tooltip.appendChild(cachedImg.cloneNode(true));
+            tooltip.classList.remove("loading");
+            tooltip.classList.add("visible");
+            updatePosition(e.clientX, e.clientY);
+            return;
+          }
+
+          // Show loading state
+          tooltip.innerHTML = "";
+          tooltip.classList.add("loading", "visible");
+          updatePosition(e.clientX, e.clientY);
+
+          // Load image
+          const img = document.createElement("img");
+          img.onload = () => {
+            if (currentLink !== link) return; // User moved to different link
+            imageCache.set(href, img);
+            tooltip.innerHTML = "";
+            tooltip.appendChild(img.cloneNode(true));
+            tooltip.classList.remove("loading");
+            updatePosition(e.clientX, e.clientY);
+          };
+          img.onerror = () => {
+            if (currentLink !== link) return;
+            tooltip.classList.remove("visible", "loading");
+          };
+          img.src = href;
+        }
+
+        function hidePreview() {
+          hideTimeout = setTimeout(() => {
+            tooltip.classList.remove("visible", "loading");
+            currentLink = null;
+          }, 100);
+        }
+
+        // Use event delegation for hover events
+        if (!(window as any).__imagePreviewInitialized) {
+          document.addEventListener("mouseover", (e) => {
+            const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]') as HTMLAnchorElement;
+            if (link) {
+              showPreview(link, e);
+            }
+          });
+
+          document.addEventListener("mouseout", (e) => {
+            const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]');
+            if (link) {
+              hidePreview();
+            }
+          });
+
+          document.addEventListener("mousemove", (e) => {
+            if (!currentLink || !tooltip.classList.contains("visible")) return;
+            
+            const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]');
+            if (link === currentLink) {
+              const tooltipRect = tooltip.getBoundingClientRect();
+              const padding = 15;
+              
+              let top = e.clientY - tooltipRect.height - padding;
+              let left = e.clientX - tooltipRect.width / 2;
+
+              if (top < padding) top = e.clientY + padding + 20;
+              if (left < padding) left = padding;
+              if (left + tooltipRect.width > window.innerWidth - padding) {
+                left = window.innerWidth - tooltipRect.width - padding;
+              }
+
+              tooltip.style.left = `${left}px`;
+              tooltip.style.top = `${top}px`;
+            }
+          });
+
+          (window as any).__imagePreviewInitialized = true;
+        }
+      }
+
+      // Run image preview on initial load
+      initImagePreview();
+
       // =========================================================================
       // CONSOLIDATED VIEW TRANSITIONS HANDLER
       // =========================================================================
@@ -1679,6 +1820,7 @@ import { ClientRouter } from "astro:transitions";
         initGlobalMenu();
         initSearchModal();
         initImageZoom();
+        initImagePreview();
 
         // Update shortcut labels for current OS
         updateSearchShortcut();

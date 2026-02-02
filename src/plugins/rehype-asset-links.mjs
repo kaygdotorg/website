@@ -46,19 +46,19 @@ function getAssetType(href) {
 }
 
 /**
- * Checks if href is a relative path (not absolute, not external, not anchor)
+ * Checks if href is a local path (relative or absolute, but not external)
  * @param {string} href - The href to check
  * @returns {boolean}
  */
-function isRelativeAssetPath(href) {
+function isLocalPath(href) {
   if (!href) return false;
-  // Skip absolute URLs, anchors, mailto, tel, etc.
+  // Skip external URLs, anchors, mailto, tel, etc.
   if (href.startsWith("http://") || href.startsWith("https://")) return false;
   if (href.startsWith("#")) return false;
   if (href.startsWith("mailto:") || href.startsWith("tel:")) return false;
-  if (href.startsWith("/")) return false; // Already absolute path
-  // Must be a relative path starting with ./ or just a filename
-  return href.startsWith("./") || !href.includes("://");
+  if (href.includes("://")) return false;
+  // Accept both relative (./) and absolute (/) local paths
+  return true;
 }
 
 /**
@@ -77,8 +77,8 @@ export default function rehypeAssetLinks() {
       const href = node.properties?.href;
       if (!href || typeof href !== "string") return;
 
-      // Check if this is a relative asset link
-      if (!isRelativeAssetPath(href)) return;
+      // Check if this is a local asset link (not external)
+      if (!isLocalPath(href)) return;
 
       const assetType = getAssetType(href);
       if (!assetType) return;
