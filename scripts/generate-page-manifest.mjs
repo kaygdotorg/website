@@ -33,25 +33,40 @@ const COLLECTION_URL_MAP = {
 };
 
 /**
- * Extract a short excerpt from markdown content
+ * Extract a short excerpt from markdown content.
+ * Priority:
+ * 1. Text after first H1 heading (if article starts with H1)
+ * 2. First few lines of content
+ * 
+ * @param {string} content - Raw markdown content (without frontmatter)
+ * @param {number} maxLength - Maximum length of excerpt
  */
-function extractExcerpt(content, maxLength = 160) {
-  // Remove frontmatter
+function extractExcerpt(content, maxLength = 150) {
+  // Remove frontmatter if present
   const withoutFrontmatter = content.replace(/^---[\s\S]*?---/, "").trim();
   
-  // Remove markdown syntax
-  const plainText = withoutFrontmatter
+  // Check if content starts with an H1 heading
+  const h1Match = withoutFrontmatter.match(/^#\s+.+\n+([\s\S]*)/);
+  let textToProcess = h1Match ? h1Match[1] : withoutFrontmatter;
+  
+  // Clean markdown syntax
+  const plainText = textToProcess
+    .replace(/```[\s\S]*?```/g, "") // code blocks first
     .replace(/!\[.*?\]\(.*?\)/g, "") // images
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // links
-    .replace(/#{1,6}\s+/g, "") // headings
-    .replace(/[*_~`]/g, "") // emphasis
-    .replace(/>\s+/g, "") // blockquotes
-    .replace(/```[\s\S]*?```/g, "") // code blocks
-    .replace(/`[^`]+`/g, "") // inline code
-    .replace(/\n+/g, " ") // newlines
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // links - keep text
+    .replace(/^#{1,6}\s+.*$/gm, "") // heading lines
+    .replace(/[*_~`]/g, "") // emphasis markers
+    .replace(/^>\s+/gm, "") // blockquotes
+    .replace(/^\s*[-*+]\s+/gm, "") // list markers
+    .replace(/^\s*\d+\.\s+/gm, "") // numbered list markers
+    .replace(/\n+/g, " ") // collapse newlines
+    .replace(/\s+/g, " ") // collapse whitespace
     .trim();
 
+  if (!plainText) return null;
   if (plainText.length <= maxLength) return plainText;
+  
+  // Truncate at word boundary and add ellipsis
   return plainText.slice(0, maxLength).replace(/\s+\S*$/, "") + "…";
 }
 
@@ -93,10 +108,16 @@ async function processFile(filePath, collection) {
     const filename = path.basename(filePath);
     const slug = getSlugFromFilename(filename, collection);
     
+    // Use frontmatter description if available, otherwise extract from content
+    let description = frontmatter.description;
+    if (!description) {
+      description = extractExcerpt(body);
+    }
+    
     return {
       slug,
       title: frontmatter.title || null,
-      description: frontmatter.description || extractExcerpt(body),
+      description,
       date: frontmatter.date || frontmatter.pubDate || null,
       collection,
     };

@@ -1697,9 +1697,9 @@ html[data-theme="light"] body {
   overflow: hidden;
 }
 
+/* Removed gradient bar from link preview for cleaner look */
 .link-preview-popover .preview-gradient-bar {
-  height: 3px;
-  background: linear-gradient(90deg, var(--color-accent-500, #ec4899), var(--color-accent-400, #f472b6), #8b5cf6);
+  display: none;
 }
 
 .link-preview-popover.loading {
@@ -1813,17 +1813,7 @@ a[data-internal-link="true"]:hover {
   position: relative;
 }
 
-/* Visual header bar for code blocks */
-.md-card-body .md-card-content pre::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--color-accent-500, #ec4899), var(--color-accent-400, #f472b6), #8b5cf6);
-  border-radius: 0.75rem 0.75rem 0 0;
-}
+/* Removed gradient header bar from code blocks for cleaner look */
 
 .md-card-body .md-card-content pre code {
   background: transparent !important;
