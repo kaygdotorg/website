@@ -1794,6 +1794,205 @@ import { ClientRouter } from "astro:transitions";
       // Run image preview on initial load
       initImagePreview();
 
+      /**
+       * =========================================================================
+       * INTERNAL LINK HOVER PREVIEW
+       * =========================================================================
+       *
+       * Shows a card preview (title, date, description) when hovering over
+       * internal links to other pages on the site. Uses a pre-generated manifest
+       * for instant lookups without fetching each page.
+       */
+      function initLinkPreview() {
+        // Create popover element if it doesn't exist
+        let popover = document.getElementById("link-preview-popover") as HTMLDivElement;
+        if (!popover) {
+          popover = document.createElement("div");
+          popover.id = "link-preview-popover";
+          popover.className = "link-preview-popover";
+          document.body.appendChild(popover);
+        }
+
+        // Manifest cache
+        let manifest: Record<string, {
+          slug: string;
+          title: string | null;
+          description: string | null;
+          date: string | null;
+          collection: string;
+        }> | null = (window as any).__pageManifest || null;
+        let manifestLoading = false;
+
+        let hideTimeout: ReturnType<typeof setTimeout> | null = null;
+        let currentLink: HTMLElement | null = null;
+
+        async function loadManifest() {
+          if (manifest || manifestLoading) return;
+          manifestLoading = true;
+          try {
+            const response = await fetch("/page-manifest.json");
+            if (response.ok) {
+              manifest = await response.json();
+              (window as any).__pageManifest = manifest;
+            }
+          } catch (err) {
+            console.error("Failed to load page manifest:", err);
+          }
+          manifestLoading = false;
+        }
+
+        function formatDate(dateStr: string | null): string {
+          if (!dateStr) return "";
+          try {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric"
+            });
+          } catch {
+            return dateStr;
+          }
+        }
+
+        function showPreview(link: HTMLAnchorElement, e: MouseEvent) {
+          if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+          }
+
+          currentLink = link;
+          const path = link.dataset.linkPath;
+          if (!path) return;
+
+          const updatePosition = (clientX: number, clientY: number) => {
+            const popoverRect = popover.getBoundingClientRect();
+            const padding = 15;
+            
+            let top = clientY - popoverRect.height - padding;
+            let left = clientX - popoverRect.width / 2;
+
+            if (top < padding) {
+              top = clientY + padding + 20;
+            }
+            if (left < padding) left = padding;
+            if (left + popoverRect.width > window.innerWidth - padding) {
+              left = window.innerWidth - popoverRect.width - padding;
+            }
+
+            popover.style.left = `${left}px`;
+            popover.style.top = `${top}px`;
+          };
+
+          // Show loading state while manifest loads
+          if (!manifest) {
+            popover.innerHTML = "";
+            popover.classList.add("loading", "visible");
+            updatePosition(e.clientX, e.clientY);
+            
+            loadManifest().then(() => {
+              if (currentLink !== link) return;
+              renderPreview(path, e.clientX, e.clientY);
+            });
+            return;
+          }
+
+          renderPreview(path, e.clientX, e.clientY);
+        }
+
+        function renderPreview(path: string, clientX: number, clientY: number) {
+          if (!manifest) return;
+          
+          const pageData = manifest[path];
+          if (!pageData) {
+            popover.classList.remove("visible", "loading");
+            return;
+          }
+
+          const formattedDate = formatDate(pageData.date);
+          
+          popover.innerHTML = `
+            <div class="preview-gradient-bar"></div>
+            <div class="link-preview-popover-inner">
+              <span class="preview-collection">${pageData.collection}</span>
+              ${pageData.title ? `<h4 class="preview-title">${pageData.title}</h4>` : ""}
+              ${formattedDate ? `<div class="preview-date">${formattedDate}</div>` : ""}
+              ${pageData.description ? `<p class="preview-description">${pageData.description}</p>` : ""}
+            </div>
+          `;
+          
+          popover.classList.remove("loading");
+          popover.classList.add("visible");
+
+          const popoverRect = popover.getBoundingClientRect();
+          const padding = 15;
+          
+          let top = clientY - popoverRect.height - padding;
+          let left = clientX - popoverRect.width / 2;
+
+          if (top < padding) top = clientY + padding + 20;
+          if (left < padding) left = padding;
+          if (left + popoverRect.width > window.innerWidth - padding) {
+            left = window.innerWidth - popoverRect.width - padding;
+          }
+
+          popover.style.left = `${left}px`;
+          popover.style.top = `${top}px`;
+        }
+
+        function hidePreview() {
+          hideTimeout = setTimeout(() => {
+            popover.classList.remove("visible", "loading");
+            currentLink = null;
+          }, 150);
+        }
+
+        // Preload manifest on first hover near any internal link
+        if (!(window as any).__linkPreviewInitialized) {
+          // Event delegation for hover
+          document.addEventListener("mouseover", (e) => {
+            const link = (e.target as HTMLElement).closest('a[data-internal-link="true"]') as HTMLAnchorElement;
+            if (link) {
+              showPreview(link, e);
+            }
+          });
+
+          document.addEventListener("mouseout", (e) => {
+            const link = (e.target as HTMLElement).closest('a[data-internal-link="true"]');
+            if (link) {
+              hidePreview();
+            }
+          });
+
+          document.addEventListener("mousemove", (e) => {
+            if (!currentLink || !popover.classList.contains("visible")) return;
+            
+            const link = (e.target as HTMLElement).closest('a[data-internal-link="true"]');
+            if (link === currentLink) {
+              const popoverRect = popover.getBoundingClientRect();
+              const padding = 15;
+              
+              let top = e.clientY - popoverRect.height - padding;
+              let left = e.clientX - popoverRect.width / 2;
+
+              if (top < padding) top = e.clientY + padding + 20;
+              if (left < padding) left = padding;
+              if (left + popoverRect.width > window.innerWidth - padding) {
+                left = window.innerWidth - popoverRect.width - padding;
+              }
+
+              popover.style.left = `${left}px`;
+              popover.style.top = `${top}px`;
+            }
+          });
+
+          (window as any).__linkPreviewInitialized = true;
+        }
+      }
+
+      // Run link preview on initial load
+      initLinkPreview();
+
       // =========================================================================
       // CONSOLIDATED VIEW TRANSITIONS HANDLER
       // =========================================================================
@@ -1821,6 +2020,7 @@ import { ClientRouter } from "astro:transitions";
         initSearchModal();
         initImageZoom();
         initImagePreview();
+        initLinkPreview();
 
         // Update shortcut labels for current OS
         updateSearchShortcut();

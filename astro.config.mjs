@@ -21,6 +21,7 @@ import tailwindcss from "@tailwindcss/vite";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeAssetLinks from "./src/plugins/rehype-asset-links.mjs";
+import rehypeInternalLinks from "./src/plugins/rehype-internal-links.mjs";
 import { fromHtml } from "hast-util-from-html";
 
 // =============================================================================
@@ -75,6 +76,9 @@ export default defineConfig({
 
       // Transform relative asset links (images, videos, docs) for proper handling
       rehypeAssetLinks,
+
+      // Mark internal page links for preview feature
+      rehypeInternalLinks,
 
       // Add clickable anchor links to headings
       [

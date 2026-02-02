@@ -2,7 +2,7 @@
 title: "CosmicByte Firefly: Mechanical Keyboard on a Budget - First Impressions"
 date: 2020-09-24 00:00
 last-edited: 2025-04-10 15:53
-cover-image: /20200924-cosmicbyte-firefly-mechanical-keyboard-on-a-budget/cosmicbyte-firefly-mechanical-keyboard-on-a-budget-cover.jpg
+cover-image: ./20200924-cosmicbyte-firefly-mechanical-keyboard-on-a-budget/cosmicbyte-firefly-mechanical-keyboard-on-a-budget-cover.jpg
 ---
 
 ## Background

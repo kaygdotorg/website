@@ -3,6 +3,7 @@ dist/
 # generated types
 .astro/
 public/pagefind/
+public/page-manifest.json
 
 # generated content assets (copied from src/content/ for static serving)
 public/uses/

@@ -3,9 +3,10 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "node scripts/copy-content-assets.mjs && astro dev",
-    "build": "node scripts/copy-content-assets.mjs && astro build && pagefind --site dist",
-    "build:search": "node scripts/copy-content-assets.mjs && astro build && pagefind --site dist --output-path public/pagefind",
+    "dev": "node scripts/copy-content-assets.mjs && node scripts/generate-page-manifest.mjs && astro dev",
+    "build": "node scripts/copy-content-assets.mjs && node scripts/generate-page-manifest.mjs && astro build && pagefind --site dist",
+    "build:search": "node scripts/copy-content-assets.mjs && node scripts/generate-page-manifest.mjs && astro build && pagefind --site dist --output-path public/pagefind",
+    "generate-manifest": "node scripts/generate-page-manifest.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "sync": "node scripts/sync-obsidian.mjs",
