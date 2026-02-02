@@ -1,6 +1,6 @@
 ---
-title: Home
-description: Personal website and digital garden
+title: K Gopal Krishna's Public Repertoire
+description: Landing page, personal website, whatever you want to call it; this is the home to all things that catch my flow.
 name: K Gopal Krishna
 tagline: Infrastructure Engineer, dead cinephile, hobbyist bodybuilder.
 profile-image: ./assets/hero-picture.jpeg
@@ -12,7 +12,7 @@ footer-text: Vibe-coded with Antigravity using Astro and Tailwind CSS
 # Used in BaseLayout.astro for SEO, social sharing, and navigation.
 # Moving these from hardcoded Astro files enables content-driven configuration.
 # =============================================================================
-site-name: "kayg's public repertoire"
+site-name: "K Gopal Krishna's Public Repertoire"
 cover-image: ./assets/home-og-image.png
 
 # =============================================================================
