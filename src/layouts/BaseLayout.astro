@@ -144,19 +144,19 @@ import { ClientRouter } from "astro:transitions";
         "@graph": [
           {
             "@type": "Person",
-            "@id": "https://kayg.org/#person",
+            "@id": `${Astro.url.origin}/#person`,
             name: resolvedSiteName,
-            url: "https://kayg.org",
+            url: Astro.url.origin,
             image: resolvedOgImage,
           },
           {
             "@type": "Website",
-            "@id": "https://kayg.org/#website",
+            "@id": `${Astro.url.origin}/#website`,
             name: resolvedSiteName,
-            url: "https://kayg.org",
+            url: Astro.url.origin,
             description: description,
-            author: { "@id": "https://kayg.org/#person" },
-            publisher: { "@id": "https://kayg.org/#person" },
+            author: { "@id": `${Astro.url.origin}/#person` },
+            publisher: { "@id": `${Astro.url.origin}/#person` },
           },
           {
             "@type": "BreadcrumbList",
@@ -165,7 +165,7 @@ import { ClientRouter } from "astro:transitions";
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: "https://kayg.org",
+                item: Astro.url.origin,
               },
               ...(currentPath !== "/"
                 ? [
