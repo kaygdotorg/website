@@ -67,6 +67,8 @@ if (latestNote) {
 }
 
 // Extract all the data from frontmatter
+// UI text fields added to enable content-driven configuration.
+// Previously these were hardcoded in the template; now they live in markdown.
 const {
   title,
   description,
@@ -79,6 +81,12 @@ const {
   quote,
   workExperience,
   resumeUrl,
+  // Content-driven UI text fields - replace hardcoded strings in template
+  heroHint,
+  bentoSectionLabel,
+  bentoSectionTitle,
+  commentsSectionLabel,
+  commentsSectionTitle,
 } = homeEntry.data;
 
 // Enhance bento cards with actual latest content where applicable
@@ -196,9 +204,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                   ))}
                 </div>
               </div>
-              <p class="hero-cards-hint">
-                swipe to shuffle · tap to navigate · scroll to explore
-              </p>
+              <p class="hero-cards-hint">{heroHint || "swipe to shuffle · tap to navigate · scroll to explore"}</p>
             </div>
           )
         }
@@ -211,8 +217,8 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       <div class="frosted-card-homepage bento-wrapper">
         <!-- Section header -->
         <div class="bento-header">
-          <span class="bento-header-label">Explore</span>
-          <h2 class="bento-header-title">A little bit about me</h2>
+          <span class="bento-header-label">{bentoSectionLabel || "Explore"}</span>
+          <h2 class="bento-header-title">{bentoSectionTitle || "A little bit about me"}</h2>
         </div>
 
         <div class="bento-grid">
@@ -221,8 +227,14 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
               <a href={card.href} class={`bento-card bento-${card.id}`}>
                 {/* 1. Image / Visual (Top) */}
                 <div class="bento-visual-container">
-                  {card.id === "photography" ? (
-                    /* Special stack for photography */
+                  {/*
+                    Content-driven layout variants replace hardcoded ID checks.
+                    The layoutVariant field from markdown determines rendering:
+                    - "photostack": Stack of photos (was: card.id === "photography")
+                    - "graph": Canvas animation (was: card.image === "obsidian-graph")
+                    - "default": Standard image (fallback)
+                  */}
+                  {card.layoutVariant === "photostack" ? (
                     <div class="photo-grid-feature">
                       <div class="photo-stack">
                         {cardPhotos?.slice(0, 4).map((photo: any) => (
@@ -241,7 +253,7 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                         ))}
                       </div>
                     </div>
-                  ) : card.image === "obsidian-graph" ? (
+                  ) : card.layoutVariant === "graph" ? (
                     <div class="obsidian-graph-container" id="obsidian-graph">
                       <canvas id="graph-canvas" />
                     </div>
@@ -266,15 +278,22 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
                 <div class="bento-content-container">
                   <div class="bento-meta">
                     <span class="bento-category">
-                      {card.id === "notes" ? "Notes" : card.category}
-                      {card.id === "now" && <span class="pulse-dot" />}
+                      {/*
+                        Content-driven display properties replace hardcoded ID checks:
+                        - displayCategory: overrides the category text
+                        - showPulse: adds pulsing dot indicator
+                        - titleInMeta: moves title to meta area
+                      */}
+                      {card.displayCategory || card.category}
+                      {card.showPulse && <span class="pulse-dot" />}
                     </span>
-                    {card.id === "notes" && (
+                    {card.titleInMeta && (
                       <span class="bento-title-aside">{card.title}</span>
                     )}
                   </div>
 
-                  {card.id !== "notes" && (
+                  {/* Title renders in main area unless titleInMeta is true */}
+                  {!card.titleInMeta && (
                     <h3 class="bento-card-title">{card.title}</h3>
                   )}
 
@@ -296,9 +315,10 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
       <div class="experience-container">
         <div class="experience-header">
           <div class="experience-header-content">
-            <span class="experience-header-label">Comments</span>
+            {/* Content-driven section labels from frontmatter */}
+            <span class="experience-header-label">{commentsSectionLabel || "Comments"}</span>
             <h2 class="experience-header-title">
-              What People Say About This Website
+              {commentsSectionTitle || "What People Say About This Website"}
             </h2>
           </div>
         </div>

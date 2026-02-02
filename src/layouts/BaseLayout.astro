@@ -4,8 +4,45 @@ import Icon from "../components/Icon.astro";
 import InProgressCard from "../components/InProgressCard.astro";
 import { getEntry } from "astro:content";
 
+// Fetch home entry for site-wide configuration.
+// Content-driven approach: site metadata, navigation, and footer content
+// now live in src/content/home/index.md instead of being hardcoded.
 const homeEntry = await getEntry("home", "index");
-const { socialLinks, email, footerText } = homeEntry?.data || {};
+const {
+  socialLinks,
+  email,
+  footerText,
+  // Site metadata previously hardcoded in this file
+  siteName,
+  ogImage,
+  // Navigation links previously hardcoded as const arrays
+  navLinks,
+} = homeEntry?.data || {};
+
+// Derive navigation arrays from content-driven navLinks.
+// Fallback to sensible defaults if navLinks is not defined in markdown.
+const visibleNavLinks =
+  navLinks?.filter((link) => link.visible !== false).slice(1) || // Skip home (index 0)
+  [
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
+    { href: "/blog", label: "Writing" },
+    { href: "/now", label: "Now" },
+    { href: "/uses", label: "Uses" },
+  ];
+
+const allNavLinks =
+  navLinks || [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
+    { href: "/blog", label: "Writing" },
+    { href: "/now", label: "Now" },
+    { href: "/uses", label: "Uses" },
+    { href: "/photography", label: "Photography" },
+    { href: "/notes", label: "Notes" },
+    { href: "/talks", label: "Talks" },
+  ];
 
 // Helper to map social labels to icon names
 const getIconName = (label: string) => {
@@ -33,25 +70,12 @@ const {
   displayInProgress = false,
 } = Astro.props;
 
-const siteName = "K Gopal Krishna";
-const ogImage = "https://kayg.org/images/og-image.png";
 const currentPath = Astro.url.pathname;
 
-const visibleNavLinks = [
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-  { href: "/blog", label: "Writing" },
-  { href: "/now", label: "Now" },
-  { href: "/uses", label: "Uses" },
-];
-
-const allNavLinks = [
-  { href: "/", label: "Home" },
-  ...visibleNavLinks,
-  { href: "/photography", label: "Photography" },
-  { href: "/notes", label: "Notes" },
-  { href: "/talks", label: "Talks" },
-];
+// Content-driven site metadata with fallback defaults.
+// These values previously lived as hardcoded consts; now they come from markdown.
+const resolvedSiteName = siteName || "kayg's public repertoire";
+const resolvedOgImage = ogImage || "https://kayg.org/images/og-image.webp";
 
 import { ClientRouter } from "astro:transitions";
 ---
@@ -88,15 +112,15 @@ import { ClientRouter } from "astro:transitions";
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
+    <meta property="og:image" content={resolvedOgImage} />
     <meta property="og:url" content={Astro.url.href} />
-    <meta property="og:site_name" content={siteName} />
+    <meta property="og:site_name" content={resolvedSiteName} />
 
     <!-- Twitter Card meta tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image" content={resolvedOgImage} />
 
     <!-- Canonical URL to prevent duplicate content issues -->
     <link rel="canonical" href={Astro.url.href} />
@@ -110,14 +134,14 @@ import { ClientRouter } from "astro:transitions";
           {
             "@type": "Person",
             "@id": "https://kayg.org/#person",
-            name: siteName,
+            name: resolvedSiteName,
             url: "https://kayg.org",
-            image: ogImage,
+            image: resolvedOgImage,
           },
           {
-            "@type": "WebSite",
+            "@type": "Website",
             "@id": "https://kayg.org/#website",
-            name: siteName,
+            name: resolvedSiteName,
             url: "https://kayg.org",
             description: description,
             author: { "@id": "https://kayg.org/#person" },

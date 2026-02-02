@@ -277,7 +277,7 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
         )
         .optional(),
 
-      /** Bento grid cards with images */
+      /** Bento grid cards with images and display configuration */
       bentoCards: z
         .array(
           z.object({
@@ -287,6 +287,19 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
             summary: z.string(),
             href: z.string(),
             image: z.union([image(), z.string()]),
+            /**
+             * Display variant for card layout.
+             * "default" - Standard card with image above content
+             * "graph" - Canvas animation instead of static image
+             * "photostack" - Stack of photos (auto-selected for photography card)
+             */
+            layoutVariant: z.enum(["default", "graph", "photostack"]).optional().default("default"),
+            /** Show pulsing dot indicator (for "now" style cards) */
+            showPulse: z.boolean().optional().default(false),
+            /** Override the displayed category text (optional) */
+            displayCategory: z.string().optional(),
+            /** Show title in meta area instead of main heading area */
+            titleInMeta: z.boolean().optional().default(false),
           })
         )
         .optional(),
@@ -315,6 +328,38 @@ const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
         .optional(),
       resumeUrl: z.string().optional(),
       footerText: z.string().optional(),
+
+      /**
+       * Site-wide metadata for SEO and social sharing.
+       * These replace hardcoded values in BaseLayout.astro.
+       */
+      siteName: z.string().optional(),
+      ogImage: z.string().optional(),
+
+      /**
+       * Navigation configuration for the site header.
+       * Replaces hardcoded navLinks arrays in BaseLayout.astro.
+       */
+      navLinks: z
+        .array(
+          z.object({
+            href: z.string(),
+            label: z.string(),
+            /** Whether to show in main nav (false = mobile menu only) */
+            visible: z.boolean().optional().default(true),
+          })
+        )
+        .optional(),
+
+      /**
+       * Homepage section labels and headings.
+       * Content-driven UI text replaces hardcoded strings in index.astro.
+       */
+      heroHint: z.string().optional(),
+      bentoSectionLabel: z.string().optional(),
+      bentoSectionTitle: z.string().optional(),
+      commentsSectionLabel: z.string().optional(),
+      commentsSectionTitle: z.string().optional(),
     })
     .passthrough();
 

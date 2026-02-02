@@ -7,6 +7,54 @@ profileImage: ./hero-picture.jpeg
 email: mail@kayg.org
 footerText: Vibe-coded with Antigravity using Astro and Tailwind CSS
 
+# =============================================================================
+# SITE METADATA
+# Used in BaseLayout.astro for SEO, social sharing, and navigation.
+# Moving these from hardcoded Astro files enables content-driven configuration.
+# =============================================================================
+siteName: "kayg's public repertoire"
+ogImage: "https://kayg.org/images/og-image.webp"
+
+# =============================================================================
+# NAVIGATION LINKS
+# Replaces hardcoded navLinks arrays in BaseLayout.astro.
+# Set visible: false to hide from main nav (will still appear in mobile menu).
+# =============================================================================
+navLinks:
+  - href: /
+    label: Home
+    visible: false # Home is accessed via logo, not nav
+  - href: /about
+    label: About
+  - href: /contact
+    label: Contact
+  - href: /blog
+    label: Writing
+  - href: /now
+    label: Now
+  - href: /uses
+    label: Uses
+  - href: /photography
+    label: Photography
+    visible: false # Shown only in mobile menu
+  - href: /notes
+    label: Notes
+    visible: false # Shown only in mobile menu
+  - href: /talks
+    label: Talks
+    visible: false # Shown only in mobile menu
+
+# =============================================================================
+# HOMEPAGE UI TEXT
+# Section headings and labels previously hardcoded in index.astro.
+# Content-driven approach enables editing without touching code.
+# =============================================================================
+heroHint: "swipe to shuffle · tap to navigate · scroll to explore"
+bentoSectionLabel: "Explore"
+bentoSectionTitle: "A little bit about me"
+commentsSectionLabel: "Comments"
+commentsSectionTitle: "What People Say About This Website"
+
 socialLinks:
   - label: GitHub
     url: https://github.com/kaygdotorg
@@ -64,19 +112,32 @@ bentoCards:
     category: Notes
     summary: A collection of interconnected fragments, ideas, and less polished thoughts.
     href: /notes
-    image: obsidian-graph # Special identifier for the animation
+    # Replaces the magic string "obsidian-graph" with explicit display configuration.
+    # The layoutVariant: graph flag tells the template to render the canvas animation
+    # instead of a static image. No special string matching required.
+    image: obsidian-graph
+    layoutVariant: graph
+    # titleInMeta moves the title to the category row, matching previous hardcoded
+    # behavior for the notes card. Content now controls layout, not template logic.
+    titleInMeta: true
   - id: now
     title: What I'm doing
     category: Now
     summary: Current projects, books, and focus areas in my life right now.
     href: /now
     image: https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80
+    # showPulse adds the animated pulsing dot indicator next to the category.
+    # Previously hardcoded for card.id === "now", now content-driven.
+    showPulse: true
   - id: photography
     title: Moments Captured
     category: Photography
     summary: A visual diary of my explorations and the beauty found in the mundane.
     href: /photography
     image: https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80
+    # layoutVariant: photostack tells the template to render the photo stack
+    # instead of a single image. Previously hardcoded for card.id === "photography".
+    layoutVariant: photostack
   - id: uses
     title: My Setup
     category: Uses
