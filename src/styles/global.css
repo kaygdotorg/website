@@ -2,11 +2,26 @@
    GLOBAL STYLESHEET
    ============================================================================
    
-   FONTS (via fontsource):
-   - DM Sans: 400 (body), 500 (labels/UI), 600 (buttons), 700 (bold)
-   - Playfair Display: 400/500/600 (headings)
-   - Cascadia Code: 400 (code blocks)
-   - Tangerine: 700 (nav logo)
+   FONT HIERARCHY:
+   - Playfair Display: 400/500/600 (editorial headings, drop caps, major titles)
+   - Outfit: 400/500/600/700 (body text, paragraphs, long-form reading)
+   - SN Pro: 500/600/700 (UI elements, navigation, buttons, labels, metadata)
+   - Cascadia Code: 400 (code blocks, monospace)
+   - Mrs Saint Delafield: 400 (nav logo accent, cursive flourishes)
+   
+   USAGE:
+   - var(--font-heading): Major headings, titles, editorial content
+   - var(--font-body): Paragraphs, long-form reading (Outfit)
+   - var(--font-ui): Navigation, buttons, labels, metadata (SN Pro, heavier weight)
+   - var(--font-mono): Code, technical content
+   - var(--font-cursive): Logo/branding accent, decorative text
+   
+   TYPOGRAPHY FEATURES:
+   - Fluid type scale via clamp() for responsive headings
+   - Ligatures enabled for code (font-variant-ligatures: contextual)
+   - Hanging punctuation for quotes and bullets
+   - text-wrap: pretty for better paragraph endings
+   - Optical alignment on large headings
    
    !IMPORTANT USAGE GUIDE (~230 instances):
    This codebase uses !important pragmatically in these justified cases:
@@ -36,15 +51,18 @@
    
    ============================================================================
 */
-@import "@fontsource/dm-sans/latin-400.css";
-@import "@fontsource/dm-sans/latin-500.css";
-@import "@fontsource/dm-sans/latin-600.css";
-@import "@fontsource/dm-sans/latin-700.css";
+@import "@fontsource/outfit/latin-400.css";
+@import "@fontsource/outfit/latin-500.css";
+@import "@fontsource/outfit/latin-600.css";
+@import "@fontsource/outfit/latin-700.css";
+@import "@fontsource/sn-pro/latin-500.css";
+@import "@fontsource/sn-pro/latin-600.css";
+@import "@fontsource/sn-pro/latin-700.css";
 @import "@fontsource/playfair-display/latin-400.css";
 @import "@fontsource/playfair-display/latin-500.css";
 @import "@fontsource/playfair-display/latin-600.css";
 @import "@fontsource/cascadia-code/latin-400.css";
-@import "@fontsource/tangerine/latin-700.css";
+@import "@fontsource/mrs-saint-delafield/latin-400.css";
 
 @import "tailwindcss";
 
@@ -53,10 +71,22 @@
 }
 
 @theme {
+  /* Font families - hierarchical system */
   --font-heading: "Playfair Display", Georgia, serif;
-  --font-display: "DM Sans", system-ui, sans-serif;
-  --font-body: "DM Sans", system-ui, sans-serif;
-  /* --font-cursive removed: Dancing Script was never used anywhere */
+  --font-body: "Outfit", system-ui, sans-serif;
+  --font-ui: "SN Pro", system-ui, sans-serif;
+  --font-mono: "Cascadia Code", ui-monospace, monospace;
+  --font-cursive: "Mrs Saint Delafield", cursive;
+
+  /* Legacy aliases for backward compatibility */
+  --font-display: var(--font-body);
+
+  /* Fluid typography scale */
+  --font-size-h1: clamp(2.5rem, 5vw, 4rem);
+  --font-size-h2: clamp(1.75rem, 4vw, 2.5rem);
+  --font-size-h3: clamp(1.375rem, 3vw, 1.875rem);
+  --font-size-body: clamp(1.0625rem, 2vw, 1.1875rem);
+  --font-size-ui: clamp(0.875rem, 1.5vw, 1rem);
 
   /* Hot Pink accent palette */
   --color-accent-50: #fdf2f8;
@@ -412,7 +442,7 @@ html[data-theme="light"] body {
 
 .page-card-summary {
   font-size: 1rem;
-  line-height: 1.7;
+  line-height: 1.6;
   color: var(--fallback-bc, #f8f4fc);
   opacity: 0.8;
   max-width: 400px;
@@ -687,18 +717,20 @@ html[data-theme="light"] body {
 
 .md-card-title h1 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: 2rem;
+  font-size: var(--font-size-h1);
   font-weight: 400;
   color: inherit;
   margin-bottom: 1.5rem;
   letter-spacing: -0.08em;
   line-height: 1.1;
+  /* Optical alignment: negative margin to align left edge visually */
+  margin-left: -0.05em;
 }
 
 @media (min-width: 768px) {
   .md-card-title h1 {
-    font-size: 2.5rem;
     margin-bottom: 1.75rem;
+    /* Fluid type already set via var(--font-size-h1) */
   }
 }
 
@@ -708,8 +740,8 @@ html[data-theme="light"] body {
   flex-wrap: wrap;
   gap: 0.75rem;
   font-size: 0.8rem;
-  font-family: var(--font-body, "DM Sans", sans-serif);
-  font-weight: 500;
+  font-family: var(--font-ui, "SN Pro", sans-serif);
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   opacity: 0.6;
@@ -903,7 +935,7 @@ html[data-theme="light"] body {
   content: counter(toc-counter) ". ";
   order: -1;
   opacity: 0.5;
-  font-family: var(--font-sans, sans-serif);
+  font-family: var(--font-ui, sans-serif);
   font-size: 0.9rem;
   font-weight: 500;
   transition: opacity 0.3s ease;
@@ -913,7 +945,7 @@ html[data-theme="light"] body {
   content: counter(toc-counter) "." counter(sub-toc-counter) ". ";
   order: -1;
   opacity: 0.4;
-  font-family: var(--font-sans, sans-serif);
+  font-family: var(--font-ui, sans-serif);
   font-size: 0.85rem;
   font-weight: 400;
   transition: opacity 0.3s ease;
@@ -983,9 +1015,9 @@ html[data-theme="light"] body {
 /* Content Card - Enhanced readability for long-form content */
 .md-card-body .md-card-content {
   line-height: 1.7;
-  /* Reduced from 2.0 for better visual density */
-  font-size: 1.1875rem;
-  /* 19px for comfortable reading */
+  /* Tighter line-height for better density while maintaining readability */
+  font-size: var(--font-size-body);
+  /* Fluid body text size */
   color: #F8F7F5;
   /* Warm off-white for reduced eye strain */
   padding: 2rem 2.5rem;
@@ -994,6 +1026,10 @@ html[data-theme="light"] body {
   max-width: 720px;
   /* Constrain text width for readability */
   margin: 0 auto;
+  /* Hanging punctuation for quotes and bullets */
+  hanging-punctuation: first;
+  /* Better paragraph text wrapping */
+  text-wrap: pretty;
 }
 
 [data-theme="light"] .md-card-body .md-card-content {
@@ -1002,14 +1038,16 @@ html[data-theme="light"] body {
 
 .md-card-body .md-card-content h2 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
-  /* Larger than body text */
+  font-size: var(--font-size-h2);
+  /* Fluid heading size */
   font-weight: 600;
   color: #ffffff;
   margin: 2.5rem 0 1rem;
   letter-spacing: -0.06em;
   line-height: 1.2;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  /* Optical alignment for large headings */
+  margin-left: -0.03em;
 }
 
 .md-card-body .md-card-content h2:first-child {
@@ -1023,8 +1061,8 @@ html[data-theme="light"] body {
 
 .md-card-body .md-card-content h3 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: clamp(1.375rem, 3.5vw, 1.75rem);
-  /* Larger than body text */
+  font-size: var(--font-size-h3);
+  /* Fluid heading size */
   font-weight: 500;
   color: #ffffff;
   opacity: 0.95;
@@ -1032,6 +1070,8 @@ html[data-theme="light"] body {
   letter-spacing: -0.06em;
   line-height: 1.25;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  /* Optical alignment for headings */
+  margin-left: -0.02em;
 }
 
 [data-theme="light"] .md-card-body .md-card-content h3 {
@@ -1047,7 +1087,7 @@ html[data-theme="light"] body {
   /* Match body line-height font size */
 }
 
-/* Drop cap for first paragraph - elegant article intro */
+/* Drop cap for first paragraph - elegant article intro with gradient */
 .md-card-body .md-card-content>p:first-of-type::first-letter {
   float: left;
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
@@ -1055,8 +1095,14 @@ html[data-theme="light"] body {
   line-height: 0.8;
   padding-right: 0.1em;
   margin-top: 0.1em;
-  color: var(--color-accent-400, #f472b6);
   font-weight: 600;
+  /* Gradient fill for visual impact */
+  background: linear-gradient(135deg, var(--color-accent-400, #f472b6) 0%, var(--color-accent-600, #db2777) 50%, #a855f7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* Subtle glow effect */
+  filter: drop-shadow(0 2px 4px rgba(244, 114, 182, 0.3));
 }
 
 .md-card-body .md-card-content ul,
@@ -1151,7 +1197,7 @@ html[data-theme="light"] body {
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1rem;
-  font-family: var(--font-body, sans-serif);
+  font-family: var(--font-ui, sans-serif);
 }
 
 .callout-type {
@@ -1819,7 +1865,7 @@ a[data-internal-link="true"]:hover {
   background: transparent !important;
   padding: 0;
   font-size: 0.875rem;
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
 /* Light mode: Only style non-syntax-highlighted code blocks.
@@ -2285,12 +2331,38 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Improved text wrapping for better paragraph endings */
+  text-wrap: pretty;
+  /* Font feature settings for optimal SN Pro rendering */
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
 }
 
 /* Typography utilities */
 .font-display {
   font-family: var(--font-display);
   font-weight: 500;
+}
+
+.font-ui {
+  font-family: var(--font-ui);
+}
+
+/* Enable programming ligatures for code */
+code,
+pre,
+kbd,
+.font-mono {
+  font-variant-ligatures: contextual;
+}
+
+/* Navigation elements use UI font */
+.nav-link,
+.glass-pill button,
+.glass-pill a:not(.nav-logo) {
+  font-family: var(--font-ui);
+  font-weight: 600;
 }
 
 /* ========================================
@@ -2396,9 +2468,9 @@ body {
 }
 
 .nav-logo-text {
-  font-family: "Tangerine", cursive;
+  font-family: var(--font-cursive, "Mrs Saint Delafield", cursive);
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1;
   color: inherit;
   white-space: nowrap;
@@ -3037,7 +3109,7 @@ body {
 .card-in-hand-label {
   padding: 8px 4px 10px 4px;
   text-align: center;
-  font-family: "Cascadia Code", "Cascadia Code PL", "SF Mono", "Fira Code", monospace;
+  font-family: var(--font-mono);
   line-height: 1.4;
 }
 
@@ -3220,7 +3292,7 @@ body {
 .prose-custom h1,
 .prose-custom h2,
 .prose-custom h3 {
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-weight: 500;
 }
 
@@ -3330,7 +3402,7 @@ html.theme-transitioning *::after {
   --pagefind-ui-tag: rgba(255, 255, 255, 0.1);
   --pagefind-ui-border-width: 0px;
   --pagefind-ui-border-radius: 2rem;
-  --pagefind-ui-font: var(--font-body, system-ui, sans-serif);
+  --pagefind-ui-font: var(--font-ui, system-ui, sans-serif);
   position: relative;
 }
 

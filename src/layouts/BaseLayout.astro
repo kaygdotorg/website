@@ -1066,22 +1066,10 @@ import { ClientRouter } from "astro:transitions";
           // CMD/CTRL + K: Toggle search
           if ((e.metaKey || e.ctrlKey) && e.key === "k") {
             e.preventDefault();
-            if (searchModal?.classList.contains("search-open")) {
-              searchModal.classList.remove("search-open");
-              setTimeout(() => {
-                document.body.classList.remove("search-active");
-              }, 400);
-              document.body.style.overflow = "";
-            } else {
-              searchModal?.classList.add("search-open");
-              document.body.classList.add("search-active");
-              document.body.style.overflow = "hidden";
-              // Focus input
-              setTimeout(() => {
-                const input = searchModal?.querySelector("input");
-                (input as HTMLInputElement)?.focus();
-              }, 100);
-            }
+            const searchToggle =
+              document.getElementById("search-toggle-desktop") ||
+              document.getElementById("search-toggle-mobile");
+            searchToggle?.click();
           }
           // CMD/CTRL + D: Toggle dark/light mode
           // Uses shared toggleTheme() function for consistent behavior
