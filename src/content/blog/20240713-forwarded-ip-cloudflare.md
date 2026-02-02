@@ -55,7 +55,7 @@ Once the image is built, all that needs to be done is adding a new line that say
     [...]
 ```
 
-And once Caddy is restarted, our `X-Forwarded-For` should have IPs in [the format we expect](../notes/20240713-x-forwarded-for.md). 
+And once Caddy is restarted, our `X-Forwarded-For` should have IPs in [the format we expect](../notes/20240713-x-forwarded-for.md).
 
 ### Stop Clients from spoofing X-Forwarded-For
 

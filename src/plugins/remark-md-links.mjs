@@ -14,9 +14,13 @@
 
 import { visit } from "unist-util-visit";
 
+// Known content collections for cross-collection link detection
+const COLLECTIONS = ["blog", "notes", "uses", "now", "talks", "changelog", "about", "contact", "homelab", "photography"];
+
 /**
- * Transforms a .md filename to the correct URL slug.
- * Strips date prefix (YYYYMMDD-) and .md extension.
+ * Transforms a .md link to the correct URL.
+ * - Strips date prefix (YYYYMMDD-) and .md extension
+ * - Converts cross-collection links (../notes/...) to absolute paths (/notes/...)
  */
 function transformMdLink(href) {
   if (!href || !href.endsWith(".md")) return href;
@@ -36,6 +40,21 @@ function transformMdLink(href) {
   const dateMatch = slug.match(/^\d{8}-(.+)$/);
   if (dateMatch) {
     slug = dateMatch[1];
+  }
+  
+  // Check for cross-collection links (e.g., ../notes/file.md)
+  // These need to be converted to absolute paths because relative paths
+  // don't work correctly with directory-style URLs (/blog/post/ vs /blog/post)
+  if (dirPart.startsWith("../") || dirPart.startsWith("..\\")) {
+    // Extract collection name from path like "../notes/" or "../../notes/"
+    const parts = dirPart.split("/").filter(p => p && p !== "..");
+    if (parts.length > 0) {
+      const potentialCollection = parts[0];
+      if (COLLECTIONS.includes(potentialCollection)) {
+        // Convert to absolute path: /collection/slug
+        return `/${potentialCollection}/${slug}`;
+      }
+    }
   }
   
   return dirPart + slug;
