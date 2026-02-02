@@ -1323,6 +1323,77 @@ import { ClientRouter } from "astro:transitions";
         });
 
         // ---------------------------------------------------------------------
+        // IMAGE LINK CLICK HANDLERS (for links to images that should open in lightbox)
+        // These are <a> tags with data-lightbox="true" set by rehype-asset-links
+        // ---------------------------------------------------------------------
+        const imageLinks = document.querySelectorAll(
+          'a[data-lightbox="true"]',
+        );
+
+        imageLinks.forEach((link) => {
+          if ((link as any).__lightboxInitialized) return;
+          (link as any).__lightboxInitialized = true;
+
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const overlay = document.getElementById("zoom-overlay");
+            const zoomedImg = document.getElementById(
+              "zoomed-image",
+            ) as HTMLImageElement;
+            if (!overlay || !zoomedImg) return;
+
+            const state = (window as any).__galleryState;
+
+            // Get the image source from the data attribute or href
+            const anchor = link as HTMLAnchorElement;
+            const imageSrc =
+              anchor.getAttribute("data-image-src") || anchor.href;
+
+            // Resolve relative path: the href might be relative like "./folder/image.jpg"
+            // We need to construct the full URL based on the current page
+            let resolvedSrc = imageSrc;
+            if (imageSrc.startsWith("./") || !imageSrc.startsWith("/")) {
+              // Get current page path and resolve relative to it
+              const currentPath = window.location.pathname;
+              const basePath = currentPath.endsWith("/")
+                ? currentPath
+                : currentPath.substring(0, currentPath.lastIndexOf("/") + 1);
+              
+              // For content collections, assets are served from /_astro/ after build
+              // But during dev, we need to try the collection path
+              // The link href should already be resolved by the browser
+              resolvedSrc = anchor.href;
+            }
+
+            // Single image mode for linked images
+            state.images = [];
+            state.currentIndex = 0;
+            state.isGalleryMode = false;
+            overlay.classList.remove("gallery-mode");
+
+            // Directly set the zoomed image
+            zoomedImg.src = resolvedSrc;
+            zoomedImg.alt = anchor.textContent || "";
+
+            // Hide gallery controls and caption for single linked images
+            const counter = document.getElementById("zoom-counter");
+            const prevBtn = document.getElementById("zoom-prev");
+            const nextBtn = document.getElementById("zoom-next");
+            const caption = document.getElementById("zoom-caption");
+
+            if (counter) counter.textContent = "";
+            if (prevBtn) (prevBtn as HTMLButtonElement).disabled = true;
+            if (nextBtn) (nextBtn as HTMLButtonElement).disabled = true;
+            if (caption) caption.classList.remove("visible");
+
+            overlay.classList.add("active");
+            document.body.style.overflow = "hidden";
+          });
+        });
+
+        // ---------------------------------------------------------------------
         // CLOSE BUTTON HANDLER
         // ---------------------------------------------------------------------
         if (!(window as any).__zoomCloseInitialized) {

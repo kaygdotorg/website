@@ -20,6 +20,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeAssetLinks from "./src/plugins/rehype-asset-links.mjs";
 import { fromHtml } from "hast-util-from-html";
 
 // =============================================================================
@@ -71,6 +72,9 @@ export default defineConfig({
     rehypePlugins: [
       // Add id attributes to headings for anchor links
       rehypeSlug,
+
+      // Transform relative asset links (images, videos, docs) for proper handling
+      rehypeAssetLinks,
 
       // Add clickable anchor links to headings
       [

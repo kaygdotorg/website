@@ -4,6 +4,15 @@ dist/
 .astro/
 public/pagefind/
 
+# generated content assets (copied from src/content/ for static serving)
+public/uses/
+public/blog/
+public/notes/
+public/talks/
+public/now/
+public/photography/
+public/homelab/
+
 # dependencies
 node_modules/
 

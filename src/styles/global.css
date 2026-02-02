@@ -1416,54 +1416,148 @@ html[data-theme="light"] body {
   z-index: 1;
 }
 
-/* Internal links - pill-style with document icon (like mymind.com) */
+/* Internal links - subtle pill-style with contextual icons */
 .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]),
 .md-card-backlinks .md-card-content a {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  /* Tighter gap */
-  padding: 0.15rem 0.65rem 0.15rem 0.5rem;
-  /* More compact padding */
-  background: rgba(20, 15, 28, 0.5);
-  border-radius: 9999px;
+  gap: 0.25rem;
+  padding: 0.1rem 0.5rem 0.1rem 0.35rem;
+  background: rgba(139, 92, 246, 0.12);
+  border-radius: 4px;
   font-weight: 500;
-  font-size: 0.85em;
-  /* Reduced from 0.95em */
-  border: 1px solid transparent;
-  background-image: linear-gradient(rgba(20, 15, 28, 0.8), rgba(20, 15, 28, 0.8)),
-    linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  vertical-align: middle;
-  margin: -2px 1px;
+  font-size: 0.875em;
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  color: var(--color-link);
+  vertical-align: baseline;
+  margin: 0 1px;
+  transition: all 0.15s ease;
 }
 
 .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"])::before,
 .md-card-backlinks .md-card-content a::before {
   content: "";
   display: inline-block;
-  width: 1.1em;
-  height: 1.1em;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ec4899' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3E%3C/svg%3E");
+  width: 0.9em;
+  height: 0.9em;
   background-size: contain;
   background-repeat: no-repeat;
   flex-shrink: 0;
+  opacity: 0.7;
+  /* Default: document/page icon (Lucide file-text) */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238b5cf6' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3C/svg%3E");
 }
 
 [data-theme="light"] .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]),
 [data-theme="light"] .md-card-backlinks .md-card-content a {
-  background-image: linear-gradient(#fdf2f8, #fdf2f8),
-    linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+  background: rgba(139, 92, 246, 0.08);
+  border-color: rgba(139, 92, 246, 0.2);
   color: var(--color-accent-600);
 }
 
-.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]):hover {
-  transform: translateY(-2px) scale(1.04);
-  background-image: linear-gradient(rgba(20, 15, 28, 0.65), rgba(20, 15, 28, 0.65)),
-    linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6, #06b6d4);
-  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.2);
+.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]):hover,
+.md-card-backlinks .md-card-content a:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: rgba(139, 92, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]):hover {
+  background: rgba(139, 92, 246, 0.15);
+}
+
+/* -------------------------------------------------------------------------
+ * Per-asset-type icons for internal links
+ * Uses data-asset-type attribute set by rehype-asset-links plugin
+ * ------------------------------------------------------------------------- */
+
+/* Image links - camera/image icon */
+.md-card-body .md-card-content a[data-asset-type="image"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2310b981' stroke-width='2'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E%3C/svg%3E");
+}
+
+.md-card-body .md-card-content a[data-asset-type="image"] {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #10b981;
+}
+
+.md-card-body .md-card-content a[data-asset-type="image"]:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.4);
+  cursor: zoom-in;
+}
+
+[data-theme="light"] .md-card-body .md-card-content a[data-asset-type="image"] {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+  color: #059669;
+}
+
+/* Video links - play icon */
+.md-card-body .md-card-content a[data-asset-type="video"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f59e0b' stroke-width='2'%3E%3Cpath d='m22 8-6 4 6 4V8Z'/%3E%3Crect width='14' height='12' x='2' y='6' rx='2' ry='2'/%3E%3C/svg%3E");
+}
+
+.md-card-body .md-card-content a[data-asset-type="video"] {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.25);
+  color: #f59e0b;
+}
+
+.md-card-body .md-card-content a[data-asset-type="video"]:hover {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+[data-theme="light"] .md-card-body .md-card-content a[data-asset-type="video"] {
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.2);
+  color: #d97706;
+}
+
+/* Document links - file icon (default, but explicit) */
+.md-card-body .md-card-content a[data-asset-type="document"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ef4444' stroke-width='2'%3E%3Cpath d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' x2='8' y1='13' y2='13'/%3E%3Cline x1='16' x2='8' y1='17' y2='17'/%3E%3C/svg%3E");
+}
+
+.md-card-body .md-card-content a[data-asset-type="document"] {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+}
+
+.md-card-body .md-card-content a[data-asset-type="document"]:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+[data-theme="light"] .md-card-body .md-card-content a[data-asset-type="document"] {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+}
+
+/* Audio links - music icon */
+.md-card-body .md-card-content a[data-asset-type="audio"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2306b6d4' stroke-width='2'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E");
+}
+
+.md-card-body .md-card-content a[data-asset-type="audio"] {
+  background: rgba(6, 182, 212, 0.12);
+  border-color: rgba(6, 182, 212, 0.25);
+  color: #06b6d4;
+}
+
+.md-card-body .md-card-content a[data-asset-type="audio"]:hover {
+  background: rgba(6, 182, 212, 0.2);
+  border-color: rgba(6, 182, 212, 0.4);
+}
+
+[data-theme="light"] .md-card-body .md-card-content a[data-asset-type="audio"] {
+  background: rgba(6, 182, 212, 0.08);
+  border-color: rgba(6, 182, 212, 0.2);
+  color: #0891b2;
 }
 
 /* External links - underlined with external icon */
