@@ -14,7 +14,7 @@ const {
   footerText,
   // Site metadata previously hardcoded in this file
   siteName,
-  ogImage,
+  "cover-image": coverImage,
   // Navigation links previously hardcoded as const arrays
   navLinks,
 } = homeEntry?.data || {};
@@ -81,10 +81,12 @@ const {
 const currentPath = Astro.url.pathname;
 
 // Content-driven site metadata with fallback defaults.
-// Page-specific ogImage takes priority over home entry default.
-// Falls back to home entry ogImage, then hardcoded default.
+// Page-specific cover-image takes priority over home entry default.
+// Falls back to home entry cover-image, then hardcoded default.
 const resolvedSiteName = siteName || "kayg's public repertoire";
-const resolvedOgImage = pageOgImage || ogImage || "https://kayg.org/images/og-image.webp";
+// cover-image can be ImageMetadata (has .src) or string URL
+const homeCoverImage = typeof coverImage === "object" ? coverImage?.src : coverImage;
+const resolvedOgImage = pageOgImage || homeCoverImage || "https://kayg.org/images/og-image.webp";
 
 import { ClientRouter } from "astro:transitions";
 ---

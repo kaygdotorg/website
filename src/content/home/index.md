@@ -13,7 +13,7 @@ footerText: Vibe-coded with Antigravity using Astro and Tailwind CSS
 # Moving these from hardcoded Astro files enables content-driven configuration.
 # =============================================================================
 siteName: "kayg's public repertoire"
-ogImage: "https://kayg.org/images/og-image.webp"
+cover-image: "https://kayg.org/images/og-image.webp"
 
 # =============================================================================
 # NAVIGATION LINKS
