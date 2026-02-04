@@ -904,7 +904,7 @@ html[data-theme="light"] body {
   text-decoration: none;
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 1.25rem;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: -0.03em;
   display: flex;
   align-items: center;
@@ -1038,8 +1038,8 @@ html[data-theme="light"] body {
 
 .md-card-body .md-card-content h2 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: var(--font-size-h2);
-  /* Fluid heading size */
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  /* Larger heading size for better visual hierarchy in posts */
   font-weight: 600;
   color: #ffffff;
   margin: 2.5rem 0 1rem;
@@ -1061,8 +1061,8 @@ html[data-theme="light"] body {
 
 .md-card-body .md-card-content h3 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: var(--font-size-h3);
-  /* Fluid heading size */
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  /* Larger heading size for better visual hierarchy in posts */
   font-weight: 500;
   color: #ffffff;
   opacity: 0.95;
