@@ -222,15 +222,9 @@ const githubUrl = entry?.filePath
           displayTOC && (
             <aside class="md-sidebar md-sidebar-left">
               <div class="md-sidebar-sticky">
-                <div class="md-sidebar-content toc-window-container">
-                  <!-- 5-item sliding window: prev-2, prev, current, next, next-2 -->
-                  <div class="toc-window">
-                    <a href="#" class="toc-window-item toc-far-prev" data-index="-2"></a>
-                    <a href="#" class="toc-window-item toc-prev" data-index="-1"></a>
-                    <a href="#" class="toc-window-item toc-current" data-index="0"></a>
-                    <a href="#" class="toc-window-item toc-next" data-index="1"></a>
-                    <a href="#" class="toc-window-item toc-far-next" data-index="2"></a>
-                  </div>
+                <div class="md-sidebar-content toc-scroll-container">
+                  <!-- Scrollable ToC list populated by JS -->
+                  <div class="toc-scroll-list"></div>
                 </div>
               </div>
             </aside>
@@ -468,68 +462,80 @@ const githubUrl = entry?.filePath
       });
     }
 
-    // Sidebar ToC: 5-item sliding window with active heading tracking
+    // Sidebar ToC: Scrollable list with active heading tracking
     function initSidebarTocWindow() {
       const content = document.getElementById("markdown-content");
-      const tocWindow = document.querySelector(".toc-window");
-      const farPrevItem = document.querySelector(".toc-far-prev");
-      const prevItem = document.querySelector(".toc-prev");
-      const currentItem = document.querySelector(".toc-current");
-      const nextItem = document.querySelector(".toc-next");
-      const farNextItem = document.querySelector(".toc-far-next");
+      const tocList = document.querySelector(".toc-scroll-list");
       
-      if (!content || !tocWindow || !currentItem) return;
+      if (!content || !tocList) return;
+      
+      // Prevent duplicate initialization - clear existing content first
+      tocList.innerHTML = '';
 
       const headings = Array.from(content.querySelectorAll("h2, h3"));
       if (headings.length === 0) return;
 
-      let currentIndex = 0;
       let lastIndex = -1;
+      const tocItems = [];
 
-      // Build heading data
-      const headingData = headings.map((h, i) => {
+      function scrollTocToIndex(index) {
+        if (!tocItems[index]) return;
+        
+        // Wait for DOM to update (especially for active item size change)
+        setTimeout(() => {
+          const item = tocItems[index];
+          // Use offsetTop which gives position relative to offsetParent
+          const itemTop = item.offsetTop;
+          const itemHeight = item.offsetHeight;
+          const containerHeight = tocList.clientHeight;
+          
+          // Scroll so item is centered in the visible area
+          const scrollTarget = itemTop - (containerHeight / 2) + (itemHeight / 2);
+          tocList.scrollTop = Math.max(0, scrollTarget);
+        }, 50);
+      }
+
+      function setActiveItem(index, scrollToc = true) {
+        // Remove active from all
+        tocItems.forEach(item => item.classList.remove('active'));
+        
+        // Set new active
+        if (tocItems[index]) {
+          tocItems[index].classList.add('active');
+          
+          // Scroll mini ToC to center the active item
+          if (scrollToc) {
+            scrollTocToIndex(index);
+          }
+        }
+      }
+
+      // Build ToC items with click handlers
+      headings.forEach((h, i) => {
         const textSpan = h.querySelector(".heading-text");
-        return {
-          id: h.id,
-          text: textSpan ? textSpan.textContent : h.textContent,
-          element: h
-        };
+        const text = textSpan ? textSpan.textContent : h.textContent;
+        
+        const a = document.createElement('a');
+        a.href = `#${h.id}`;
+        a.className = 'toc-scroll-item';
+        a.textContent = text;
+        a.dataset.index = i;
+        
+        // Click handler: scroll main page AND mini ToC
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          lastIndex = i;
+          setActiveItem(i, true);
+          // Scroll main page to the heading
+          headings[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        
+        tocList.appendChild(a);
+        tocItems.push(a);
       });
 
-      function updateItem(item, data) {
-        if (!item) return;
-        if (data) {
-          item.textContent = data.text;
-          item.href = `#${data.id}`;
-        } else {
-          item.textContent = '';
-          item.href = '#';
-        }
-      }
-
-      function updateTocWindow(newIndex, direction) {
-        const farPrev = headingData[newIndex - 2];
-        const prev = headingData[newIndex - 1];
-        const curr = headingData[newIndex];
-        const next = headingData[newIndex + 1];
-        const farNext = headingData[newIndex + 2];
-
-        // Add animation class
-        if (direction !== 0) {
-          tocWindow.classList.remove('sliding-up', 'sliding-down');
-          tocWindow.classList.add(direction > 0 ? 'sliding-up' : 'sliding-down');
-          setTimeout(() => tocWindow.classList.remove('sliding-up', 'sliding-down'), 400);
-        }
-
-        updateItem(farPrevItem, farPrev);
-        updateItem(prevItem, prev);
-        updateItem(currentItem, curr);
-        updateItem(nextItem, next);
-        updateItem(farNextItem, farNext);
-      }
-
       // Initialize with first heading
-      updateTocWindow(0, 0);
+      setActiveItem(0);
 
       // IntersectionObserver to track active heading
       const observer = new IntersectionObserver((entries) => {
@@ -537,10 +543,8 @@ const githubUrl = entry?.filePath
           if (entry.isIntersecting) {
             const index = headings.indexOf(entry.target);
             if (index !== -1 && index !== lastIndex) {
-              const direction = index > lastIndex ? 1 : -1;
               lastIndex = index;
-              currentIndex = index;
-              updateTocWindow(index, direction);
+              setActiveItem(index);
             }
           }
         });
