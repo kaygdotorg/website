@@ -659,15 +659,13 @@ html[data-theme="light"] body {
   }
 }
 
-/* Backlinks Header - non-collapsible */
-.md-backlinks-header,
+/* Comments Header */
 .md-comments-header {
   padding: 1rem 2.5rem;
   max-width: 720px;
   margin: 0 auto;
 }
 
-.md-backlinks-header h2,
 .md-comments-header h2 {
   font-family: var(--font-heading, "Playfair Display", Georgia, serif);
   font-size: 1.75rem;
@@ -974,11 +972,52 @@ html[data-theme="light"] body {
   font-size: 1.1rem;
 }
 
-/* Backlinks Card */
-/* Backlinks styled via shared internal-link-pill logic below */
-.md-card-backlinks .md-card-content {
+/* Navigation Section - Horizontal prev/next links */
+.md-navigation {
   max-width: 720px;
   margin: 0 auto;
+  padding: 1.5rem 2.5rem;
+}
+
+.md-navigation-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.md-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-family: var(--font-ui, "SN Pro", sans-serif);
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--color-accent-500);
+  background: rgba(244, 114, 182, 0.08);
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  transition: all 0.2s ease;
+}
+
+.md-nav-link:hover {
+  background: rgba(244, 114, 182, 0.15);
+  border-color: rgba(244, 114, 182, 0.4);
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .md-nav-link {
+  background: rgba(236, 72, 153, 0.08);
+  border-color: rgba(236, 72, 153, 0.2);
+  color: var(--color-accent-600);
+}
+
+[data-theme="light"] .md-nav-link:hover {
+  background: rgba(236, 72, 153, 0.15);
+  border-color: rgba(236, 72, 153, 0.4);
 }
 
 /* Comments Card - Separate from main content card */
@@ -997,20 +1036,7 @@ html[data-theme="light"] body {
   padding: 0 2.5rem 1rem;
 }
 
-.md-card-backlinks .md-card-content ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.75rem;
-}
-
-.md-card-backlinks .md-card-content li {
-  padding: 0;
-  border-bottom: none;
-}
+/* Legacy backlinks ul/li styles removed - now using .md-navigation */
 
 /* Content Card - Enhanced readability for long-form content */
 .md-card-body .md-card-content {
@@ -1463,8 +1489,7 @@ html[data-theme="light"] body {
 }
 
 /* Internal links - pill-style with document icon (like mymind.com) */
-.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]),
-.md-card-backlinks .md-card-content a {
+.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]) {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -1484,8 +1509,7 @@ html[data-theme="light"] body {
   transition: all 0.2s ease;
 }
 
-.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"])::before,
-.md-card-backlinks .md-card-content a::before {
+.md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"])::before {
   content: "";
   display: inline-block;
   width: 1.1em;
@@ -1496,8 +1520,7 @@ html[data-theme="light"] body {
   flex-shrink: 0;
 }
 
-[data-theme="light"] .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]),
-[data-theme="light"] .md-card-backlinks .md-card-content a {
+[data-theme="light"] .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]) {
   background-image: linear-gradient(#fdf2f8, #fdf2f8),
     linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
   color: var(--color-accent-600);
@@ -4070,14 +4093,12 @@ html.theme-transitioning *::after {
 /* Title headings are white, only links and callouts have pink */
 .md-card-title h1,
 .md-card-header h2,
-.md-backlinks-header h2,
 .md-comments-header h2 {
   color: #ffffff;
 }
 
 [data-theme="light"] .md-card-title h1,
 [data-theme="light"] .md-card-header h2,
-[data-theme="light"] .md-backlinks-header h2,
 [data-theme="light"] .md-comments-header h2 {
   color: #1a1225;
 }

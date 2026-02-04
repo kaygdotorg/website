@@ -263,25 +263,18 @@ const githubUrl = entry?.filePath
         )}
       </div>
 
-      <!-- Backlinks Section - Not collapsible -->
+      <!-- Navigation Section -->
       {
         backlinks.length > 0 && (
           <>
             <hr class="md-section-divider" />
-            <div class="md-section md-card-backlinks" id="backlinks-card">
-              <div class="md-backlinks-header">
-                <h2>Backlinks ({backlinks.length})</h2>
+            <nav class="md-section md-navigation" id="navigation-card">
+              <div class="md-navigation-content">
+                {backlinks.map((link) => (
+                  <a href={link.href} class="md-nav-link">{link.title}</a>
+                ))}
               </div>
-              <div class="md-card-content">
-                <ul>
-                  {backlinks.map((link) => (
-                    <li>
-                      <a href={link.href}>{link.title}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            </nav>
           </>
         )
       }

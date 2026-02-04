@@ -41,7 +41,7 @@ But:
 
 Perhaps, the spotlight complaint is the one that bugs me the most, and is the leading reason why I stick to Apple default tools – even though they are inferior in many ways.
 
-Safari, on the other hand, has many problems. I would say, more problems than both of the above browsers combined. I mean, think about [discovering this crap when you're in an important meeting](https://kayg.org/blog/keep-playing-audio-in-safari-when-switching-to-another-tab-group/). Or [experiencing this when you want to chill after said important meeting](https://kayg.org/blog/safari-goes-nuts-everytime-i-watch-a-youtube-video/).
+Safari, on the other hand, has many problems. I would say, more problems than both of the above browsers combined. I mean, think about [discovering this crap when you're in an important meeting](./20240909-persistent-audio-playback-tab-groups-safari.md). Or [experiencing this when you want to chill after said important meeting](./20250430-safari-audio-stuttering-youtube.md).
 
 But Safari also has many good things going for it too:
 

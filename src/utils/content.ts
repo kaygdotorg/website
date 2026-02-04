@@ -169,16 +169,28 @@ export function buildBacklinks(
 
   // Previous entry (older = higher index in date-sorted array)
   const prevEntry = entries[currentIndex + 1];
-  if (prevEntry) {
+  // Next entry (newer = lower index in date-sorted array)
+  const nextEntry = entries[currentIndex - 1];
+
+  // If both exist: prev on left with ←, next on right with →
+  // If only one exists: it goes on right with →
+  if (prevEntry && nextEntry) {
     backlinks.push({
       title: `← ${prevEntry.data.title}`,
       href: `${basePath}/${getUrlSlug(prevEntry)}`,
     });
-  }
-
-  // Next entry (newer = lower index in date-sorted array)
-  const nextEntry = entries[currentIndex - 1];
-  if (nextEntry) {
+    backlinks.push({
+      title: `${nextEntry.data.title} →`,
+      href: `${basePath}/${getUrlSlug(nextEntry)}`,
+    });
+  } else if (prevEntry) {
+    // Only prev exists - put on right with →
+    backlinks.push({
+      title: `${prevEntry.data.title} →`,
+      href: `${basePath}/${getUrlSlug(prevEntry)}`,
+    });
+  } else if (nextEntry) {
+    // Only next exists - put on right with →
     backlinks.push({
       title: `${nextEntry.data.title} →`,
       href: `${basePath}/${getUrlSlug(nextEntry)}`,

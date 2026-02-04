@@ -5,6 +5,7 @@ title: The Message Type in iOS Shortcuts
 tags:
   - apple-quirks
 slug: the-message-type-in-ios-shortcuts
+cover-image: https://images.unsplash.com/photo-1668697092034-82edc78d1a8d?q=80&w=3736&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
 ---
 ## The Problem
 
