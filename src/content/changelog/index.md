@@ -2,8 +2,40 @@
 title: Changelog
 date: 2026-01-22 00:00:00
 description: A log of notable changes, updates, and improvements to this website.
-last-edited: 2026-02-02 23:15:00
+last-edited: 2026-02-04 22:55:00
 ---
+
+## 2026-02-04 Tuesday
+
+- **Sidebar Table of Contents**
+  - Scrollable mini ToC in left sidebar (desktop only)
+  - Shows all headings with faded gradient mask at edges
+  - Active heading centered and highlighted (larger font, pink color, full text wrap)
+  - Auto-scrolls to center active item while reading
+  - Click any item to navigate and scroll both main page and mini ToC
+  - Hidden scrollbar for clean appearance
+
+- **Sidebar Local Graph**
+  - Moved local graph visualization to right sidebar
+  - Compact view with expand button for fullscreen lightbox
+  - Node labels only appear on hover (including in lightbox)
+  - Removed sidebar headings for minimal look
+
+- **Sidebar Visibility**
+  - Both sidebars faded (25% opacity) by default for focused reading
+  - Full opacity (100%) on hover for interaction
+  - Smooth fade transitions
+
+- **Navigation Links**
+  - Previous link (←) left-aligned, next link (→) right-aligned
+  - Proper spacing when links wrap to two lines
+  - Chronological ordering: previous = older, next = newer
+
+- **Backlinks & Graph Infrastructure**
+  - Link index generation script for tracking internal links
+  - True backlinks section showing pages that link TO current page
+  - Graph data with nodes and edges for visualization
+  - Collection-based node coloring
 
 ## 2026-02-02 Sunday
 
