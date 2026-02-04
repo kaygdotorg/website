@@ -655,22 +655,75 @@ html[data-theme="light"] body {
     display: none !important;
   }
 
+  /* Linear ToC/Backlinks - visible by default, hidden in sidebar mode */
+  .md-toc-linear,
+  .md-toc-linear-divider {
+    display: block;
+    opacity: 1;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .md-backlinks-linear,
+  .md-backlinks-linear-divider {
+    display: block;
+    opacity: 1;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Sidebars - hidden by default, visible in sidebar mode */
   .md-sidebar {
     display: block;
     position: sticky;
-    top: calc(50vh - 200px); /* Vertically centered in viewport */
+    top: calc(50vh - 200px);
     align-self: start;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Sidebar mode: hide linear, show sidebars */
+  .sidebar-mode .md-toc-linear,
+  .sidebar-mode .md-toc-linear-divider {
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sidebar-mode .md-backlinks-linear,
+  .sidebar-mode .md-backlinks-linear-divider {
+    opacity: 0;
+    pointer-events: none;
+    height: 0;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sidebar-mode .md-sidebar {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Keep existing sidebar styles */
+  .md-sidebar.visible {
+    opacity: 1;
+    pointer-events: auto;
     max-height: 400px;
   }
 
   .md-sidebar-left {
     border-right: 1px solid rgba(255, 255, 255, 0.06);
     padding-right: 1.25rem;
+    padding-left: 1.25rem;
   }
 
   .md-sidebar-right {
     border-left: 1px solid rgba(255, 255, 255, 0.06);
     padding-left: 1.25rem;
+    padding-right: 1.25rem;
   }
 
   [data-theme="light"] .md-sidebar-left {
@@ -685,33 +738,32 @@ html[data-theme="light"] body {
     display: flex;
     flex-direction: column;
     max-height: calc(100vh - 12rem);
+    background: rgba(30, 25, 40, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+  }
+
+  [data-theme="light"] .md-sidebar-sticky {
+    background: rgba(245, 240, 250, 0.7);
+    border-color: rgba(0, 0, 0, 0.06);
   }
 
   .md-sidebar-header {
-    padding: 0 1rem 0.75rem;
+    padding: 0 0 0.75rem;
     flex-shrink: 0;
   }
 
-  .md-sidebar-header h3 {
-    font-size: 0.7rem;
+  .md-sidebar-title {
+    font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+    font-size: 1.1rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
     color: var(--color-base-content);
-    opacity: 0.45;
     margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .md-sidebar-header .md-backlinks-count {
-    font-size: 0.6rem;
-    padding: 0.1rem 0.4rem;
   }
 
   .md-sidebar-content {
-    padding: 0 1rem;
+    padding: 0;
     flex: 1;
     overflow: hidden;
   }
@@ -751,78 +803,92 @@ html[data-theme="light"] body {
     background: rgba(0, 0, 0, 0.2);
   }
 
-  /* ToC list in sidebar - matches inline ToC styling */
+  /* ToC list in sidebar - matches inline ToC styling with numbering */
   .toc-list-sidebar {
     list-style: none;
     padding: 0;
     margin: 0;
-    font-size: 0.875rem;
-    line-height: 1.6;
+    counter-reset: toc-sidebar-counter;
   }
 
   .toc-list-sidebar li {
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.5rem;
+    counter-increment: toc-sidebar-counter;
+  }
+
+  .toc-list-sidebar li.has-sub {
+    counter-reset: toc-sidebar-sub-counter;
+  }
+
+  .toc-list-sidebar li.is-sub {
+    counter-increment: toc-sidebar-sub-counter;
   }
 
   .toc-list-sidebar a {
+    font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+    font-size: 1rem;
+    font-weight: 500;
     color: var(--color-base-content);
-    opacity: 0.65;
     text-decoration: none;
-    transition: opacity 0.2s ease, color 0.2s ease;
-    display: block;
-    padding: 0.15rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    padding: 0.2rem 0;
+  }
+
+  .toc-list-sidebar a::before {
+    content: counter(toc-sidebar-counter) ". ";
+    font-family: var(--font-body, system-ui, sans-serif);
+    font-size: 0.85rem;
+    font-weight: 400;
+    opacity: 0.5;
+    min-width: 1.5rem;
   }
 
   .toc-list-sidebar a:hover {
-    opacity: 1;
-    color: #f472b6; /* Pink accent */
+    color: #f472b6;
+    transform: scale(1.02);
+    transform-origin: left center;
   }
 
-  /* Indent for nested headings */
+  /* Indent for nested headings (h3) */
   .toc-list-sidebar .toc-h3 {
-    padding-left: 0.875rem;
+    padding-left: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .toc-list-sidebar .toc-h3::before {
+    content: counter(toc-sidebar-counter) "." counter(toc-sidebar-sub-counter) ". ";
     font-size: 0.8rem;
-    opacity: 0.55;
+    min-width: 2rem;
   }
 
   .toc-list-sidebar .toc-h4 {
-    padding-left: 1.75rem;
-    font-size: 0.75rem;
-    opacity: 0.5;
+    padding-left: 2rem;
+    font-size: 0.85rem;
   }
 
-  /* Backlink pills in sidebar */
+  /* Backlink items in sidebar - matches ToC styling */
   .md-backlink-pill-sidebar {
-    display: block;
-    padding: 0.5rem 0.7rem;
-    margin-bottom: 0.45rem;
-    font-size: 0.8rem;
-    line-height: 1.45;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0;
+    margin-bottom: 0.4rem;
+    font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.4;
     color: var(--color-base-content);
-    opacity: 0.7;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 0.5rem;
     text-decoration: none;
     transition: all 0.2s ease;
   }
 
   .md-backlink-pill-sidebar:hover {
-    opacity: 1;
-    background: rgba(244, 114, 182, 0.1);
-    border-color: rgba(244, 114, 182, 0.2);
     color: #f472b6;
-  }
-
-  [data-theme="light"] .md-backlink-pill-sidebar {
-    background: rgba(0, 0, 0, 0.02);
-    border-color: rgba(0, 0, 0, 0.06);
-  }
-
-  [data-theme="light"] .md-backlink-pill-sidebar:hover {
-    background: rgba(236, 72, 153, 0.08);
-    border-color: rgba(236, 72, 153, 0.15);
-    color: #ec4899;
+    transform: scale(1.02);
+    transform-origin: left center;
   }
 }
 
@@ -1135,21 +1201,6 @@ html[data-theme="light"] body {
   position: relative;
 }
 
-/* TOC Link Arrow: Placed to the right via order: 1, slides in from right on hover */
-.md-card-toc .md-card-content a::before {
-  content: "←";
-  opacity: 0;
-  transform: translateX(8px);
-  transition: all 0.3s ease;
-  color: var(--color-accent-500);
-  font-weight: bold;
-  order: 1;
-}
-
-.md-card-toc .md-card-content a:hover::before {
-  opacity: 1;
-  transform: translateX(0);
-}
 
 .md-card-toc .md-card-content li.toc-level-2>a::after {
   content: counter(toc-counter) ". ";
@@ -1173,13 +1224,10 @@ html[data-theme="light"] body {
 
 .md-card-toc .md-card-content a:hover {
   opacity: 1;
-  color: var(--color-accent-500);
+  color: #f472b6;
   background: rgba(236, 72, 153, 0.04);
-  transform: translateX(4px);
-}
-
-.md-card-toc .md-card-content a:hover::after {
-  opacity: 0.2;
+  transform: scale(1.02);
+  transform-origin: left center;
 }
 
 .md-card-toc .md-card-content li.toc-level-2 {

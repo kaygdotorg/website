@@ -223,7 +223,7 @@ const githubUrl = entry?.filePath
             <aside class="md-sidebar md-sidebar-left">
               <div class="md-sidebar-sticky">
                 <div class="md-sidebar-header">
-                  <h3 class="section-heading" data-anchor="table-of-contents">Contents<a class="heading-link" href="#table-of-contents" aria-label="Link to Table of contents"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+                  <h2 class="md-sidebar-title">Table of contents</h2>
                 </div>
                 <div class="md-sidebar-content md-sidebar-scrollable">
                   <ul class="toc-list-sidebar">
@@ -241,7 +241,7 @@ const githubUrl = entry?.filePath
           {
             displayTOC && (
               <>
-                <section class="md-section md-card-collapsible md-card-toc md-mobile-only" id="table-of-contents">
+                <section class="md-section md-card-collapsible md-card-toc md-toc-linear" id="table-of-contents">
                   <div class="md-card-header" onclick="toggleCard('table-of-contents')">
                     <h2 class="section-heading" data-anchor="table-of-contents">Table of contents<a class="heading-link" href="#table-of-contents" aria-label="Link to Table of contents"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
                     <svg
@@ -264,7 +264,7 @@ const githubUrl = entry?.filePath
                     </ul>
                   </div>
                 </section>
-                <hr class="md-section-divider md-mobile-only" />
+                <hr class="md-section-divider md-toc-linear-divider" />
               </>
             )
           }
@@ -310,12 +310,12 @@ const githubUrl = entry?.filePath
             )
           }
 
-          <!-- Backlinks Section - Mobile only -->
+          <!-- Backlinks Section - Linear (shown at bottom on desktop, always on mobile) -->
           {
             trueBacklinks.length > 0 && (
               <>
-                <hr class="md-section-divider md-mobile-only" />
-                <section class="md-section md-backlinks md-mobile-only" id="backlinks">
+                <hr class="md-section-divider md-backlinks-linear-divider" />
+                <section class="md-section md-backlinks md-backlinks-linear" id="backlinks">
                   <div class="md-backlinks-header">
                     <h3 class="section-heading" data-anchor="backlinks">Linked from<a class="heading-link" href="#backlinks" aria-label="Link to Backlinks"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
                     <span class="md-backlinks-count">{trueBacklinks.length}</span>
@@ -357,8 +357,7 @@ const githubUrl = entry?.filePath
             <aside class="md-sidebar md-sidebar-right">
               <div class="md-sidebar-sticky">
                 <div class="md-sidebar-header">
-                  <h3 class="section-heading" data-anchor="backlinks">Linked from<a class="heading-link" href="#backlinks" aria-label="Link to Backlinks"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
-                  <span class="md-backlinks-count">{trueBacklinks.length}</span>
+                  <h2 class="md-sidebar-title">Linked from</h2>
                 </div>
                 <div class="md-sidebar-content md-sidebar-scrollable">
                   {trueBacklinks.map((link) => (
@@ -593,6 +592,51 @@ const githubUrl = entry?.filePath
       });
     }
 
+    // Sidebar mode morphing - toggle between linear and sidebar views
+    function initSidebarMorphing() {
+      const linearToc = document.querySelector('.md-toc-linear');
+      const linearBacklinks = document.querySelector('.md-backlinks-linear');
+      const markdownContent = document.getElementById('markdown-content');
+      const navSection = document.getElementById('navigation-card');
+      const unifiedCard = document.querySelector('.md-unified-card');
+      
+      if (!linearToc || !markdownContent || !unifiedCard) return;
+
+      // Find the last heading in the article content
+      const headings = markdownContent.querySelectorAll('h2, h3, h4');
+      const lastHeading = headings.length > 0 ? headings[headings.length - 1] : null;
+
+      function updateMode() {
+        const linearTocRect = linearToc.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        
+        // Calculate if we've scrolled past the linear ToC
+        const pastLinearToc = linearTocRect.bottom < viewportHeight * 0.3;
+        
+        // Calculate if we've reached the bottom (last heading or nav section)
+        let atBottom = false;
+        if (lastHeading) {
+          const lastHeadingRect = lastHeading.getBoundingClientRect();
+          atBottom = lastHeadingRect.top < viewportHeight * 0.5;
+        }
+        if (navSection) {
+          const navRect = navSection.getBoundingClientRect();
+          atBottom = atBottom || navRect.top < viewportHeight * 0.7;
+        }
+
+        // Toggle sidebar mode: show sidebars only when reading content (past ToC, before bottom)
+        if (pastLinearToc && !atBottom) {
+          unifiedCard.classList.add('sidebar-mode');
+        } else {
+          unifiedCard.classList.remove('sidebar-mode');
+        }
+      }
+
+      window.addEventListener('scroll', updateMode, { passive: true });
+      window.addEventListener('resize', updateMode, { passive: true });
+      updateMode();
+    }
+
     // Initialize all markdown features
     function initMarkdownFeatures() {
       wrapHeadingText();
@@ -601,6 +645,7 @@ const githubUrl = entry?.filePath
       initScrollProgress();
       initLastEditedToggle();
       initVideoAutoplay();
+      initSidebarMorphing();
 
       // Initialize Clipboard Links
       const content = document.getElementById("markdown-content");
