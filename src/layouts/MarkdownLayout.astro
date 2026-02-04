@@ -486,31 +486,6 @@ const githubUrl = entry?.filePath
         }
       });
 
-      // Add scroll spy for sidebar ToC active state
-      if (tocListSidebar) {
-        initTocScrollSpy(headings, tocListSidebar);
-      }
-    }
-
-    // Scroll spy to highlight current section in sidebar ToC
-    function initTocScrollSpy(headings, tocListSidebar) {
-      if (!headings.length) return;
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const id = entry.target.id;
-            tocListSidebar.querySelectorAll('a').forEach(a => {
-              a.classList.toggle('active', a.dataset.headingId === id);
-            });
-          }
-        });
-      }, {
-        rootMargin: '-80px 0px -70% 0px',
-        threshold: 0
-      });
-
-      headings.forEach(heading => observer.observe(heading));
     }
 
     // Scroll Progress Button Logic
@@ -876,7 +851,7 @@ const githubUrl = entry?.filePath
 
       setTimeout(() => {
         toast.classList.remove("show");
-      }, 3000);
+      }, 1500);
     }
 
     // Make toggleCard available globally (safer assignment)
