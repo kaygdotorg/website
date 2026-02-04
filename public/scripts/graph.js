@@ -560,10 +560,10 @@
         }
       }
 
-      // Draw all labels in lightbox (or just hovered + current)
+      // Draw labels only on hover in lightbox
       for (const node of this.nodes) {
         const isHovered = node === this.lightboxHoveredNode;
-        if (isHovered || node.isCurrent) {
+        if (isHovered) {
           this.drawLabel(ctx, node, nodeScale);
         }
       }
@@ -821,7 +821,8 @@
   // =============================================================================
 
   function initGraphs() {
-    const containers = document.querySelectorAll(".md-graph-container");
+    // Initialize both main and sidebar graph containers
+    const containers = document.querySelectorAll(".md-graph-container, .md-graph-container-sidebar");
     containers.forEach((container) => {
       if (!container._graph) {
         container._graph = new LocalGraph(container);

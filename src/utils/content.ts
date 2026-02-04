@@ -202,48 +202,48 @@ export function buildBacklinks(
 ): Backlink[] {
   const backlinks: Backlink[] = [];
 
-  // Always include link back to collection index
-  backlinks.push({
-    title: `← ${label}`,
-    href: basePath,
-  });
-
-  // Find current entry's position in the sorted array
+  // Find current entry's position in the sorted array (sorted newest first)
   const currentSlug = getUrlSlug(current);
   const currentIndex = entries.findIndex((e) => getUrlSlug(e) === currentSlug);
 
   if (currentIndex === -1) {
-    // Current entry not found in list (shouldn't happen, but handle gracefully)
-    return backlinks;
+    // Current entry not found - return parent link only
+    return [
+      { title: `← ${label}`, href: basePath },
+      { title: `${label} →`, href: basePath },
+    ];
   }
 
-  // Previous entry (older = higher index in date-sorted array)
-  const prevEntry = entries[currentIndex + 1];
-  // Next entry (newer = lower index in date-sorted array)
-  const nextEntry = entries[currentIndex - 1];
+  // Previous = older post (higher index) or parent if oldest
+  // Next = newer post (lower index) or parent if newest
+  const prevEntry = entries[currentIndex + 1]; // older
+  const nextEntry = entries[currentIndex - 1]; // newer
 
-  // If both exist: prev on left with ←, next on right with →
-  // If only one exists: it goes on right with →
-  if (prevEntry && nextEntry) {
+  // ← Previous (older post, or parent page if this is the oldest)
+  if (prevEntry) {
     backlinks.push({
       title: `← ${prevEntry.data.title}`,
       href: `${basePath}/${getUrlSlug(prevEntry)}`,
     });
+  } else {
+    // Oldest post - previous is parent page
+    backlinks.push({
+      title: `← ${label}`,
+      href: basePath,
+    });
+  }
+
+  // → Next (newer post, or parent page if this is the newest)
+  if (nextEntry) {
     backlinks.push({
       title: `${nextEntry.data.title} →`,
       href: `${basePath}/${getUrlSlug(nextEntry)}`,
     });
-  } else if (prevEntry) {
-    // Only prev exists - put on right with →
+  } else {
+    // Newest post - next is parent page
     backlinks.push({
-      title: `${prevEntry.data.title} →`,
-      href: `${basePath}/${getUrlSlug(prevEntry)}`,
-    });
-  } else if (nextEntry) {
-    // Only next exists - put on right with →
-    backlinks.push({
-      title: `${nextEntry.data.title} →`,
-      href: `${basePath}/${getUrlSlug(nextEntry)}`,
+      title: `${label} →`,
+      href: basePath,
     });
   }
 
