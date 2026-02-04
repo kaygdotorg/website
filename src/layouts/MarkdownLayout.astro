@@ -215,39 +215,61 @@ const githubUrl = entry?.filePath
       <!-- Divider -->
       <hr class="md-section-divider" />
 
-      <!-- Table of Contents Section - Collapsible -->
-      {
-        displayTOC && (
-          <>
-            <section class="md-section md-card-collapsible md-card-toc" id="table-of-contents">
-              <div class="md-card-header" onclick="toggleCard('table-of-contents')">
-                <h2>Table of contents</h2>
-                <svg
-                  class="md-card-toggle"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
+      <!-- Three-column layout wrapper for desktop sidebars -->
+      <div class="md-content-wrapper">
+        <!-- Left Sidebar: Table of Contents (desktop only) -->
+        {
+          displayTOC && (
+            <aside class="md-sidebar md-sidebar-left">
+              <div class="md-sidebar-sticky">
+                <div class="md-sidebar-header">
+                  <h3 class="section-heading" data-anchor="table-of-contents">Contents<a class="heading-link" href="#table-of-contents" aria-label="Link to Table of contents"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+                </div>
+                <div class="md-sidebar-content md-sidebar-scrollable">
+                  <ul class="toc-list-sidebar">
+                    <!-- Populated by JS -->
+                  </ul>
+                </div>
               </div>
-              <div class="md-card-content">
-                <ul id="toc-list">
-                  <!-- Populated by JS -->
-                </ul>
-              </div>
-            </section>
-            <hr class="md-section-divider" />
-          </>
-        )
-      }
+            </aside>
+          )
+        }
 
-      <!-- Content Section - Not collapsible -->
+        <!-- Main content column -->
+        <div class="md-main-content">
+          <!-- Table of Contents Section - Mobile only, Collapsible -->
+          {
+            displayTOC && (
+              <>
+                <section class="md-section md-card-collapsible md-card-toc md-mobile-only" id="table-of-contents">
+                  <div class="md-card-header" onclick="toggleCard('table-of-contents')">
+                    <h2 class="section-heading" data-anchor="table-of-contents">Table of contents<a class="heading-link" href="#table-of-contents" aria-label="Link to Table of contents"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+                    <svg
+                      class="md-card-toggle"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                  <div class="md-card-content">
+                    <ul id="toc-list">
+                      <!-- Populated by JS -->
+                    </ul>
+                  </div>
+                </section>
+                <hr class="md-section-divider md-mobile-only" />
+              </>
+            )
+          }
+
+          <!-- Content Section - Not collapsible -->
       <div class="md-section md-card-body" id="content-card">
         <div class="md-card-content" id="markdown-content">
           <slot />
@@ -272,60 +294,85 @@ const githubUrl = entry?.filePath
         )}
       </div>
 
-      <!-- Navigation Section -->
-      {
-        backlinks.length > 0 && (
-          <>
-            <hr class="md-section-divider" />
-            <nav class="md-section md-navigation" id="navigation-card">
-              <div class="md-navigation-content">
-                {backlinks.map((link) => (
-                  <a href={link.href} class="md-nav-link">{link.title}</a>
-                ))}
-              </div>
-            </nav>
-          </>
-        )
-      }
+          <!-- Navigation Section -->
+          {
+            backlinks.length > 0 && (
+              <>
+                <hr class="md-section-divider" />
+                <nav class="md-section md-navigation" id="navigation-card">
+                  <div class="md-navigation-content">
+                    {backlinks.map((link) => (
+                      <a href={link.href} class="md-nav-link">{link.title}</a>
+                    ))}
+                  </div>
+                </nav>
+              </>
+            )
+          }
 
-      <!-- Backlinks Section (True backlinks - pages that link TO this page) -->
-      {
-        trueBacklinks.length > 0 && (
-          <>
-            <hr class="md-section-divider" />
-            <section class="md-section md-backlinks" id="backlinks">
-              <div class="md-backlinks-header">
-                <h3>Linked from</h3>
-                <span class="md-backlinks-count">{trueBacklinks.length}</span>
-              </div>
-              <div class="md-backlinks-content">
-                {trueBacklinks.map((link) => (
-                  <a href={link.source} class="md-backlink-pill" data-collection={link.collection}>
-                    {link.title}
-                  </a>
-                ))}
-              </div>
-            </section>
-          </>
-        )
-      }
+          <!-- Backlinks Section - Mobile only -->
+          {
+            trueBacklinks.length > 0 && (
+              <>
+                <hr class="md-section-divider md-mobile-only" />
+                <section class="md-section md-backlinks md-mobile-only" id="backlinks">
+                  <div class="md-backlinks-header">
+                    <h3 class="section-heading" data-anchor="backlinks">Linked from<a class="heading-link" href="#backlinks" aria-label="Link to Backlinks"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+                    <span class="md-backlinks-count">{trueBacklinks.length}</span>
+                  </div>
+                  <div class="md-backlinks-content">
+                    {trueBacklinks.map((link) => (
+                      <a href={link.source} class="md-backlink-pill" data-collection={link.collection}>
+                        {link.title}
+                      </a>
+                    ))}
+                  </div>
+                </section>
+              </>
+            )
+          }
 
-      <!-- Local Graph Section -->
-      {
-        graphData.nodes.length > 1 && (
-          <>
-            <hr class="md-section-divider" />
-            <section class="md-section md-graph" id="local-graph">
-              <div class="md-graph-header">
-                <h3>Local Graph</h3>
+          <!-- Local Graph Section -->
+          {
+            graphData.nodes.length > 1 && (
+              <>
+                <hr class="md-section-divider" />
+                <section class="md-section md-graph" id="local-graph">
+                  <div class="md-graph-header">
+                    <h3 class="section-heading" data-anchor="local-graph">Local Graph<a class="heading-link" href="#local-graph" aria-label="Link to Local Graph"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+                  </div>
+                  <div class="md-graph-container" data-current={currentPath} data-graph={JSON.stringify(graphData)}>
+                    <canvas></canvas>
+                  </div>
+                </section>
+              </>
+            )
+          }
+
+        </div><!-- End md-main-content -->
+
+        <!-- Right Sidebar: Backlinks (desktop only) -->
+        {
+          trueBacklinks.length > 0 && (
+            <aside class="md-sidebar md-sidebar-right">
+              <div class="md-sidebar-sticky">
+                <div class="md-sidebar-header">
+                  <h3 class="section-heading" data-anchor="backlinks">Linked from<a class="heading-link" href="#backlinks" aria-label="Link to Backlinks"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+                  <span class="md-backlinks-count">{trueBacklinks.length}</span>
+                </div>
+                <div class="md-sidebar-content md-sidebar-scrollable">
+                  {trueBacklinks.map((link) => (
+                    <a href={link.source} class="md-backlink-pill-sidebar" data-collection={link.collection}>
+                      {link.title}
+                    </a>
+                  ))}
+                </div>
               </div>
-              <div class="md-graph-container" data-current={currentPath} data-graph={JSON.stringify(graphData)}>
-                <canvas></canvas>
-              </div>
-            </section>
-          </>
-        )
-      }
+            </aside>
+          )
+        }
+
+      </div><!-- End md-content-wrapper -->
 
     </div>
 
@@ -334,7 +381,7 @@ const githubUrl = entry?.filePath
       displayComments && (
         <section class="frosted-card md-comments-card" id="comments">
           <div class="md-comments-header">
-            <h2>Comments</h2>
+            <h2 class="section-heading" data-anchor="comments">Comments<a class="heading-link" href="#comments" aria-label="Link to Comments"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
           </div>
           <div class="md-card-content">
             <div id="remark42"></div>
@@ -386,22 +433,24 @@ const githubUrl = entry?.filePath
       });
     }
 
-    // Generate TOC from headings
+    // Generate TOC from headings (populates both mobile and desktop sidebar)
     function generateTOC() {
       const content = document.getElementById("markdown-content");
       const tocList = document.getElementById("toc-list");
-      if (!content || !tocList) return;
+      const tocListSidebar = document.querySelector(".toc-list-sidebar");
+      if (!content) return;
 
       const headings = content.querySelectorAll("h2, h3");
 
       if (headings.length === 0) {
         // Hide TOC if no headings
-        document.getElementById("toc-card")?.classList.add("collapsed");
+        document.getElementById("table-of-contents")?.classList.add("collapsed");
         return;
       }
 
       // Clear existing TOC to prevent duplicates on re-init
-      tocList.innerHTML = "";
+      if (tocList) tocList.innerHTML = "";
+      if (tocListSidebar) tocListSidebar.innerHTML = "";
 
       headings.forEach((heading, index) => {
         // Add ID to heading if not present
@@ -409,18 +458,59 @@ const githubUrl = entry?.filePath
           heading.id = `heading-${index}`;
         }
 
-        const li = document.createElement("li");
-        li.className = `toc-level-${heading.tagName.toLowerCase() === "h2" ? "2" : "3"}`;
-
-        const a = document.createElement("a");
-        a.href = `#${heading.id}`;
-        // Get text from heading-text span or fallback to textContent
+        const tagName = heading.tagName.toLowerCase();
         const textSpan = heading.querySelector(".heading-text");
-        a.textContent = textSpan ? textSpan.textContent : heading.textContent;
+        const text = textSpan ? textSpan.textContent : heading.textContent;
 
-        li.appendChild(a);
-        tocList.appendChild(li);
+        // Mobile ToC
+        if (tocList) {
+          const li = document.createElement("li");
+          li.className = `toc-level-${tagName === "h2" ? "2" : "3"}`;
+          const a = document.createElement("a");
+          a.href = `#${heading.id}`;
+          a.textContent = text;
+          li.appendChild(a);
+          tocList.appendChild(li);
+        }
+
+        // Desktop sidebar ToC
+        if (tocListSidebar) {
+          const li = document.createElement("li");
+          const a = document.createElement("a");
+          a.href = `#${heading.id}`;
+          a.textContent = text;
+          a.className = `toc-${tagName}`;
+          a.dataset.headingId = heading.id;
+          li.appendChild(a);
+          tocListSidebar.appendChild(li);
+        }
       });
+
+      // Add scroll spy for sidebar ToC active state
+      if (tocListSidebar) {
+        initTocScrollSpy(headings, tocListSidebar);
+      }
+    }
+
+    // Scroll spy to highlight current section in sidebar ToC
+    function initTocScrollSpy(headings, tocListSidebar) {
+      if (!headings.length) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            tocListSidebar.querySelectorAll('a').forEach(a => {
+              a.classList.toggle('active', a.dataset.headingId === id);
+            });
+          }
+        });
+      }, {
+        rootMargin: '-80px 0px -70% 0px',
+        threshold: 0
+      });
+
+      headings.forEach(heading => observer.observe(heading));
     }
 
     // Scroll Progress Button Logic
@@ -697,6 +787,80 @@ const githubUrl = entry?.filePath
     // Initialize on load and on page transitions
     document.addEventListener("DOMContentLoaded", initMarkdownFeatures);
     document.addEventListener("astro:page-load", initMarkdownFeatures);
+
+    // Initialize section heading copy-link functionality (ToC, Backlinks, Local Graph, Comments)
+    function initSectionHeadingClipboard() {
+      const sectionHeadings = document.querySelectorAll('.section-heading');
+      
+      sectionHeadings.forEach(heading => {
+        const anchor = heading.dataset.anchor;
+        if (!anchor) return;
+        
+        // Give heading an ID for the copy function
+        heading.id = anchor;
+        
+        function copySectionLink(e) {
+          // Don't copy if clicking collapse toggle
+          if (e.target.closest('.md-card-toggle')) return;
+          
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const url = `${window.location.origin}${window.location.pathname}#${anchor}`;
+          heading.classList.add("tapped");
+          setTimeout(() => heading.classList.remove("tapped"), 3000);
+          
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(url)
+              .then(() => showToast("Link copied to clipboard!"))
+              .catch(() => {
+                fallbackCopy(url);
+              });
+          } else {
+            fallbackCopy(url);
+          }
+        }
+        
+        function fallbackCopy(text) {
+          const textArea = document.createElement("textarea");
+          textArea.value = text;
+          textArea.style.position = "fixed";
+          textArea.style.left = "-9999px";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          try {
+            if (document.execCommand("copy")) showToast("Link copied to clipboard!");
+          } catch (err) {}
+          document.body.removeChild(textArea);
+        }
+        
+        // Click on heading or link icon
+        heading.addEventListener('click', copySectionLink);
+        
+        // Touch support
+        let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+        heading.addEventListener('touchstart', (e) => {
+          const touch = e.changedTouches[0];
+          touchStartX = touch.clientX;
+          touchStartY = touch.clientY;
+          touchStartTime = Date.now();
+        }, { passive: true });
+        
+        heading.addEventListener('touchend', (e) => {
+          const touch = e.changedTouches[0];
+          const dx = Math.abs(touch.clientX - touchStartX);
+          const dy = Math.abs(touch.clientY - touchStartY);
+          const dt = Date.now() - touchStartTime;
+          if (dx < 10 && dy < 10 && dt < 300) {
+            copySectionLink(e);
+          }
+        }, { passive: false });
+      });
+    }
+    
+    document.addEventListener("DOMContentLoaded", initSectionHeadingClipboard);
+    document.addEventListener("astro:page-load", initSectionHeadingClipboard);
 
     function showToast(message) {
       let toast = document.getElementById("toast-notification");
