@@ -35,8 +35,12 @@ import {
   calculateReadingTime,
   getUrlSlug,
   buildBacklinks,
+  getTrueBacklinks,
+  getLocalGraphData,
   CONTENT_COLLECTIONS,
   type ContentCollection,
+  type TrueBacklink,
+  type GraphData,
 } from "../../utils/content";
 
 // =============================================================================
@@ -172,6 +176,25 @@ const backlinks = buildBacklinks(
   sortedEntries,
   entry,
 );
+
+// -----------------------------------------------------------------------------
+// TRUE BACKLINKS & GRAPH DATA
+// -----------------------------------------------------------------------------
+
+/**
+ * Get the current page's URL path for backlinks lookup.
+ */
+const currentPath = `${config.basePath}/${getUrlSlug(entry)}`;
+
+/**
+ * Fetch true backlinks (pages that link TO this page).
+ */
+const trueBacklinks = await getTrueBacklinks(currentPath);
+
+/**
+ * Fetch local graph data (nodes within 1 hop of this page).
+ */
+const graphData = await getLocalGraphData(currentPath, 1);
 ---
 
 <MarkdownLayout
@@ -182,6 +205,9 @@ const backlinks = buildBacklinks(
   lastEdited={lastEdited}
   readingTime={readingTime}
   backlinks={backlinks}
+  trueBacklinks={trueBacklinks}
+  graphData={graphData}
+  currentPath={currentPath}
   coverImage={entry.data["cover-image"]}
 >
   {

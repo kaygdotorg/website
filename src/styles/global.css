@@ -1020,6 +1020,282 @@ html[data-theme="light"] body {
   border-color: rgba(236, 72, 153, 0.4);
 }
 
+/* =============================================================================
+   BACKLINKS SECTION - True backlinks (pages that link TO current page)
+   ============================================================================= */
+
+.md-backlinks {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 2.5rem;
+}
+
+.md-backlinks-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.md-backlinks-header h3 {
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: inherit;
+  margin: 0;
+}
+
+.md-backlinks-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  border-radius: 9999px;
+  font-family: var(--font-ui, "SN Pro", sans-serif);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(244, 114, 182, 0.15);
+  color: var(--color-accent-400);
+}
+
+.md-backlinks-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.md-backlink-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.85rem;
+  border-radius: 2rem;
+  font-family: var(--font-ui, "SN Pro", sans-serif);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--color-accent-400);
+  background: rgba(244, 114, 182, 0.08);
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  transition: all 0.2s ease;
+}
+
+.md-backlink-pill:hover {
+  background: rgba(244, 114, 182, 0.15);
+  border-color: rgba(244, 114, 182, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Collection-specific colors for backlink pills */
+.md-backlink-pill[data-collection="blog"] {
+  color: #ec4899;
+  background: rgba(236, 72, 153, 0.08);
+  border-color: rgba(236, 72, 153, 0.2);
+}
+
+.md-backlink-pill[data-collection="notes"] {
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.2);
+}
+
+.md-backlink-pill[data-collection="talks"] {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.md-backlink-pill[data-collection="uses"] {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.md-backlink-pill[data-collection="now"] {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+[data-theme="light"] .md-backlinks-count {
+  background: rgba(236, 72, 153, 0.12);
+  color: var(--color-accent-600);
+}
+
+[data-theme="light"] .md-backlink-pill {
+  background: rgba(236, 72, 153, 0.06);
+  border-color: rgba(236, 72, 153, 0.15);
+  color: var(--color-accent-600);
+}
+
+[data-theme="light"] .md-backlink-pill:hover {
+  background: rgba(236, 72, 153, 0.12);
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+/* =============================================================================
+   LOCAL GRAPH SECTION - Force-directed graph visualization
+   ============================================================================= */
+
+.md-graph {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem 2.5rem;
+}
+
+.md-graph-header {
+  margin-bottom: 1rem;
+}
+
+.md-graph-header h3 {
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: inherit;
+  margin: 0;
+}
+
+.md-graph-container {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.md-graph-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Expand button */
+.graph-expand-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.graph-expand-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Lightbox overlay */
+.graph-lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  transition: background 0.25s ease, backdrop-filter 0.25s ease;
+}
+
+.graph-lightbox.active {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.graph-lightbox-canvas {
+  border-radius: 1rem;
+  background: rgba(20, 20, 25, 0.95);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.graph-lightbox.active .graph-lightbox-canvas {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.graph-lightbox-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.graph-lightbox.active .graph-lightbox-close {
+  opacity: 1;
+}
+
+.graph-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+[data-theme="light"] .md-graph-container {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .graph-expand-btn {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .graph-expand-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="light"] .graph-lightbox.active {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="light"] .graph-lightbox-canvas {
+  background: rgba(250, 250, 252, 0.98);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .graph-lightbox-close {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .graph-lightbox-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: rgba(0, 0, 0, 0.8);
+}
+
 /* Comments Card - Separate from main content card */
 .md-comments-card {
   margin-top: 2rem;

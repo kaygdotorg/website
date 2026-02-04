@@ -1,0 +1,1011 @@
+{
+  "backlinks": {
+    "/blog/ceph": [
+      {
+        "source": "/blog/difference-osd-reweight-crush-reweight",
+        "title": "Difference Between OSD Reweight and CRUSH Reweight",
+        "collection": "blog"
+      },
+      {
+        "source": "/blog/storage-classes-ceph-s3",
+        "title": "Storage Classes in Ceph S3",
+        "collection": "blog"
+      },
+      {
+        "source": "/blog/placement-rules-ceph-s3",
+        "title": "Placement Rules in Ceph S3",
+        "collection": "blog"
+      }
+    ],
+    "/blog/nearfull-osd": [
+      {
+        "source": "/blog/difference-osd-reweight-crush-reweight",
+        "title": "Difference Between OSD Reweight and CRUSH Reweight",
+        "collection": "blog"
+      }
+    ],
+    "/blog/long-live-wordpress": [
+      {
+        "source": "/blog/changing-wordpress-url",
+        "title": "Changing Wordpress URL",
+        "collection": "blog"
+      },
+      {
+        "source": "/blog/no-longer-a-journal-virgin",
+        "title": "No Longer a Journal Virgin",
+        "collection": "blog"
+      }
+    ],
+    "/blog/placement-rules-ceph-s3": [
+      {
+        "source": "/blog/storage-classes-ceph-s3",
+        "title": "Storage Classes in Ceph S3",
+        "collection": "blog"
+      }
+    ],
+    "/blog/rid-fwbr-interfaces-proxmox": [
+      {
+        "source": "/blog/virtual-router-proxmox-skullsaints-onyx",
+        "title": "Virtual Router in Proxmox with the Skullsaints Onyx",
+        "collection": "blog"
+      }
+    ],
+    "/notes/x-forwarded-for": [
+      {
+        "source": "/blog/forwarded-ip-cloudflare",
+        "title": "Getting Forwarded IPs Right with Cloudflare",
+        "collection": "blog"
+      }
+    ],
+    "/blog/forwarded-ip-cloudflare": [
+      {
+        "source": "/blog/make-proxmox-console-work-load-balancer",
+        "title": "Make Proxmox Console Work Reliably with a Load Balancer",
+        "collection": "blog"
+      }
+    ],
+    "/blog/time-flies-by": [
+      {
+        "source": "/blog/busycal-vs-fantastical",
+        "title": "BusyCal vs Fantastical",
+        "collection": "blog"
+      },
+      {
+        "source": "/blog/the-password-manager-situation",
+        "title": "The Password Manager Situation",
+        "collection": "blog"
+      },
+      {
+        "source": "/blog/resisting-craft-v3",
+        "title": "Resisting Craft V3",
+        "collection": "blog"
+      }
+    ],
+    "/blog/evpn-vxlan-proxmox-sdn": [
+      {
+        "source": "/blog/docker-mtu-proxmox-sdn",
+        "title": "TLS Handshake Timeout in Docker Containers within Proxmox SDN",
+        "collection": "blog"
+      }
+    ],
+    "/blog/bridge-mtu-proxmox": [
+      {
+        "source": "/blog/docker-mtu-proxmox-sdn",
+        "title": "TLS Handshake Timeout in Docker Containers within Proxmox SDN",
+        "collection": "blog"
+      }
+    ],
+    "/blog/comments": [
+      {
+        "source": "/blog/docker-mtu-proxmox-sdn",
+        "title": "TLS Handshake Timeout in Docker Containers within Proxmox SDN",
+        "collection": "blog"
+      }
+    ],
+    "/blog/busycal-vs-fantastical": [
+      {
+        "source": "/blog/obsidian-vs-other-tools-and-obsidian",
+        "title": "Obsidian vs Calendar Reminders and Obsidian",
+        "collection": "blog"
+      }
+    ],
+    "/blog/persistent-audio-playback-tab-groups-safari": [
+      {
+        "source": "/blog/safari-audio-stuttering-youtube",
+        "title": "Safari goes nuts everytime I watch a YouTube Video",
+        "collection": "blog"
+      },
+      {
+        "source": "/blog/switching-between-safari-profile-windows",
+        "title": "Switching between Safari Profile Windows - Not Creating New Ones",
+        "collection": "blog"
+      }
+    ],
+    "/blog/storage-classes-ceph-s3": [
+      {
+        "source": "/blog/placement-rules-ceph-s3",
+        "title": "Placement Rules in Ceph S3",
+        "collection": "blog"
+      }
+    ],
+    "/blog/safari-audio-stuttering-youtube": [
+      {
+        "source": "/blog/switching-between-safari-profile-windows",
+        "title": "Switching between Safari Profile Windows - Not Creating New Ones",
+        "collection": "blog"
+      }
+    ],
+    "/blog/20250911-switching-between-safari-profile-windows/switch-safari-profile-window.bttpreset": [
+      {
+        "source": "/blog/switching-between-safari-profile-windows",
+        "title": "Switching between Safari Profile Windows - Not Creating New Ones",
+        "collection": "blog"
+      }
+    ],
+    "/notes/ceph": [
+      {
+        "source": "/notes/spurious-read-errors",
+        "title": "Ceph Spurious Read Errors",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/replace-failed-drive-ceph-cluster",
+        "title": "Replacing a failed drive in a Ceph Cluster",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/querying-ceph-config",
+        "title": "Querying Ceph Configuration",
+        "collection": "notes"
+      }
+    ],
+    "/notes/osd-op-subop-latency": [
+      {
+        "source": "/notes/ceph-slow-ops",
+        "title": "Slow Operations in Ceph OSDs",
+        "collection": "notes"
+      }
+    ],
+    "/notes/nearfull-ratio": [
+      {
+        "source": "/notes/full-ratio",
+        "title": "Full Ratio",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/nearfull-osd",
+        "title": "Nearfull OSD",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/backfillfull-ratio",
+        "title": "Backfillfull Ratio",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/ceph",
+        "title": "Ceph",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/nearfull-ratio",
+        "title": "Nearfull Ratio",
+        "collection": "notes"
+      }
+    ],
+    "/notes/full-ratio": [
+      {
+        "source": "/notes/full-ratio",
+        "title": "Full Ratio",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/backfillfull-ratio",
+        "title": "Backfillfull Ratio",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/ceph",
+        "title": "Ceph",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/nearfull-ratio",
+        "title": "Nearfull Ratio",
+        "collection": "notes"
+      }
+    ],
+    "/notes/nearfull-osd": [
+      {
+        "source": "/notes/replace-failed-drive-ceph-cluster",
+        "title": "Replacing a failed drive in a Ceph Cluster",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/ceph",
+        "title": "Ceph",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/nearfull-ratio",
+        "title": "Nearfull Ratio",
+        "collection": "notes"
+      }
+    ],
+    "/blog/difference-osd-reweight-crush-reweight": [
+      {
+        "source": "/notes/replace-failed-drive-ceph-cluster",
+        "title": "Replacing a failed drive in a Ceph Cluster",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/ceph",
+        "title": "Ceph",
+        "collection": "notes"
+      }
+    ],
+    "/notes/backfillfull-ratio": [
+      {
+        "source": "/notes/backfillfull-ratio",
+        "title": "Backfillfull Ratio",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/ceph",
+        "title": "Ceph",
+        "collection": "notes"
+      },
+      {
+        "source": "/notes/nearfull-ratio",
+        "title": "Nearfull Ratio",
+        "collection": "notes"
+      }
+    ],
+    "/notes/querying-ceph-config": [
+      {
+        "source": "/notes/ceph",
+        "title": "Ceph",
+        "collection": "notes"
+      }
+    ],
+    "/notes/replace-failed-drive-ceph-cluster": [
+      {
+        "source": "/notes/ceph",
+        "title": "Ceph",
+        "collection": "notes"
+      }
+    ],
+    "/notes/move-wordpress-quartz": [
+      {
+        "source": "/notes/comments",
+        "title": "Comments!",
+        "collection": "notes"
+      }
+    ],
+    "/notes/changing-wordpress-url": [
+      {
+        "source": "/notes/move-wordpress-quartz",
+        "title": "Moving from Wordpress to Quartz",
+        "collection": "notes"
+      }
+    ],
+    "/notes/comments": [
+      {
+        "source": "/notes/move-wordpress-quartz",
+        "title": "Moving from Wordpress to Quartz",
+        "collection": "notes"
+      }
+    ],
+    "/notes/sbi-cashback-card": [
+      {
+        "source": "/notes/save-up-expenses",
+        "title": "Save Up on Expenses",
+        "collection": "notes"
+      }
+    ],
+    "/notes/save-up-expenses": [
+      {
+        "source": "/notes/sbi-cashback-card",
+        "title": "SBI Cashback Card",
+        "collection": "notes"
+      }
+    ],
+    "/notes/key-spam-macos": [
+      {
+        "source": "/notes/hidden-folders-finder",
+        "title": "Hidden Folders in Finder",
+        "collection": "notes"
+      }
+    ],
+    "/notes/proxmox": [
+      {
+        "source": "/notes/evpn-vxlan-proxmox-sdn",
+        "title": "EVPN + VXLAN in Proxmox SDN",
+        "collection": "notes"
+      }
+    ],
+    "/talks/vlans-proxmox": [
+      {
+        "source": "/notes/evpn-vxlan-proxmox-sdn",
+        "title": "EVPN + VXLAN in Proxmox SDN",
+        "collection": "notes"
+      }
+    ],
+    "/blog/virtual-router-proxmox-skullsaints-onyx": [
+      {
+        "source": "/notes/rid-fwbr-interfaces-proxmox",
+        "title": "Getting Rid of fwbr- Interfaces on Proxmox",
+        "collection": "notes"
+      }
+    ],
+    "/notes/evpn-vxlan-proxmox-sdn": [
+      {
+        "source": "/notes/bridge-mtu-proxmox",
+        "title": "Bridge MTUs in Proxmox",
+        "collection": "notes"
+      }
+    ],
+    "/talks/migrating-vms-encrypted-proxmox": [
+      {
+        "source": "/talks/foss-united-talk-migrating-vms-zfs-native-encryption",
+        "title": "FOSS United Talk - Migrating VMs between Proxmox Nodes backed by ZFS Native Encryption",
+        "collection": "talks"
+      }
+    ],
+    "/talks/ilug-d-talk-ceph-rgw-multi-site": [
+      {
+        "source": "/talks/foss-united-talk-migrating-vms-zfs-native-encryption",
+        "title": "FOSS United Talk - Migrating VMs between Proxmox Nodes backed by ZFS Native Encryption",
+        "collection": "talks"
+      }
+    ],
+    "/photography": [
+      {
+        "source": "/about",
+        "title": "About",
+        "collection": "about"
+      }
+    ],
+    "/blog": [
+      {
+        "source": "/about",
+        "title": "About",
+        "collection": "about"
+      }
+    ],
+    "/notes": [
+      {
+        "source": "/about",
+        "title": "About",
+        "collection": "about"
+      }
+    ],
+    "/now": [
+      {
+        "source": "/about",
+        "title": "About",
+        "collection": "about"
+      }
+    ]
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "/blog/the-day-a-pig-fell-into-the-well-review",
+        "title": "The Day a Pig Fell into the Well (1996), dir. Hong Sang-soo",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/the-power-of-kangwon-province-review",
+        "title": "The Power of Kangwon Province (1998), dir. Hong Sang-soo",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/virgin-stripped-bare-by-her-bachelors-review",
+        "title": "Virgin Stripped Bare by Her Bachelors (2000), dir. Hong Sang-Soo",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/dunkirk-review",
+        "title": "Dunkirk (2017), dir. Christopher Nolan",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/ae-dil-hai-mushkil-review",
+        "title": "Ae Dil Hai Mushkil (2016), dir. Karan Johar",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/right-now-wrong-then-review",
+        "title": "Right Now, Wrong Then (2015), dir Hong Sang-Soo",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/following-review",
+        "title": "Following (1998), dir. Christopher Nolan",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/mind-game-review",
+        "title": "Mind Game (2004), dir. Masaaki Yuasa",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/list-review",
+        "title": "List (2011), dir. Hong Sang-soo",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/cosmicbyte-firefly-mechanical-keyboard-on-a-budget",
+        "title": "CosmicByte Firefly: Mechanical Keyboard on a Budget - First Impressions",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/retrieving-the-correct-ip-address-for-a-caddy-wordpress-stack",
+        "title": "Retrieving the correct IP address for a Caddy-Wordpress stack",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/t7-shield-benchmark-apfs-vs-ntfs",
+        "title": "T7 Shield - APFS vs NTFS",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/difference-osd-reweight-crush-reweight",
+        "title": "Difference Between OSD Reweight and CRUSH Reweight",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/changing-wordpress-url",
+        "title": "Changing Wordpress URL",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/firefox-profile-downgrade",
+        "title": "Firefox Profile Downgrade",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/long-live-wordpress",
+        "title": "Long Live Wordpress",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/no-longer-a-journal-virgin",
+        "title": "No Longer a Journal Virgin",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/storage-classes-ceph-s3",
+        "title": "Storage Classes in Ceph S3",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/virtual-router-proxmox-skullsaints-onyx",
+        "title": "Virtual Router in Proxmox with the Skullsaints Onyx",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/caps-lock-not-hyper-key",
+        "title": "Using Caps Lock as NOT the Hyper Key",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/forwarded-ip-cloudflare",
+        "title": "Getting Forwarded IPs Right with Cloudflare",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/make-proxmox-console-work-load-balancer",
+        "title": "Make Proxmox Console Work Reliably with a Load Balancer",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/persistent-audio-playback-tab-groups-safari",
+        "title": "Keep Playing Audio in Safari When Switching to Another Tab Group",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/stop-whining-instead-explore",
+        "title": "Stop Whining, Instead Explore",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/time-flies-by",
+        "title": "Time Flies By",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/busycal-vs-fantastical",
+        "title": "BusyCal vs Fantastical",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/the-password-manager-situation",
+        "title": "The Password Manager Situation",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/resisting-craft-v3",
+        "title": "Resisting Craft V3",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/unsupported-format-ios-photos",
+        "title": "Unsupported File Formats in iOS Photos - H264 Main-L6",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/things-to-do-after-proxmox-install",
+        "title": "Things to do after installing Proxmox",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/docker-mtu-proxmox-sdn",
+        "title": "TLS Handshake Timeout in Docker Containers within Proxmox SDN",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/obsidian-vs-other-tools-and-obsidian",
+        "title": "Obsidian vs Calendar Reminders and Obsidian",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/safari-audio-stuttering-youtube",
+        "title": "Safari goes nuts everytime I watch a YouTube Video",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/proxmox-lxc-debian-login-delay",
+        "title": "Fix Login Delay on Debian LXC on Proxmox",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/placement-rules-ceph-s3",
+        "title": "Placement Rules in Ceph S3",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog/switching-between-safari-profile-windows",
+        "title": "Switching between Safari Profile Windows - Not Creating New Ones",
+        "collection": "blog"
+      },
+      {
+        "id": "/blog",
+        "title": "Blog",
+        "collection": "blog"
+      },
+      {
+        "id": "/notes/spurious-read-errors",
+        "title": "Ceph Spurious Read Errors",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/ceph-osd-compaction",
+        "title": "Compacting Ceph OSDs",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/osd-memory-target",
+        "title": "Ceph OSD Memory Usage",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/mds-failing-respond-cache-pressure",
+        "title": "MDS failing to Respond to Cache Pressure",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/osd-op-subop-latency",
+        "title": "Ceph Operation v/s Subop Latency",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/ceph-slow-ops",
+        "title": "Slow Operations in Ceph OSDs",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/full-ratio",
+        "title": "Full Ratio",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/mds-standby-replay-memory-leak",
+        "title": "Ceph Quincy MDS Standby-Replay Memory Leak",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/nearfull-osd",
+        "title": "Nearfull OSD",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/replace-failed-drive-ceph-cluster",
+        "title": "Replacing a failed drive in a Ceph Cluster",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/august-in-the-water-articles-read",
+        "title": "August in the Water",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/backfillfull-ratio",
+        "title": "Backfillfull Ratio",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/ceph",
+        "title": "Ceph",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/nearfull-ratio",
+        "title": "Nearfull Ratio",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/querying-ceph-config",
+        "title": "Querying Ceph Configuration",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/comments",
+        "title": "Comments!",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/move-wordpress-quartz",
+        "title": "Moving from Wordpress to Quartz",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/osd-max-scrubs",
+        "title": "OSD Scrubs on HDD v/s SSD",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/enlarge-disk-proxmox-vm",
+        "title": "Increase Disk Space on Proxmox VM",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/key-spam-macos",
+        "title": "Enable Key Spam or Disable Special Characters on MacOS",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/save-up-expenses",
+        "title": "Save Up on Expenses",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/sbi-cashback-card",
+        "title": "SBI Cashback Card",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/deloads-hypertrophy-training",
+        "title": "Deloading in Hypertrophy Training",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/hidden-folders-finder",
+        "title": "Hidden Folders in Finder",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/migrating-vms-encrypted-proxmox",
+        "title": "Migrating VMs on Encrypted Proxmox",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/evpn-vxlan-proxmox-sdn",
+        "title": "EVPN + VXLAN in Proxmox SDN",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/rid-fwbr-interfaces-proxmox",
+        "title": "Getting Rid of fwbr- Interfaces on Proxmox",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/static-mac-address-linux-bridge-proxmox",
+        "title": "Static MAC Address for a Linux Bridge on Debian or Proxmox",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/x-forwarded-for",
+        "title": "The X-Forwarded-For HTTP Header",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/bridge-mtu-proxmox",
+        "title": "Bridge MTUs in Proxmox",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/ceph-pg-scaling",
+        "title": "Ceph PG Scaling",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/lmp-version-bluetooth-macos",
+        "title": "Finding Bluetooth LMP version on MacOS",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/google-workspace-calendar-iphone",
+        "title": "Google Workspace Delegate Calendars on iPhone",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes/ios-shortcuts-message-type",
+        "title": "The Message Type in iOS Shortcuts",
+        "collection": "notes"
+      },
+      {
+        "id": "/notes",
+        "title": "Notes",
+        "collection": "notes"
+      },
+      {
+        "id": "/talks/vlans-in-proxmox",
+        "title": "VLANs in Proxmox",
+        "collection": "talks"
+      },
+      {
+        "id": "/talks/ceph-rgw-multi-site-new-features-and-an-overview",
+        "title": "Ceph RGW Multi-Site - New Features and An Overview",
+        "collection": "talks"
+      },
+      {
+        "id": "/talks/encryption-zfs-and-proxmox-an-unusual-triangle",
+        "title": "Encryption, ZFS and Proxmox: An unusual triangle",
+        "collection": "talks"
+      },
+      {
+        "id": "/talks/learning-the-tools-we-already-possess-bash",
+        "title": "Learning the tools we already possess: Bash",
+        "collection": "talks"
+      },
+      {
+        "id": "/talks/foss-united-talk-migrating-vms-zfs-native-encryption",
+        "title": "FOSS United Talk - Migrating VMs between Proxmox Nodes backed by ZFS Native Encryption",
+        "collection": "talks"
+      },
+      {
+        "id": "/talks/introduction-to-proxmox-9-whats-new-and-why-virtualize-your-projects",
+        "title": "Introduction to Proxmox 9: What's New and Why Virtualize Your Projects?",
+        "collection": "talks"
+      },
+      {
+        "id": "/talks",
+        "title": "Talks",
+        "collection": "talks"
+      },
+      {
+        "id": "/uses/uses",
+        "title": "Workspace / April 02, 2024",
+        "collection": "uses"
+      },
+      {
+        "id": "/uses",
+        "title": "Uses",
+        "collection": "uses"
+      },
+      {
+        "id": "/now",
+        "title": "Now",
+        "collection": "now"
+      },
+      {
+        "id": "/changelog",
+        "title": "Changelog",
+        "collection": "changelog"
+      },
+      {
+        "id": "/about",
+        "title": "About",
+        "collection": "about"
+      },
+      {
+        "id": "/homelab",
+        "title": "Homelab",
+        "collection": "homelab"
+      }
+    ],
+    "links": [
+      {
+        "source": "/blog/changing-wordpress-url",
+        "target": "/blog/long-live-wordpress"
+      },
+      {
+        "source": "/blog/no-longer-a-journal-virgin",
+        "target": "/blog/long-live-wordpress"
+      },
+      {
+        "source": "/blog/storage-classes-ceph-s3",
+        "target": "/blog/placement-rules-ceph-s3"
+      },
+      {
+        "source": "/blog/forwarded-ip-cloudflare",
+        "target": "/notes/x-forwarded-for"
+      },
+      {
+        "source": "/blog/make-proxmox-console-work-load-balancer",
+        "target": "/blog/forwarded-ip-cloudflare"
+      },
+      {
+        "source": "/blog/busycal-vs-fantastical",
+        "target": "/blog/time-flies-by"
+      },
+      {
+        "source": "/blog/the-password-manager-situation",
+        "target": "/blog/time-flies-by"
+      },
+      {
+        "source": "/blog/resisting-craft-v3",
+        "target": "/blog/time-flies-by"
+      },
+      {
+        "source": "/blog/obsidian-vs-other-tools-and-obsidian",
+        "target": "/blog/busycal-vs-fantastical"
+      },
+      {
+        "source": "/blog/safari-audio-stuttering-youtube",
+        "target": "/blog/persistent-audio-playback-tab-groups-safari"
+      },
+      {
+        "source": "/blog/placement-rules-ceph-s3",
+        "target": "/blog/storage-classes-ceph-s3"
+      },
+      {
+        "source": "/blog/switching-between-safari-profile-windows",
+        "target": "/blog/persistent-audio-playback-tab-groups-safari"
+      },
+      {
+        "source": "/blog/switching-between-safari-profile-windows",
+        "target": "/blog/safari-audio-stuttering-youtube"
+      },
+      {
+        "source": "/notes/spurious-read-errors",
+        "target": "/notes/ceph"
+      },
+      {
+        "source": "/notes/ceph-slow-ops",
+        "target": "/notes/osd-op-subop-latency"
+      },
+      {
+        "source": "/notes/full-ratio",
+        "target": "/notes/nearfull-ratio"
+      },
+      {
+        "source": "/notes/full-ratio",
+        "target": "/notes/full-ratio"
+      },
+      {
+        "source": "/notes/nearfull-osd",
+        "target": "/notes/nearfull-ratio"
+      },
+      {
+        "source": "/notes/replace-failed-drive-ceph-cluster",
+        "target": "/notes/ceph"
+      },
+      {
+        "source": "/notes/replace-failed-drive-ceph-cluster",
+        "target": "/notes/nearfull-osd"
+      },
+      {
+        "source": "/notes/replace-failed-drive-ceph-cluster",
+        "target": "/blog/difference-osd-reweight-crush-reweight"
+      },
+      {
+        "source": "/notes/backfillfull-ratio",
+        "target": "/notes/nearfull-ratio"
+      },
+      {
+        "source": "/notes/backfillfull-ratio",
+        "target": "/notes/backfillfull-ratio"
+      },
+      {
+        "source": "/notes/backfillfull-ratio",
+        "target": "/notes/full-ratio"
+      },
+      {
+        "source": "/notes/ceph",
+        "target": "/notes/querying-ceph-config"
+      },
+      {
+        "source": "/notes/ceph",
+        "target": "/notes/backfillfull-ratio"
+      },
+      {
+        "source": "/notes/ceph",
+        "target": "/blog/difference-osd-reweight-crush-reweight"
+      },
+      {
+        "source": "/notes/ceph",
+        "target": "/notes/full-ratio"
+      },
+      {
+        "source": "/notes/ceph",
+        "target": "/notes/nearfull-osd"
+      },
+      {
+        "source": "/notes/ceph",
+        "target": "/notes/nearfull-ratio"
+      },
+      {
+        "source": "/notes/ceph",
+        "target": "/notes/replace-failed-drive-ceph-cluster"
+      },
+      {
+        "source": "/notes/nearfull-ratio",
+        "target": "/notes/nearfull-osd"
+      },
+      {
+        "source": "/notes/nearfull-ratio",
+        "target": "/notes/nearfull-ratio"
+      },
+      {
+        "source": "/notes/nearfull-ratio",
+        "target": "/notes/backfillfull-ratio"
+      },
+      {
+        "source": "/notes/nearfull-ratio",
+        "target": "/notes/full-ratio"
+      },
+      {
+        "source": "/notes/querying-ceph-config",
+        "target": "/notes/ceph"
+      },
+      {
+        "source": "/notes/comments",
+        "target": "/notes/move-wordpress-quartz"
+      },
+      {
+        "source": "/notes/move-wordpress-quartz",
+        "target": "/notes/comments"
+      },
+      {
+        "source": "/notes/save-up-expenses",
+        "target": "/notes/sbi-cashback-card"
+      },
+      {
+        "source": "/notes/sbi-cashback-card",
+        "target": "/notes/save-up-expenses"
+      },
+      {
+        "source": "/notes/hidden-folders-finder",
+        "target": "/notes/key-spam-macos"
+      },
+      {
+        "source": "/notes/rid-fwbr-interfaces-proxmox",
+        "target": "/blog/virtual-router-proxmox-skullsaints-onyx"
+      },
+      {
+        "source": "/notes/bridge-mtu-proxmox",
+        "target": "/notes/evpn-vxlan-proxmox-sdn"
+      },
+      {
+        "source": "/about",
+        "target": "/blog"
+      },
+      {
+        "source": "/about",
+        "target": "/notes"
+      },
+      {
+        "source": "/about",
+        "target": "/now"
+      }
+    ]
+  },
+  "meta": {
+    "generatedAt": "2026-02-04T08:43:36.985Z",
+    "totalPages": 85,
+    "totalLinks": 46
+  }
+}

@@ -12,6 +12,12 @@ interface Props {
   lastEdited?: Date | string;
   readingTime?: number;
   backlinks?: Array<{ title: string; href: string }>;
+  /** True backlinks: pages that link TO this page */
+  trueBacklinks?: Array<{ source: string; title: string; collection: string }>;
+  /** Graph data for local graph visualization */
+  graphData?: { nodes: Array<{ id: string; title: string; collection: string }>; links: Array<{ source: string; target: string }> };
+  /** Current page path for graph highlighting */
+  currentPath?: string;
   coverImage?: any;
 }
 
@@ -23,6 +29,9 @@ const {
   lastEdited,
   readingTime,
   backlinks = [],
+  trueBacklinks = [],
+  graphData = { nodes: [], links: [] },
+  currentPath = "",
   coverImage,
 } = Astro.props;
 
@@ -210,8 +219,8 @@ const githubUrl = entry?.filePath
       {
         displayTOC && (
           <>
-            <div class="md-section md-card-collapsible md-card-toc" id="toc-card">
-              <div class="md-card-header" onclick="toggleCard('toc-card')">
+            <section class="md-section md-card-collapsible md-card-toc" id="table-of-contents">
+              <div class="md-card-header" onclick="toggleCard('table-of-contents')">
                 <h2>Table of contents</h2>
                 <svg
                   class="md-card-toggle"
@@ -232,7 +241,7 @@ const githubUrl = entry?.filePath
                   <!-- Populated by JS -->
                 </ul>
               </div>
-            </div>
+            </section>
             <hr class="md-section-divider" />
           </>
         )
@@ -279,19 +288,58 @@ const githubUrl = entry?.filePath
         )
       }
 
+      <!-- Backlinks Section (True backlinks - pages that link TO this page) -->
+      {
+        trueBacklinks.length > 0 && (
+          <>
+            <hr class="md-section-divider" />
+            <section class="md-section md-backlinks" id="backlinks">
+              <div class="md-backlinks-header">
+                <h3>Linked from</h3>
+                <span class="md-backlinks-count">{trueBacklinks.length}</span>
+              </div>
+              <div class="md-backlinks-content">
+                {trueBacklinks.map((link) => (
+                  <a href={link.source} class="md-backlink-pill" data-collection={link.collection}>
+                    {link.title}
+                  </a>
+                ))}
+              </div>
+            </section>
+          </>
+        )
+      }
+
+      <!-- Local Graph Section -->
+      {
+        graphData.nodes.length > 1 && (
+          <>
+            <hr class="md-section-divider" />
+            <section class="md-section md-graph" id="local-graph">
+              <div class="md-graph-header">
+                <h3>Local Graph</h3>
+              </div>
+              <div class="md-graph-container" data-current={currentPath} data-graph={JSON.stringify(graphData)}>
+                <canvas></canvas>
+              </div>
+            </section>
+          </>
+        )
+      }
+
     </div>
 
     <!-- Comments Section - Separate Card -->
     {
       displayComments && (
-        <div class="frosted-card md-comments-card">
+        <section class="frosted-card md-comments-card" id="comments">
           <div class="md-comments-header">
             <h2>Comments</h2>
           </div>
           <div class="md-card-content">
             <div id="remark42"></div>
           </div>
-        </div>
+        </section>
       )
     }
   </div>
@@ -754,4 +802,7 @@ const githubUrl = entry?.filePath
       initRemark42();
     })();
   </script>
+
+  <!-- Local Graph Visualization Script -->
+  <script src="/scripts/graph.js" defer></script>
 </BaseLayout>
