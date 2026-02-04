@@ -12,13 +12,10 @@ iOS Shortcuts has the "every thing is an object" philosophy which plays quite we
 
 ![A shortcut input depending on the type has multiple fields as structured data](./20260204-ios-shortcuts-message-type/shortcuts-illustration.mp4)
 
-→ Sender
-
-→ Message Content
-
-→ Recipents
-
-→ Name? 
+- Sender
+- Message Content
+- Recipents
+- Name? 
 
 Anyways, you get my point.
 
