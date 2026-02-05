@@ -219,14 +219,15 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                       data-index={index}
                       data-position={index}
                     >
-                      <!-- Card photo images - GIFs preserved, others optimized -->
+                      <!-- Card photo images - First image loads eagerly for LCP, others lazy -->
                       <div class="card-in-hand-image">
                         {typeof item.src === "string" ? (
                           <img
                             src={item.src}
                             alt={item.label}
                             draggable="false"
-                            loading="lazy"
+                            loading={index === 0 ? "eager" : "lazy"}
+                            fetchpriority={index === 0 ? "high" : "auto"}
                             decoding="async"
                           />
                         ) : item.src.format === "gif" ? (
@@ -234,7 +235,8 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                             src={item.src.src}
                             alt={item.label}
                             draggable="false"
-                            loading="lazy"
+                            loading={index === 0 ? "eager" : "lazy"}
+                            fetchpriority={index === 0 ? "high" : "auto"}
                             decoding="async"
                           />
                         ) : (
@@ -242,7 +244,7 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                             src={item.src}
                             alt={item.label}
                             draggable="false"
-                            loading="lazy"
+                            loading={index === 0 ? "eager" : "lazy"}
                             decoding="async"
                           />
                         )}
