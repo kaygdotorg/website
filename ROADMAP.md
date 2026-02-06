@@ -1,15 +1,20 @@
 # Roadmap
 
-Future improvements and technical debt items for the personal-page codebase.
+Future improvements and technical debt items for the website codebase.
 
 ---
 
 ## 🔧 Code Quality
 
 ### Extract BaseLayout Scripts
-**Priority:** Low | **Effort:** High | **Risk:** Medium
+**Priority:** High | **Effort:** High | **Risk:** Medium
 
-The `BaseLayout.astro` file is currently ~1247 lines with inline JavaScript handling:
+The client-side UI logic is currently concentrated in very large files:
+- `src/layouts/BaseLayout.astro` (~1580 lines)
+- `src/pages/index.astro` (~1660 lines)
+- `src/layouts/MarkdownLayout.astro` (~700 lines)
+
+These files include inline JavaScript for:
 - Theme toggle & system preference detection
 - Scroll-aware navigation show/hide
 - Mobile menu & keyboard shortcuts
@@ -17,24 +22,26 @@ The `BaseLayout.astro` file is currently ~1247 lines with inline JavaScript hand
 - Pagefind search integration
 
 **Proposed solution:**
-Extract into separate TypeScript modules:
+Extract to focused client modules with explicit init/cleanup entry points:
 ```
 src/scripts/
 ├── theme.ts        # Theme toggle, localStorage, system preference
 ├── navigation.ts   # Scroll detection, mobile menu, shortcuts
 ├── image-zoom.ts   # Gallery zoom, navigation, swipe gestures  
 ├── search.ts       # Pagefind integration
+├── markdown.ts     # TOC, heading links, callouts, clipboard
+└── homepage.ts     # Card deck + graph animation + hero/nav observers
 ```
 
 **Benefits:**
-- BaseLayout shrinks to ~400 lines
+- Smaller, easier-to-review Astro layout files
 - Scripts are cacheable separately
 - Easier to test and debug
-- Better code organization
+- Lower risk of event-listener duplication on view transitions
 
 ---
 
 ## 📝 Notes
 
-- Last updated: 2026-01-22
-- Related commit: `refactor: consolidate duplicate pages into reusable components`
+- Last updated: 2026-02-06
+- Keep migration incremental: extract one module at a time and verify behavior after each move.
