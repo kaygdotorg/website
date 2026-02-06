@@ -30,11 +30,12 @@
  * @see src/utils/content.ts for CONTENT_COLLECTIONS configuration
  */
 import MarkdownLayout from "../../layouts/MarkdownLayout.astro";
-import { getCollection, render } from "astro:content";
+import { render } from "astro:content";
 import {
   calculateReadingTime,
   getUrlSlug,
   buildBacklinks,
+  getPublishedEntries,
   CONTENT_COLLECTIONS,
   type ContentCollection,
 } from "../../utils/content";
@@ -62,13 +63,10 @@ export async function getStaticPaths() {
   // Generate paths for all entries across all collections
   const paths = await Promise.all(
     collections.map(async (collectionName) => {
-      // Fetch all entries except the index (landing page)
       // Build only published entries for detail pages.
-      // This matches list-page behavior and prevents draft URLs from being generated.
-      const entries = await getCollection(
-        collectionName,
-        ({ id, data }) => id !== "index" && !data.draft,
-      );
+      // Reuse the shared helper so route generation and list rendering keep
+      // the same draft/index filtering and date-sort behavior.
+      const entries = await getPublishedEntries(collectionName);
 
       // Map each entry to a route
       return entries.map((entry) => ({
@@ -146,21 +144,9 @@ const lastEdited = entry.data["last edited"];
 
 /**
  * Fetch all published entries for prev/next navigation.
- * Excludes:
- * - Index entries (landing pages)
- * - Draft entries
+ * Uses the shared helper so navigation order matches collection listing pages.
  */
-const allEntries = await getCollection(
-  collectionName,
-  ({ id, data }) => id !== "index" && !data.draft,
-);
-
-/**
- * Sort entries by date (newest first) for chronological navigation.
- */
-const sortedEntries = allEntries.sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
-);
+const sortedEntries = await getPublishedEntries(collectionName);
 
 /**
  * Build navigation backlinks:
