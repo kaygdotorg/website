@@ -679,10 +679,13 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
         if (container) {
           width = container.clientWidth;
           height = container.clientHeight;
-          // Scale canvas for high-DPI displays
-          canvas.width = width * window.devicePixelRatio;
-          canvas.height = height * window.devicePixelRatio;
-          ctx?.scale(window.devicePixelRatio, window.devicePixelRatio);
+          // Scale canvas for high-DPI displays.
+          // IMPORTANT: reset transform before applying DPR scaling, otherwise
+          // repeated resize events compound scale() calls and distort the graph.
+          const dpr = window.devicePixelRatio || 1;
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
       }
 
