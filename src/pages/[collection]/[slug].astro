@@ -63,9 +63,11 @@ export async function getStaticPaths() {
   const paths = await Promise.all(
     collections.map(async (collectionName) => {
       // Fetch all entries except the index (landing page)
+      // Build only published entries for detail pages.
+      // This matches list-page behavior and prevents draft URLs from being generated.
       const entries = await getCollection(
         collectionName,
-        ({ id }) => id !== "index",
+        ({ id, data }) => id !== "index" && !data.draft,
       );
 
       // Map each entry to a route
