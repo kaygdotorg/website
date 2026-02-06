@@ -203,7 +203,13 @@ const githubUrl = entry?.filePath
         displayTOC && (
           <>
             <div class="md-section md-card-collapsible md-card-toc" id="toc-card">
-              <div class="md-card-header" onclick="toggleCard('toc-card')">
+              <button
+                type="button"
+                class="md-card-header"
+                aria-expanded="true"
+                aria-controls="toc-card-content"
+                onclick="toggleCard('toc-card')"
+              >
                 <h2>Table of contents</h2>
                 <svg
                   class="md-card-toggle"
@@ -218,8 +224,8 @@ const githubUrl = entry?.filePath
                     d="M19 9l-7 7-7-7"
                   />
                 </svg>
-              </div>
-              <div class="md-card-content">
+              </button>
+              <div class="md-card-content" id="toc-card-content">
                 <ul id="toc-list">
                   <!-- Populated by JS -->
                 </ul>
@@ -296,11 +302,20 @@ const githubUrl = entry?.filePath
   </div>
 
   <script is:inline>
-    // Toggle collapsible cards
+    // Toggle collapsible cards.
+    // Keep aria-expanded in sync so screen readers announce state changes.
     function toggleCard(cardId) {
       const card = document.getElementById(cardId);
       if (card) {
         card.classList.toggle("collapsed");
+
+        const trigger = card.querySelector(".md-card-header");
+        if (trigger instanceof HTMLButtonElement) {
+          trigger.setAttribute(
+            "aria-expanded",
+            String(!card.classList.contains("collapsed")),
+          );
+        }
       }
     }
 

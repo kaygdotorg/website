@@ -736,6 +736,11 @@ html[data-theme="light"] body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font: inherit;
   padding: 1rem 2.5rem;
   cursor: pointer;
   user-select: none;
