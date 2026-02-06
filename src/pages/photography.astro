@@ -29,7 +29,7 @@
  * - camera: Camera/equipment used (optional)
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getCollection, render } from "astro:content";
+import { getCollection } from "astro:content";
 
 // =============================================================================
 // DATA FETCHING
@@ -72,10 +72,9 @@ const photoEntries = allEntries.filter(
  */
 const photos = await Promise.all(
   photoEntries.map(async (photo) => {
-    // Render the markdown body to extract the description
-    const { Content, headings } = await render(photo);
-    // Get raw body text by rendering to string (simple extraction)
-    // The body is the markdown content after frontmatter
+    // Use raw markdown body directly for photo descriptions.
+    // We avoid render() here because this page only needs plain text metadata,
+    // which keeps photo list generation lighter during builds.
     const bodyText = photo.body?.trim() || "";
 
     return {

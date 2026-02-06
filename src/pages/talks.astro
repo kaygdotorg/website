@@ -15,7 +15,7 @@
  * - Vertical timeline line connecting entries
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { getCollection, render } from "astro:content";
+import { getCollection } from "astro:content";
 import { formatDateWithComma } from "../utils/dates";
 import { getExcerpt } from "../utils/markdown";
 import { getUrlSlug } from "../utils/content";
@@ -39,13 +39,6 @@ if (!entry) {
     "Missing talks/index.md - This file provides the page title and description."
   );
 }
-
-/**
- * Render the index content (not currently used in the template,
- * but available if needed for page description).
- * ASTRO 5: Use imported render() function.
- */
-const { Content } = await render(entry);
 
 /**
  * Filter and sort talks:
