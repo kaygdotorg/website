@@ -169,10 +169,16 @@ const { tags, totalCount, cardSelector, maxTags = 10 } = Astro.props;
 
           // Show/hide cards based on tag match
           cards.forEach((card) => {
-            // Parse the tags array from the card's data attribute
-            const itemTags = JSON.parse(
-              card.getAttribute("data-tags") || "[]"
-            );
+            // Parse the tags array from the card's data attribute.
+            // Guard against malformed JSON so one bad card does not break
+            // filtering behavior for the entire page.
+            let itemTags: string[] = [];
+            try {
+              const rawTags = JSON.parse(card.getAttribute("data-tags") || "[]");
+              itemTags = Array.isArray(rawTags) ? rawTags : [];
+            } catch {
+              itemTags = [];
+            }
 
             // Show card if "all" selected or tag matches
             const shouldShow =
