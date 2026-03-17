@@ -366,6 +366,31 @@ html[data-theme="light"] body {
 
 
 /* ========================================
+   Tag Pill - Shared tag/badge styling
+   ======================================== */
+
+/*
+ * Consistent pill style for tags, used in:
+ * - ContentCard.astro (list page cards, up to 3 tags)
+ * - MarkdownLayout.astro (article footer "Filed under" section)
+ * Uses DaisyUI --bc (base-content) variable for theme-aware colors.
+ */
+.tag-pill {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  padding: 0.125rem 0.625rem;
+  border-radius: 0.5rem;
+  background: oklch(var(--bc) / 0.05);
+  color: oklch(var(--bc) / 0.5);
+  transition: all 0.2s ease;
+}
+
+.tag-pill:hover {
+  color: oklch(var(--bc));
+  background: oklch(var(--bc) / 0.1);
+}
+
+/* ========================================
    Full Page Card Sections - Scroll Snap
    ======================================== */
 
@@ -4475,6 +4500,49 @@ html.theme-transitioning *::after {
 /* ========================================
    Accessibility: Focus Indicators
    ======================================== */
+
+/*
+ * Global :focus-visible baseline.
+ *
+ * Provides a consistent 2px pink accent ring for keyboard-only focus
+ * (mouse clicks won't trigger it). The fallback #f472b6 matches the
+ * site's accent-400 design token. Component-specific overrides below
+ * add border-radius to match each element's shape.
+ *
+ * Covered elements:
+ * - Pagefind search input (needs !important to override its own reset)
+ * - Sidebar TOC scroll items (4px radius, matches pill shape)
+ * - Tag filter pills (full-round, matches .tag-pill shape)
+ * - Markdown prev/next navigation links (8px radius)
+ * - Homepage card hand (larger 3px ring, defined separately below)
+ */
+:focus-visible {
+  outline: 2px solid var(--color-accent-400, #f472b6);
+  outline-offset: 2px;
+}
+
+.pagefind-ui__search-input:focus-visible {
+  outline: 2px solid var(--color-accent-400, #f472b6) !important;
+  outline-offset: 2px;
+}
+
+.toc-scroll-item:focus-visible {
+  outline: 2px solid var(--color-accent-400, #f472b6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.tag-pill:focus-visible {
+  outline: 2px solid var(--color-accent-400, #f472b6);
+  outline-offset: 2px;
+  border-radius: 9999px;
+}
+
+.md-nav-link:focus-visible {
+  outline: 2px solid var(--color-accent-400, #f472b6);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
 
 /* Focus ring for cards */
 .card-in-hand:focus-visible {

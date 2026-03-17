@@ -7,7 +7,14 @@
  *    - Strips date prefix (YYYYMMDD-) and .md extension
  *    - Converts cross-collection links to absolute paths
  *
- * 2. Adds data attributes for the internal link preview feature:
+ * 2. Resolves same-folder relative links (e.g. ./slug) to absolute paths
+ *    by deriving the source collection from the vfile path. This is critical
+ *    because the remark-md-links plugin strips the .md extension but keeps
+ *    links relative when they're within the same collection. Without
+ *    resolution to absolute paths, parseInternalLink() can't match them
+ *    against CONTENT_PREFIXES and the link preview feature won't activate.
+ *
+ * 3. Adds data attributes for the internal link preview feature:
  *    - data-internal-link="true" for CSS styling and JS targeting
  *    - data-link-path for manifest lookup
  */
@@ -70,15 +77,21 @@ function transformMdLink(href) {
 // Site domains to treat as internal
 const SITE_DOMAINS = ["kayg.org", "www.kayg.org", "localhost"];
 
-// Content prefixes for internal page detection
-const CONTENT_PREFIXES = ["/blog", "/uses", "/changelog", "/now", "/about", "/notes"];
+// Content prefixes for internal page detection — must cover every collection
+// that should trigger link previews on hover.
+const CONTENT_PREFIXES = COLLECTIONS.map(c => `/${c}`);
 
 /**
- * Checks if href is an internal page link (not asset, not external)
+ * Checks if href is an internal page link (not asset, not external).
+ *
  * @param {string} href - The href to check
+ * @param {string|null} sourceCollection - The collection the source file
+ *   belongs to (e.g. "blog"), derived from the vfile path. When provided,
+ *   same-folder relative links like "./slug" are resolved to absolute paths
+ *   (e.g. "/blog/slug") so they match CONTENT_PREFIXES and activate previews.
  * @returns {{ isInternal: boolean, path: string | null }}
  */
-function parseInternalLink(href) {
+function parseInternalLink(href, sourceCollection = null) {
   if (!href) return { isInternal: false, path: null };
   
   // Skip anchors, mailto, tel
@@ -107,10 +120,13 @@ function parseInternalLink(href) {
   } else if (href.startsWith("/")) {
     // Absolute path
     path = href;
-  } else if (!href.includes("://")) {
-    // Relative path - these could be internal page links
-    // We can't determine the full path without knowing the source file location
-    // So we'll just mark them as potentially internal
+  } else if (!href.includes("://") && sourceCollection) {
+    // Relative path (e.g. "./storage-classes-ceph-s3" left by remark-md-links).
+    // Resolve to absolute using the source collection so the link matches
+    // CONTENT_PREFIXES and gets data-internal-link for the preview feature.
+    const slug = href.replace(/^\.\//, "").split("#")[0].split("?")[0];
+    path = `/${sourceCollection}/${slug}`;
+  } else {
     return { isInternal: false, path: null };
   }
   
@@ -131,25 +147,38 @@ function parseInternalLink(href) {
 /**
  * Rehype plugin to:
  * 1. Transform .md links to correct URL slugs (strips date prefix and .md extension)
- * 2. Mark internal page links for the preview feature
+ * 2. Resolve same-folder relative links to absolute paths using the source
+ *    collection derived from the vfile path (e.g. src/content/blog/... → "blog")
+ * 3. Mark internal page links with data-internal-link / data-link-path for the
+ *    hover preview feature in BaseLayout
  */
 export default function rehypeInternalLinks() {
-  return (tree) => {
+  return (tree, file) => {
+    // Derive the source collection from the vfile path so we can resolve
+    // relative links. Matches "src/content/<collection>/" in the file path.
+    let sourceCollection = null;
+    const filePath = file?.history?.[0] || file?.path || file?.data?.astro?.filePath || "";
+    const collectionMatch = filePath.match(/src\/content\/([^/]+)\//);
+    if (collectionMatch && COLLECTIONS.includes(collectionMatch[1])) {
+      sourceCollection = collectionMatch[1];
+    }
+
     visit(tree, "element", (node) => {
       if (node.tagName !== "a") return;
-      
+
       let href = node.properties?.href;
       if (!href || typeof href !== "string") return;
-      
+
       // Step 1: Transform .md links to URL slugs (backup for any missed by remark)
       if (href.endsWith(".md")) {
         href = transformMdLink(href);
         node.properties.href = href;
       }
-      
-      // Step 2: Add data attributes for internal link preview feature
-      const { isInternal, path } = parseInternalLink(href);
-      
+
+      // Step 2: Add data attributes for internal link preview feature.
+      // Pass sourceCollection so relative links can be resolved to absolute.
+      const { isInternal, path } = parseInternalLink(href, sourceCollection);
+
       if (isInternal && path) {
         node.properties["data-internal-link"] = "true";
         node.properties["data-link-path"] = path;
