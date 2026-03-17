@@ -300,7 +300,7 @@ const githubUrl = entry?.filePath
                 <span>Filed under</span>
                 <div class="flex flex-wrap gap-2">
                   {entry.data.tags.map((tag: string) => (
-                    <span class="px-2.5 py-0.5 rounded-lg bg-base-content/5 text-base-content/50 hover:text-base-content hover:bg-base-content/10 transition-all cursor-default">
+                    <span class="tag-pill cursor-default">
                       #{tag}
                     </span>
                   ))}

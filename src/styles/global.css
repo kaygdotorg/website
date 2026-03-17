@@ -366,6 +366,26 @@ html[data-theme="light"] body {
 
 
 /* ========================================
+   Tag Pill - Shared tag/badge styling
+   ======================================== */
+
+/* Consistent pill style used on content cards and article footers */
+.tag-pill {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  padding: 0.125rem 0.625rem;
+  border-radius: 0.5rem;
+  background: oklch(var(--bc) / 0.05);
+  color: oklch(var(--bc) / 0.5);
+  transition: all 0.2s ease;
+}
+
+.tag-pill:hover {
+  color: oklch(var(--bc));
+  background: oklch(var(--bc) / 0.1);
+}
+
+/* ========================================
    Full Page Card Sections - Scroll Snap
    ======================================== */
 
