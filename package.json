@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "prebuild": "node scripts/copy-content-assets.mjs && node scripts/generate-page-manifest.mjs && node scripts/generate-link-index.mjs",
     "build": "astro build && pagefind --site dist",
     "build:search": "astro build && pagefind --site dist --output-path public/pagefind",
     "preview": "astro preview",
