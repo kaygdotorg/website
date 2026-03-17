@@ -765,6 +765,79 @@ const githubUrl = entry?.filePath
       updateOpacity();
     }
 
+    /**
+     * Enhance code blocks with a copy-to-clipboard button and language label.
+     *
+     * Finds all <pre> elements in the markdown content area. For Shiki-
+     * highlighted blocks (<pre class="astro-code">) the language is read from
+     * the data-language attribute. A small header bar is prepended with the
+     * language label (left) and a copy button (right). The button shows
+     * "Copied!" for 2 seconds after a successful copy.
+     *
+     * Skips blocks that have already been enhanced (data-code-enhanced) to
+     * avoid duplicates on View Transition re-initializations.
+     */
+    function initCodeBlockCopy() {
+      const content = document.getElementById("markdown-content");
+      if (!content) return;
+
+      const pres = content.querySelectorAll("pre");
+      pres.forEach((pre) => {
+        if (pre.dataset.codeEnhanced) return;
+        pre.dataset.codeEnhanced = "true";
+
+        // Detect language from Shiki's data-language attribute
+        const lang = pre.getAttribute("data-language") || "";
+
+        // Create header bar
+        const header = document.createElement("div");
+        header.className = "code-block-header";
+
+        // Language label (left side)
+        const langLabel = document.createElement("span");
+        langLabel.className = "code-block-lang";
+        langLabel.textContent = lang;
+        header.appendChild(langLabel);
+
+        // Copy button (right side)
+        const btn = document.createElement("button");
+        btn.className = "code-block-copy";
+        btn.setAttribute("aria-label", "Copy code to clipboard");
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+        btn.addEventListener("click", async () => {
+          const code = pre.querySelector("code");
+          const text = code ? code.textContent : pre.textContent;
+
+          // Try clipboard API first, fall back to hidden textarea for
+          // non-HTTPS contexts (e.g. Tailscale MagicDNS over HTTP).
+          let copied = false;
+          if (navigator.clipboard && window.isSecureContext) {
+            try {
+              await navigator.clipboard.writeText(text || "");
+              copied = true;
+            } catch (e) { /* fall through to fallback */ }
+          }
+          if (!copied) {
+            const ta = document.createElement("textarea");
+            ta.value = text || "";
+            ta.style.cssText = "position:fixed;left:-9999px;opacity:0";
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand("copy"); copied = true; } catch (e) {}
+            document.body.removeChild(ta);
+          }
+
+          if (copied && window.showToast) {
+            window.showToast("Copied to clipboard!");
+          }
+        });
+        header.appendChild(btn);
+
+        // Insert header before the code block content
+        pre.insertBefore(header, pre.firstChild);
+      });
+    }
+
     // Initialize all markdown features
     function initMarkdownFeatures() {
       wrapHeadingText();
@@ -775,6 +848,7 @@ const githubUrl = entry?.filePath
       initLastEditedToggle();
       initVideoAutoplay();
       initSidebarMorphing();
+      initCodeBlockCopy();
 
       // Initialize Clipboard Links
       const content = document.getElementById("markdown-content");
@@ -1011,27 +1085,48 @@ const githubUrl = entry?.filePath
     document.addEventListener("DOMContentLoaded", initSectionHeadingClipboard);
     document.addEventListener("astro:page-load", initSectionHeadingClipboard);
 
+    /**
+     * Show a toast notification at the bottom of the screen.
+     *
+     * On first call, creates the toast element and forces a reflow before
+     * adding .show so the CSS transition animates from the initial
+     * translateY(100px)/opacity:0 state. Without the reflow, the browser
+     * batches the DOM insertion and class addition into one frame, skipping
+     * the enter animation on the very first invocation.
+     */
     function showToast(message) {
       let toast = document.getElementById("toast-notification");
-      if (!toast) {
+      const isNew = !toast;
+      if (isNew) {
         toast = document.createElement("div");
         toast.id = "toast-notification";
         toast.className = "toast-notification";
         document.body.appendChild(toast);
       }
 
+      // Reset any active animation
+      toast.classList.remove("show");
       toast.textContent = message;
+
+      // Force reflow so the browser registers the non-show state before
+      // we add .show — ensures the slide-in transition plays every time.
+      void toast.offsetHeight;
+
       toast.classList.add("show");
 
-      setTimeout(() => {
+      // Clear any existing timeout to avoid premature hide on rapid clicks
+      if (toast._hideTimeout) clearTimeout(toast._hideTimeout);
+      toast._hideTimeout = setTimeout(() => {
         toast.classList.remove("show");
       }, 1500);
     }
 
-    // Make toggleCard available globally (safer assignment)
+    // Make toggleCard and showToast available globally so other script
+    // blocks (e.g. initCodeBlockCopy in the first block) can use them.
     if (typeof window.toggleCard === "undefined") {
       window.toggleCard = toggleCard;
     }
+    window.showToast = showToast;
   </script>
 
   <!-- Remark42 Comments Scripts (only loaded if comments container exists) -->

@@ -2,8 +2,61 @@
 title: Changelog
 date: 2026-01-22 00:00:00
 description: A log of notable changes, updates, and improvements to this website.
-last-edited: 2026-02-04 22:55:00
+last-edited: 2026-03-17 18:00:00
 ---
+
+## 2026-03-17 Monday
+
+- **Astro 6 Migration**
+  - Upgraded from Astro 5 to Astro 6 with Vite 7, Zod 4, and Shiki 4
+  - Zero code changes required — the site was already using modern APIs
+  - Build still produces 89 pages with no errors or deprecation warnings
+
+- **Self-Hosted Fonts via Fonts API**
+  - Replaced manual @fontsource npm packages with Astro 6's built-in Fonts API
+  - Fonts are downloaded at build time and served from the site itself — no external CDN requests
+  - Automatic fallback font generation with metric adjustments to prevent layout shift
+  - Removed 5 @fontsource packages and 12 CSS import lines
+
+- **Maple Mono — New Monospace Font**
+  - Replaced Cascadia Code with Maple Mono for all code and monospace text
+  - Round corners, programming ligatures, and a beautiful cursive italic variant
+  - Used for inline code, code blocks, language labels, and the copy button
+
+- **Code Block Overhaul**
+  - New Catppuccin syntax themes: warm charcoal in dark mode, clean white in light mode
+  - Language label in Maple Mono cursive italic (top-left of each block)
+  - One-click copy-to-clipboard button (top-right) with toast confirmation
+  - Code blocks now span the full card width, matching TOC and other sections
+  - Themes adapt automatically when switching between light and dark mode
+
+- **Internal Link Previews Fixed**
+  - Hovering over links to other posts within the same section (e.g. blog-to-blog) now shows the preview popup
+  - Previously only cross-section links (e.g. blog-to-notes) worked
+  - Also fixed the page manifest and link index not being generated during builds
+
+- **Build Pipeline Improvements**
+  - Added automatic prebuild step that copies images, generates the page manifest, and builds the link index
+  - A fresh `npm run build` now works out of the box — no manual script running needed
+  - Images, videos, link previews, and backlinks all work on first build
+
+- **Accessibility**
+  - Added aria-labels to all icon-only buttons (heading links, theme toggle, search, etc.)
+  - Keyboard focus indicators: pink ring appears when tabbing through interactive elements
+  - Heading anchor links no longer show a faint underline when not hovered
+
+- **UI Polish**
+  - Fixed Telegram icon (was corrupted, now shows the correct paper plane)
+  - Tags now look the same on list page cards and inside articles ("Filed under")
+  - "Updated 2mo ago" badges on content cards when a post has been edited
+  - Table of contents is automatically hidden on pages with one or no headings
+  - Toast notifications now animate smoothly from the very first click
+  - Removed unused font packages (dm-sans, tangerine)
+
+- **Umami Analytics**
+  - Integrated self-hosted Umami analytics (umami.kayg.org)
+  - Cookie-free, GDPR compliant, no external tracking
+  - Tracks page views across View Transitions
 
 ## 2026-02-04 Tuesday
 

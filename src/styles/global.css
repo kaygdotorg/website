@@ -6,7 +6,7 @@
    - Playfair Display: 400/500/600 (editorial headings, drop caps, major titles)
    - Outfit: 400/500/600/700 (body text, paragraphs, long-form reading)
    - SN Pro: 500/600/700 (UI elements, navigation, buttons, labels, metadata)
-   - Cascadia Code: 400 (code blocks, monospace)
+   - Maple Mono: 400, 600 (code blocks, monospace — round corners, ligatures)
    - Mrs Saint Delafield: 400 (nav logo accent, cursive flourishes)
    
    USAGE:
@@ -2461,8 +2461,10 @@ a[data-internal-link="true"]:hover {
   opacity: 0.8;
 }
 
+/* Inline code — weight 500 (medium) for Maple Mono's best readability. */
 .md-card-body .md-card-content code {
-  font-family: "Cascadia Code", monospace;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-weight: 500;
   font-size: 0.9em;
   background: rgba(255, 255, 255, 0.1);
   padding: 0.15em 0.4em;
@@ -2473,31 +2475,122 @@ a[data-internal-link="true"]:hover {
   background: rgba(0, 0, 0, 0.06);
 }
 
-/* Code blocks (pre) - enhanced styling */
+/* Shiki dual-theme toggle — swap Catppuccin light/dark syntax colors.
+ * Shiki renders catppuccin-latte as the default inline styles and stores
+ * catppuccin-mocha values in --shiki-dark / --shiki-dark-bg CSS variables.
+ * This rule activates the dark values when [data-theme="dark"]. */
+[data-theme="dark"] .astro-code,
+[data-theme="dark"] .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
+
+/* Code blocks (pre) - enhanced styling.
+ * Background is controlled by Shiki's dual themes (rose-pine-moon for dark,
+ * rose-pine-dawn for light) configured in astro.config.mjs. We do NOT force
+ * a background color here — Shiki injects it via CSS variables on the
+ * .astro-code element. The border and radius provide the card-like frame. */
+/* Code blocks break out of .md-card-content padding (1.5rem) via negative
+ * margins so they span the full card width, matching TOC/backlinks sections.
+ * border-radius matches the site's card aesthetic (1.25rem). */
 .md-card-body .md-card-content pre {
-  margin: 1.5rem 0;
-  padding: 1.25rem;
-  border-radius: 0.75rem;
-  background: rgba(13, 9, 16, 0.9) !important;
+  margin: 1.5rem -1.5rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
   position: relative;
 }
 
-/* Removed gradient header bar from code blocks for cleaner look */
+[data-theme="light"] .md-card-body .md-card-content pre {
+  border-color: rgba(0, 0, 0, 0.08);
+}
 
+/* Code block header bar — contains language label (left) and copy button (right).
+ * Injected by initCodeBlockCopy() in MarkdownLayout. Sits inside <pre> before
+ * <code>, using sticky positioning so it stays visible while scrolling long blocks. */
+.code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -1.25rem -1.5rem 1rem -1.5rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: inherit;
+  border-radius: 1rem 1rem 0 0;
+}
+
+[data-theme="light"] .code-block-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Language label — Maple Mono italic for the cursive variant look. */
+.code-block-lang {
+  font-size: 0.75rem;
+  font-weight: 400;
+  font-style: italic;
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.3);
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+[data-theme="light"] .code-block-lang {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* Copy button — icon-only ghost button, brightens on hover. */
+.code-block-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem;
+  border: none;
+  border-radius: 0.25rem;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.code-block-copy:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.code-block-copy.copied {
+  color: #34d399;
+}
+
+[data-theme="light"] .code-block-copy {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .code-block-copy:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="light"] .code-block-copy.copied {
+  color: #059669;
+}
+
+/* Code inside blocks — weight 500 for Maple Mono's best readability */
 .md-card-body .md-card-content pre code {
   background: transparent !important;
   padding: 0;
   font-size: 0.875rem;
+  font-weight: 500;
   line-height: 1.6;
 }
 
-/* Light mode: Only style non-syntax-highlighted code blocks.
-   Shiki (astro-code) generates inline styles for dark theme tokens,
-   so we must NOT override its background or text will be invisible. */
+/* Light mode fallback for non-Shiki code blocks (e.g. plain <pre> without
+   syntax highlighting). Shiki-highlighted blocks use their own theme. */
 [data-theme="light"] .md-card-body .md-card-content pre:not(.astro-code) {
-  background: rgba(0, 0, 0, 0.04) !important;
+  background: rgba(0, 0, 0, 0.03) !important;
   border-color: rgba(0, 0, 0, 0.08);
 }
 
@@ -2844,7 +2937,7 @@ a[data-internal-link="true"]:hover {
 }
 
 .bento-date {
-  font-family: "Cascadia Code", monospace;
+  font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 0.75rem;
   opacity: 0.5;
   margin-top: auto;
@@ -5614,7 +5707,7 @@ html.theme-transitioning *::after {
 }
 
 .experience-company {
-  font-family: Cascadia Code, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--font-mono), SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   font-size: 1rem;
   color: var(--fallback-bc, #f8f4fc);
   opacity: 0.6;
