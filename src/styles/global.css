@@ -2562,6 +2562,10 @@ a[data-internal-link="true"]:hover {
   }
 }
 
+/* Heading anchor link — the icon that appears after headings for copy-link.
+ * Hidden by default (opacity: 0), revealed on hover/tap. text-decoration: none
+ * prevents the browser's default <a> underline from bleeding through at low
+ * opacity, which can appear as a faint accent-colored line after headings. */
 .heading-link {
   display: inline-flex;
   align-items: center;
@@ -2572,6 +2576,7 @@ a[data-internal-link="true"]:hover {
   color: var(--color-accent-500);
   vertical-align: middle;
   cursor: pointer;
+  text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -2671,6 +2676,7 @@ a[data-internal-link="true"]:hover {
   opacity: 0;
   transition: opacity 0.2s ease, transform 0.2s ease;
   margin-left: 0.25rem;
+  text-decoration: none;
 }
 
 .section-heading:hover .heading-link {
