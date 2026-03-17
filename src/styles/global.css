@@ -659,7 +659,9 @@ html[data-theme="light"] body {
   min-width: 0;
 }
 
-/* Desktop layout: three columns with sticky sidebars */
+/* Desktop layout: three columns with sticky sidebars.
+ * Pages with 0-1 headings hide the left sidebar content but keep the
+ * grid column as a spacer so content width stays consistent. */
 @media (min-width: 1280px) {
   .md-content-wrapper {
     display: grid;
