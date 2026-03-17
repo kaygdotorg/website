@@ -4476,6 +4476,44 @@ html.theme-transitioning *::after {
    Accessibility: Focus Indicators
    ======================================== */
 
+/*
+ * Global :focus-visible baseline
+ * Provides a consistent focus ring for all interactive elements.
+ * Uses :focus-visible so the ring only appears for keyboard navigation,
+ * not mouse clicks. Specific component overrides follow below.
+ */
+:focus-visible {
+  outline: 2px solid var(--color-accent-400, #f472b6);
+  outline-offset: 2px;
+}
+
+/* Remove outline:none that suppresses focus on the search input */
+.pagefind-ui__search-input:focus-visible {
+  outline: 2px solid var(--color-accent-400, #f472b6) !important;
+  outline-offset: 2px;
+}
+
+/* TOC scroll items */
+.toc-scroll-item:focus-visible {
+  outline: 2px solid var(--color-accent-400, #f472b6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Tag filter pills */
+.tag-pill:focus-visible {
+  outline: 2px solid var(--color-accent-400, #f472b6);
+  outline-offset: 2px;
+  border-radius: 9999px;
+}
+
+/* Markdown navigation links */
+.md-nav-link:focus-visible {
+  outline: 2px solid var(--color-accent-400, #f472b6);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
 /* Focus ring for cards */
 .card-in-hand:focus-visible {
   outline: 3px solid var(--color-accent-500, #ec4899);
