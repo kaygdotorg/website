@@ -205,6 +205,18 @@ import Font from "astro/components/Font.astro";
       })}
     />
 
+    <!-- Umami Analytics — self-hosted, cookie-free, GDPR compliant.
+         data-astro-rerun ensures the script re-fires on View Transition
+         navigations (Astro's ClientRouter swaps pages without full reloads).
+         The tracker runs async/deferred and sends no cookies or PII. -->
+    <script
+      is:inline
+      defer
+      src="https://umami.kayg.org/script.js"
+      data-website-id=""
+      data-astro-rerun
+    ></script>
+
     <!-- Preconnect to external image CDN for faster loading -->
     <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="dns-prefetch" href="https://images.unsplash.com" />
