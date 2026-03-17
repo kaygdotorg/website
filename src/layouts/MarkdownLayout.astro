@@ -238,7 +238,7 @@ const githubUrl = entry?.filePath
             displayTOC && (
               <>
                 <section class="md-section md-card-collapsible md-card-toc md-toc-linear" id="table-of-contents">
-                  <button type="button" class="md-card-header" onclick="toggleCard('table-of-contents')" aria-expanded="true" aria-controls="toc-content">
+                  <div class="md-card-header" onclick="toggleCard('table-of-contents')">
                     <h2 class="section-heading" id="toc-heading" data-anchor="table-of-contents"><span class="heading-text">Table of contents</span><a class="heading-link" href="#table-of-contents" aria-label="Link to Table of contents"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
                     <svg
                       class="md-card-toggle"
@@ -254,8 +254,8 @@ const githubUrl = entry?.filePath
                         d="M19 9l-7 7-7-7"
                       />
                     </svg>
-                  </button>
-                  <div class="md-card-content" id="toc-content">
+                  </div>
+                  <div class="md-card-content">
                     <ul id="toc-list">
                       <!-- Populated by JS -->
                     </ul>
@@ -442,12 +442,7 @@ const githubUrl = entry?.filePath
 
       if (headings.length === 0) {
         // Hide TOC if no headings
-        const tocSection = document.getElementById("table-of-contents");
-        if (tocSection) {
-          tocSection.classList.add("collapsed");
-          const trigger = tocSection.querySelector("button.md-card-header");
-          if (trigger) trigger.setAttribute("aria-expanded", "false");
-        }
+        document.getElementById("table-of-contents")?.classList.add("collapsed");
         return;
       }
 
