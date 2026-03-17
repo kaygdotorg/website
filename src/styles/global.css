@@ -1871,8 +1871,10 @@ html[data-theme="light"] body {
   color: #ec4899;
 }
 
-/* Internal Links Refinement - Subtle Dash */
-.md-card-body .md-card-content a:not([href^="http"]) {
+/* Internal Links Refinement - Subtle Dash.
+ * Excludes heading anchor links (aria-label="Copy link to section") which
+ * are invisible by default and have their own hover reveal via .heading-link. */
+.md-card-body .md-card-content a:not([href^="http"]):not([aria-label="Copy link to section"]) {
   font-size: 0.88em;
   font-weight: 500;
   border-bottom: 1px dashed rgba(236, 72, 153, 0.3);
@@ -1880,7 +1882,7 @@ html[data-theme="light"] body {
   transition: all 0.2s ease;
 }
 
-.md-card-body .md-card-content a:not([href^="http"]):hover {
+.md-card-body .md-card-content a:not([href^="http"]):not([aria-label="Copy link to section"]):hover {
   background: rgba(236, 72, 153, 0.08);
   border-bottom-style: solid;
   border-bottom-color: rgba(236, 72, 153, 0.6);
