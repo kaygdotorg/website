@@ -272,7 +272,7 @@ const githubUrl = entry?.filePath
         </div>
         
         {/* Tags Section at bottom of content */}
-        {entry?.data?.tags && entry.data.tags.length > 0 && (
+        {Array.isArray(entry?.data?.tags) && entry.data.tags.length > 0 && (
           <div class="md-tags-footer mt-12 pt-8 border-t border-base-content/5">
             <div class="md-card-content">
               <div class="flex items-center gap-3 text-sm text-base-content/40">
@@ -381,11 +381,20 @@ const githubUrl = entry?.filePath
   </div>
 
   <script is:inline>
-    // Toggle collapsible cards
+    // Toggle collapsible cards.
+    // Keep aria-expanded in sync so screen readers announce state changes.
     function toggleCard(cardId) {
       const card = document.getElementById(cardId);
       if (card) {
         card.classList.toggle("collapsed");
+
+        const trigger = card.querySelector(".md-card-header");
+        if (trigger instanceof HTMLButtonElement) {
+          trigger.setAttribute(
+            "aria-expanded",
+            String(!card.classList.contains("collapsed")),
+          );
+        }
       }
     }
 

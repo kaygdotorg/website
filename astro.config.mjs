@@ -67,6 +67,9 @@ export default defineConfig({
       // Tailwind CSS v4 uses a Vite plugin instead of PostCSS
       tailwindcss(),
     ],
+    server: {
+      allowedHosts: ["code"],
+    },
   },
 
   // ---------------------------------------------------------------------------

@@ -4,6 +4,10 @@
  * 1. Renames files to YYYY-MM-DD-posttitle.md format
  * 2. Adds slug field to frontmatter for URL routing
  * 3. Cleans up description field
+ *
+ * NOTE:
+ * This repository now uses `src/content/blog` (not the old `writing` folder).
+ * The script intentionally targets blog posts and skips `index.md`.
  * 
  * Usage: node scripts/rename-posts.mjs
  */
@@ -11,7 +15,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-const WRITING_DIR = './src/content/writing';
+const BLOG_DIR = './src/content/blog';
 
 // Slugify a string
 function slugify(str) {
@@ -67,7 +71,7 @@ async function processFile(filepath) {
 
     // New filename
     const newFilename = `${date}-${titleSlug}.md`;
-    const newFilepath = path.join(WRITING_DIR, newFilename);
+    const newFilepath = path.join(BLOG_DIR, newFilename);
 
     // Check if slug field already exists
     const hasSlug = /^slug:/m.test(content);
@@ -112,22 +116,30 @@ async function processFile(filepath) {
 }
 
 async function main() {
-    console.log('🔄 Renaming and fixing posts...\n');
+    console.log('🔄 Renaming and fixing blog posts...\n');
 
-    const files = await fs.readdir(WRITING_DIR);
-    const mdFiles = files.filter(f => f.endsWith('.md'));
+    // Validate target directory up front so failures are explicit.
+    try {
+        await fs.access(BLOG_DIR);
+    } catch {
+        console.error(`❌ Blog directory not found: ${BLOG_DIR}`);
+        process.exit(1);
+    }
+
+    const files = await fs.readdir(BLOG_DIR);
+    const mdFiles = files.filter(f => f.endsWith('.md') && f !== 'index.md');
 
     console.log(`Found ${mdFiles.length} posts\n`);
 
     const renames = [];
 
     for (const file of mdFiles) {
-        const result = await processFile(path.join(WRITING_DIR, file));
+        const result = await processFile(path.join(BLOG_DIR, file));
         if (result) renames.push(result);
     }
 
     console.log(`\n✨ Done! Renamed ${renames.length} files.`);
-    console.log('\nSlug field added to all posts for URL routing.');
+    console.log('\nSlug field added where missing for URL routing.');
 }
 
 main().catch(console.error);

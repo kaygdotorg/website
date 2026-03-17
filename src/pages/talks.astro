@@ -42,13 +42,6 @@ if (!entry) {
 }
 
 /**
- * Render the index content (not currently used in the template,
- * but available if needed for page description).
- * ASTRO 5: Use imported render() function.
- */
-const { Content } = await render(entry);
-
-/**
  * Filter and sort talks:
  * - Exclude the index entry
  * - Sort by date, newest first

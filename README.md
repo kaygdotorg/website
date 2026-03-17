@@ -1,97 +1,95 @@
-# Personal Landing Page
+# Personal Website
 
-A personal website built with Astro, Tailwind CSS, and DaisyUI.
-
-## Structure
-
-```
-src/
-├── content/           # Markdown content (from Obsidian)
-│   ├── pages/         # Content pages (now.md, uses.md)
-│   └── config.ts      # Content collection schemas
-├── layouts/
-│   └── BaseLayout.astro
-├── pages/             # Route pages
-│   ├── index.astro    # Landing page
-│   ├── now.astro      # /now page
-│   ├── uses.astro     # /uses page
-│   ├── photography.astro
-│   └── writing.astro
-└── styles/
-    └── global.css     # Tailwind + DaisyUI + custom styles
-```
-
-## Getting Started
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-```
-
-## Using Obsidian Content
-
-1. Write your content in Obsidian using standard markdown
-2. Copy the `.md` files to `src/content/pages/`
-3. Add frontmatter with required fields:
-
-```md
----
-title: Page Title
-description: Optional description
-lastUpdated: December 2024
----
-
-Your markdown content here...
-```
-
-## Customization
-
-### Changing the theme
-
-Edit `src/styles/global.css` to customize:
-- Colors (the `--color-warm-*` variables)
-- Fonts (currently using Instrument Serif for display)
-- DaisyUI theme (dark by default)
-
-### Adding pages
-
-1. Create a `.md` file in `src/content/pages/`
-2. Create a corresponding `.astro` file in `src/pages/`
-3. Use `getEntry()` to fetch and render the markdown
-
-### Photography page
-
-Replace the placeholder Unsplash images with your own:
-1. Add images to `public/photos/`
-2. Update the `photos` array in `src/pages/photography.astro`
-
-## Adding Quartz for /writing
-
-To add your Obsidian vault as a digital garden:
-
-1. Clone Quartz into a `/writing` subdirectory
-2. Configure your deployment to serve both builds
-3. Update the navigation link in `BaseLayout.astro` to point to `/writing/`
-
-## Deployment
-
-This site can be deployed to:
-- **Vercel**: Connect repo, it auto-detects Astro
-- **Netlify**: Same, auto-detection works
-- **GitHub Pages**: Use the `@astrojs/github-pages` adapter
+Personal site built with Astro 5, content collections, and a custom UI layer.
 
 ## Tech Stack
 
-- [Astro](https://astro.build) - Static site generator
-- [Tailwind CSS v4](https://tailwindcss.com) - Utility CSS
-- [DaisyUI](https://daisyui.com) - Component library
-- [Instrument Serif](https://fonts.google.com/specimen/Instrument+Serif) - Display font
+- [Astro 5](https://astro.build)
+- [Tailwind CSS v4](https://tailwindcss.com)
+- [DaisyUI](https://daisyui.com)
+- [Pagefind](https://pagefind.app) for on-site search
+
+## Project Layout
+
+```text
+src/
+  content/                 # Collection content (markdown + local assets)
+    blog/
+    notes/
+    talks/
+    now/
+    uses/
+    photography/
+    home/
+    about/
+    contact/
+    homelab/
+    changelog/
+  content.config.ts        # Astro content collection schemas/loaders
+  pages/
+    index.astro
+    blog.astro
+    notes.astro
+    talks.astro
+    photography.astro
+    changelog.astro
+    now/index.astro
+    uses/index.astro
+    [page].astro
+    [collection]/[slug].astro
+  layouts/
+    BaseLayout.astro
+    MarkdownLayout.astro
+    TimelineLayout.astro
+  components/
+  styles/global.css
+scripts/
+  sync-obsidian.mjs
+public/
+  favicon.svg
+  robots.txt
+  resume.pdf
+```
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+npm run preview
+```
+
+`npm run build` generates the Astro output and runs Pagefind against `dist/`.
+
+## Search in Dev Mode
+
+Pagefind needs a built index. To test search while running dev server:
+
+```bash
+npm run build:search
+npm run dev
+```
+
+This writes the index to `public/pagefind/` (git-ignored).
+
+## Content Workflow
+
+- Markdown content lives under `src/content/<collection>/`.
+- Collection schemas and frontmatter validation live in `src/content.config.ts`.
+- Use `scripts/sync-obsidian.mjs` to sync from an Obsidian vault (requires `OBSIDIAN_PATH` in `.env`).
+
+## Assets
+
+- Put assets in `src/content/...` when you want Astro/Vite optimization.
+- Put assets in `public/` when you need exact, unprocessed files (for example PDFs or files that should bypass optimization).
+
+## License
+
+- Code: MIT (`LICENSE`)
+- Content: CC BY-NC 4.0 (`src/content/LICENSE`)

@@ -471,14 +471,6 @@ import { ClientRouter } from "astro:transitions";
       </div>
     </nav>
 
-    <!-- Progressive Blur Overlay (variable blur below navbar) -->
-    <div
-      id="navbar-blur"
-      class:list={["navbar-blur-overlay", hideNavInitially && "blur-hidden"]}
-      aria-hidden="true"
-    >
-    </div>
-
     <!-- Mobile Menu Overlay (centered) -->
     <div id="mobile-menu" class="mobile-menu-container fixed inset-0 z-40">
       <!-- Backdrop - dims and blurs the page -->
@@ -801,6 +793,12 @@ import { ClientRouter } from "astro:transitions";
           document.body.style.overflow = "";
         }
 
+        // Expose menu controls for keyboard shortcuts.
+        // Keeping these as references ensures keyboard paths and click paths
+        // share the same open/close behavior and body class timing.
+        (window as any).__openGlobalMenu = openMenu;
+        (window as any).__closeGlobalMenu = closeMenu;
+
         if (mobileMenuInner) {
           mobileMenuInner.addEventListener("click", (e) => {
             if (e.target === mobileMenuInner) closeMenu();
@@ -939,6 +937,12 @@ import { ClientRouter } from "astro:transitions";
           document.body.style.overflow = "";
         }
 
+        // Expose search controls for keyboard shortcuts.
+        // This keeps all search entry points (buttons, ESC, CMD/CTRL+K)
+        // on one code path so Pagefind loading and body-state cleanup stay consistent.
+        (window as any).__openSearchModal = openSearch;
+        (window as any).__closeSearchModal = closeSearch;
+
         searchToggles.forEach((toggle) => {
           if (toggle) {
             const newToggle = toggle.cloneNode(true) as HTMLElement;
@@ -1063,15 +1067,32 @@ import { ClientRouter } from "astro:transitions";
         document.addEventListener("keydown", (e) => {
           const searchModal = document.getElementById("search-modal");
           const mobileMenu = document.getElementById("mobile-menu");
+          const closeSearchModal = (window as any).__closeSearchModal as
+            (() => void) | undefined;
+          const openSearchModal = (window as any).__openSearchModal as
+            (() => void) | undefined;
+          const closeGlobalMenu = (window as any).__closeGlobalMenu as
+            (() => void) | undefined;
 
           if (e.key === "Escape") {
             if (searchModal?.classList.contains("search-open")) {
-              searchModal.classList.remove("search-open");
-              document.body.style.overflow = "";
+              // Use the shared close handler so body classes are cleaned up
+              // with the same timing as click/backdrop paths.
+              if (closeSearchModal) {
+                closeSearchModal();
+              } else {
+                searchModal.classList.remove("search-open");
+                document.body.classList.remove("search-active");
+                document.body.style.overflow = "";
+              }
             } else if (mobileMenu?.classList.contains("menu-open")) {
-              mobileMenu.classList.remove("menu-open");
-              document.body.classList.remove("mobile-menu-active");
-              document.body.style.overflow = "";
+              if (closeGlobalMenu) {
+                closeGlobalMenu();
+              } else {
+                mobileMenu.classList.remove("menu-open");
+                document.body.classList.remove("mobile-menu-active");
+                document.body.style.overflow = "";
+              }
             }
           }
           // CMD/CTRL + K: Toggle search

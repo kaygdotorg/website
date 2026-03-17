@@ -43,7 +43,7 @@ const latestUses = usesEntries.sort(
 
 // Get latest entries for bento cards
 const latestBlog = blogEntries.sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 )[0];
 const latestTalk = talksEntries.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
@@ -820,10 +820,13 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
         if (container) {
           width = container.clientWidth;
           height = container.clientHeight;
-          // Scale canvas for high-DPI displays
-          canvas.width = width * window.devicePixelRatio;
-          canvas.height = height * window.devicePixelRatio;
-          ctx?.scale(window.devicePixelRatio, window.devicePixelRatio);
+          // Scale canvas for high-DPI displays.
+          // IMPORTANT: reset transform before applying DPR scaling, otherwise
+          // repeated resize events compound scale() calls and distort the graph.
+          const dpr = window.devicePixelRatio || 1;
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
       }
 
@@ -1040,7 +1043,6 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
     function initNavScrollObserver() {
       const heroSection = document.getElementById("hero-section");
       const navContainer = document.getElementById("nav-container");
-      const blurOverlay = document.getElementById("navbar-blur");
 
       if (heroSection && navContainer) {
         // Disconnect previous observer if it exists (prevents stacking)
@@ -1052,15 +1054,13 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
           (entries) => {
             entries.forEach((entry) => {
               if (!entry.isIntersecting) {
-                // Hero is out of view (scrolled past) -> Show Nav & Blur
+                // Hero is out of view (scrolled past) -> Show nav
                 navContainer.classList.remove("nav-hidden");
                 navContainer.classList.add("nav-visible");
-                blurOverlay?.classList.remove("blur-hidden");
               } else {
-                // Hero is in view -> Hide Nav & Blur
+                // Hero is in view -> Hide nav
                 navContainer.classList.remove("nav-visible");
                 navContainer.classList.add("nav-hidden");
-                blurOverlay?.classList.add("blur-hidden");
               }
             });
           },
