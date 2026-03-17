@@ -1065,6 +1065,17 @@ html[data-theme="light"] body {
   margin: 0 auto;
 }
 
+button.md-card-header {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  padding: inherit;
+}
+
 .md-card-header:hover {
   background: transparent;
 }
