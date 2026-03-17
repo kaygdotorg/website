@@ -260,6 +260,9 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                 </div>
               </div>
               <p class="hero-cards-hint">{heroHint || "swipe to shuffle · tap to navigate · scroll to explore"}</p>
+              <p class="card-hand-touch-hint" id="card-hand-touch-hint" aria-hidden="true">
+                <span class="card-hand-touch-hint-arrows">&larr; swipe &rarr;</span>
+              </p>
             </div>
           )
         }
@@ -700,6 +703,19 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       );
 
       updateCardPositions();
+
+      // Hide the touch hint as soon as the user interacts with the card deck
+      const touchHint = document.getElementById("card-hand-touch-hint");
+      if (touchHint) {
+        const dismissHint = () => {
+          touchHint.style.animation = "none";
+          touchHint.style.opacity = "0";
+          touchHint.style.transition = "opacity 0.3s ease";
+        };
+        cardHand.addEventListener("touchstart", dismissHint, { once: true });
+        cardHand.addEventListener("mousedown", dismissHint, { once: true });
+        cardHand.addEventListener("wheel", dismissHint, { once: true });
+      }
     }
 
     /**
@@ -1219,6 +1235,37 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       color: var(--color-base-content, inherit);
       opacity: 0.6;
       margin-top: 1rem;
+    }
+
+    /* Touch-only swipe hint — visible only on coarse-pointer (touch) devices */
+    .card-hand-touch-hint {
+      display: none;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--color-base-content, inherit);
+      opacity: 0;
+      margin-top: 0.5rem;
+      letter-spacing: 0.05em;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .card-hand-touch-hint-arrows {
+      opacity: 0.3;
+    }
+
+    @media (pointer: coarse) {
+      .card-hand-touch-hint {
+        display: block;
+        animation: card-hand-hint-fade 4s ease-out forwards;
+      }
+    }
+
+    @keyframes card-hand-hint-fade {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      75% { opacity: 1; }
+      100% { opacity: 0; }
     }
 
     /* ============================================
