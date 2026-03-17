@@ -12,11 +12,6 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.1",
-    "@fontsource/cascadia-code": "^5.2.3",
-    "@fontsource/mrs-saint-delafield": "^5.2.7",
-    "@fontsource/outfit": "^5.2.8",
-    "@fontsource/playfair-display": "^5.2.8",
-    "@fontsource/sn-pro": "^5.2.6",
     "@pagefind/default-ui": "^1.4.0",
     "@tailwindcss/vite": "^4.2.1",
     "astro": "^6.0.5",
