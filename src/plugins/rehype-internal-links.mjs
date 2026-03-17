@@ -163,7 +163,6 @@ export default function rehypeInternalLinks() {
       sourceCollection = collectionMatch[1];
     }
 
-
     visit(tree, "element", (node) => {
       if (node.tagName !== "a") return;
 
