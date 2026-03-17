@@ -65,7 +65,7 @@ export default defineConfig({
   //   --font-heading:  Playfair Display — article titles, section headings
   //   --font-body:     Outfit — body text, cards, descriptions
   //   --font-ui:       SN Pro — navigation, buttons, UI chrome
-  //   --font-mono:     Cascadia Code — code blocks, inline code
+  //   --font-mono:     Maple Mono — code blocks, inline code (round corners, ligatures)
   //   --font-cursive:  Mrs Saint Delafield — decorative/signature accents
   fonts: [
     {
@@ -91,9 +91,10 @@ export default defineConfig({
     },
     {
       provider: fontProviders.fontsource(),
-      name: "Cascadia Code",
+      name: "Maple Mono",
       cssVariable: "--font-mono",
-      weights: [400],
+      weights: [400, 500, 600, 700],
+      styles: ["normal", "italic"],
       subsets: ["latin"],
     },
     {
@@ -148,6 +149,17 @@ export default defineConfig({
   // ---------------------------------------------------------------------------
   // Remark and Rehype plugins for transforming markdown.
   markdown: {
+    // Shiki syntax highlighting — dual Catppuccin themes that adapt to
+    // light/dark mode. Astro renders both themes' inline styles and uses
+    // CSS variables to toggle between them based on [data-theme].
+    // - catppuccin-mocha: warm charcoal bg (#1e1e2e), pastel syntax
+    // - catppuccin-latte: cool white bg (#eff1f5), high-contrast syntax
+    shikiConfig: {
+      themes: {
+        dark: "catppuccin-mocha",
+        light: "catppuccin-latte",
+      },
+    },
     // Remark plugins (run on markdown AST, before HTML conversion)
     remarkPlugins: [
       // Transform .md links to correct URL slugs (strips date prefix and .md extension)
