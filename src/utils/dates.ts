@@ -78,6 +78,34 @@ export function getRelativeTime(date: Date | string | undefined): string {
 }
 
 /**
+ * Get compact relative time string for "Updated X ago" badges.
+ *
+ * Returns null when the difference is less than 1 day (badge should not show).
+ * Format: "Xd ago", "Xw ago", "Xmo ago", "Xy ago"
+ */
+export function getCompactRelativeTime(date: Date | string | undefined): string | null {
+  const d = toDate(date);
+  if (!d) return null;
+
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 1) return null;
+
+  const diffYears = Math.floor(diffDays / 365);
+  if (diffYears > 0) return `${diffYears}y ago`;
+
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths > 0) return `${diffMonths}mo ago`;
+
+  const diffWeeks = Math.floor(diffDays / 7);
+  if (diffWeeks > 0) return `${diffWeeks}w ago`;
+
+  return `${diffDays}d ago`;
+}
+
+/**
  * Convert date to ISO string, handling both Date objects and strings
  */
 export function toISOString(date: Date | string | undefined): string | undefined {

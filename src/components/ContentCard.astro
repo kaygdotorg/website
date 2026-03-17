@@ -31,7 +31,7 @@
  * - Uses entry.body for excerpt extraction (still available with glob loader)
  */
 import Icon from "./Icon.astro";
-import { formatDate } from "../utils/dates";
+import { formatDate, getCompactRelativeTime, toDate } from "../utils/dates";
 import { getExcerpt } from "../utils/markdown";
 import { getUrlSlug } from "../utils/content";
 
@@ -94,6 +94,20 @@ const tags = Array.isArray(entry.data.tags) ? entry.data.tags : [];
  * Uses getUrlSlug which prefers frontmatter slug over entry.id.
  */
 const href = `${basePath}/${getUrlSlug(entry)}`;
+
+/**
+ * Compute "Updated X ago" badge text.
+ * Only shown when last-edited exists and is at least 1 day after the published date.
+ */
+const lastEdited = toDate(entry.data["last-edited"]);
+const publishedDate = toDate(entry.data.date);
+const showUpdatedBadge = (() => {
+  if (!lastEdited || !publishedDate) return false;
+  const diffMs = Math.abs(lastEdited.getTime() - publishedDate.getTime());
+  const diffDays = diffMs / (1000 * 60 * 60 * 24);
+  return diffDays >= 1;
+})();
+const updatedAgoText = showUpdatedBadge ? getCompactRelativeTime(lastEdited!) : null;
 ---
 
 <article
@@ -149,6 +163,13 @@ const href = `${basePath}/${getUrlSlug(entry)}`;
           <time datetime={entry.data.date.toISOString()}>
             {formatDate(entry.data.date)}
           </time>
+
+          {/* "Updated X ago" badge (only when last-edited differs from published date) */}
+          {updatedAgoText && (
+            <span class="bg-base-content/5 text-base-content/40 text-xs px-2 py-0.5 rounded-full">
+              Updated {updatedAgoText}
+            </span>
+          )}
 
           {/* Tags (if enabled and present) */}
           {showTags && tags.length > 0 && (
