@@ -101,6 +101,7 @@ const resolvedOgImage =
   pageOgImage || homeCoverImage || `${Astro.url.origin}/images/og-image.webp`;
 
 import { ClientRouter } from "astro:transitions";
+import Font from "astro/components/Font.astro";
 ---
 
 <!doctype html>
@@ -130,6 +131,15 @@ import { ClientRouter } from "astro:transitions";
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+
+    <!-- Astro 6 Fonts API — injects @font-face declarations and preload links
+         for all fonts registered in astro.config.mjs. Fonts are self-hosted
+         from /_astro/fonts/ with no external CDN requests. -->
+    <Font cssVariable="--font-heading" />
+    <Font cssVariable="--font-body" />
+    <Font cssVariable="--font-ui" />
+    <Font cssVariable="--font-mono" />
+    <Font cssVariable="--font-cursive" />
 
     <!-- Open Graph meta tags for social sharing -->
     <meta property="og:type" content="website" />

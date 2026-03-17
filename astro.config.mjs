@@ -3,19 +3,20 @@
  * ASTRO CONFIGURATION
  * =============================================================================
  *
- * Configuration file for the Astro 5 site.
+ * Configuration file for the Astro 6 site.
  *
  * KEY FEATURES CONFIGURED:
  * - Site URL for sitemap and canonical URLs
  * - Sitemap generation via @astrojs/sitemap
  * - Tailwind CSS v4 via Vite plugin
+ * - Fonts API with fontsource provider (replaces manual @fontsource imports)
  * - Markdown processing with rehype plugins
  *
  * @see https://docs.astro.build/en/reference/configuration-reference/
  */
 
 // @ts-check
-import { defineConfig } from "astro/config";
+import { defineConfig, fontProviders } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeSlug from "rehype-slug";
@@ -50,6 +51,61 @@ export default defineConfig({
   },
 
   // ---------------------------------------------------------------------------
+  // FONTS
+  // ---------------------------------------------------------------------------
+  // Astro 6 Fonts API — replaces manual @fontsource CSS imports.
+  // Fonts are downloaded, cached locally, and served from the site itself
+  // (no third-party requests). Preload links and fallbacks are automatic.
+  //
+  // The cssVariable names match the Tailwind @theme variables defined in
+  // global.css (--font-heading, --font-body, etc.) so existing styles
+  // continue to work without changes.
+  //
+  // Font roles:
+  //   --font-heading:  Playfair Display — article titles, section headings
+  //   --font-body:     Outfit — body text, cards, descriptions
+  //   --font-ui:       SN Pro — navigation, buttons, UI chrome
+  //   --font-mono:     Cascadia Code — code blocks, inline code
+  //   --font-cursive:  Mrs Saint Delafield — decorative/signature accents
+  fonts: [
+    {
+      provider: fontProviders.fontsource(),
+      name: "Playfair Display",
+      cssVariable: "--font-heading",
+      weights: [400, 500, 600],
+      subsets: ["latin"],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: "Outfit",
+      cssVariable: "--font-body",
+      weights: [400, 500, 600, 700],
+      subsets: ["latin"],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: "SN Pro",
+      cssVariable: "--font-ui",
+      weights: [500, 600, 700],
+      subsets: ["latin"],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: "Cascadia Code",
+      cssVariable: "--font-mono",
+      weights: [400],
+      subsets: ["latin"],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: "Mrs Saint Delafield",
+      cssVariable: "--font-cursive",
+      weights: [400],
+      subsets: ["latin"],
+    },
+  ],
+
+  // ---------------------------------------------------------------------------
   // INTEGRATIONS
   // ---------------------------------------------------------------------------
   // Official Astro integrations and plugins.
@@ -68,7 +124,10 @@ export default defineConfig({
       tailwindcss(),
     ],
     server: {
-      allowedHosts: ["code"],
+      allowedHosts: true,
+    },
+    preview: {
+      allowedHosts: true,
     },
   },
 

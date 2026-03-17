@@ -51,18 +51,10 @@
    
    ============================================================================
 */
-@import "@fontsource/outfit/latin-400.css";
-@import "@fontsource/outfit/latin-500.css";
-@import "@fontsource/outfit/latin-600.css";
-@import "@fontsource/outfit/latin-700.css";
-@import "@fontsource/sn-pro/latin-500.css";
-@import "@fontsource/sn-pro/latin-600.css";
-@import "@fontsource/sn-pro/latin-700.css";
-@import "@fontsource/playfair-display/latin-400.css";
-@import "@fontsource/playfair-display/latin-500.css";
-@import "@fontsource/playfair-display/latin-600.css";
-@import "@fontsource/cascadia-code/latin-400.css";
-@import "@fontsource/mrs-saint-delafield/latin-400.css";
+/* Font imports are now handled by Astro 6 Fonts API (see astro.config.mjs).
+ * The API downloads fonts at build time and injects optimized @font-face
+ * declarations with preload links automatically — no manual @fontsource
+ * imports needed. */
 
 @import "tailwindcss";
 
@@ -71,12 +63,13 @@
 }
 
 @theme {
-  /* Font families - hierarchical system */
-  --font-heading: "Playfair Display", Georgia, serif;
-  --font-body: "Outfit", system-ui, sans-serif;
-  --font-ui: "SN Pro", system-ui, sans-serif;
-  --font-mono: "Cascadia Code", ui-monospace, monospace;
-  --font-cursive: "Mrs Saint Delafield", cursive;
+  /* Font families — injected at :root by Astro 6 Fonts API (<Font /> in
+   * BaseLayout <head>). The API sets --font-heading, --font-body, etc.
+   * with hashed font-family names and auto-generated metric fallbacks.
+   *
+   * We intentionally do NOT redefine these variables here — the Fonts API
+   * owns them. Tailwind picks up the :root values automatically. If the
+   * Fonts API is ever removed, restore manual font-family declarations. */
 
   /* Legacy aliases for backward compatibility */
   --font-display: var(--font-body);
