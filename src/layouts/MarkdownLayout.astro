@@ -8,8 +8,6 @@ interface Props {
   title: string;
   description?: string;
   entry?: any; // Add entry prop to extract description
-  /** The collection this entry belongs to (e.g. "blog", "notes") */
-  collectionName?: string;
   createdDate?: Date | string;
   lastEdited?: Date | string;
   readingTime?: number;
@@ -27,7 +25,6 @@ const {
   title,
   description: propDescription,
   entry,
-  collectionName,
   createdDate,
   lastEdited,
   readingTime,
@@ -37,13 +34,6 @@ const {
   currentPath = "",
   coverImage,
 } = Astro.props;
-
-// Collections that have meaningful listing pages for the back link
-const listableCollections = ["blog", "notes", "talks", "uses", "photography"];
-const showBackLink = collectionName && listableCollections.includes(collectionName);
-const collectionDisplayName = collectionName
-  ? collectionName.charAt(0).toUpperCase() + collectionName.slice(1)
-  : "";
 
 // Use description from props, or extract from entry body, or fallback
 const description =
@@ -132,16 +122,6 @@ const githubUrl = entry?.filePath
           </div>
         )
       }
-
-      <!-- Back to Collection Link -->
-      {showBackLink && (
-        <a
-          href={`/${collectionName}`}
-          class="text-sm text-base-content/50 hover:text-base-content/80 transition-colors inline-flex items-center gap-1 mb-2 px-6 pt-4"
-        >
-          &larr; Back to {collectionDisplayName}
-        </a>
-      )}
 
       <!-- Title Section -->
       <div class="md-card-title">
