@@ -115,6 +115,11 @@ export default defineConfig({
           // Append the link after the heading text (not before)
           behavior: "append",
 
+          // Accessible label for the icon-only anchor link
+          properties: {
+            ariaLabel: "Copy link to section",
+          },
+
           // Custom link icon (Lucide link icon)
           content: fromHtml(
             `<span class="heading-link">
