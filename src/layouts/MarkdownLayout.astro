@@ -243,7 +243,7 @@ const githubUrl = entry?.filePath
         </div>
         
         {/* Tags Section at bottom of content */}
-        {entry?.data?.tags && entry.data.tags.length > 0 && (
+        {Array.isArray(entry?.data?.tags) && entry.data.tags.length > 0 && (
           <div class="md-tags-footer mt-12 pt-8 border-t border-base-content/5">
             <div class="md-card-content">
               <div class="flex items-center gap-3 text-sm text-base-content/40">
@@ -704,8 +704,11 @@ const githubUrl = entry?.filePath
       // Load remark42 embed script
       !function(e,n){for(var o=0;o<e.length;o++){var r=n.createElement("script"),c=".js",d=n.head||n.body;"noModule"in r?(r.type="module",c=".mjs"):r.async=!0,r.defer=!0,r.src=remark_config.host+"/web/"+e[o]+c,d.appendChild(r)}}(remark_config.components||["embed"],document);
 
-      // Sync theme with remark42
-      const remark42ThemeObserver = new MutationObserver((mutations) => {
+      // Sync theme with remark42 (disconnect any prior observer to avoid leaks on view transitions)
+      if (window.__remark42ThemeObserver) {
+        window.__remark42ThemeObserver.disconnect();
+      }
+      window.__remark42ThemeObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           if (mutation.attributeName === "data-theme" && window.REMARK42) {
             const newTheme = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
@@ -713,7 +716,7 @@ const githubUrl = entry?.filePath
           }
         });
       });
-      remark42ThemeObserver.observe(document.documentElement, { attributes: true });
+      window.__remark42ThemeObserver.observe(document.documentElement, { attributes: true });
     }
   </script>
 </BaseLayout>

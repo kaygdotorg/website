@@ -42,7 +42,7 @@ const latestUses = usesEntries.sort(
 
 // Get latest entries for bento cards
 const latestBlog = blogEntries.sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 )[0];
 const latestTalk = talksEntries.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),

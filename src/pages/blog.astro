@@ -53,7 +53,7 @@ if (!indexEntry) {
  */
 const posts = allBlogEntries
   .filter((entry) => entry.id !== "index" && !entry.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
 // =============================================================================
 // TAG AGGREGATION

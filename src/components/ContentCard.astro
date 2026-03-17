@@ -87,7 +87,7 @@ const description = entry.data.description || getExcerpt(entry.body);
 /**
  * Get tags array, defaulting to empty array if not present.
  */
-const tags = entry.data.tags || [];
+const tags = Array.isArray(entry.data.tags) ? entry.data.tags : [];
 
 /**
  * Build the full URL for this entry.
