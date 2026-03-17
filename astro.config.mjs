@@ -124,7 +124,10 @@ export default defineConfig({
       tailwindcss(),
     ],
     server: {
-      allowedHosts: ["code"],
+      allowedHosts: true,
+    },
+    preview: {
+      allowedHosts: true,
     },
   },
 
