@@ -123,6 +123,9 @@ export default defineConfig({
       // Tailwind CSS v4 uses a Vite plugin instead of PostCSS
       tailwindcss(),
     ],
+    // Vite 7 blocks unrecognized hostnames by default (DNS rebinding protection).
+    // Allow all hosts so the site is accessible via Tailscale MagicDNS ("code")
+    // and other network names in both dev and preview modes.
     server: {
       allowedHosts: true,
     },
