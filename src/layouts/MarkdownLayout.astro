@@ -268,21 +268,10 @@ const githubUrl = entry?.filePath
             )
           }
 
-          {/* Image carousel for uses pages — CSS scroll-snap with preloaded
-              blurred backgrounds that crossfade via opacity (no URL swapping). */}
+          {/* Image carousel for uses pages — CSS scroll-snap with static
+              frosted background (radial gradient blur). */}
           {carouselImages.length > 0 && (
             <div class="uses-carousel-section">
-              {/* Preloaded blurred background layers — one per image, stacked.
-                  JS toggles .bg-active on the one matching the centered slide. */}
-              <div class="uses-carousel-bgs" aria-hidden="true">
-                {carouselImages.map(({ src }, i) => (
-                  <div
-                    class={`uses-carousel-bg ${i === 0 ? "bg-active" : ""}`}
-                    style={`background-image: url(${src})`}
-                    data-index={i}
-                  />
-                ))}
-              </div>
               <div class="uses-carousel" role="region" aria-label="Image gallery" tabindex="0">
                 {carouselImages.map(({ alt, src }, i) => (
                   <figure class="uses-carousel-slide" data-index={i}>
@@ -897,20 +886,13 @@ const githubUrl = entry?.filePath
       if (!carousel) return;
 
       const slides = carousel.querySelectorAll(".uses-carousel-slide");
-      const bgs = document.querySelectorAll(".uses-carousel-bg");
       if (!slides.length) return;
 
-      // Mark first slide as active
       slides[0].classList.add("active");
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-          const idx = entry.target.dataset.index;
           entry.target.classList.toggle("active", entry.isIntersecting);
-          // Crossfade to the matching preloaded background layer
-          if (entry.isIntersecting) {
-            bgs.forEach(bg => bg.classList.toggle("bg-active", bg.dataset.index === idx));
-          }
         });
       }, {
         root: carousel,

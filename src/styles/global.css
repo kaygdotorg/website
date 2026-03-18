@@ -2620,58 +2620,46 @@ a[data-internal-link="true"]:hover {
   background: rgba(13, 9, 16, 0.9);
 }
 
-/* Preloaded blurred background container — holds one div per image,
- * all stacked absolutely. Only the .bg-active one is visible (opacity 1).
- * Images are already loaded by the browser so transitions are instant. */
-.uses-carousel-bgs {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: 1.5rem;
-  overflow: hidden;
-}
-
-.uses-carousel-bg {
-  position: absolute;
-  inset: -25%;
-  background-size: cover;
-  background-position: center;
-  filter: blur(50px) saturate(1.4) brightness(0.25);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.uses-carousel-bg.bg-active {
-  opacity: 1;
-}
-
-/* Dark overlay on top of the blur for contrast */
-.uses-carousel-section::after {
+/* Static frosted background — solid dark color with a subtle noise/grain
+ * texture via backdrop-filter on an inner layer. No dynamic image swapping. */
+.uses-carousel-section::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(13, 9, 16, 0.2);
+  background: radial-gradient(
+    ellipse at 30% 50%,
+    rgba(80, 50, 120, 0.3),
+    transparent 70%
+  ), radial-gradient(
+    ellipse at 70% 50%,
+    rgba(40, 80, 120, 0.2),
+    transparent 70%
+  );
+  filter: blur(40px);
   z-index: 0;
   border-radius: 1.5rem;
-  pointer-events: none;
 }
 
-/* Ensure carousel content sits above the blur layers */
+/* Ensure carousel content sits above the background layer */
 .uses-carousel {
   position: relative;
   z-index: 1;
 }
 
 [data-theme="light"] .uses-carousel-section {
-  background: rgba(240, 237, 245, 0.9);
+  background: rgba(235, 230, 245, 0.8);
 }
 
-[data-theme="light"] .uses-carousel-bg {
-  filter: blur(50px) saturate(1.2) brightness(1.1);
-}
-
-[data-theme="light"] .uses-carousel-section::after {
-  background: rgba(255, 255, 255, 0.2);
+[data-theme="light"] .uses-carousel-section::before {
+  background: radial-gradient(
+    ellipse at 30% 50%,
+    rgba(180, 140, 220, 0.2),
+    transparent 70%
+  ), radial-gradient(
+    ellipse at 70% 50%,
+    rgba(100, 160, 200, 0.15),
+    transparent 70%
+  );
 }
 
 /* Padding centers the active slide. align-items: center vertically
@@ -2701,12 +2689,17 @@ a[data-internal-link="true"]:hover {
  * Tight gap (0.25rem) keeps them visually adjacent despite being small. */
 /* Mobile: 240px base width. At scale(0.65) neighbors are ~156px wide,
  * which peeks in from both sides of the centered active slide. */
+/* height matches the image height so the absolute-positioned caption
+ * sits flush at the bottom of the image, not below it. */
 .uses-carousel-slide {
   flex: 0 0 240px;
+  height: 240px;
   scroll-snap-align: center;
   border-radius: 1rem;
   overflow: hidden;
   position: relative;
+  margin: 0;
+  padding: 0;
   transform: scale(0.65) translateZ(-100px);
   opacity: 0.45;
   transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
@@ -2777,6 +2770,7 @@ a[data-internal-link="true"]:hover {
 
   .uses-carousel-slide {
     flex: 0 0 400px;
+    height: 300px;
   }
 
   .uses-carousel-slide img {
@@ -2792,6 +2786,7 @@ a[data-internal-link="true"]:hover {
 
   .uses-carousel-slide {
     flex: 0 0 520px;
+    height: 360px;
   }
 
   .uses-carousel-slide img {
