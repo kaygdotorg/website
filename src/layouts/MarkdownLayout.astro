@@ -268,12 +268,24 @@ const githubUrl = entry?.filePath
             )
           }
 
-          {/* Image carousel for uses pages — pure CSS scroll-snap */}
+          {/* Image carousel for uses pages — CSS scroll-snap with preloaded
+              blurred backgrounds that crossfade via opacity (no URL swapping). */}
           {carouselImages.length > 0 && (
             <div class="uses-carousel-section">
+              {/* Preloaded blurred background layers — one per image, stacked.
+                  JS toggles .bg-active on the one matching the centered slide. */}
+              <div class="uses-carousel-bgs" aria-hidden="true">
+                {carouselImages.map(({ src }, i) => (
+                  <div
+                    class={`uses-carousel-bg ${i === 0 ? "bg-active" : ""}`}
+                    style={`background-image: url(${src})`}
+                    data-index={i}
+                  />
+                ))}
+              </div>
               <div class="uses-carousel" role="region" aria-label="Image gallery" tabindex="0">
-                {carouselImages.map(({ alt, src }) => (
-                  <figure class="uses-carousel-slide">
+                {carouselImages.map(({ alt, src }, i) => (
+                  <figure class="uses-carousel-slide" data-index={i}>
                     <img
                       src={src}
                       alt={alt}
@@ -881,29 +893,23 @@ const githubUrl = entry?.filePath
      * renders as a heavily blurred, full-bleed background.
      */
     function initUsesCarousel() {
-      const section = document.querySelector(".uses-carousel-section");
       const carousel = document.querySelector(".uses-carousel");
-      if (!section || !carousel) return;
+      if (!carousel) return;
 
       const slides = carousel.querySelectorAll(".uses-carousel-slide");
+      const bgs = document.querySelectorAll(".uses-carousel-bg");
       if (!slides.length) return;
 
-      // Set initial active slide and background
+      // Mark first slide as active
       slides[0].classList.add("active");
-      const firstImg = slides[0].querySelector("img");
-      if (firstImg?.src) {
-        section.style.setProperty("--carousel-bg", `url(${firstImg.src})`);
-      }
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
+          const idx = entry.target.dataset.index;
           entry.target.classList.toggle("active", entry.isIntersecting);
-          // Update section background when a new slide becomes active
+          // Crossfade to the matching preloaded background layer
           if (entry.isIntersecting) {
-            const img = entry.target.querySelector("img");
-            if (img?.src) {
-              section.style.setProperty("--carousel-bg", `url(${img.src})`);
-            }
+            bgs.forEach(bg => bg.classList.toggle("bg-active", bg.dataset.index === idx));
           }
         });
       }, {
