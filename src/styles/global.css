@@ -2611,15 +2611,17 @@ a[data-internal-link="true"]:hover {
  * match the full card width via negative margins. Background uses a
  * dark frosted mosaic texture (repeating-conic-gradient for the faceted
  * glass squares + dark tint) to frame the images. */
+/* Mobile: inset from parent card edges with padding (margin: 0.5rem).
+ * Larger mosaic tiles (20px) for a visible faceted glass texture. */
 .uses-carousel-section {
-  margin: 0 0 2rem 0;
+  margin: 0.5rem 0.5rem 2rem 0.5rem;
   overflow: hidden;
   perspective: 1200px;
   background:
     repeating-conic-gradient(
-      rgba(255, 255, 255, 0.03) 0% 25%,
+      rgba(255, 255, 255, 0.04) 0% 25%,
       transparent 0% 50%
-    ) 0 0 / 10px 10px,
+    ) 0 0 / 20px 20px,
     rgba(13, 9, 16, 0.6);
   border-radius: 1.5rem;
 }
@@ -2627,26 +2629,20 @@ a[data-internal-link="true"]:hover {
 [data-theme="light"] .uses-carousel-section {
   background:
     repeating-conic-gradient(
-      rgba(0, 0, 0, 0.03) 0% 25%,
+      rgba(0, 0, 0, 0.04) 0% 25%,
       transparent 0% 50%
-    ) 0 0 / 10px 10px,
+    ) 0 0 / 20px 20px,
     rgba(240, 237, 245, 0.6);
-}
-
-@media (min-width: 768px) {
-  .uses-carousel-section {
-    margin: 0 -1.5rem 2rem -1.5rem;
-  }
 }
 
 .uses-carousel {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.25rem;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding: 2rem calc(50% - 160px);
+  padding: 2rem calc(50% - 140px);
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -2658,17 +2654,20 @@ a[data-internal-link="true"]:hover {
 /* Each slide: shrunk and faded by default, the .active class (set by JS
  * IntersectionObserver) scales it up and brings it forward.
  * overflow: visible allows the color bleed glow to extend beyond the slide. */
+/* Neighbors are scaled to 0.65 (significantly smaller) and pushed back
+ * with translateZ to create a strong depth contrast with the active slide.
+ * Tight gap (0.25rem) keeps them visually adjacent despite being small. */
 .uses-carousel-slide {
   flex: 0 0 320px;
   scroll-snap-align: center;
   border-radius: 1rem;
   overflow: visible;
   position: relative;
-  transform: scale(0.8) translateZ(-80px);
-  opacity: 0.5;
+  transform: scale(0.65) translateZ(-100px);
+  opacity: 0.45;
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
               opacity 0.4s ease;
-  filter: brightness(0.7);
+  filter: brightness(0.6);
 }
 
 /* Color bleed: blurred copy of the image behind each slide, creating a
@@ -2747,9 +2746,13 @@ a[data-internal-link="true"]:hover {
 
 /* Tablet: wider and taller slides */
 @media (min-width: 768px) {
+  .uses-carousel-section {
+    margin: 0 -1.5rem 2rem -1.5rem;
+  }
+
   .uses-carousel {
-    padding: 2rem calc(50% - 220px);
-    gap: 1rem;
+    padding: 2rem calc(50% - 200px);
+    gap: 0.25rem;
   }
 
   .uses-carousel-slide {
@@ -2764,7 +2767,7 @@ a[data-internal-link="true"]:hover {
 /* Desktop: even larger */
 @media (min-width: 1024px) {
   .uses-carousel {
-    padding: 2rem calc(50% - 280px);
+    padding: 2rem calc(50% - 260px);
   }
 
   .uses-carousel-slide {
