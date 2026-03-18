@@ -872,34 +872,39 @@ const githubUrl = entry?.filePath
     }
 
     /**
-     * Uses carousel: toggle .active on the centered slide via
-     * IntersectionObserver. Each slide is observed at 50% threshold —
-     * when it crosses center, it gets .active (scale 1, full opacity),
-     * others stay receded (scale 0.8, dimmed). Pure CSS handles the
-     * transitions; this JS only toggles the class.
+     * Uses carousel: toggle .active on the centered slide and update the
+     * section's blurred background image (Spotify "Now Playing" style).
+     *
+     * IntersectionObserver at 60% threshold toggles .active on slides.
+     * When a slide becomes active, its <img> src is set as --carousel-bg
+     * on the .uses-carousel-section, which the ::before pseudo-element
+     * renders as a heavily blurred, full-bleed background.
      */
     function initUsesCarousel() {
+      const section = document.querySelector(".uses-carousel-section");
       const carousel = document.querySelector(".uses-carousel");
-      if (!carousel) return;
+      if (!section || !carousel) return;
 
       const slides = carousel.querySelectorAll(".uses-carousel-slide");
       if (!slides.length) return;
 
-      // Set --slide-bg CSS variable on each slide from its <img> src
-      // so the ::before pseudo-element can use it for the color bleed glow.
-      slides.forEach(slide => {
-        const img = slide.querySelector("img");
-        if (img?.src) {
-          slide.style.setProperty("--slide-bg", `url(${img.src})`);
-        }
-      });
-
-      // Mark first slide as active initially
+      // Set initial active slide and background
       slides[0].classList.add("active");
+      const firstImg = slides[0].querySelector("img");
+      if (firstImg?.src) {
+        section.style.setProperty("--carousel-bg", `url(${firstImg.src})`);
+      }
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           entry.target.classList.toggle("active", entry.isIntersecting);
+          // Update section background when a new slide becomes active
+          if (entry.isIntersecting) {
+            const img = entry.target.querySelector("img");
+            if (img?.src) {
+              section.style.setProperty("--carousel-bg", `url(${img.src})`);
+            }
+          }
         });
       }, {
         root: carousel,
