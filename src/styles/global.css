@@ -2727,21 +2727,24 @@ a[data-internal-link="true"]:hover {
   z-index: 1;
 }
 
-/* Image fills slide width. Rounded top when caption is present (caption
- * rounds the bottom). The slide's overflow:hidden clips everything. */
 .uses-carousel-slide img {
   width: 100%;
   height: 240px;
   object-fit: cover;
   display: block;
+  border-radius: 1rem;
   user-select: none;
   -webkit-user-drag: none;
   cursor: zoom-in;
 }
 
-/* Caption: attached below the image as a flow element (not floating).
- * Solid dark strip, text vertically centered, rounds off the bottom. */
+/* Caption: absolute-positioned at the bottom of the image, attached
+ * flush against it. Solid dark strip with text vertically centered. */
 .uses-carousel-slide figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2777,7 +2780,7 @@ a[data-internal-link="true"]:hover {
   }
 
   .uses-carousel-slide img {
-    height: 320px;
+    height: 300px;
   }
 }
 
@@ -2792,7 +2795,7 @@ a[data-internal-link="true"]:hover {
   }
 
   .uses-carousel-slide img {
-    height: 380px;
+    height: 360px;
   }
 }
 
