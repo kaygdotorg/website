@@ -2670,19 +2670,30 @@ a[data-internal-link="true"]:hover {
   cursor: zoom-in;
 }
 
+/* Caption: vertically centered overlay with frosted dark glass effect.
+ * Uses backdrop-filter for the glass blur + a dark tint for contrast.
+ * The repeating-conic-gradient creates a subtle faceted/mosaic texture. */
 .uses-carousel-slide figcaption {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.75rem 1rem;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.75rem;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background:
+    repeating-conic-gradient(
+      rgba(255, 255, 255, 0.03) 0% 25%,
+      transparent 0% 50%
+    ) 0 0 / 12px 12px,
+    rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px) saturate(1.2);
+  -webkit-backdrop-filter: blur(6px) saturate(1.2);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.8rem;
   font-family: var(--font-mono), ui-monospace, monospace;
   font-style: italic;
   text-align: center;
-  border-radius: 0 0 1rem 1rem;
+  border-radius: 1rem;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -2693,7 +2704,12 @@ a[data-internal-link="true"]:hover {
 }
 
 [data-theme="light"] .uses-carousel-slide figcaption {
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.4));
+  background:
+    repeating-conic-gradient(
+      rgba(0, 0, 0, 0.04) 0% 25%,
+      transparent 0% 50%
+    ) 0 0 / 12px 12px,
+    rgba(0, 0, 0, 0.45);
 }
 
 /* Tablet: wider and taller slides */
