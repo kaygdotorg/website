@@ -2621,7 +2621,7 @@ a[data-internal-link="true"]:hover {
       transparent 0% 50%
     ) 0 0 / 10px 10px,
     rgba(13, 9, 16, 0.6);
-  border-radius: 1rem;
+  border-radius: 1.5rem;
 }
 
 [data-theme="light"] .uses-carousel-section {
@@ -2630,7 +2630,7 @@ a[data-internal-link="true"]:hover {
       rgba(0, 0, 0, 0.03) 0% 25%,
       transparent 0% 50%
     ) 0 0 / 10px 10px,
-    rgba(0, 0, 0, 0.04);
+    rgba(240, 237, 245, 0.6);
 }
 
 @media (min-width: 768px) {
@@ -2655,18 +2655,39 @@ a[data-internal-link="true"]:hover {
 }
 
 /* Each slide: shrunk and faded by default, the .active class (set by JS
- * IntersectionObserver) scales it up and brings it forward. */
+ * IntersectionObserver) scales it up and brings it forward.
+ * overflow: visible allows the color bleed glow to extend beyond the slide. */
 .uses-carousel-slide {
   flex: 0 0 320px;
   scroll-snap-align: center;
   border-radius: 1rem;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
   transform: scale(0.8) translateZ(-80px);
   opacity: 0.5;
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
               opacity 0.4s ease;
   filter: brightness(0.7);
+}
+
+/* Color bleed: blurred copy of the image behind each slide, creating a
+ * glow effect where the image's dominant colors bleed into the carousel
+ * background. Uses the same src as the <img> via inherit (set by JS).
+ * Only visible on the active slide to avoid visual noise. */
+.uses-carousel-slide::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background: var(--slide-bg) center / cover no-repeat;
+  filter: blur(40px) saturate(1.5);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.5s ease;
+  border-radius: 2rem;
+}
+
+.uses-carousel-slide.active::before {
+  opacity: 0.6;
 }
 
 /* Active (centered) slide — full size, full opacity, in front */

@@ -885,6 +885,15 @@ const githubUrl = entry?.filePath
       const slides = carousel.querySelectorAll(".uses-carousel-slide");
       if (!slides.length) return;
 
+      // Set --slide-bg CSS variable on each slide from its <img> src
+      // so the ::before pseudo-element can use it for the color bleed glow.
+      slides.forEach(slide => {
+        const img = slide.querySelector("img");
+        if (img?.src) {
+          slide.style.setProperty("--slide-bg", `url(${img.src})`);
+        }
+      });
+
       // Mark first slide as active initially
       slides[0].classList.add("active");
 
