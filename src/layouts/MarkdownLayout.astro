@@ -731,11 +731,23 @@ const githubUrl = entry?.filePath
         const linearTocRect = linearToc.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
         
-        // Calculate fade-in progress (0 to 1) as ToC scrolls out of view
-        // Start fading when ToC bottom reaches 50% of viewport, complete at 20%
-        const fadeInStart = viewportHeight * 0.5;
-        const fadeInEnd = viewportHeight * 0.2;
-        const fadeInProgress = clamp((fadeInStart - linearTocRect.bottom) / (fadeInStart - fadeInEnd), 0, 1);
+        // Calculate fade-in progress (0 to 1) as user scrolls past the ToC.
+        // If a carousel exists above the content, use the first heading's
+        // position instead so the sidebar doesn't appear during the carousel.
+        const firstHeading = markdownContent.querySelector("h2, h3");
+        const carouselExists = !!document.querySelector(".uses-carousel");
+        let fadeInProgress;
+        if (carouselExists && firstHeading) {
+          const headingRect = firstHeading.getBoundingClientRect();
+          const fadeInStart = viewportHeight * 0.7;
+          const fadeInEnd = viewportHeight * 0.3;
+          fadeInProgress = clamp((fadeInStart - headingRect.top) / (fadeInStart - fadeInEnd), 0, 1);
+        } else {
+          // Default: fade in when linear ToC scrolls out of view
+          const fadeInStart = viewportHeight * 0.5;
+          const fadeInEnd = viewportHeight * 0.2;
+          fadeInProgress = clamp((fadeInStart - linearTocRect.bottom) / (fadeInStart - fadeInEnd), 0, 1);
+        }
         
         // Calculate fade-out progress (1 to 0) as we approach bottom
         let fadeOutProgress = 1;
@@ -859,6 +871,35 @@ const githubUrl = entry?.filePath
       });
     }
 
+    /**
+     * Uses carousel: toggle .active on the centered slide via
+     * IntersectionObserver. Each slide is observed at 50% threshold —
+     * when it crosses center, it gets .active (scale 1, full opacity),
+     * others stay receded (scale 0.8, dimmed). Pure CSS handles the
+     * transitions; this JS only toggles the class.
+     */
+    function initUsesCarousel() {
+      const carousel = document.querySelector(".uses-carousel");
+      if (!carousel) return;
+
+      const slides = carousel.querySelectorAll(".uses-carousel-slide");
+      if (!slides.length) return;
+
+      // Mark first slide as active initially
+      slides[0].classList.add("active");
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          entry.target.classList.toggle("active", entry.isIntersecting);
+        });
+      }, {
+        root: carousel,
+        threshold: 0.6,
+      });
+
+      slides.forEach(slide => observer.observe(slide));
+    }
+
     // Initialize all markdown features
     function initMarkdownFeatures() {
       wrapHeadingText();
@@ -870,6 +911,7 @@ const githubUrl = entry?.filePath
       initVideoAutoplay();
       initSidebarMorphing();
       initCodeBlockCopy();
+      initUsesCarousel();
 
       // Initialize Clipboard Links
       const content = document.getElementById("markdown-content");
