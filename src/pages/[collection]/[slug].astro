@@ -134,20 +134,29 @@ const config = CONTENT_COLLECTIONS[collectionName];
  */
 const readingTime = calculateReadingTime(entry.body);
 
-// Extract all markdown image paths for the uses carousel.
-// Matches ![alt](<path>) syntax. Only for "uses" collection.
+// Extract all image paths (both embedded ![alt](<path>) and linked [alt](<path>))
+// from the markdown body for the uses carousel. Only for "uses" collection.
+// Deduplicates by filename so the same image linked multiple times appears once.
 const urlSlug = getUrlSlug(entry);
-const carouselImages = collectionName === "uses"
-  ? [...(entry.body || "").matchAll(/!\[([^\]]*)\]\(<([^>]+)>\)/g)].map(m => {
-      const rawPath = m[2];
-      // Extract just the filename from paths like ./20240402-uses/workspace.jpg
-      const filename = rawPath.split("/").pop();
-      return {
-        alt: m[1] || "",
-        src: `/${collectionName}/${urlSlug}/${filename}`,
-      };
-    })
-  : [];
+const IMAGE_EXTENSIONS = /\.(jpe?g|png|gif|webp|avif|svg)$/i;
+const carouselImages: Array<{ alt: string; src: string }> = (() => {
+  if (collectionName !== "uses" || !entry.body) return [];
+  const seen = new Set<string>();
+  const images: Array<{ alt: string; src: string }> = [];
+  // Match both ![alt](<path>) and [alt](<path>) — the !? makes the ! optional
+  for (const m of entry.body.matchAll(/!?\[([^\]]*)\]\(<([^>]+)>\)/g)) {
+    const rawPath = m[2];
+    if (!IMAGE_EXTENSIONS.test(rawPath)) continue;
+    const filename = rawPath.split("/").pop() || "";
+    if (seen.has(filename)) continue;
+    seen.add(filename);
+    images.push({
+      alt: m[1] || "",
+      src: `/${collectionName}/${urlSlug}/${filename}`,
+    });
+  }
+  return images;
+})();
 
 /**
  * Extract dates from frontmatter.

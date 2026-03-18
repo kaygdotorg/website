@@ -2659,6 +2659,7 @@ a[data-internal-link="true"]:hover {
   border-radius: 1rem;
   user-select: none;
   -webkit-user-drag: none;
+  cursor: zoom-in;
 }
 
 .uses-carousel-slide figcaption {
