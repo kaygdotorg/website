@@ -19,6 +19,7 @@ interface Props {
   /** Current page path for graph highlighting */
   currentPath?: string;
   coverImage?: any;
+  carouselImages?: Array<{ alt: string; src: string }>;
 }
 
 const {
@@ -33,6 +34,7 @@ const {
   graphData = { nodes: [], links: [] },
   currentPath = "",
   coverImage,
+  carouselImages = [],
 } = Astro.props;
 
 // Use description from props, or extract from entry body, or fallback
@@ -265,6 +267,25 @@ const githubUrl = entry?.filePath
               </>
             )
           }
+
+          {/* Image carousel for uses pages — pure CSS scroll-snap */}
+          {carouselImages.length > 0 && (
+            <div class="uses-carousel-section">
+              <div class="uses-carousel" role="region" aria-label="Image gallery" tabindex="0">
+                {carouselImages.map(({ alt, src }) => (
+                  <figure class="uses-carousel-slide">
+                    <img
+                      src={src}
+                      alt={alt}
+                      loading="lazy"
+                      draggable="false"
+                    />
+                    {alt && <figcaption>{alt}</figcaption>}
+                  </figure>
+                ))}
+              </div>
+            </div>
+          )}
 
           <!-- Content Section - Not collapsible -->
       <div class="md-section md-card-body" id="content-card">

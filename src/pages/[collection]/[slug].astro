@@ -134,6 +134,21 @@ const config = CONTENT_COLLECTIONS[collectionName];
  */
 const readingTime = calculateReadingTime(entry.body);
 
+// Extract all markdown image paths for the uses carousel.
+// Matches ![alt](<path>) syntax. Only for "uses" collection.
+const urlSlug = getUrlSlug(entry);
+const carouselImages = collectionName === "uses"
+  ? [...(entry.body || "").matchAll(/!\[([^\]]*)\]\(<([^>]+)>\)/g)].map(m => {
+      const rawPath = m[2];
+      // Extract just the filename from paths like ./20240402-uses/workspace.jpg
+      const filename = rawPath.split("/").pop();
+      return {
+        alt: m[1] || "",
+        src: `/${collectionName}/${urlSlug}/${filename}`,
+      };
+    })
+  : [];
+
 /**
  * Extract dates from frontmatter.
  * - createdDate: When the entry was first published
@@ -197,6 +212,7 @@ const graphData = await getLocalGraphData(currentPath, 1);
   graphData={graphData}
   currentPath={currentPath}
   coverImage={entry.data["cover-image"]}
+  carouselImages={carouselImages}
 >
   {
     /* =========================================================================
