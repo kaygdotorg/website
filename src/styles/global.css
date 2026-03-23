@@ -2480,7 +2480,7 @@ a[data-internal-link="true"]:hover {
  * catppuccin-mocha values in --shiki-dark / --shiki-dark-bg CSS variables.
  * This rule activates the dark values when [data-theme="dark"]. */
 [data-theme="dark"] .astro-code,
-[data-theme="dark"] .astro-code span {
+[data-theme="dark"] .astro-code code span {
   color: var(--shiki-dark) !important;
   background-color: var(--shiki-dark-bg) !important;
 }
@@ -2495,7 +2495,7 @@ a[data-internal-link="true"]:hover {
  * border-radius matches the site's card aesthetic (1.25rem). */
 .md-card-body .md-card-content pre {
   margin: 1.5rem -1.5rem;
-  padding: 3.25rem 1.5rem 1.25rem;
+  padding: 1.1rem 1.5rem 1.25rem;
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
@@ -2510,9 +2510,8 @@ a[data-internal-link="true"]:hover {
 
 /* Code block header — sits in the top padding zone of the code block and uses
  * sticky positioning on both axes so the chip and copy button remain visible
- * while horizontally scrolling long lines. The divider is intentionally
- * omitted so the controls feel integrated into the block instead of separated
- * by an extra bar. */
+ * while horizontally scrolling long lines. Keeping the header in normal flow
+ * avoids the first line of code being clipped behind the controls. */
 .code-block-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -2521,8 +2520,8 @@ a[data-internal-link="true"]:hover {
   position: sticky;
   top: 0;
   left: 0;
-  margin: -3.25rem 0 1.35rem;
-  padding: 0.9rem 0 0;
+  margin: 0 0 1.1rem;
+  padding: 0;
   width: 100%;
   min-width: 100%;
   box-sizing: border-box;
@@ -2548,7 +2547,7 @@ a[data-internal-link="true"]:hover {
   text-transform: lowercase;
   letter-spacing: 0.04em;
   color: #1e1e2e;
-  background: #f38ba8 !important;
+  background-color: #f38ba8 !important;
   background-image: none !important;
   border: 1px solid rgba(243, 139, 168, 0.95);
   box-shadow:
@@ -2562,7 +2561,7 @@ a[data-internal-link="true"]:hover {
 
 [data-theme="light"] .code-block-lang {
   color: #1e1e2e;
-  background: #f38ba8 !important;
+  background-color: #f38ba8 !important;
   background-image: none !important;
   border-color: rgba(243, 139, 168, 0.95);
   box-shadow:

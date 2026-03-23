@@ -841,9 +841,10 @@ const githubUrl = entry?.filePath
      * language label (left) and a copy button (right). The language label is
      * rendered with a leading ">" to make the block feel more terminal-like.
      *
-     * On successful copy, the button shows the toast and triggers a scanline
-     * sweep that runs for the same duration as the toast. The code text itself
-     * is never redrawn, which keeps the effect reliable on mobile browsers.
+     * On successful copy, the button triggers the code-block surface reaction
+     * and briefly switches into its copied state. Code blocks deliberately do
+     * not show the global bottom toast anymore, because that bottom-fixed
+     * element reads like a black bar flash on mobile Safari.
      *
      * Skips blocks that have already been enhanced (data-code-enhanced) to
      * avoid duplicates on View Transition re-initializations.
@@ -899,9 +900,10 @@ const githubUrl = entry?.filePath
             document.body.removeChild(ta);
           }
 
-          if (copied && window.showToast) {
+          if (copied) {
             animateCodeBlockCopy(pre);
-            window.showToast("Copied to clipboard!");
+            btn.classList.add("copied");
+            window.setTimeout(() => btn.classList.remove("copied"), TOAST_DURATION_MS);
           }
 
           // Mobile Safari can leave the button in a pressed/focused visual
