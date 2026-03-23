@@ -932,9 +932,6 @@ const githubUrl = entry?.filePath
       overlay.style.left = `${Math.round(codeRect.left - preRect.left)}px`;
       overlay.style.top = `${Math.round(codeRect.top - preRect.top)}px`;
 
-      pre.appendChild(overlay);
-      pre.classList.add("code-block-copy-active");
-
       const cleanup = () => {
         const frame = codeBlockCopyAnimationFrames.get(pre);
         if (frame) {
@@ -969,9 +966,11 @@ const githubUrl = entry?.filePath
           return;
         }
 
+        pre.appendChild(overlay);
+        codeBlockCopyAnimationCleanups.set(pre, cleanup);
+
         const start = performance.now();
-        const renderFrame = (now) => {
-          const progress = Math.min((now - start) / TOAST_DURATION_MS, 1);
+        const drawPixelatedFrame = (progress) => {
           const pixelationPeak = Math.sin(progress * Math.PI);
           const sampleScale = Math.max(0.08, 1 - pixelationPeak * 0.92);
 
@@ -987,6 +986,16 @@ const githubUrl = entry?.filePath
           context.imageSmoothingEnabled = false;
           context.clearRect(0, 0, overlay.width, overlay.height);
           context.drawImage(workCanvas, 0, 0, overlay.width, overlay.height);
+        };
+
+        // Draw the first frame before hiding the live text so the user never
+        // sees a blank code block if rasterization is slow or fails midway.
+        drawPixelatedFrame(0);
+        pre.classList.add("code-block-copy-active");
+
+        const renderFrame = (now) => {
+          const progress = Math.min((now - start) / TOAST_DURATION_MS, 1);
+          drawPixelatedFrame(progress);
 
           if (progress < 1) {
             const frame = requestAnimationFrame(renderFrame);
@@ -995,7 +1004,6 @@ const githubUrl = entry?.filePath
             cleanup();
           }
         };
-
         const frame = requestAnimationFrame(renderFrame);
         codeBlockCopyAnimationFrames.set(pre, frame);
       } catch (error) {
