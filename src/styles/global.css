@@ -2580,48 +2580,22 @@ a[data-internal-link="true"]:hover {
   color: #059669;
 }
 
-/* Copy reaction: the code should pixelate in place instead of acting like a
- * whole-layer blur. We animate text-shadow and letter-spacing on both the
- * <code> element and its syntax-highlight spans so the glyphs get chunkier
- * while the layout and block bounds remain stable. */
-.md-card-body .md-card-content pre.code-block-copy-active code,
-.md-card-body .md-card-content pre.code-block-copy-active code span {
-  animation: code-block-copy-pixelate 1.5s steps(10, end);
-  will-change: text-shadow, letter-spacing;
+/* Copy reaction: while a copied block is animating, the live code text stays
+ * in the layout but is visually hidden so a raster overlay can pixelate in the
+ * exact same place without causing reflow or shifting line breaks. */
+.md-card-body .md-card-content pre.code-block-copy-active code {
+  opacity: 0;
 }
 
-@keyframes code-block-copy-pixelate {
-  0%,
-  100% {
-    text-shadow: none;
-    letter-spacing: 0;
-  }
-  18% {
-    text-shadow:
-      0.025em 0 0 currentColor,
-      -0.025em 0 0 currentColor,
-      0 0.025em 0 currentColor,
-      0 -0.025em 0 currentColor;
-    letter-spacing: 0.004em;
-  }
-  46% {
-    text-shadow:
-      0.05em 0 0 currentColor,
-      -0.05em 0 0 currentColor,
-      0 0.05em 0 currentColor,
-      0 -0.05em 0 currentColor,
-      0.05em 0.05em 0 currentColor,
-      -0.05em -0.05em 0 currentColor;
-    letter-spacing: 0.01em;
-  }
-  74% {
-    text-shadow:
-      0.03em 0 0 currentColor,
-      -0.03em 0 0 currentColor,
-      0 0.03em 0 currentColor,
-      0 -0.03em 0 currentColor;
-    letter-spacing: 0.005em;
-  }
+/* Raster overlay used for the copy animation. The canvas is positioned over
+ * the <code> area only, so the header bar and surrounding pre block chrome
+ * stay stable while the text itself pixelates. */
+.code-block-pixel-overlay {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 /* Code inside blocks — weight 500 for Maple Mono's best readability */
