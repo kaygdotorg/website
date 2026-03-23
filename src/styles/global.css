@@ -2599,9 +2599,9 @@ a[data-internal-link="true"]:hover {
    ========================================
    A spring-like 3D carousel where the center image is large and in focus,
    while neighboring images recede to the sides with scale, opacity, and
-   translateZ transforms. Uses CSS scroll-snap for snap points, with a
-   small JS IntersectionObserver to toggle the .active class on the
-   centered slide.
+   translateZ transforms. CSS scroll-snap handles the physical scrolling,
+   while JS computes which slide is closest to the viewport center so only
+   one slide is ever visually "active" at a time.
 
    Structure: .uses-carousel-section > .uses-carousel > .uses-carousel-slide
    Images are extracted from the markdown body at build time and passed
@@ -2612,7 +2612,9 @@ a[data-internal-link="true"]:hover {
  * --carousel-bg CSS variable is updated by JS as slides scroll. A dark
  * overlay tints the blur so slide content stays readable. */
 .uses-carousel-section {
-  margin: 0.5rem 0.5rem 2rem 0.5rem;
+  margin: 0.5rem 0 2rem 0;
+  width: 100%;
+  max-width: 100%;
   overflow: hidden;
   perspective: 1200px;
   border-radius: 1.5rem;
@@ -2667,7 +2669,7 @@ a[data-internal-link="true"]:hover {
 .uses-carousel {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 0.5rem;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
@@ -2675,6 +2677,7 @@ a[data-internal-link="true"]:hover {
   padding: 1.5rem calc(50% - 120px);
   scrollbar-width: none;
   -ms-overflow-style: none;
+  overscroll-behavior-x: contain;
 }
 
 .uses-carousel::-webkit-scrollbar {
@@ -2689,30 +2692,25 @@ a[data-internal-link="true"]:hover {
  * Tight gap (0.25rem) keeps them visually adjacent despite being small. */
 /* Mobile: 240px base width. At scale(0.65) neighbors are ~156px wide,
  * which peeks in from both sides of the centered active slide. */
-/* height matches the image height so the absolute-positioned caption
- * sits flush at the bottom of the image, not below it. */
+/* Slide (<figure>) holds the image and an attached caption strip. The
+ * figure height matches the image height so the caption can be absolutely
+ * positioned on top of the bottom edge without creating a second visible
+ * row or a gap below the photo. */
 .uses-carousel-slide {
   flex: 0 0 240px;
   height: 240px;
+  margin: 0;
+  padding: 0;
   scroll-snap-align: center;
   border-radius: 1rem;
   overflow: hidden;
-  position: relative;
-  margin: 0;
-  padding: 0;
+  background: transparent;
   transform: scale(0.65) translateZ(-100px);
   opacity: 0.45;
-  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-              opacity 0.25s ease,
-              filter 0.25s ease;
   filter: brightness(0.6);
+  transition: transform 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
 }
 
-/* Color bleed: blurred copy of the image behind each slide, creating a
- * glow effect where the image's dominant colors bleed into the carousel
- * background. Uses the same src as the <img> via inherit (set by JS).
- * Only visible on the active slide to avoid visual noise. */
-/* Active (centered) slide — full size, full opacity, in front */
 .uses-carousel-slide.active {
   transform: scale(1) translateZ(0);
   opacity: 1;
@@ -2720,47 +2718,56 @@ a[data-internal-link="true"]:hover {
   z-index: 1;
 }
 
+/* Image: fixed height, covers the full width */
 .uses-carousel-slide img {
+  display: block;
   width: 100%;
   height: 240px;
   object-fit: cover;
-  display: block;
-  border-radius: 1rem;
+  object-position: center center;
   user-select: none;
   -webkit-user-drag: none;
   cursor: zoom-in;
 }
 
-/* Caption: absolute-positioned at the bottom of the image, attached
- * flush against it. Solid dark strip with text vertically centered. */
+/* Caption strip is anchored to the image itself instead of flowing below
+ * the figure. This keeps the label visually tied to the photo at every
+ * breakpoint and avoids the detached-caption look from the previous state. */
 .uses-carousel-slide figcaption {
   position: absolute;
-  bottom: 0;
   left: 0;
   right: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 2rem;
-  padding: 0 1rem;
-  background: rgba(13, 9, 16, 0.9);
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.7rem;
+  bottom: 0;
+  padding: 0.7rem 0.9rem;
+  background: linear-gradient(
+    to top,
+    rgba(13, 9, 16, 0.92),
+    rgba(13, 9, 16, 0.76),
+    transparent
+  );
+  color: rgba(255, 255, 255, 0.88);
   font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.72rem;
   font-style: italic;
+  line-height: 1.35;
   text-align: center;
-  border-radius: 0 0 1rem 1rem;
+  pointer-events: none;
 }
 
 [data-theme="light"] .uses-carousel-slide figcaption {
-  background: rgba(255, 255, 255, 0.9);
-  color: rgba(0, 0, 0, 0.7);
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.94),
+    rgba(255, 255, 255, 0.8),
+    transparent
+  );
+  color: rgba(17, 24, 39, 0.78);
 }
 
 /* Tablet: wider and taller slides */
 @media (min-width: 768px) {
   .uses-carousel-section {
-    margin: 0 -1.5rem 2rem -1.5rem;
+    margin: 0 0 2rem 0;
   }
 
   .uses-carousel {
@@ -2775,6 +2782,11 @@ a[data-internal-link="true"]:hover {
 
   .uses-carousel-slide img {
     height: 300px;
+  }
+
+  .uses-carousel-slide figcaption {
+    padding: 0.85rem 1.15rem;
+    font-size: 0.78rem;
   }
 }
 
@@ -2791,6 +2803,11 @@ a[data-internal-link="true"]:hover {
 
   .uses-carousel-slide img {
     height: 360px;
+  }
+
+  .uses-carousel-slide figcaption {
+    padding: 0.95rem 1.25rem;
+    font-size: 0.82rem;
   }
 }
 
