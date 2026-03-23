@@ -2580,32 +2580,47 @@ a[data-internal-link="true"]:hover {
   color: #059669;
 }
 
-/* Copy reaction: when the user copies a block, the text briefly goes through
- * a stepped blur/contrast treatment so it feels like the toast is "sampling"
- * the snippet before it settles back to sharp text. The animation duration is
- * matched in MarkdownLayout to the toast visibility duration. */
-.md-card-body .md-card-content pre.code-block-copy-active code {
+/* Copy reaction: the code should pixelate in place instead of acting like a
+ * whole-layer blur. We animate text-shadow and letter-spacing on both the
+ * <code> element and its syntax-highlight spans so the glyphs get chunkier
+ * while the layout and block bounds remain stable. */
+.md-card-body .md-card-content pre.code-block-copy-active code,
+.md-card-body .md-card-content pre.code-block-copy-active code span {
   animation: code-block-copy-pixelate 1.5s steps(10, end);
-  transform-origin: center;
+  will-change: text-shadow, letter-spacing;
 }
 
 @keyframes code-block-copy-pixelate {
   0%,
   100% {
-    filter: blur(0) contrast(1) saturate(1);
-    opacity: 1;
+    text-shadow: none;
+    letter-spacing: 0;
   }
   18% {
-    filter: blur(0.9px) contrast(1.28) saturate(0.92);
-    opacity: 0.96;
+    text-shadow:
+      0.025em 0 0 currentColor,
+      -0.025em 0 0 currentColor,
+      0 0.025em 0 currentColor,
+      0 -0.025em 0 currentColor;
+    letter-spacing: 0.004em;
   }
   46% {
-    filter: blur(1.6px) contrast(1.42) saturate(0.85);
-    opacity: 0.9;
+    text-shadow:
+      0.05em 0 0 currentColor,
+      -0.05em 0 0 currentColor,
+      0 0.05em 0 currentColor,
+      0 -0.05em 0 currentColor,
+      0.05em 0.05em 0 currentColor,
+      -0.05em -0.05em 0 currentColor;
+    letter-spacing: 0.01em;
   }
   74% {
-    filter: blur(0.85px) contrast(1.18) saturate(0.95);
-    opacity: 0.96;
+    text-shadow:
+      0.03em 0 0 currentColor,
+      -0.03em 0 0 currentColor,
+      0 0.03em 0 currentColor,
+      0 -0.03em 0 currentColor;
+    letter-spacing: 0.005em;
   }
 }
 
