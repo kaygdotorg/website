@@ -948,7 +948,6 @@ const githubUrl = entry?.filePath
             Math.min(1, (pixelationPeak - 0.32) / 0.46),
           );
           const sampleScale = Math.max(0.08, 1 - pixelationPeak * 0.92);
-          const sourceOpacity = Math.max(0.38, 1 - overlayVisibility * 0.62);
 
           const sampleWidth = Math.max(1, Math.round(sourceCanvas.width * sampleScale));
           const sampleHeight = Math.max(1, Math.round(sourceCanvas.height * sampleScale));
@@ -962,8 +961,11 @@ const githubUrl = entry?.filePath
           context.imageSmoothingEnabled = false;
           context.clearRect(0, 0, overlay.width, overlay.height);
           context.drawImage(workCanvas, 0, 0, overlay.width, overlay.height);
-          overlay.style.opacity = overlayVisibility.toFixed(3);
-          pre.style.setProperty("--code-copy-source-opacity", sourceOpacity.toFixed(3));
+          // Keep the real code fully visible and treat the raster as a brief
+          // effect layer only. This avoids the eye reading the overlay as a
+          // temporary font swap before the chunky pixels become obvious.
+          overlay.style.opacity = (overlayVisibility * 0.92).toFixed(3);
+          pre.style.setProperty("--code-copy-source-opacity", "1");
         };
 
         // Keep the overlay invisible at the start and end of the toast so the
