@@ -268,9 +268,9 @@ const githubUrl = entry?.filePath
             )
           }
 
-          {/* Image carousel for uses pages — scroll-snap gallery with an
-              attached caption strip inside each figure so the label stays
-              visually bound to the image instead of sitting below it. */}
+          {/* Image carousel for uses pages — scroll-snap gallery with a real
+              caption strip rendered after the image so the text stays tied
+              to the slide without overlapping the photo itself. */}
           {carouselImages.length > 0 && (
             <div class="uses-carousel-section">
               <div class="uses-carousel" role="region" aria-label="Image gallery" tabindex="0">
