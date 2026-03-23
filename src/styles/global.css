@@ -2730,9 +2730,13 @@ a[data-internal-link="true"]:hover {
   width: 100%;
   aspect-ratio: var(--uses-carousel-image-ratio);
   height: auto;
+  margin: 0;
   object-fit: cover;
   object-position: center center;
   border-radius: 1rem 1rem 0 0;
+  border: none;
+  box-shadow: none;
+  transform: none;
   user-select: none;
   -webkit-user-drag: none;
   cursor: zoom-in;
@@ -2747,6 +2751,7 @@ a[data-internal-link="true"]:hover {
   justify-content: center;
   box-sizing: border-box;
   flex-shrink: 0;
+  margin-top: 0;
   padding: 0.7rem 0.9rem;
   background: rgba(13, 9, 16, 0.92);
   color: rgba(255, 255, 255, 0.88);
@@ -2768,6 +2773,11 @@ a[data-internal-link="true"]:hover {
   background: rgba(255, 255, 255, 0.94);
   color: rgba(17, 24, 39, 0.78);
   border-top-color: rgba(17, 24, 39, 0.08);
+}
+
+.uses-carousel-slide:hover img,
+.uses-carousel-slide.active:hover img {
+  transform: none;
 }
 
 /* Tablet: wider and taller slides */
