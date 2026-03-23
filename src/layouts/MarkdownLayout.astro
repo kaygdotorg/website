@@ -901,10 +901,11 @@ const githubUrl = entry?.filePath
     }
 
     /**
-     * Pixelate the copied code block in place by hiding the live text briefly
-     * and replacing it with a raster snapshot that is scaled down and back up
-     * with image smoothing disabled. This produces actual chunky pixels rather
-     * than a glow/blur approximation while preserving layout and line breaks.
+     * Pixelate the copied code block in place with a raster snapshot that is
+     * scaled down and back up with image smoothing disabled. The live code
+     * stays in the layout underneath the overlay and is only dimmed, not
+     * removed, so the effect reads like the same text breaking into pixels
+     * rather than disappearing and coming back.
      */
     async function animateCodeBlockCopy(pre) {
       const code = pre.querySelector("code");
@@ -939,6 +940,7 @@ const githubUrl = entry?.filePath
           codeBlockCopyAnimationFrames.delete(pre);
         }
         pre.classList.remove("code-block-copy-active");
+        pre.style.removeProperty("--code-copy-source-opacity");
         if (overlay.isConnected) {
           overlay.remove();
         }
@@ -973,6 +975,7 @@ const githubUrl = entry?.filePath
         const drawPixelatedFrame = (progress) => {
           const pixelationPeak = Math.sin(progress * Math.PI);
           const sampleScale = Math.max(0.08, 1 - pixelationPeak * 0.92);
+          const sourceOpacity = Math.max(0.22, 1 - pixelationPeak * 0.78);
 
           const sampleWidth = Math.max(1, Math.round(sourceCanvas.width * sampleScale));
           const sampleHeight = Math.max(1, Math.round(sourceCanvas.height * sampleScale));
@@ -986,10 +989,12 @@ const githubUrl = entry?.filePath
           context.imageSmoothingEnabled = false;
           context.clearRect(0, 0, overlay.width, overlay.height);
           context.drawImage(workCanvas, 0, 0, overlay.width, overlay.height);
+          overlay.style.opacity = pixelationPeak.toFixed(3);
+          pre.style.setProperty("--code-copy-source-opacity", sourceOpacity.toFixed(3));
         };
 
-        // Draw the first frame before hiding the live text so the user never
-        // sees a blank code block if rasterization is slow or fails midway.
+        // Attach the overlay after the snapshot exists, then crossfade between
+        // the live code and the pixelated raster so the glyphs never vanish.
         drawPixelatedFrame(0);
         pre.classList.add("code-block-copy-active");
 

@@ -2580,20 +2580,24 @@ a[data-internal-link="true"]:hover {
   color: #059669;
 }
 
-/* Copy reaction: while a copied block is animating, the live code text stays
- * in the layout but is visually hidden so a raster overlay can pixelate in the
- * exact same place without causing reflow or shifting line breaks. */
+/* Copy reaction: the source text remains visible and only dims via a custom
+ * property while the raster overlay pixelates on top. Keeping the live code in
+ * place avoids the "blank then return" behavior that reads like a flicker
+ * instead of the same glyphs breaking into chunky pixels. */
 .md-card-body .md-card-content pre.code-block-copy-active code {
-  opacity: 0;
+  opacity: var(--code-copy-source-opacity, 1);
 }
 
 /* Raster overlay used for the copy animation. The canvas is positioned over
  * the <code> area only, so the header bar and surrounding pre block chrome
- * stay stable while the text itself pixelates. */
+ * stay stable while the text itself pixelates. Opacity is animated from the
+ * script so the overlay can fade in at peak pixelation and fade back out as
+ * the toast leaves. */
 .code-block-pixel-overlay {
   position: absolute;
   z-index: 2;
   pointer-events: none;
+  opacity: 0;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
