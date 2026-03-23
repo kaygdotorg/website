@@ -2527,7 +2527,9 @@ a[data-internal-link="true"]:hover {
   border-bottom-color: rgba(0, 0, 0, 0.06);
 }
 
-/* Language label — Maple Mono italic for the cursive variant look. */
+/* Language label — Maple Mono italic with a leading terminal-style prompt.
+ * The ">" is part of the text content so the visual cue survives copy/header
+ * layout changes without requiring a separate pseudo-element. */
 .code-block-lang {
   font-size: 0.75rem;
   font-weight: 400;
@@ -2576,6 +2578,35 @@ a[data-internal-link="true"]:hover {
 
 [data-theme="light"] .code-block-copy.copied {
   color: #059669;
+}
+
+/* Copy reaction: when the user copies a block, the text briefly goes through
+ * a stepped blur/contrast treatment so it feels like the toast is "sampling"
+ * the snippet before it settles back to sharp text. The animation duration is
+ * matched in MarkdownLayout to the toast visibility duration. */
+.md-card-body .md-card-content pre.code-block-copy-active code {
+  animation: code-block-copy-pixelate 1.5s steps(10, end);
+  transform-origin: center;
+}
+
+@keyframes code-block-copy-pixelate {
+  0%,
+  100% {
+    filter: blur(0) contrast(1) saturate(1);
+    opacity: 1;
+  }
+  18% {
+    filter: blur(0.9px) contrast(1.28) saturate(0.92);
+    opacity: 0.96;
+  }
+  46% {
+    filter: blur(1.6px) contrast(1.42) saturate(0.85);
+    opacity: 0.9;
+  }
+  74% {
+    filter: blur(0.85px) contrast(1.18) saturate(0.95);
+    opacity: 0.96;
+  }
 }
 
 /* Code inside blocks — weight 500 for Maple Mono's best readability */

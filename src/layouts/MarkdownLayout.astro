@@ -801,13 +801,26 @@ const githubUrl = entry?.filePath
     }
 
     /**
+     * Shared toast visibility duration. Code block copy animation uses the
+     * same timing so the pixelate/unpixelate effect begins when the toast
+     * enters and resolves when it leaves, instead of relying on a separate
+     * arbitrary timeout that could drift from the toast lifecycle.
+     */
+    const TOAST_DURATION_MS = 1500;
+    const codeBlockCopyAnimationTimeouts = new WeakMap();
+
+    /**
      * Enhance code blocks with a copy-to-clipboard button and language label.
      *
      * Finds all <pre> elements in the markdown content area. For Shiki-
      * highlighted blocks (<pre class="astro-code">) the language is read from
      * the data-language attribute. A small header bar is prepended with the
-     * language label (left) and a copy button (right). The button shows
-     * "Copied!" for 2 seconds after a successful copy.
+     * language label (left) and a copy button (right). The language label is
+     * rendered with a leading ">" to make the block feel more terminal-like.
+     *
+     * On successful copy, the button shows the toast and briefly applies a
+     * pixelation class to the copied block so the code visually reacts in sync
+     * with the toast appearing/disappearing.
      *
      * Skips blocks that have already been enhanced (data-code-enhanced) to
      * avoid duplicates on View Transition re-initializations.
@@ -831,7 +844,7 @@ const githubUrl = entry?.filePath
         // Language label (left side)
         const langLabel = document.createElement("span");
         langLabel.className = "code-block-lang";
-        langLabel.textContent = lang;
+        langLabel.textContent = `> ${lang || "text"}`;
         header.appendChild(langLabel);
 
         // Copy button (right side)
@@ -863,6 +876,19 @@ const githubUrl = entry?.filePath
           }
 
           if (copied && window.showToast) {
+            // Keep the code reaction tied to the same duration as the toast.
+            const existingTimeout = codeBlockCopyAnimationTimeouts.get(pre);
+            if (existingTimeout) {
+              clearTimeout(existingTimeout);
+            }
+            pre.classList.remove("code-block-copy-active");
+            void pre.offsetHeight;
+            pre.classList.add("code-block-copy-active");
+            const timeout = setTimeout(() => {
+              pre.classList.remove("code-block-copy-active");
+            }, TOAST_DURATION_MS);
+            codeBlockCopyAnimationTimeouts.set(pre, timeout);
+
             window.showToast("Copied to clipboard!");
           }
         });
@@ -1210,7 +1236,7 @@ const githubUrl = entry?.filePath
       if (toast._hideTimeout) clearTimeout(toast._hideTimeout);
       toast._hideTimeout = setTimeout(() => {
         toast.classList.remove("show");
-      }, 1500);
+      }, TOAST_DURATION_MS);
     }
 
     // Make toggleCard and showToast available globally so other script
