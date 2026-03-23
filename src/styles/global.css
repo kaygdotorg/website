@@ -2698,6 +2698,8 @@ a[data-internal-link="true"]:hover {
  * image instead of on top of it while still scaling the whole slide as
  * a single visual unit. */
 .uses-carousel-slide {
+  --uses-carousel-image-ratio: 4 / 3;
+  --uses-carousel-caption-min-height: 3.25rem;
   flex: 0 0 240px;
   margin: 0;
   padding: 0;
@@ -2720,12 +2722,14 @@ a[data-internal-link="true"]:hover {
   z-index: 1;
 }
 
-/* Image: fixed height, covers the full width, with only the top corners
- * rounded so the caption strip can finish the card shape cleanly below. */
+/* Image frame keeps one stable aspect ratio across breakpoints. The actual
+ * image fills that frame completely and may crop, which avoids the dark
+ * bars that appeared when width/height combinations drifted by device. */
 .uses-carousel-slide img {
   display: block;
   width: 100%;
-  height: 240px;
+  aspect-ratio: var(--uses-carousel-image-ratio);
+  height: auto;
   object-fit: cover;
   object-position: center center;
   border-radius: 1rem 1rem 0 0;
@@ -2737,6 +2741,12 @@ a[data-internal-link="true"]:hover {
 /* Caption strip lives below the image rather than overlaying it. This
  * makes the label readable while keeping it attached to the same card. */
 .uses-carousel-slide figcaption {
+  min-height: var(--uses-carousel-caption-min-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
   padding: 0.7rem 0.9rem;
   background: rgba(13, 9, 16, 0.92);
   color: rgba(255, 255, 255, 0.88);
@@ -2772,11 +2782,8 @@ a[data-internal-link="true"]:hover {
   }
 
   .uses-carousel-slide {
+    --uses-carousel-caption-min-height: 3.5rem;
     flex: 0 0 400px;
-  }
-
-  .uses-carousel-slide img {
-    height: 300px;
   }
 
   .uses-carousel-slide figcaption {
@@ -2792,11 +2799,8 @@ a[data-internal-link="true"]:hover {
   }
 
   .uses-carousel-slide {
+    --uses-carousel-caption-min-height: 3.75rem;
     flex: 0 0 520px;
-  }
-
-  .uses-carousel-slide img {
-    height: 360px;
   }
 
   .uses-carousel-slide figcaption {
