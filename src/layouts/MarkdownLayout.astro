@@ -943,8 +943,12 @@ const githubUrl = entry?.filePath
         const start = performance.now();
         const drawPixelatedFrame = (progress) => {
           const pixelationPeak = Math.sin(progress * Math.PI);
+          const overlayVisibility = Math.max(
+            0,
+            Math.min(1, (pixelationPeak - 0.32) / 0.46),
+          );
           const sampleScale = Math.max(0.08, 1 - pixelationPeak * 0.92);
-          const sourceOpacity = Math.max(0.22, 1 - pixelationPeak * 0.78);
+          const sourceOpacity = Math.max(0.38, 1 - overlayVisibility * 0.62);
 
           const sampleWidth = Math.max(1, Math.round(sourceCanvas.width * sampleScale));
           const sampleHeight = Math.max(1, Math.round(sourceCanvas.height * sampleScale));
@@ -958,12 +962,13 @@ const githubUrl = entry?.filePath
           context.imageSmoothingEnabled = false;
           context.clearRect(0, 0, overlay.width, overlay.height);
           context.drawImage(workCanvas, 0, 0, overlay.width, overlay.height);
-          overlay.style.opacity = pixelationPeak.toFixed(3);
+          overlay.style.opacity = overlayVisibility.toFixed(3);
           pre.style.setProperty("--code-copy-source-opacity", sourceOpacity.toFixed(3));
         };
 
-        // Attach the overlay after the snapshot exists, then crossfade between
-        // the live code and the pixelated raster so the glyphs never vanish.
+        // Keep the overlay invisible at the start and end of the toast so the
+        // eye never catches it as alternate typography before it has broken
+        // into visible chunky pixels.
         drawPixelatedFrame(0);
         pre.classList.add("code-block-copy-active");
 
