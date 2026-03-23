@@ -2499,6 +2499,8 @@ a[data-internal-link="true"]:hover {
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   position: relative;
 }
 
@@ -2508,16 +2510,23 @@ a[data-internal-link="true"]:hover {
 
 /* Code block header bar — contains language label (left) and copy button (right).
  * Injected by initCodeBlockCopy() in MarkdownLayout. Sits inside <pre> before
- * <code>, using sticky positioning so it stays visible while scrolling long blocks. */
+ * <code>, using sticky positioning on both axes so it stays visible while
+ * scrolling long blocks vertically or horizontally. The explicit width keeps
+ * the header pinned to the visible frame of the code block instead of drifting
+ * with the wider code content underneath. */
 .code-block-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin: -1.25rem -1.5rem 1rem -1.5rem;
   padding: 0.75rem 1.5rem;
+  width: calc(100% + 3rem);
+  min-width: calc(100% + 3rem);
+  box-sizing: border-box;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   position: sticky;
   top: 0;
+  left: 0;
   z-index: 1;
   background: inherit;
   border-radius: 1rem 1rem 0 0;
@@ -2555,12 +2564,16 @@ a[data-internal-link="true"]:hover {
   background: transparent;
   color: rgba(255, 255, 255, 0.25);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition: color 0.15s ease, background 0.15s ease;
 }
 
-.code-block-copy:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.7);
+@media (hover: hover) {
+  .code-block-copy:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+  }
 }
 
 .code-block-copy.copied {
@@ -2571,9 +2584,11 @@ a[data-internal-link="true"]:hover {
   color: rgba(0, 0, 0, 0.3);
 }
 
-[data-theme="light"] .code-block-copy:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: rgba(0, 0, 0, 0.6);
+@media (hover: hover) {
+  [data-theme="light"] .code-block-copy:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.6);
+  }
 }
 
 [data-theme="light"] .code-block-copy.copied {
