@@ -802,198 +802,34 @@ const githubUrl = entry?.filePath
 
     /**
      * Shared toast visibility duration. Code block copy animation uses the
-     * same timing so the pixelate/unpixelate effect begins when the toast
-     * enters and resolves when it leaves, instead of relying on a separate
-     * arbitrary timeout that could drift from the toast lifecycle.
+     * same timing so the copy feedback enters and resolves with the toast,
+     * instead of relying on a separate arbitrary timeout that could drift
+     * from the toast lifecycle.
      */
     const TOAST_DURATION_MS = 1500;
-    const codeBlockCopyAnimationFrames = new WeakMap();
-    const codeBlockCopyAnimationCleanups = new WeakMap();
+    const codeBlockCopyAnimationTimers = new WeakMap();
 
     /**
-     * Inline computed styles onto a cloned subtree so it can be serialized
-     * into an SVG foreignObject snapshot. This keeps Shiki token colors and
-     * layout intact when the code block is rasterized for the temporary
-     * pixelation overlay.
+     * Apply a scanline sweep instead of redrawing the code text. A transient
+     * overlay band moves across the block while the original glyphs remain
+     * untouched, which keeps typography stable on mobile browsers.
      */
-    /**
-     * Render the visible code tokens into an offscreen canvas using the live
-     * DOM's computed font and color values. This avoids the SVG foreignObject
-     * path, which can fall back to serif/sans fonts even when the page itself
-     * is already showing Maple Mono correctly.
-     */
-    async function createCodeBlockSnapshot(code, width, height) {
-      if (document.fonts?.ready) {
-        await document.fonts.ready;
+    function animateCodeBlockCopy(pre) {
+      const existingTimer = codeBlockCopyAnimationTimers.get(pre);
+      if (existingTimer) {
+        window.clearTimeout(existingTimer);
       }
 
-      const dpr = window.devicePixelRatio || 1;
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.max(1, Math.round(width * dpr));
-      canvas.height = Math.max(1, Math.round(height * dpr));
+      pre.classList.remove("code-block-copy-active");
+      // Force a reflow so rapid repeated copies restart the CSS animation.
+      void pre.offsetWidth;
+      pre.classList.add("code-block-copy-active");
 
-      const context = canvas.getContext("2d");
-      if (!context) {
-        throw new Error("Could not create 2D canvas context");
-      }
-
-      const codeRect = code.getBoundingClientRect();
-      context.scale(dpr, dpr);
-      context.textBaseline = "top";
-      context.direction = window.getComputedStyle(code).direction || "ltr";
-
-      const leafTokens = Array.from(code.querySelectorAll("*")).filter(
-        (element) => element.children.length === 0 && element.textContent?.length,
-      );
-      const drawableTokens = leafTokens.length ? leafTokens : [code];
-
-      drawableTokens.forEach((token) => {
-        const text = token.textContent;
-        if (!text) return;
-
-        const rect = token.getBoundingClientRect();
-        if (rect.width <= 0 || rect.height <= 0) return;
-
-        const style = window.getComputedStyle(token);
-        const fontSize = parseFloat(style.fontSize) || rect.height;
-        const yOffset = Math.max(0, (rect.height - fontSize) / 2);
-
-        context.font =
-          style.font ||
-          `${style.fontStyle} ${style.fontVariant} ${style.fontWeight} ${style.fontSize} / ${style.lineHeight} ${style.fontFamily}`;
-        context.fillStyle = style.color;
-        context.direction = style.direction || "ltr";
-        context.fillText(text, rect.left - codeRect.left, rect.top - codeRect.top + yOffset);
-      });
-
-      return canvas;
-    }
-
-    /**
-     * Pixelate the copied code block in place with a raster snapshot that is
-     * scaled down and back up with image smoothing disabled. The live code
-     * stays in the layout underneath the overlay and is only dimmed, not
-     * removed, so the effect reads like the same text breaking into pixels
-     * rather than disappearing and coming back.
-     */
-    async function animateCodeBlockCopy(pre) {
-      const code = pre.querySelector("code");
-      if (!code) return;
-
-      const existingCleanup = codeBlockCopyAnimationCleanups.get(pre);
-      if (existingCleanup) {
-        existingCleanup();
-      }
-
-      const preRect = pre.getBoundingClientRect();
-      const codeRect = code.getBoundingClientRect();
-      const width = Math.max(1, Math.round(codeRect.width));
-      const height = Math.max(1, Math.round(codeRect.height));
-      if (width < 2 || height < 2) return;
-
-      const overlay = document.createElement("canvas");
-      overlay.className = "code-block-pixel-overlay";
-
-      const dpr = window.devicePixelRatio || 1;
-      overlay.width = Math.max(1, Math.round(width * dpr));
-      overlay.height = Math.max(1, Math.round(height * dpr));
-      overlay.style.width = `${width}px`;
-      overlay.style.height = `${height}px`;
-      overlay.style.left = `${Math.round(codeRect.left - preRect.left)}px`;
-      overlay.style.top = `${Math.round(codeRect.top - preRect.top)}px`;
-
-      const cleanup = () => {
-        const frame = codeBlockCopyAnimationFrames.get(pre);
-        if (frame) {
-          cancelAnimationFrame(frame);
-          codeBlockCopyAnimationFrames.delete(pre);
-        }
+      const timer = window.setTimeout(() => {
         pre.classList.remove("code-block-copy-active");
-        pre.style.removeProperty("--code-copy-source-opacity");
-        if (overlay.isConnected) {
-          overlay.remove();
-        }
-        codeBlockCopyAnimationCleanups.delete(pre);
-      };
-      codeBlockCopyAnimationCleanups.set(pre, cleanup);
-
-      try {
-        const sourceCanvas = await createCodeBlockSnapshot(code, width, height);
-        if (!pre.isConnected) {
-          cleanup();
-          return;
-        }
-
-        const context = overlay.getContext("2d");
-        if (!context) {
-          cleanup();
-          return;
-        }
-
-        const workCanvas = document.createElement("canvas");
-        const workContext = workCanvas.getContext("2d");
-        if (!workContext) {
-          cleanup();
-          return;
-        }
-
-        pre.appendChild(overlay);
-        codeBlockCopyAnimationCleanups.set(pre, cleanup);
-
-        const start = performance.now();
-        const drawPixelatedFrame = (progress) => {
-          // Show the raster overlay only during the middle of the toast, when
-          // it is already heavily pixelated. Hiding the ramp-in/ramp-out phases
-          // keeps the eye from reading the overlay as a second font render.
-          const holdStart = 0.24;
-          const holdEnd = 0.76;
-          const holdProgress = Math.max(
-            0,
-            Math.min(1, (progress - holdStart) / (holdEnd - holdStart)),
-          );
-          const overlayVisibility = Math.sin(holdProgress * Math.PI);
-          const sampleScale = holdProgress > 0 ? 0.12 : 1;
-
-          const sampleWidth = Math.max(1, Math.round(sourceCanvas.width * sampleScale));
-          const sampleHeight = Math.max(1, Math.round(sourceCanvas.height * sampleScale));
-
-          workCanvas.width = sampleWidth;
-          workCanvas.height = sampleHeight;
-          workContext.imageSmoothingEnabled = false;
-          workContext.clearRect(0, 0, sampleWidth, sampleHeight);
-          workContext.drawImage(sourceCanvas, 0, 0, sampleWidth, sampleHeight);
-
-          context.imageSmoothingEnabled = false;
-          context.clearRect(0, 0, overlay.width, overlay.height);
-          context.drawImage(workCanvas, 0, 0, overlay.width, overlay.height);
-          // Keep the real code fully visible and treat the raster as a brief,
-          // lower-opacity effect layer only. This reads as a pixel shimmer on
-          // top of the stable code instead of alternate text replacing it.
-          overlay.style.opacity = (overlayVisibility * 0.45).toFixed(3);
-          pre.style.setProperty("--code-copy-source-opacity", "1");
-        };
-
-        // Keep the overlay invisible at the start and end of the toast, and
-        // only reveal it once the raster is fully blocky in the middle.
-        drawPixelatedFrame(0);
-        pre.classList.add("code-block-copy-active");
-
-        const renderFrame = (now) => {
-          const progress = Math.min((now - start) / TOAST_DURATION_MS, 1);
-          drawPixelatedFrame(progress);
-
-          if (progress < 1) {
-            const frame = requestAnimationFrame(renderFrame);
-            codeBlockCopyAnimationFrames.set(pre, frame);
-          } else {
-            cleanup();
-          }
-        };
-        const frame = requestAnimationFrame(renderFrame);
-        codeBlockCopyAnimationFrames.set(pre, frame);
-      } catch (error) {
-        cleanup();
-      }
+        codeBlockCopyAnimationTimers.delete(pre);
+      }, TOAST_DURATION_MS);
+      codeBlockCopyAnimationTimers.set(pre, timer);
     }
 
     /**
@@ -1005,9 +841,9 @@ const githubUrl = entry?.filePath
      * language label (left) and a copy button (right). The language label is
      * rendered with a leading ">" to make the block feel more terminal-like.
      *
-     * On successful copy, the button shows the toast and briefly rasterizes
-     * the copied block into a canvas overlay that pixelates in place while
-     * the toast is visible.
+     * On successful copy, the button shows the toast and triggers a scanline
+     * sweep that runs for the same duration as the toast. The code text itself
+     * is never redrawn, which keeps the effect reliable on mobile browsers.
      *
      * Skips blocks that have already been enhanced (data-code-enhanced) to
      * avoid duplicates on View Transition re-initializations.
