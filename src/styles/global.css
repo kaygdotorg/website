@@ -2495,7 +2495,7 @@ a[data-internal-link="true"]:hover {
  * border-radius matches the site's card aesthetic (1.25rem). */
 .md-card-body .md-card-content pre {
   margin: 1.5rem -1.5rem;
-  padding: 3.6rem 1.5rem 1.25rem;
+  padding: 1.25rem 1.5rem;
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
@@ -2508,23 +2508,26 @@ a[data-internal-link="true"]:hover {
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-/* Code block header overlay — the language chip and copy button are anchored
- * directly to the top corners of the code block instead of sitting in a
- * separate bar. This avoids the misaligned "floating row" look on mobile and
- * keeps the controls fixed while long code scrolls underneath. */
+/* Code block header — sits in the top padding zone of the code block and uses
+ * sticky positioning on both axes so the chip and copy button remain visible
+ * while horizontally scrolling long lines. The divider is intentionally
+ * omitted so the controls feel integrated into the block instead of separated
+ * by an extra bar. */
 .code-block-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   column-gap: 0.75rem;
-  position: absolute;
-  inset: 0 0 auto 0;
-  margin: 0;
-  padding: 0.75rem 0.75rem 0;
+  position: sticky;
+  top: 0;
+  left: 0;
+  margin: -1.25rem 0 0.95rem;
+  padding: 0.75rem 0 0;
   width: 100%;
+  min-width: 100%;
   box-sizing: border-box;
   z-index: 3;
-  pointer-events: none;
+  background: inherit;
 }
 
 /* Language label — Maple Mono italic with a leading terminal-style prompt.
@@ -2579,7 +2582,6 @@ a[data-internal-link="true"]:hover {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  pointer-events: auto;
   backdrop-filter: blur(10px);
   transition: color 0.15s ease, background 0.15s ease;
 }
