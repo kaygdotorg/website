@@ -2607,10 +2607,10 @@ a[data-internal-link="true"]:hover {
    Images are extracted from the markdown body at build time and passed
    as the carouselImages prop to MarkdownLayout. */
 
-/* Carousel section: the background is a heavily blurred, full-bleed copy
- * of the currently active image (Spotify "Now Playing" style). The
- * --carousel-bg CSS variable is updated by JS as slides scroll. A dark
- * overlay tints the blur so slide content stays readable. */
+/* Carousel section background acts like a small stage behind the slides:
+ * a dark base, a restrained colored bloom, and a soft top highlight. The
+ * goal is polish rather than spectacle, so the backdrop supports the
+ * active slide without looking like a second visual subject. */
 .uses-carousel-section {
   margin: 0.5rem 0 2rem 0;
   width: 100%;
@@ -2622,46 +2622,100 @@ a[data-internal-link="true"]:hover {
   background: rgba(13, 9, 16, 0.9);
 }
 
-/* Static frosted background — solid dark color with a subtle noise/grain
- * texture via backdrop-filter on an inner layer. No dynamic image swapping. */
+/* Colored bloom: broad, low-contrast gradients that make the carousel feel
+ * atmospheric while keeping the center stage darker for image contrast. */
 .uses-carousel-section::before {
   content: "";
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    ellipse at 30% 50%,
-    rgba(80, 50, 120, 0.3),
-    transparent 70%
+    ellipse at 50% 52%,
+    rgba(66, 42, 108, 0.34),
+    transparent 68%
   ), radial-gradient(
-    ellipse at 70% 50%,
-    rgba(40, 80, 120, 0.2),
-    transparent 70%
+    ellipse at 24% 30%,
+    rgba(130, 78, 168, 0.14),
+    transparent 56%
+  ), radial-gradient(
+    ellipse at 78% 34%,
+    rgba(69, 122, 176, 0.12),
+    transparent 58%
   );
-  filter: blur(40px);
+  filter: blur(46px);
   z-index: 0;
   border-radius: 1.5rem;
 }
 
-/* Ensure carousel content sits above the background layer */
+/* Stage finish: a subtle inner highlight and edge vignette that gives the
+ * container more depth than a flat frosted rectangle. */
+.uses-carousel-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.045),
+      transparent 22%,
+      transparent 76%,
+      rgba(0, 0, 0, 0.18)
+    ),
+    radial-gradient(
+      ellipse at center,
+      transparent 58%,
+      rgba(6, 4, 10, 0.22) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 1.5rem;
+}
+
+/* Ensure carousel content sits above the background layers */
 .uses-carousel {
   position: relative;
   z-index: 1;
 }
 
 [data-theme="light"] .uses-carousel-section {
-  background: rgba(235, 230, 245, 0.8);
+  background: rgba(239, 235, 244, 0.88);
 }
 
 [data-theme="light"] .uses-carousel-section::before {
   background: radial-gradient(
-    ellipse at 30% 50%,
-    rgba(180, 140, 220, 0.2),
+    ellipse at 50% 52%,
+    rgba(193, 173, 224, 0.28),
     transparent 70%
   ), radial-gradient(
-    ellipse at 70% 50%,
-    rgba(100, 160, 200, 0.15),
-    transparent 70%
+    ellipse at 24% 30%,
+    rgba(210, 164, 224, 0.16),
+    transparent 56%
+  ), radial-gradient(
+    ellipse at 78% 34%,
+    rgba(150, 192, 224, 0.14),
+    transparent 58%
   );
+}
+
+[data-theme="light"] .uses-carousel-section::after {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.32),
+      transparent 24%,
+      transparent 76%,
+      rgba(120, 108, 134, 0.08)
+    ),
+    radial-gradient(
+      ellipse at center,
+      transparent 58%,
+      rgba(125, 113, 142, 0.08) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 0 0 1px rgba(120, 108, 134, 0.08);
 }
 
 /* Padding centers the active slide while keeping a minimum visual gutter
@@ -2699,7 +2753,7 @@ a[data-internal-link="true"]:hover {
  * a single visual unit. */
 .uses-carousel-slide {
   --uses-carousel-image-ratio: 4 / 3;
-  --uses-carousel-caption-min-height: 3.25rem;
+  --uses-carousel-caption-min-height: 2.4rem;
   flex: 0 0 240px;
   margin: 0;
   padding: 0;
@@ -2752,15 +2806,16 @@ a[data-internal-link="true"]:hover {
   box-sizing: border-box;
   flex-shrink: 0;
   margin-top: 0;
-  padding: 0.7rem 0.9rem;
-  background: rgba(13, 9, 16, 0.92);
-  color: rgba(255, 255, 255, 0.88);
+  padding: 0.42rem 0.75rem;
+  background: rgba(13, 9, 16, 0.76);
+  color: rgba(255, 255, 255, 0.8);
   font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   font-style: italic;
-  line-height: 1.35;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
   text-align: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 0 0 1rem 1rem;
   pointer-events: none;
 }
@@ -2770,9 +2825,9 @@ a[data-internal-link="true"]:hover {
 }
 
 [data-theme="light"] .uses-carousel-slide figcaption {
-  background: rgba(255, 255, 255, 0.94);
-  color: rgba(17, 24, 39, 0.78);
-  border-top-color: rgba(17, 24, 39, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+  color: rgba(55, 65, 81, 0.76);
+  border-top-color: rgba(17, 24, 39, 0.06);
 }
 
 .uses-carousel-slide:hover img,
@@ -2792,13 +2847,13 @@ a[data-internal-link="true"]:hover {
   }
 
   .uses-carousel-slide {
-    --uses-carousel-caption-min-height: 3.5rem;
+    --uses-carousel-caption-min-height: 2.65rem;
     flex: 0 0 400px;
   }
 
   .uses-carousel-slide figcaption {
-    padding: 0.85rem 1.15rem;
-    font-size: 0.78rem;
+    padding: 0.5rem 0.95rem;
+    font-size: 0.68rem;
   }
 }
 
@@ -2809,13 +2864,13 @@ a[data-internal-link="true"]:hover {
   }
 
   .uses-carousel-slide {
-    --uses-carousel-caption-min-height: 3.75rem;
+    --uses-carousel-caption-min-height: 2.85rem;
     flex: 0 0 520px;
   }
 
   .uses-carousel-slide figcaption {
-    padding: 0.95rem 1.25rem;
-    font-size: 0.82rem;
+    padding: 0.58rem 1.05rem;
+    font-size: 0.72rem;
   }
 }
 
