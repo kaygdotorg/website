@@ -810,9 +810,11 @@ const githubUrl = entry?.filePath
     const codeBlockCopyAnimationTimers = new WeakMap();
 
     /**
-     * Apply a scanline sweep instead of redrawing the code text. A transient
-     * overlay band moves across the block while the original glyphs remain
-     * untouched, which keeps typography stable on mobile browsers.
+     * Apply a lightweight copied-state reaction directly on the <pre>.
+     *
+     * The animation is intentionally limited to the block surface so mobile
+     * Safari does not have to composite extra moving layers near the viewport
+     * edge, which previously showed up as a black flash during copy feedback.
      */
     function animateCodeBlockCopy(pre) {
       const existingTimer = codeBlockCopyAnimationTimers.get(pre);
@@ -841,10 +843,11 @@ const githubUrl = entry?.filePath
      * language label (left) and a copy button (right). The language label is
      * rendered with a leading ">" to make the block feel more terminal-like.
      *
-     * On successful copy, the button triggers the code-block surface reaction
-     * and briefly switches into its copied state. Code blocks deliberately do
-     * not show the global bottom toast anymore, because that bottom-fixed
-     * element reads like a black bar flash on mobile Safari.
+     * On successful copy, the button triggers the code-block surface reaction,
+     * briefly switches into its copied state, and reuses the shared toast.
+     * The toast is now anchored near the top of the viewport instead of the
+     * bottom, so the confirmation stays explicit without recreating the mobile
+     * Safari black-bar artifact that the old bottom toast caused.
      *
      * Skips blocks that have already been enhanced (data-code-enhanced) to
      * avoid duplicates on View Transition re-initializations.
@@ -904,6 +907,7 @@ const githubUrl = entry?.filePath
             animateCodeBlockCopy(pre);
             btn.classList.add("copied");
             window.setTimeout(() => btn.classList.remove("copied"), TOAST_DURATION_MS);
+            showToast("Copied to clipboard!");
           }
 
           // Mobile Safari can leave the button in a pressed/focused visual
@@ -1223,13 +1227,13 @@ const githubUrl = entry?.filePath
     document.addEventListener("astro:page-load", initSectionHeadingClipboard);
 
     /**
-     * Show a toast notification at the bottom of the screen.
+     * Show a toast notification near the top of the screen.
      *
      * On first call, creates the toast element and forces a reflow before
      * adding .show so the CSS transition animates from the initial
-     * translateY(100px)/opacity:0 state. Without the reflow, the browser
-     * batches the DOM insertion and class addition into one frame, skipping
-     * the enter animation on the very first invocation.
+     * off-screen/opacity:0 state. Without the reflow, the browser batches the
+     * DOM insertion and class addition into one frame, skipping the enter
+     * animation on the very first invocation.
      */
     function showToast(message) {
       let toast = document.getElementById("toast-notification");

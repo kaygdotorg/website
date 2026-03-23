@@ -2532,8 +2532,8 @@ a[data-internal-link="true"]:hover {
 /* Language label — Maple Mono italic with a leading terminal-style prompt.
  * The ">" is part of the text content so the visual cue survives copy/header
  * layout changes without requiring a separate pseudo-element. The bubble uses
- * the same Catppuccin pink from the tmux config (`#f38ba8`) so the label reads
- * like a matched status chip anchored to the top-left corner. */
+ * the Catppuccin Lavender token from the tmux config (`#b4befe`) as a filled
+ * pill so the chip reads like a deliberate status marker, not an outlined tag. */
 .code-block-lang {
   display: inline-flex;
   align-items: center;
@@ -2547,12 +2547,12 @@ a[data-internal-link="true"]:hover {
   text-transform: lowercase;
   letter-spacing: 0.04em;
   color: #1e1e2e;
-  background-color: #f38ba8 !important;
+  background-color: #b4befe !important;
   background-image: none !important;
-  border: 1px solid rgba(243, 139, 168, 0.95);
+  border: 1px solid rgba(180, 190, 254, 0.98);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 8px 18px -14px rgba(243, 139, 168, 0.45);
+    0 8px 18px -14px rgba(180, 190, 254, 0.4);
   font-family: var(--font-mono), ui-monospace, monospace;
   white-space: nowrap;
   overflow: hidden;
@@ -2561,12 +2561,12 @@ a[data-internal-link="true"]:hover {
 
 [data-theme="light"] .code-block-lang {
   color: #1e1e2e;
-  background-color: #f38ba8 !important;
+  background-color: #b4befe !important;
   background-image: none !important;
-  border-color: rgba(243, 139, 168, 0.95);
+  border-color: rgba(180, 190, 254, 0.98);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 8px 18px -14px rgba(243, 139, 168, 0.35);
+    0 8px 18px -14px rgba(180, 190, 254, 0.3);
 }
 
 /* Copy button — icon-only ghost button, brightens on hover. */
@@ -2593,8 +2593,12 @@ a[data-internal-link="true"]:hover {
   }
 }
 
+/* Copied state is intentionally more explicit than the idle icon so code-block
+ * copy still gives clear confirmation even if the user dismisses the toast. */
 .code-block-copy.copied {
-  color: #34d399;
+  color: #a6e3a1;
+  background: rgba(166, 227, 161, 0.14);
+  border-color: rgba(166, 227, 161, 0.32);
 }
 
 [data-theme="light"] .code-block-copy {
@@ -2611,7 +2615,9 @@ a[data-internal-link="true"]:hover {
 }
 
 [data-theme="light"] .code-block-copy.copied {
-  color: #059669;
+  color: #047857;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(5, 150, 105, 0.22);
 }
 
 /* Copy reaction: use a restrained surface lift only. Avoiding moving overlays,
@@ -3161,35 +3167,44 @@ a[data-internal-link="true"]:hover {
   }
 }
 
-/* Toast Notification - Frosted glass with subtle pink */
+/* Toast notification — mounted near the top of the viewport and kept simple.
+ * Avoid bottom anchoring and backdrop-filter here: both were prone to reading
+ * like a black flash on mobile Safari during clipboard interactions. */
 .toast-notification {
   position: fixed;
-  bottom: 2rem;
+  top: calc(env(safe-area-inset-top, 0px) + 1rem);
   left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  background: rgba(20, 15, 28, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  color: white;
-  padding: 0.75rem 1.5rem;
+  transform: translateX(-50%) translateY(-1rem);
+  width: fit-content;
+  max-width: min(calc(100vw - 2rem), 28rem);
+  background: rgba(24, 24, 37, 0.96);
+  color: rgba(239, 241, 245, 0.96);
+  padding: 0.7rem 1.1rem;
   border-radius: 9999px;
   font-family: var(--font-display, "DM Sans", sans-serif);
   font-weight: 500;
-  font-size: 0.9rem;
-  border: 1px solid rgba(236, 72, 153, 0.3);
+  font-size: 0.88rem;
+  line-height: 1.2;
+  text-align: center;
+  border: 1px solid rgba(180, 190, 254, 0.34);
   box-shadow:
-    0 0 20px rgba(236, 72, 153, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.2);
+    0 14px 34px -22px rgba(17, 17, 27, 0.78),
+    0 10px 24px -20px rgba(180, 190, 254, 0.38);
   z-index: 100;
   opacity: 0;
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+  transition:
+    transform 0.22s ease,
+    opacity 0.22s ease;
   pointer-events: none;
 }
 
 [data-theme="light"] .toast-notification {
-  background: rgba(255, 255, 255, 0.8);
-  color: #1a1225;
-  border-color: rgba(236, 72, 153, 0.4);
+  background: rgba(255, 255, 255, 0.97);
+  color: #1f2937;
+  border-color: rgba(99, 102, 241, 0.18);
+  box-shadow:
+    0 14px 34px -22px rgba(15, 23, 42, 0.22),
+    0 10px 24px -20px rgba(99, 102, 241, 0.16);
 }
 
 .toast-notification.show {
@@ -5106,10 +5121,6 @@ html.theme-transitioning *::after {
 
   .lightbox-overlay {
     backdrop-filter: blur(20px);
-  }
-
-  .toast-notification {
-    backdrop-filter: blur(16px);
   }
 
   .pagefind-ui__results-area {
