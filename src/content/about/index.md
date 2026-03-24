@@ -3,27 +3,24 @@ title: About
 slug: /about
 date: 2026-01-22 00:00:00
 description: A little more about who I am, what I do, and the journey so far.
-display-table-of-contents: false
-display-dates: false
-display-in-progress: true
+display-table-of-contents: true
+display-dates: true
+display-in-progress: false
 last-edited: 2026-01-23 13:11:35
+last edited: 2026-03-24 11:59:18
 ---
-Hey, I'm **K Gopal Krishna** — a DevOps engineer, systems enthusiast, and occasional writer based in India.
+## Intro
 
-## What I Do
+If you've made it here, welcome! I am a devops / linux guy / storage engineer by profession, hobbyist bodybuilder and a full-time admirer of pretty apps. As a result of such admiration, I am currently trying out my hand with learning SwiftUI since vibe-coding is on a high right now.  
 
-I work with infrastructure at scale — Kubernetes, Ceph, Proxmox, and all the tooling that makes distributed systems work. I enjoy solving complex problems and sharing those solutions through my blog and talks.
+If you'd like to take a look at my professional background, [here you go](./resumepdf).
+## Contact
 
-## Outside of Work
+I am usually either `kayg` or `kaygdotorg` in most places. Here are a few that I remember: 
 
-When I'm not debugging cluster issues, you'll find me:
-- 📷 Taking photos (check out my [photography](/photography) page)
-- 🎧 Listening to music and podcasts
-- 📚 Reading about technology and philosophy
-- 🏋️ Working out
-
-## This Website
-
-This site is built with [Astro](https://astro.build), styled with Tailwind CSS, and deployed on my homelab. The content is written in Obsidian and synced to the site automatically.
-
-Feel free to explore my [blog](/blog), read my [notes](/notes), or see what I'm working on [now](/now).
+- **Email**: [mail@kayg.org](mailto:mail@kayg.org)
+- **GitHub**: [kaygdotorg](https://github.com/kaygdotorg)
+- **LinkedIn**: [K Gopal Krishna](https://www.linkedin.com/in/k-gopal-krishna-7546b92a2/)
+- **Mastodon**: [@kayg](https://mas.to/@kayg)
+- **Telegram**: [@kaygdotorg](https://t.me/kaygdotorg)
+- **X / Twitter**: [@kaygdotorg](https://x.com/kaygdotorg)
