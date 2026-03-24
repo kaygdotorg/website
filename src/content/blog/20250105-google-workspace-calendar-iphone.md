@@ -7,11 +7,11 @@ title: Google Workspace Delegate Calendars on iPhone
 
   Google Workspace Delegated Calendars do not show up on the Apple Calendar on iPhone. It does so on my Mac, under a "Delegated Calendars" section like so:
 
-![delegates-apple-calendar-macos](<./20250105-google-workspace-calendar-iphone/delegates-apple-calendar-macos.png>)
+![delegates-apple-calendar-macos](<../blog/20250105-google-workspace-calendar-iphone/delegates-apple-calendar-macos.png>)
 
 But on my iPhone, not only do the shared calendars not show up under the account, moreso upon tapping on the "Delegate Calendars" button brings me to an empty page:
 
-![apple-calendar-iphone-ios-delegates](<./20250105-google-workspace-calendar-iphone/apple-calendar-iphone-ios-delegates.png>)
+![apple-calendar-iphone-ios-delegates](<../blog/20250105-google-workspace-calendar-iphone/apple-calendar-iphone-ios-delegates.png>)
 
 ## ❔ Why?
 

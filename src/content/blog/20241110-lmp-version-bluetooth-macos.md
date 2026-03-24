@@ -13,7 +13,7 @@ For example, [one of my youtube videos](https://www.youtube.com/shorts/Qe65sRivT
 
 At first glance, System Report / Information doesn't give out any information that could be linked to the bluetooth version but it does tell me the **MAC address of the trackpad**.
 
-![system-information-bluetooth](<./20241110-lmp-version-bluetooth-macos/system-information-bluetooth.png>)
+![system-information-bluetooth](<../blog/20241110-lmp-version-bluetooth-macos/system-information-bluetooth.png>)
 
 The same information can be found out in the terminal by running:
 
@@ -23,7 +23,7 @@ system_profiler -detailLevel full SPBluetoothDataType
 
 Another way to find out the MAC address of a connected device is to hold the Option key while clicking on Control Center → Bluetooth:
 
-![control-center-bluetooth-option-key](<./20241110-lmp-version-bluetooth-macos/control-center-bluetooth-option-key.png>)
+![control-center-bluetooth-option-key](<../blog/20241110-lmp-version-bluetooth-macos/control-center-bluetooth-option-key.png>)
 ## 📚 Looking Deeper
 
 A [stackoverflow answer](https://superuser.com/questions/1560716/how-can-i-check-the-bluetooth-version-of-a-connected-device) says that finding the LMP version is key. However, since that information is not exposed very easily, we need to turn to logs. To do that:
@@ -33,7 +33,7 @@ A [stackoverflow answer](https://superuser.com/questions/1560716/how-can-i-check
 3. Disconnect Magic Trackpad, wait for a second and reconnect it.
 4. A message should appear that looks something like this:
 
-![console-app-bluetooth-lmp](<./20241110-lmp-version-bluetooth-macos/console-app-bluetooth-lmp.png>)
+![console-app-bluetooth-lmp](<../blog/20241110-lmp-version-bluetooth-macos/console-app-bluetooth-lmp.png>)
 
 According to the table [that Microsoft provides](https://support.microsoft.com/en-us/windows/what-bluetooth-version-is-on-my-pc-f5d4cff7-c00d-337b-a642-d2d23b082793), we can infer it's Bluetooth 5.2 since `LMPVersion=0000000B` [translates to 11 in decimal](https://www.rapidtables.com/convert/number/hex-to-decimal.html?x=0000000B). The `LMPSubVersion` is manufacturer specific and does not mean anything here, according to 4.3.3. LMP version of [this official bluetooth document](https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Core-54/out/en/br-edr-controller/link-manager-protocol-specification.html) that says:
 

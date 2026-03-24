@@ -29,7 +29,7 @@ When there's a failed drive/OSD, there are two situations:
 
 - In both cases, the disk can be marked out of the [ceph](<./20240125-ceph.md>) cluster with `ceph osd out <osd.num>` or `ceph osd reweight 0` (Both are equivalent operations).
 
-- [ceph](<./20240125-ceph.md>) drains the dying OSD and moves data OR if the disk is dead, ceph rebuilds data from redundant bits / parity to _other OSDs on the same node_. This may cause a [nearfull-osd](<./20240117-nearfull-osd.md>) situation.
+- [ceph](<./20240125-ceph.md>) drains the dying OSD and moves data OR if the disk is dead, ceph rebuilds data from redundant bits / parity to _other OSDs on the same node_. This may cause a [nearfull-osd](<20240117-nearfull-osd.md>) situation.
  
 - To prevent such a situation, the trick here is to set `ceph osd crush reweight 0`.  This makes sure that the data is distributed to _other OSDs on all the nodes / throughout the crushmap_. See [difference-osd-reweight-crush-reweight](<../blog/20240205-difference-osd-reweight-crush-reweight.md>).
 

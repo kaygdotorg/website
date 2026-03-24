@@ -11,7 +11,7 @@ cover-image: https://images.unsplash.com/photo-1668697092034-82edc78d1a8d?q=80&w
 
 iOS Shortcuts has the "every thing is an object" philosophy which plays quite well when you pair it with variables. As such, it allows you to use a single input (whatever you pass onto the shortcut) as a variable itself - meaning if you receive a "message" as the "shortcut input," you automagically get:
 
-![A shortcut input depending on the type has multiple fields as structured data](./20260204-ios-shortcuts-message-type/shortcuts-illustration.mp4)
+![A shortcut input depending on the type has multiple fields as structured data](../blog/20260204-ios-shortcuts-message-type/shortcuts-illustration.mp4)
 
 - Sender
 - Message Content
@@ -26,4 +26,4 @@ The problem is that the message type doesn't automagically appear unless...
 
 An automation of the type "Message" is configured beforehand and the required shortcut ("Sliding into Mohit's DMs" as the example above) is selected as the one to process it. 
 
-![Shortcuts → Automations → "+" icon → Tap on Message → Configure Triggers](./20260204-ios-shortcuts-message-type/automation-shortcuts-illustration.jpeg)
+![Shortcuts → Automations → "+" icon → Tap on Message → Configure Triggers](../blog/20260204-ios-shortcuts-message-type/automation-shortcuts-illustration.jpeg)

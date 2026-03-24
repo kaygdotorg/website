@@ -11,15 +11,15 @@ Hidden folders are disabled by default on MacOS, which means it won't see any fi
 
 Sometimes when I want to open a new folder from VSCode, I am at a loss on how to proceed with opening a config file which typically resides in `~/.config`.
 
-![hidden-folders-in-finder-1](<./20240428-hidden-folders-finder/hidden-folders-in-finder-1.png>)
+![hidden-folders-in-finder-1](<../blog/20240428-hidden-folders-finder/hidden-folders-in-finder-1.png>)
 
 ## 🎤 How?
 
 Press `CMD + SHIFT + .`
 
-![hidden-folders-in-macos-2](<./20240428-hidden-folders-finder/hidden-folders-in-macos-2.mp4>)
+![hidden-folders-in-macos-2](<../blog/20240428-hidden-folders-finder/hidden-folders-in-macos-2.mp4>)
 
-Of course, this can also be toggled globally with a `defaults` command, like when enabling [key spam](<./20240422-key-spam-macos.md>).
+Of course, this can also be toggled globally with a `defaults` command, like when enabling [key spam](<20240422-key-spam-macos.md>).
 ## 👓 References
 
 https://apple.stackexchange.com/a/402026
