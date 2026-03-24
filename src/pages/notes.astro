@@ -1,128 +1,34 @@
 ---
 /**
  * =============================================================================
- * NOTES LIST PAGE (/notes) - Digital Garden
+ * LEGACY NOTES INDEX REDIRECT (/notes)
  * =============================================================================
  *
- * Displays all published notes with tag filtering capability.
- * Notes are shorter, technical pieces in a "Digital Garden" style.
+ * The standalone Notes section was merged into Blog. Keep the old /notes
+ * landing page alive as a static HTML redirect so existing bookmarks and
+ * search-engine results still land on the new writing index after the content
+ * move.
  *
- * FEATURES:
- * - "Digital Garden" section label to differentiate from blog
- * - Page metadata from notes/index.md
- * - List of all published notes (excludes drafts and index)
- * - Tag filter for narrowing down notes by topic
- * - Consistent card rendering via ContentCard component
- *
- * DATA FLOW:
- * 1. Fetch all notes entries from content collection
- * 2. Separate index entry (page metadata) from note entries
- * 3. Calculate tag frequency for filter display
- * 4. Render notes using ContentCard component
+ * This page is intentionally framework-free: a canonical link, meta refresh,
+ * and location.replace() are enough for output:static and keep the redirect
+ * working even when the generated dist/ directory is served directly.
  */
-import BaseLayout from "../layouts/BaseLayout.astro";
-import ContentCard from "../components/ContentCard.astro";
-import TagFilter from "../components/TagFilter.astro";
-import { getCollection } from "astro:content";
-
-// =============================================================================
-// DATA FETCHING
-// =============================================================================
-
-/**
- * Fetch all notes entries from the content collection.
- */
-const allNotesEntries = await getCollection("notes");
-
-/**
- * Get the index entry for page metadata (title, description).
- */
-const indexEntry = allNotesEntries.find((e) => e.id === "index");
-
-if (!indexEntry) {
-  throw new Error(
-    "Missing notes/index.md - This file provides the page title and description."
-  );
-}
-
-/**
- * Filter and sort published notes:
- * - Exclude the index entry
- * - Exclude drafts
- * - Sort by date, newest first
- */
-const notes = allNotesEntries
-  .filter((entry) => entry.id !== "index" && !entry.data.draft)
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-// =============================================================================
-// TAG AGGREGATION
-// =============================================================================
-
-/**
- * Calculate tag frequency for the tag filter.
- */
-const tagMap = new Map<string, number>();
-notes.forEach((note) => {
-  const tags = note.data.tags || [];
-  tags.forEach((tag: string) => {
-    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
-  });
-});
-
-const tagCounts = Array.from(tagMap, ([tag, count]) => ({ tag, count }))
-  .sort((a, b) => b.count - a.count);
+const destination = "/blog";
 ---
 
-<BaseLayout title={indexEntry.data.title} description={indexEntry.data.description}>
-  <section class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
-    {/* =====================================================================
-        PAGE HEADER
-        Includes "Digital Garden" label to distinguish from blog posts.
-        ===================================================================== */}
-    <header class="mb-12 max-w-2xl animate-fade-up">
-      <span class="text-accent font-medium tracking-widest uppercase text-xs mb-3 block">
-        Digital Garden
-      </span>
-      <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
-        {indexEntry.data.title}
-      </h1>
-      <p class="text-base-content/70 text-lg leading-relaxed">
-        {indexEntry.data.description}
-      </p>
-    </header>
-
-    {/* =====================================================================
-        TAG FILTER
-        Interactive filter buttons for narrowing notes by tag.
-        ===================================================================== */}
-    <TagFilter
-      tags={tagCounts}
-      totalCount={notes.length}
-      cardSelector=".note-card"
-    />
-
-    {/* =====================================================================
-        NOTES LIST
-        Grid of ContentCard components, one per published note.
-        ===================================================================== */}
-    <div class="space-y-6">
-      {notes.map((note, index) => (
-        <ContentCard
-          entry={note}
-          basePath="/notes"
-          index={index}
-          cardClass="note-card"
-          showTags={true}
-        />
-      ))}
-    </div>
-  </section>
-
-  {/* Style for hiding filtered cards */}
-  <style>
-    .note-card.hidden {
-      display: none;
-    }
-  </style>
-</BaseLayout>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting to /blog</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={destination} />
+    <meta http-equiv="refresh" content={`0;url=${destination}`} />
+  </head>
+  <body>
+    <p>Redirecting to <a href={destination}>{destination}</a>.</p>
+    <script is:inline>
+      window.location.replace("/blog");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,56 @@
+---
+/**
+ * =============================================================================
+ * LEGACY NOTES ENTRY REDIRECT (/notes/[slug])
+ * =============================================================================
+ *
+ * Individual note URLs now live under /blog/[slug]. Generate one redirect page
+ * per published blog entry so the old /notes/<slug> shape continues to work
+ * after removing src/content/notes from the active Astro content collections.
+ *
+ * Using blog entries as the source of truth keeps the redirect set aligned with
+ * the merged collection and avoids depending on a legacy notes folder.
+ */
+import { getCollection } from "astro:content";
+import { getUrlSlug } from "../../utils/content";
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection(
+    "blog",
+    ({ id, data }) => id !== "index" && !data.draft,
+  );
+
+  return blogEntries.map((entry) => {
+    const slug = getUrlSlug(entry);
+    return {
+      params: { slug },
+      props: {
+        destination: `/blog/${slug}`,
+      },
+    };
+  });
+}
+
+interface Props {
+  destination: string;
+}
+
+const { destination } = Astro.props as Props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting to {destination}</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={destination} />
+    <meta http-equiv="refresh" content={`0;url=${destination}`} />
+  </head>
+  <body>
+    <p>Redirecting to <a href={destination}>{destination}</a>.</p>
+    <script is:inline>
+      window.location.replace(location.pathname.replace(/^\/notes/, "/blog"));
+    </script>
+  </body>
+</html>

@@ -17,6 +17,10 @@ import { promises as fs } from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { fileURLToPath } from "url";
+import {
+  resolveMarkdownEntryUrl,
+  splitUrlSuffix,
+} from "../src/utils/content-paths.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,12 +31,14 @@ const ROOT = path.resolve(__dirname, "..");
 // =============================================================================
 
 // Content collections to process (all markdown collections)
-const COLLECTIONS = ["blog", "notes", "talks", "uses", "now", "changelog", "about", "homelab"];
+// The notes collection was merged into blog. Keep resolving old ../notes/*.md
+// authoring patterns via src/utils/content-paths.mjs, but only index active
+// routed collections here so backlinks point at /blog URLs directly.
+const COLLECTIONS = ["blog", "talks", "uses", "now", "changelog", "about", "homelab"];
 
 // Map collection folders to URL paths
 const COLLECTION_URL_MAP = {
   blog: "/blog",
-  notes: "/notes",
   talks: "/talks",
   uses: "/uses",
   now: "/now",
@@ -60,10 +66,11 @@ const ASSET_EXTENSIONS = /\.(jpe?g|png|gif|webp|svg|avif|heic|bmp|tiff?|mp4|webm
  * - mailto: and tel: links
  *
  * @param {string} content - Raw markdown content
- * @param {string} sourceCollection - The collection of the source file (for resolving relative links)
+ * @param {string} sourceCollection - The collection of the source file (for fallback resolution)
+ * @param {string} sourceFilePath - Absolute path to the source markdown file
  * @returns {string[]} Array of internal link paths
  */
-function extractInternalLinks(content, sourceCollection) {
+function extractInternalLinks(content, sourceCollection, sourceFilePath) {
   const links = [];
 
   // Match markdown links: [text](url)
@@ -96,8 +103,9 @@ function extractInternalLinks(content, sourceCollection) {
     // Skip tag links
     if (href.startsWith("/tags/") || href.includes("/tags/")) continue;
 
-    // Normalize the link with source collection context for relative paths
-    const normalizedPath = normalizeLink(href, sourceCollection);
+    // Normalize links using the same source-file-relative resolver as the
+    // render pipeline so backlinks/graph edges match the final rendered hrefs.
+    const normalizedPath = normalizeLink(href, sourceCollection, sourceFilePath);
     if (normalizedPath) {
       links.push(normalizedPath);
     }
@@ -115,12 +123,24 @@ function extractInternalLinks(content, sourceCollection) {
  *
  * @param {string} href - The original href
  * @param {string} sourceCollection - The collection of the source file
+ * @param {string} sourceFilePath - Absolute path to the source markdown file
  * @returns {string|null} Normalized path or null if invalid
  */
-function normalizeLink(href, sourceCollection) {
+function normalizeLink(href, sourceCollection, sourceFilePath) {
   // Remove anchor fragments
   let path = href.split("#")[0];
   if (!path) return null;
+
+  // Prefer the same resolver used by the markdown render pipeline. This keeps
+  // backlinks consistent with authored links that use bare relative paths and
+  // with targets that override their slug in frontmatter.
+  const renderedUrl = resolveMarkdownEntryUrl(href, sourceFilePath);
+  const renderedPath = splitUrlSuffix(renderedUrl).pathname;
+  if (renderedPath.startsWith("/")) {
+    return renderedPath.endsWith("/") && renderedPath.length > 1
+      ? renderedPath.slice(0, -1)
+      : renderedPath;
+  }
 
   // Handle .md links - strip extension and date prefix
   if (path.endsWith(".md")) {
@@ -136,7 +156,8 @@ function normalizeLink(href, sourceCollection) {
     }
   }
 
-  // Handle relative paths pointing to other collections (../notes/file)
+  // Handle relative paths pointing to other collections (../notes/file).
+  // Legacy notes links are normalized earlier by resolveMarkdownEntryUrl().
   if (path.startsWith("../")) {
     // Clean up relative prefixes
     const cleaned = path.replace(/^(\.\.\/)+/, "");
@@ -265,7 +286,7 @@ async function processFile(filePath, collection) {
     const pagePath = getPathFromFilename(filename, collection);
 
     // Extract and resolve links from content (passing collection for relative path resolution)
-    const links = extractInternalLinks(body, collection);
+    const links = extractInternalLinks(body, collection, filePath);
 
     return {
       path: pagePath,

@@ -13,11 +13,10 @@
  *
  * Each collection corresponds to a content type:
  * - blog: Long-form articles
- * - notes: Short technical notes (Digital Garden style)
  * - talks: Presentation slides and talk content
  * - now: "What I'm doing now" updates
  * - uses: Tools and setup documentation
- * - home/about/contact/homelab/changelog: Static pages
+ * - home/about/homelab/changelog: Static pages
  * - photography: Gallery page + photo entries (combined)
  *
  * FILE NAMING CONVENTION:
@@ -67,7 +66,7 @@ const CONTENT_BASE = join(__dirname, "content");
 // =============================================================================
 
 /**
- * Schema for static pages (about, contact, homelab, etc.)
+ * Schema for static pages (about, homelab, changelog, etc.)
  * These pages have minimal frontmatter requirements.
  *
  * .passthrough() allows additional fields in frontmatter without validation,
@@ -93,7 +92,7 @@ const pageSchema = z
   .passthrough();
 
 /**
- * Schema for content posts (blog, notes, talks, now, uses)
+ * Schema for content posts (blog, talks, now, uses)
  * These have richer metadata including tags, cover images, and excerpts.
  */
 const postSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
@@ -222,18 +221,17 @@ const createCollection = (folder: string, schema: any) =>
   });
 
 // -----------------------------------------------------------------------------
-// Post Collections (blog, notes, talks, now, uses)
+// Post Collections (blog, talks, now, uses)
 // These have dates, tags, and full content features
 // -----------------------------------------------------------------------------
 
 const blog = createCollection("blog", postSchema);
-const notes = createCollection("notes", postSchema);
 const talks = createCollection("talks", postSchema);
 const now = createCollection("now", postSchema);
 const uses = createCollection("uses", postSchema);
 
 // -----------------------------------------------------------------------------
-// Page Collections (home, about, contact, homelab, changelog)
+// Page Collections (home, about, homelab, changelog)
 // These are simpler static pages
 // -----------------------------------------------------------------------------
 
@@ -385,7 +383,6 @@ const home = defineCollection({
   schema: homeSchema,
 });
 const about = createCollection("about", pageSchema);
-const contact = createCollection("contact", pageSchema);
 const homelab = createCollection("homelab", pageSchema);
 const changelog = createCollection("changelog", pageSchema);
 
@@ -437,14 +434,12 @@ const photography = createCollection("photography", photographySchema);
 export const collections = {
   // Post collections
   blog,
-  notes,
   talks,
   now,
   uses,
   // Page collections
   home,
   about,
-  contact,
   homelab,
   changelog,
   // Photography (includes both page metadata and photo entries)

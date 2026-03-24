@@ -19,6 +19,7 @@ interface Props {
   /** Current page path for graph highlighting */
   currentPath?: string;
   coverImage?: any;
+  carouselImages?: Array<{ alt: string; src: string }>;
 }
 
 const {
@@ -33,6 +34,7 @@ const {
   graphData = { nodes: [], links: [] },
   currentPath = "",
   coverImage,
+  carouselImages = [],
 } = Astro.props;
 
 // Use description from props, or extract from entry body, or fallback
@@ -265,6 +267,27 @@ const githubUrl = entry?.filePath
               </>
             )
           }
+
+          {/* Image carousel for uses pages — scroll-snap gallery with a real
+              caption strip rendered after the image so the text stays tied
+              to the slide without overlapping the photo itself. */}
+          {carouselImages.length > 0 && (
+            <div class="uses-carousel-section">
+              <div class="uses-carousel" role="region" aria-label="Image gallery" tabindex="0">
+                {carouselImages.map(({ alt, src }, i) => (
+                  <figure class="uses-carousel-slide" data-index={i}>
+                    <img
+                      src={src}
+                      alt={alt}
+                      loading="lazy"
+                      draggable="false"
+                    />
+                    {alt && <figcaption>{alt}</figcaption>}
+                  </figure>
+                ))}
+              </div>
+            </div>
+          )}
 
           <!-- Content Section - Not collapsible -->
       <div class="md-section md-card-body" id="content-card">
@@ -710,11 +733,23 @@ const githubUrl = entry?.filePath
         const linearTocRect = linearToc.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
         
-        // Calculate fade-in progress (0 to 1) as ToC scrolls out of view
-        // Start fading when ToC bottom reaches 50% of viewport, complete at 20%
-        const fadeInStart = viewportHeight * 0.5;
-        const fadeInEnd = viewportHeight * 0.2;
-        const fadeInProgress = clamp((fadeInStart - linearTocRect.bottom) / (fadeInStart - fadeInEnd), 0, 1);
+        // Calculate fade-in progress (0 to 1) as user scrolls past the ToC.
+        // If a carousel exists above the content, use the first heading's
+        // position instead so the sidebar doesn't appear during the carousel.
+        const firstHeading = markdownContent.querySelector("h2, h3");
+        const carouselExists = !!document.querySelector(".uses-carousel");
+        let fadeInProgress;
+        if (carouselExists && firstHeading) {
+          const headingRect = firstHeading.getBoundingClientRect();
+          const fadeInStart = viewportHeight * 0.7;
+          const fadeInEnd = viewportHeight * 0.3;
+          fadeInProgress = clamp((fadeInStart - headingRect.top) / (fadeInStart - fadeInEnd), 0, 1);
+        } else {
+          // Default: fade in when linear ToC scrolls out of view
+          const fadeInStart = viewportHeight * 0.5;
+          const fadeInEnd = viewportHeight * 0.2;
+          fadeInProgress = clamp((fadeInStart - linearTocRect.bottom) / (fadeInStart - fadeInEnd), 0, 1);
+        }
         
         // Calculate fade-out progress (1 to 0) as we approach bottom
         let fadeOutProgress = 1;
@@ -766,13 +801,135 @@ const githubUrl = entry?.filePath
     }
 
     /**
+     * Shared toast visibility duration. Code block copy animation uses the
+     * same timing so the copy feedback enters and resolves with the toast,
+     * instead of relying on a separate arbitrary timeout that could drift
+     * from the toast lifecycle.
+     */
+    const TOAST_DURATION_MS = 1500;
+    const codeBlockCopyAnimationTimers = new WeakMap();
+
+    /**
+     * Copy plain text to the clipboard with one shared path for code blocks
+     * and heading links.
+     *
+     * The secure-context Clipboard API remains the fast path. Outside secure
+     * contexts, avoid focusing a hidden <textarea>: mobile Safari can treat
+     * that focus jump like an input-bar paint near the bottom edge. Instead we
+     * temporarily select an invisible text node and intercept the copy event so
+     * the browser never has to activate a hidden form control.
+     */
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (error) {
+          // Fall through to the legacy path when the async API is available
+          // but fails due to browser quirks or permission state.
+        }
+      }
+
+      return legacyCopyTextToClipboard(text);
+    }
+
+    /**
+     * Legacy copy path for non-secure contexts.
+     *
+     * This keeps the fallback self-contained and restores the user's previous
+     * selection after the copy attempt, so the page does not leave behind a
+     * stray selection highlight when the browser cannot use navigator.clipboard.
+     */
+    function legacyCopyTextToClipboard(text) {
+      const selection = window.getSelection();
+      if (!selection) return false;
+
+      const savedRanges = [];
+      for (let index = 0; index < selection.rangeCount; index += 1) {
+        savedRanges.push(selection.getRangeAt(index).cloneRange());
+      }
+
+      const marker = document.createElement("span");
+      marker.textContent = text;
+      marker.setAttribute("aria-hidden", "true");
+      marker.style.cssText = [
+        "position:fixed",
+        "top:0",
+        "left:0",
+        "opacity:0",
+        "pointer-events:none",
+        "user-select:text",
+        "-webkit-user-select:text",
+        "white-space:pre",
+      ].join(";");
+      document.body.appendChild(marker);
+
+      const range = document.createRange();
+      range.selectNodeContents(marker);
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      const handleCopy = (event) => {
+        if (!event.clipboardData) return;
+        event.preventDefault();
+        event.clipboardData.setData("text/plain", text);
+      };
+
+      document.addEventListener("copy", handleCopy);
+
+      let copied = false;
+      try {
+        copied = document.execCommand("copy");
+      } catch (error) {
+        copied = false;
+      }
+
+      document.removeEventListener("copy", handleCopy);
+      selection.removeAllRanges();
+      savedRanges.forEach((savedRange) => selection.addRange(savedRange));
+      document.body.removeChild(marker);
+      return copied;
+    }
+
+    /**
+     * Apply a lightweight copied-state reaction directly on the <pre>.
+     *
+     * The animation is intentionally limited to the block surface so mobile
+     * Safari does not have to composite extra moving layers near the viewport
+     * edge, which previously showed up as a black flash during copy feedback.
+     */
+    function animateCodeBlockCopy(pre) {
+      const existingTimer = codeBlockCopyAnimationTimers.get(pre);
+      if (existingTimer) {
+        window.clearTimeout(existingTimer);
+      }
+
+      pre.classList.remove("code-block-copy-active");
+      // Force a reflow so rapid repeated copies restart the CSS animation.
+      void pre.offsetWidth;
+      pre.classList.add("code-block-copy-active");
+
+      const timer = window.setTimeout(() => {
+        pre.classList.remove("code-block-copy-active");
+        codeBlockCopyAnimationTimers.delete(pre);
+      }, TOAST_DURATION_MS);
+      codeBlockCopyAnimationTimers.set(pre, timer);
+    }
+
+    /**
      * Enhance code blocks with a copy-to-clipboard button and language label.
      *
      * Finds all <pre> elements in the markdown content area. For Shiki-
      * highlighted blocks (<pre class="astro-code">) the language is read from
      * the data-language attribute. A small header bar is prepended with the
-     * language label (left) and a copy button (right). The button shows
-     * "Copied!" for 2 seconds after a successful copy.
+     * language label (left) and a copy button (right). The label stays terse
+     * and direct so the pill reads like UI chrome instead of command output.
+     *
+     * On successful copy, the button triggers the code-block surface reaction,
+     * briefly switches into its copied state, and reuses the shared toast.
+     * The toast stays in its longstanding bottom position; the mobile Safari
+     * flash fix comes from the shared clipboard fallback avoiding hidden input
+     * focus, not from relocating the toast UI.
      *
      * Skips blocks that have already been enhanced (data-code-enhanced) to
      * avoid duplicates on View Transition re-initializations.
@@ -796,11 +953,12 @@ const githubUrl = entry?.filePath
         // Language label (left side)
         const langLabel = document.createElement("span");
         langLabel.className = "code-block-lang";
-        langLabel.textContent = lang;
+        langLabel.textContent = lang || "text";
         header.appendChild(langLabel);
 
         // Copy button (right side)
         const btn = document.createElement("button");
+        btn.type = "button";
         btn.className = "code-block-copy";
         btn.setAttribute("aria-label", "Copy code to clipboard");
         btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
@@ -808,34 +966,81 @@ const githubUrl = entry?.filePath
           const code = pre.querySelector("code");
           const text = code ? code.textContent : pre.textContent;
 
-          // Try clipboard API first, fall back to hidden textarea for
-          // non-HTTPS contexts (e.g. Tailscale MagicDNS over HTTP).
-          let copied = false;
-          if (navigator.clipboard && window.isSecureContext) {
-            try {
-              await navigator.clipboard.writeText(text || "");
-              copied = true;
-            } catch (e) { /* fall through to fallback */ }
-          }
-          if (!copied) {
-            const ta = document.createElement("textarea");
-            ta.value = text || "";
-            ta.style.cssText = "position:fixed;left:-9999px;opacity:0";
-            document.body.appendChild(ta);
-            ta.select();
-            try { document.execCommand("copy"); copied = true; } catch (e) {}
-            document.body.removeChild(ta);
+          const copied = await copyTextToClipboard(text || "");
+
+          if (copied) {
+            animateCodeBlockCopy(pre);
+            btn.classList.add("copied");
+            window.setTimeout(() => btn.classList.remove("copied"), TOAST_DURATION_MS);
+            showToast("Copied to clipboard!");
           }
 
-          if (copied && window.showToast) {
-            window.showToast("Copied to clipboard!");
-          }
+          // Mobile Safari can leave the button in a pressed/focused visual
+          // state after tap. Blur it explicitly once the copy action finishes
+          // so the control returns to its resting appearance immediately.
+          btn.blur();
         });
         header.appendChild(btn);
 
         // Insert header before the code block content
         pre.insertBefore(header, pre.firstChild);
       });
+    }
+
+    /**
+     * Uses carousel: keep exactly one slide active by measuring which slide
+     * is closest to the horizontal center of the scroll container.
+     *
+     * Relying on IntersectionObserver alone left edge cases where reversing
+     * direction mid-swipe could keep the right-hand slide active even after
+     * the centered slide moved back into place. A center-distance check on
+     * scroll/resize makes the visual state deterministic and matches what
+     * the user actually sees in the viewport.
+     */
+    function initUsesCarousel() {
+      const carousel = document.querySelector(".uses-carousel");
+      if (!carousel) return;
+
+      const slides = Array.from(carousel.querySelectorAll(".uses-carousel-slide"));
+      if (!slides.length) return;
+
+      let frame = 0;
+
+      function updateActiveSlide() {
+        frame = 0;
+
+        const carouselRect = carousel.getBoundingClientRect();
+        const carouselCenter = carouselRect.left + carouselRect.width / 2;
+
+        let activeSlide = slides[0];
+        let smallestDistance = Number.POSITIVE_INFINITY;
+
+        slides.forEach((slide) => {
+          const slideRect = slide.getBoundingClientRect();
+          const slideCenter = slideRect.left + slideRect.width / 2;
+          const distanceFromCenter = Math.abs(slideCenter - carouselCenter);
+
+          if (distanceFromCenter < smallestDistance) {
+            smallestDistance = distanceFromCenter;
+            activeSlide = slide;
+          }
+        });
+
+        slides.forEach((slide) => {
+          slide.classList.toggle("active", slide === activeSlide);
+        });
+      }
+
+      function scheduleActiveSlideUpdate() {
+        if (frame) return;
+        frame = window.requestAnimationFrame(updateActiveSlide);
+      }
+
+      carousel.addEventListener("scroll", scheduleActiveSlideUpdate, {
+        passive: true,
+      });
+      window.addEventListener("resize", scheduleActiveSlideUpdate);
+      scheduleActiveSlideUpdate();
     }
 
     // Initialize all markdown features
@@ -849,6 +1054,7 @@ const githubUrl = entry?.filePath
       initVideoAutoplay();
       initSidebarMorphing();
       initCodeBlockCopy();
+      initUsesCarousel();
 
       // Initialize Clipboard Links
       const content = document.getElementById("markdown-content");
@@ -928,31 +1134,10 @@ const githubUrl = entry?.filePath
           heading.classList.add("tapped");
           setTimeout(() => heading.classList.remove("tapped"), 3000);
 
-          if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard
-              .writeText(url)
-              .then(() => showToast("Link copied to clipboard!"))
-              .catch(() => fallbackCopyTextToClipboard(url));
-          } else {
-            fallbackCopyTextToClipboard(url);
-          }
+          copyTextToClipboard(url).then((copied) => {
+            if (copied) showToast("Link copied to clipboard!");
+          });
         }
-      }
-
-      function fallbackCopyTextToClipboard(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-9999px";
-        textArea.style.top = "0";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-          if (document.execCommand("copy"))
-            showToast("Link copied to clipboard!");
-        } catch (err) {}
-        document.body.removeChild(textArea);
       }
 
       function handleHeadingInteraction(e) {
@@ -1032,30 +1217,10 @@ const githubUrl = entry?.filePath
           const url = `${window.location.origin}${window.location.pathname}#${anchor}`;
           heading.classList.add("tapped");
           setTimeout(() => heading.classList.remove("tapped"), 1500); // Match toast duration
-          
-          if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(url)
-              .then(() => showToast("Link copied to clipboard!"))
-              .catch(() => {
-                fallbackCopy(url);
-              });
-          } else {
-            fallbackCopy(url);
-          }
-        }
-        
-        function fallbackCopy(text) {
-          const textArea = document.createElement("textarea");
-          textArea.value = text;
-          textArea.style.position = "fixed";
-          textArea.style.left = "-9999px";
-          document.body.appendChild(textArea);
-          textArea.focus();
-          textArea.select();
-          try {
-            if (document.execCommand("copy")) showToast("Link copied to clipboard!");
-          } catch (err) {}
-          document.body.removeChild(textArea);
+
+          copyTextToClipboard(url).then((copied) => {
+            if (copied) showToast("Link copied to clipboard!");
+          });
         }
         
         // Click on heading or link icon
@@ -1086,13 +1251,13 @@ const githubUrl = entry?.filePath
     document.addEventListener("astro:page-load", initSectionHeadingClipboard);
 
     /**
-     * Show a toast notification at the bottom of the screen.
+     * Show a toast notification near the bottom of the screen.
      *
      * On first call, creates the toast element and forces a reflow before
      * adding .show so the CSS transition animates from the initial
-     * translateY(100px)/opacity:0 state. Without the reflow, the browser
-     * batches the DOM insertion and class addition into one frame, skipping
-     * the enter animation on the very first invocation.
+     * off-screen/opacity:0 state. Without the reflow, the browser batches the
+     * DOM insertion and class addition into one frame, skipping the enter
+     * animation on the very first invocation.
      */
     function showToast(message) {
       let toast = document.getElementById("toast-notification");
@@ -1118,7 +1283,7 @@ const githubUrl = entry?.filePath
       if (toast._hideTimeout) clearTimeout(toast._hideTimeout);
       toast._hideTimeout = setTimeout(() => {
         toast.classList.remove("show");
-      }, 1500);
+      }, TOAST_DURATION_MS);
     }
 
     // Make toggleCard and showToast available globally so other script

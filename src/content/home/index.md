@@ -26,8 +26,6 @@ nav-links:
     visible: false # Home is accessed via logo, not nav
   - href: /about
     label: About
-  - href: /contact
-    label: Contact
   - href: /blog
     label: Writing
   - href: /now
@@ -36,9 +34,6 @@ nav-links:
     label: Uses
   - href: /photography
     label: Photography
-    visible: false # Shown only in mobile menu
-  - href: /notes
-    label: Notes
     visible: false # Shown only in mobile menu
   - href: /talks
     label: Talks
@@ -89,11 +84,8 @@ card-photos:
     label: Talks
     href: /talks
     date: Jan 2026
-  - src: https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&q=80
-    label: Notes
-    href: /notes
-    date: Jan 2026
-
+  # The legacy Notes collection now redirects to /blog, so the homepage should
+  # no longer advertise it as a separate destination in the hero card strip.
 bento-cards:
   - id: talks
     title: Public Speaking
@@ -107,28 +99,6 @@ bento-cards:
     summary: Long-form thoughts on infrastructure, software design, and digital life.
     href: /blog
     image: https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80
-  - id: notes
-    title: Digital Garden
-    category: Notes
-    summary: A collection of interconnected fragments, ideas, and less polished thoughts.
-    href: /notes
-    # Replaces the magic string "obsidian-graph" with explicit display configuration.
-    # The layoutVariant: graph flag tells the template to render the canvas animation
-    # instead of a static image. No special string matching required.
-    image: obsidian-graph
-    layout-variant: graph
-    # titleInMeta moves the title to the category row, matching previous hardcoded
-    # behavior for the notes card. Content now controls layout, not template logic.
-    title-in-meta: true
-  - id: now
-    title: What I'm doing
-    category: Now
-    summary: Current projects, books, and focus areas in my life right now.
-    href: /now
-    image: https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80
-    # showPulse adds the animated pulsing dot indicator next to the category.
-    # Previously hardcoded for card.id === "now", now content-driven.
-    show-pulse: true
   - id: photography
     title: Moments Captured
     category: Photography
@@ -153,17 +123,24 @@ bento-cards:
   - id: about
     title: About Me
     category: Profile
-    summary: More about my journey, philosophy, and the things that drive me forward.
+    summary: More about my journey, philosophy, and how best to get in touch.
     href: /about
     image: ./assets/hero-picture.jpeg
-  - id: contact
-    title: Say Hello
-    category: Contact
-    summary: I'm always open to interesting conversations and collaborations. Reach out via email.
-    href: /contact
-    image: https://images.unsplash.com/photo-1523966211575-eb4a01e7dd51?w=800&q=80
+  - id: now
+    title: What I'm doing
+    category: Now
+    summary: Current projects, books, and focus areas in my life right now.
+    href: /now
+    image: https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80
+    # Keep Now next to About in the final desktop row so both profile-style
+    # cards share the same visual weight after retiring standalone Notes/Contact.
+    # showPulse adds the animated pulsing dot indicator next to the category.
+    # Previously hardcoded for card.id === "now", now content-driven.
+    show-pulse: true
 
-resume-url: ./resume.pdf
+# Resume lives in public/ so the homepage hero links to the stable root path
+# instead of a content-relative asset that the markdown pipeline would warn on.
+resume-url: /resume.pdf
 
 work-experience:
   - role: Support Engineer

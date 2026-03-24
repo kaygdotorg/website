@@ -2480,7 +2480,7 @@ a[data-internal-link="true"]:hover {
  * catppuccin-mocha values in --shiki-dark / --shiki-dark-bg CSS variables.
  * This rule activates the dark values when [data-theme="dark"]. */
 [data-theme="dark"] .astro-code,
-[data-theme="dark"] .astro-code span {
+[data-theme="dark"] .astro-code code span {
   color: var(--shiki-dark) !important;
   background-color: var(--shiki-dark-bg) !important;
 }
@@ -2495,10 +2495,12 @@ a[data-internal-link="true"]:hover {
  * border-radius matches the site's card aesthetic (1.25rem). */
 .md-card-body .md-card-content pre {
   margin: 1.5rem -1.5rem;
-  padding: 1.25rem 1.5rem;
+  padding: 1.1rem 1.5rem 1.25rem;
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   position: relative;
 }
 
@@ -2506,40 +2508,68 @@ a[data-internal-link="true"]:hover {
   border-color: rgba(0, 0, 0, 0.08);
 }
 
-/* Code block header bar — contains language label (left) and copy button (right).
- * Injected by initCodeBlockCopy() in MarkdownLayout. Sits inside <pre> before
- * <code>, using sticky positioning so it stays visible while scrolling long blocks. */
+/* Code block header — sits in the top padding zone of the code block and uses
+ * sticky positioning on both axes so the chip and copy button remain visible
+ * while horizontally scrolling long lines. Keeping the header in normal flow
+ * avoids the first line of code being clipped behind the controls. */
 .code-block-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  margin: -1.25rem -1.5rem 1rem -1.5rem;
-  padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  column-gap: 0.75rem;
   position: sticky;
   top: 0;
-  z-index: 1;
+  left: 0;
+  margin: 0 0 1.1rem;
+  padding: 0;
+  width: 100%;
+  min-width: 100%;
+  box-sizing: border-box;
+  z-index: 3;
   background: inherit;
-  border-radius: 1rem 1rem 0 0;
 }
 
-[data-theme="light"] .code-block-header {
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-}
-
-/* Language label — Maple Mono italic for the cursive variant look. */
+/* Language label — a compact Maple Mono pill with stronger weight and explicit
+ * centering so the tiny label still reads crisply once it is reduced to badge
+ * scale. The label stays upright because Maple Mono's italic forms lean enough
+ * to make short language tags feel optically off-center inside the pill. The
+ * fill color matches the "work" pill in the latest screenshot, which lines up
+ * with the Catppuccin Mauve token from the tmux config (`#cba6f7`). */
 .code-block-lang {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  max-width: 100%;
+  padding: 0.26rem 0.65rem;
+  border-radius: 999px;
   font-size: 0.75rem;
-  font-weight: 400;
-  font-style: italic;
+  font-weight: 700;
+  font-style: normal;
   text-transform: lowercase;
   letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  color: #1e1e2e;
+  background-color: #cba6f7 !important;
+  background-image: none !important;
+  border: 1px solid rgba(203, 166, 247, 0.98);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 8px 18px -14px rgba(203, 166, 247, 0.4);
   font-family: var(--font-mono), ui-monospace, monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 [data-theme="light"] .code-block-lang {
-  color: rgba(0, 0, 0, 0.3);
+  color: #1e1e2e;
+  background-color: #cba6f7 !important;
+  background-image: none !important;
+  border-color: rgba(203, 166, 247, 0.98);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 8px 18px -14px rgba(203, 166, 247, 0.3);
 }
 
 /* Copy button — icon-only ghost button, brightens on hover. */
@@ -2547,35 +2577,93 @@ a[data-internal-link="true"]:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  justify-self: end;
   padding: 0.3rem;
-  border: none;
-  border-radius: 0.25rem;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(24, 24, 37, 0.72);
+  color: rgba(205, 214, 244, 0.55);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition: color 0.15s ease, background 0.15s ease;
 }
 
-.code-block-copy:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.7);
+@media (hover: hover) {
+  .code-block-copy:hover {
+    background: rgba(49, 50, 68, 0.88);
+    color: rgba(205, 214, 244, 0.9);
+  }
 }
 
+/* Copied state uses a brighter pink accent than the idle mauve chip so the
+ * interaction reads immediately when the user taps copy. The chrome still
+ * fits the Catppuccin family, but the copied state is intentionally punchier
+ * than the resting palette to make the success feedback obvious. */
 .code-block-copy.copied {
-  color: #34d399;
+  color: #fff2f7;
+  background: rgba(255, 111, 174, 0.28);
+  border-color: rgba(255, 111, 174, 0.62);
+  box-shadow:
+    0 14px 28px -16px rgba(255, 111, 174, 0.54),
+    0 0 20px -12px rgba(255, 111, 174, 0.42);
 }
 
 [data-theme="light"] .code-block-copy {
-  color: rgba(0, 0, 0, 0.3);
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  color: rgba(0, 0, 0, 0.42);
 }
 
-[data-theme="light"] .code-block-copy:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: rgba(0, 0, 0, 0.6);
+@media (hover: hover) {
+  [data-theme="light"] .code-block-copy:hover {
+    background: rgba(255, 255, 255, 0.92);
+    color: rgba(0, 0, 0, 0.6);
+  }
 }
 
 [data-theme="light"] .code-block-copy.copied {
-  color: #059669;
+  color: #9d174d;
+  background: rgba(255, 111, 174, 0.18);
+  border-color: rgba(236, 72, 153, 0.36);
+  box-shadow:
+    0 14px 28px -18px rgba(236, 72, 153, 0.26),
+    0 0 18px -12px rgba(236, 72, 153, 0.18);
+}
+
+/* Copy reaction: use an outer-only pink aura so the glow stays behind the
+ * block rather than reading like a border treatment. The animation spans the
+ * full shared toast duration and uses a single swell/fade curve instead of
+ * multiple abrupt pulses, so the feedback feels like one continuous motion.
+ * The effect still avoids moving overlays, `filter`, and `backdrop-filter`,
+ * which keeps Safari from flashing a black bar near the bottom edge during
+ * clipboard feedback. */
+.md-card-body .md-card-content pre.code-block-copy-active {
+  animation: code-block-copy-surface 1.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes code-block-copy-surface {
+  0%,
+  100% {
+    box-shadow:
+      0 18px 32px -26px rgba(255, 111, 174, 0),
+      0 0 0 0 rgba(255, 111, 174, 0);
+  }
+  18% {
+    box-shadow:
+      0 20px 40px -24px rgba(255, 111, 174, 0.2),
+      0 0 26px -14px rgba(255, 111, 174, 0.24);
+  }
+  42% {
+    box-shadow:
+      0 28px 56px -22px rgba(255, 111, 174, 0.34),
+      0 0 42px -10px rgba(255, 111, 174, 0.5);
+  }
+  68% {
+    box-shadow:
+      0 24px 48px -24px rgba(255, 111, 174, 0.24),
+      0 0 30px -12px rgba(255, 111, 174, 0.32);
+  }
 }
 
 /* Code inside blocks — weight 500 for Maple Mono's best readability */
@@ -2592,6 +2680,308 @@ a[data-internal-link="true"]:hover {
 [data-theme="light"] .md-card-body .md-card-content pre:not(.astro-code) {
   background: rgba(0, 0, 0, 0.03) !important;
   border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* ========================================
+   Uses Image Carousel — 3D perspective
+   ========================================
+   A spring-like 3D carousel where the center image is large and in focus,
+   while neighboring images recede to the sides with scale, opacity, and
+   translateZ transforms. CSS scroll-snap handles the physical scrolling,
+   while JS computes which slide is closest to the viewport center so only
+   one slide is ever visually "active" at a time.
+
+   Structure: .uses-carousel-section > .uses-carousel > .uses-carousel-slide
+   Images are extracted from the markdown body at build time and passed
+   as the carouselImages prop to MarkdownLayout. */
+
+/* Carousel section background acts like a small stage behind the slides:
+ * a dark base, a restrained colored bloom, and a soft top highlight. The
+ * goal is polish rather than spectacle, so the backdrop supports the
+ * active slide without looking like a second visual subject. */
+.uses-carousel-section {
+  margin: 0.5rem 0 2rem 0;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  perspective: 1200px;
+  border-radius: 1.5rem;
+  position: relative;
+  background: rgba(13, 9, 16, 0.9);
+}
+
+/* Colored bloom: broad, low-contrast gradients that make the carousel feel
+ * atmospheric while keeping the center stage darker for image contrast. */
+.uses-carousel-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 52%,
+    rgba(66, 42, 108, 0.34),
+    transparent 68%
+  ), radial-gradient(
+    ellipse at 24% 30%,
+    rgba(130, 78, 168, 0.14),
+    transparent 56%
+  ), radial-gradient(
+    ellipse at 78% 34%,
+    rgba(69, 122, 176, 0.12),
+    transparent 58%
+  );
+  filter: blur(46px);
+  z-index: 0;
+  border-radius: 1.5rem;
+}
+
+/* Stage finish: a subtle inner highlight and edge vignette that gives the
+ * container more depth than a flat frosted rectangle. */
+.uses-carousel-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.045),
+      transparent 22%,
+      transparent 76%,
+      rgba(0, 0, 0, 0.18)
+    ),
+    radial-gradient(
+      ellipse at center,
+      transparent 58%,
+      rgba(6, 4, 10, 0.22) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 1.5rem;
+}
+
+/* Ensure carousel content sits above the background layers */
+.uses-carousel {
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme="light"] .uses-carousel-section {
+  background: rgba(239, 235, 244, 0.88);
+}
+
+[data-theme="light"] .uses-carousel-section::before {
+  background: radial-gradient(
+    ellipse at 50% 52%,
+    rgba(193, 173, 224, 0.28),
+    transparent 70%
+  ), radial-gradient(
+    ellipse at 24% 30%,
+    rgba(210, 164, 224, 0.16),
+    transparent 56%
+  ), radial-gradient(
+    ellipse at 78% 34%,
+    rgba(150, 192, 224, 0.14),
+    transparent 58%
+  );
+}
+
+[data-theme="light"] .uses-carousel-section::after {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.32),
+      transparent 24%,
+      transparent 76%,
+      rgba(120, 108, 134, 0.08)
+    ),
+    radial-gradient(
+      ellipse at center,
+      transparent 58%,
+      rgba(125, 113, 142, 0.08) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 0 0 1px rgba(120, 108, 134, 0.08);
+}
+
+/* Padding centers the active slide while keeping a minimum visual gutter
+ * against the carousel card edge at every breakpoint. That prevents the
+ * tablet layout from looking pressed against the parent card border. */
+.uses-carousel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 1.5rem max(0.75rem, calc(50% - 120px));
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-x: contain;
+}
+
+.uses-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Each slide: shrunk and faded by default, the .active class (set by JS
+ * IntersectionObserver) scales it up and brings it forward.
+ * overflow: visible allows the color bleed glow to extend beyond the slide. */
+/* Neighbors are scaled to 0.65 (significantly smaller) and pushed back
+ * with translateZ to create a strong depth contrast with the active slide.
+ * Tight gap (0.25rem) keeps them visually adjacent despite being small. */
+/* Mobile: 240px base width. At scale(0.65) neighbors are ~156px wide,
+ * which peeks in from both sides of the centered active slide. */
+/* Slide (<figure>) is a two-part card: image first, caption strip second.
+ * Keeping the caption in normal document flow puts the text below the
+ * image instead of on top of it while still scaling the whole slide as
+ * a single visual unit. */
+.uses-carousel-slide {
+  --uses-carousel-image-ratio: 4 / 3;
+  --uses-carousel-caption-min-height: 2rem;
+  flex: 0 0 240px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: center;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: rgba(13, 9, 16, 0.9);
+  transform: scale(0.65) translateZ(-100px);
+  opacity: 0.58;
+  filter: brightness(0.74) saturate(0.9);
+  box-shadow:
+    0 18px 34px -24px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(255, 255, 255, 0.025);
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease,
+    filter 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.uses-carousel-slide.active {
+  transform: scale(1) translateZ(0);
+  opacity: 1;
+  filter: brightness(1) saturate(1);
+  box-shadow:
+    0 28px 56px -26px rgba(0, 0, 0, 0.56),
+    0 12px 30px -22px rgba(154, 88, 208, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  z-index: 1;
+}
+
+/* Image frame keeps one stable aspect ratio across breakpoints. The actual
+ * image fills that frame completely and may crop, which avoids the dark
+ * bars that appeared when width/height combinations drifted by device. */
+.uses-carousel-slide img {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--uses-carousel-image-ratio);
+  height: auto;
+  margin: 0;
+  object-fit: cover;
+  object-position: center center;
+  border-radius: 1rem 1rem 0 0;
+  border: none;
+  box-shadow: none;
+  transform: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  cursor: zoom-in;
+}
+
+/* Caption strip lives below the image rather than overlaying it. This
+ * makes the label readable while keeping it attached to the same card. */
+.uses-carousel-slide figcaption {
+  min-height: var(--uses-carousel-caption-min-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  margin-top: 0;
+  padding: 0.3rem 0.62rem;
+  background: rgba(13, 9, 16, 0.62);
+  color: rgba(255, 255, 255, 0.72);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.58rem;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 0 0 1rem 1rem;
+  pointer-events: none;
+}
+
+[data-theme="light"] .uses-carousel-slide {
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 18px 34px -26px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(120, 108, 134, 0.06);
+}
+
+[data-theme="light"] .uses-carousel-slide figcaption {
+  background: rgba(255, 255, 255, 0.72);
+  color: rgba(75, 85, 99, 0.7);
+  border-top-color: rgba(17, 24, 39, 0.045);
+}
+
+[data-theme="light"] .uses-carousel-slide.active {
+  box-shadow:
+    0 28px 52px -28px rgba(15, 23, 42, 0.16),
+    0 10px 28px -24px rgba(167, 139, 250, 0.16),
+    0 0 0 1px rgba(120, 108, 134, 0.08);
+}
+
+.uses-carousel-slide:hover img,
+.uses-carousel-slide.active:hover img {
+  transform: none;
+}
+
+/* Tablet: wider and taller slides */
+@media (min-width: 768px) {
+  .uses-carousel-section {
+    margin: 0 0 2rem 0;
+  }
+
+  .uses-carousel {
+    padding: 2rem max(1.25rem, calc(50% - 200px));
+    gap: 0;
+  }
+
+  .uses-carousel-slide {
+    --uses-carousel-caption-min-height: 2.2rem;
+    flex: 0 0 400px;
+  }
+
+  .uses-carousel-slide figcaption {
+    padding: 0.34rem 0.8rem;
+    font-size: 0.61rem;
+  }
+}
+
+/* Desktop: even larger */
+@media (min-width: 1024px) {
+  .uses-carousel {
+    padding: 2rem max(1.5rem, calc(50% - 260px));
+  }
+
+  .uses-carousel-slide {
+    --uses-carousel-caption-min-height: 2.3rem;
+    flex: 0 0 520px;
+  }
+
+  .uses-carousel-slide figcaption {
+    padding: 0.38rem 0.9rem;
+    font-size: 0.64rem;
+  }
 }
 
 /* ========================================
@@ -2797,35 +3187,44 @@ a[data-internal-link="true"]:hover {
   }
 }
 
-/* Toast Notification - Frosted glass with subtle pink */
+/* Toast notification — kept near the bottom of the viewport to preserve the
+ * longstanding site behavior. The copy flash fix now lives in the clipboard
+ * fallback logic rather than by moving the toast itself. */
 .toast-notification {
   position: fixed;
-  bottom: 2rem;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
   left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  background: rgba(20, 15, 28, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  color: white;
-  padding: 0.75rem 1.5rem;
+  transform: translateX(-50%) translateY(1rem);
+  width: fit-content;
+  max-width: min(calc(100vw - 2rem), 28rem);
+  background: rgba(24, 24, 37, 0.96);
+  color: rgba(239, 241, 245, 0.96);
+  padding: 0.7rem 1.1rem;
   border-radius: 9999px;
   font-family: var(--font-display, "DM Sans", sans-serif);
   font-weight: 500;
-  font-size: 0.9rem;
-  border: 1px solid rgba(236, 72, 153, 0.3);
+  font-size: 0.88rem;
+  line-height: 1.2;
+  text-align: center;
+  border: 1px solid rgba(180, 190, 254, 0.34);
   box-shadow:
-    0 0 20px rgba(236, 72, 153, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.2);
+    0 14px 34px -22px rgba(17, 17, 27, 0.78),
+    0 10px 24px -20px rgba(180, 190, 254, 0.38);
   z-index: 100;
   opacity: 0;
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+  transition:
+    transform 0.22s ease,
+    opacity 0.22s ease;
   pointer-events: none;
 }
 
 [data-theme="light"] .toast-notification {
-  background: rgba(255, 255, 255, 0.8);
-  color: #1a1225;
-  border-color: rgba(236, 72, 153, 0.4);
+  background: rgba(255, 255, 255, 0.97);
+  color: #1f2937;
+  border-color: rgba(99, 102, 241, 0.18);
+  box-shadow:
+    0 14px 34px -22px rgba(15, 23, 42, 0.22),
+    0 10px 24px -20px rgba(99, 102, 241, 0.16);
 }
 
 .toast-notification.show {
@@ -4742,10 +5141,6 @@ html.theme-transitioning *::after {
 
   .lightbox-overlay {
     backdrop-filter: blur(20px);
-  }
-
-  .toast-notification {
-    backdrop-filter: blur(16px);
   }
 
   .pagefind-ui__results-area {
