@@ -810,6 +810,88 @@ const githubUrl = entry?.filePath
     const codeBlockCopyAnimationTimers = new WeakMap();
 
     /**
+     * Copy plain text to the clipboard with one shared path for code blocks
+     * and heading links.
+     *
+     * The secure-context Clipboard API remains the fast path. Outside secure
+     * contexts, avoid focusing a hidden <textarea>: mobile Safari can treat
+     * that focus jump like an input-bar paint near the bottom edge. Instead we
+     * temporarily select an invisible text node and intercept the copy event so
+     * the browser never has to activate a hidden form control.
+     */
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (error) {
+          // Fall through to the legacy path when the async API is available
+          // but fails due to browser quirks or permission state.
+        }
+      }
+
+      return legacyCopyTextToClipboard(text);
+    }
+
+    /**
+     * Legacy copy path for non-secure contexts.
+     *
+     * This keeps the fallback self-contained and restores the user's previous
+     * selection after the copy attempt, so the page does not leave behind a
+     * stray selection highlight when the browser cannot use navigator.clipboard.
+     */
+    function legacyCopyTextToClipboard(text) {
+      const selection = window.getSelection();
+      if (!selection) return false;
+
+      const savedRanges = [];
+      for (let index = 0; index < selection.rangeCount; index += 1) {
+        savedRanges.push(selection.getRangeAt(index).cloneRange());
+      }
+
+      const marker = document.createElement("span");
+      marker.textContent = text;
+      marker.setAttribute("aria-hidden", "true");
+      marker.style.cssText = [
+        "position:fixed",
+        "top:0",
+        "left:0",
+        "opacity:0",
+        "pointer-events:none",
+        "user-select:text",
+        "-webkit-user-select:text",
+        "white-space:pre",
+      ].join(";");
+      document.body.appendChild(marker);
+
+      const range = document.createRange();
+      range.selectNodeContents(marker);
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      const handleCopy = (event) => {
+        if (!event.clipboardData) return;
+        event.preventDefault();
+        event.clipboardData.setData("text/plain", text);
+      };
+
+      document.addEventListener("copy", handleCopy);
+
+      let copied = false;
+      try {
+        copied = document.execCommand("copy");
+      } catch (error) {
+        copied = false;
+      }
+
+      document.removeEventListener("copy", handleCopy);
+      selection.removeAllRanges();
+      savedRanges.forEach((savedRange) => selection.addRange(savedRange));
+      document.body.removeChild(marker);
+      return copied;
+    }
+
+    /**
      * Apply a lightweight copied-state reaction directly on the <pre>.
      *
      * The animation is intentionally limited to the block surface so mobile
@@ -845,9 +927,9 @@ const githubUrl = entry?.filePath
      *
      * On successful copy, the button triggers the code-block surface reaction,
      * briefly switches into its copied state, and reuses the shared toast.
-     * The toast is now anchored near the top of the viewport instead of the
-     * bottom, so the confirmation stays explicit without recreating the mobile
-     * Safari black-bar artifact that the old bottom toast caused.
+     * The toast stays in its longstanding bottom position; the mobile Safari
+     * flash fix comes from the shared clipboard fallback avoiding hidden input
+     * focus, not from relocating the toast UI.
      *
      * Skips blocks that have already been enhanced (data-code-enhanced) to
      * avoid duplicates on View Transition re-initializations.
@@ -884,24 +966,7 @@ const githubUrl = entry?.filePath
           const code = pre.querySelector("code");
           const text = code ? code.textContent : pre.textContent;
 
-          // Try clipboard API first, fall back to hidden textarea for
-          // non-HTTPS contexts (e.g. Tailscale MagicDNS over HTTP).
-          let copied = false;
-          if (navigator.clipboard && window.isSecureContext) {
-            try {
-              await navigator.clipboard.writeText(text || "");
-              copied = true;
-            } catch (e) { /* fall through to fallback */ }
-          }
-          if (!copied) {
-            const ta = document.createElement("textarea");
-            ta.value = text || "";
-            ta.style.cssText = "position:fixed;left:-9999px;opacity:0";
-            document.body.appendChild(ta);
-            ta.select();
-            try { document.execCommand("copy"); copied = true; } catch (e) {}
-            document.body.removeChild(ta);
-          }
+          const copied = await copyTextToClipboard(text || "");
 
           if (copied) {
             animateCodeBlockCopy(pre);
@@ -1069,31 +1134,10 @@ const githubUrl = entry?.filePath
           heading.classList.add("tapped");
           setTimeout(() => heading.classList.remove("tapped"), 3000);
 
-          if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard
-              .writeText(url)
-              .then(() => showToast("Link copied to clipboard!"))
-              .catch(() => fallbackCopyTextToClipboard(url));
-          } else {
-            fallbackCopyTextToClipboard(url);
-          }
+          copyTextToClipboard(url).then((copied) => {
+            if (copied) showToast("Link copied to clipboard!");
+          });
         }
-      }
-
-      function fallbackCopyTextToClipboard(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-9999px";
-        textArea.style.top = "0";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-          if (document.execCommand("copy"))
-            showToast("Link copied to clipboard!");
-        } catch (err) {}
-        document.body.removeChild(textArea);
       }
 
       function handleHeadingInteraction(e) {
@@ -1173,30 +1217,10 @@ const githubUrl = entry?.filePath
           const url = `${window.location.origin}${window.location.pathname}#${anchor}`;
           heading.classList.add("tapped");
           setTimeout(() => heading.classList.remove("tapped"), 1500); // Match toast duration
-          
-          if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(url)
-              .then(() => showToast("Link copied to clipboard!"))
-              .catch(() => {
-                fallbackCopy(url);
-              });
-          } else {
-            fallbackCopy(url);
-          }
-        }
-        
-        function fallbackCopy(text) {
-          const textArea = document.createElement("textarea");
-          textArea.value = text;
-          textArea.style.position = "fixed";
-          textArea.style.left = "-9999px";
-          document.body.appendChild(textArea);
-          textArea.focus();
-          textArea.select();
-          try {
-            if (document.execCommand("copy")) showToast("Link copied to clipboard!");
-          } catch (err) {}
-          document.body.removeChild(textArea);
+
+          copyTextToClipboard(url).then((copied) => {
+            if (copied) showToast("Link copied to clipboard!");
+          });
         }
         
         // Click on heading or link icon
@@ -1227,7 +1251,7 @@ const githubUrl = entry?.filePath
     document.addEventListener("astro:page-load", initSectionHeadingClipboard);
 
     /**
-     * Show a toast notification near the top of the screen.
+     * Show a toast notification near the bottom of the screen.
      *
      * On first call, creates the toast element and forces a reflow before
      * adding .show so the CSS transition animates from the initial

@@ -2531,9 +2531,9 @@ a[data-internal-link="true"]:hover {
 
 /* Language label — Maple Mono italic with a leading terminal-style prompt.
  * The ">" is part of the text content so the visual cue survives copy/header
- * layout changes without requiring a separate pseudo-element. The bubble uses
- * the Catppuccin Lavender token from the tmux config (`#b4befe`) as a filled
- * pill so the chip reads like a deliberate status marker, not an outlined tag. */
+ * layout changes without requiring a separate pseudo-element. The fill color
+ * matches the "work" pill in the latest screenshot, which lines up with the
+ * Catppuccin Mauve token from the tmux config (`#cba6f7`). */
 .code-block-lang {
   display: inline-flex;
   align-items: center;
@@ -2547,12 +2547,12 @@ a[data-internal-link="true"]:hover {
   text-transform: lowercase;
   letter-spacing: 0.04em;
   color: #1e1e2e;
-  background-color: #b4befe !important;
+  background-color: #cba6f7 !important;
   background-image: none !important;
-  border: 1px solid rgba(180, 190, 254, 0.98);
+  border: 1px solid rgba(203, 166, 247, 0.98);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    0 8px 18px -14px rgba(180, 190, 254, 0.4);
+    0 8px 18px -14px rgba(203, 166, 247, 0.4);
   font-family: var(--font-mono), ui-monospace, monospace;
   white-space: nowrap;
   overflow: hidden;
@@ -2561,12 +2561,12 @@ a[data-internal-link="true"]:hover {
 
 [data-theme="light"] .code-block-lang {
   color: #1e1e2e;
-  background-color: #b4befe !important;
+  background-color: #cba6f7 !important;
   background-image: none !important;
-  border-color: rgba(180, 190, 254, 0.98);
+  border-color: rgba(203, 166, 247, 0.98);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 8px 18px -14px rgba(180, 190, 254, 0.3);
+    0 8px 18px -14px rgba(203, 166, 247, 0.3);
 }
 
 /* Copy button — icon-only ghost button, brightens on hover. */
@@ -3167,14 +3167,14 @@ a[data-internal-link="true"]:hover {
   }
 }
 
-/* Toast notification — mounted near the top of the viewport and kept simple.
- * Avoid bottom anchoring and backdrop-filter here: both were prone to reading
- * like a black flash on mobile Safari during clipboard interactions. */
+/* Toast notification — kept near the bottom of the viewport to preserve the
+ * longstanding site behavior. The copy flash fix now lives in the clipboard
+ * fallback logic rather than by moving the toast itself. */
 .toast-notification {
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 1rem);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
   left: 50%;
-  transform: translateX(-50%) translateY(-1rem);
+  transform: translateX(-50%) translateY(1rem);
   width: fit-content;
   max-width: min(calc(100vw - 2rem), 28rem);
   background: rgba(24, 24, 37, 0.96);
