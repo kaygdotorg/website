@@ -922,8 +922,8 @@ const githubUrl = entry?.filePath
      * Finds all <pre> elements in the markdown content area. For Shiki-
      * highlighted blocks (<pre class="astro-code">) the language is read from
      * the data-language attribute. A small header bar is prepended with the
-     * language label (left) and a copy button (right). The language label is
-     * rendered with a leading ">" to make the block feel more terminal-like.
+     * language label (left) and a copy button (right). The label stays terse
+     * and direct so the pill reads like UI chrome instead of command output.
      *
      * On successful copy, the button triggers the code-block surface reaction,
      * briefly switches into its copied state, and reuses the shared toast.
@@ -953,7 +953,7 @@ const githubUrl = entry?.filePath
         // Language label (left side)
         const langLabel = document.createElement("span");
         langLabel.className = "code-block-lang";
-        langLabel.textContent = `> ${lang || "text"}`;
+        langLabel.textContent = lang || "text";
         header.appendChild(langLabel);
 
         // Copy button (right side)
