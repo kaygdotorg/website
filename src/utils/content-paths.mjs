@@ -22,6 +22,25 @@
  * first, then translate that resolved target into the site's public URL shape.
  * That preserves CommonMark semantics while still honoring the site's
  * slug-based routing and asset-copy conventions.
+ *
+ * AUTHORING SPEC
+ * --------------
+ * In markdown body content:
+ * - Page links support both ./post.md and post.md
+ * - Cross-collection page links support ../notes/post.md style paths
+ * - Asset links and embeds support both ./image.png and image.png
+ * - Fragments are preserved, so post.md#Heading remains anchored after rewrite
+ *
+ * In frontmatter:
+ * - Only asset-like values are resolved and copied
+ * - Frontmatter is not treated as a markdown-page-link surface
+ * - Detection is stricter than markdown body parsing so labels like
+ *   "Twitter/X" and email addresses are not mistaken for files
+ *
+ * Published output:
+ * - Markdown entry links become absolute page URLs like /blog/post-slug
+ * - Relative assets become copied public URLs like /blog/post-slug/file.png
+ * - Cross-collection links preserve the target collection in the final URL
  */
 
 import fs from "fs";
@@ -232,7 +251,11 @@ export function resolveContentTarget(href, sourceFilePath) {
  *
  * Successful rewrites always become absolute site paths. That avoids browser-
  * relative directory bugs such as /blog/post/other-post when the intended
- * target is /blog/other-post.
+ * target is /blog/other-post. The same rule also keeps cross-collection links
+ * stable, for example:
+ * - ../notes/20240713-x-forwarded-for.md -> /notes/x-forwarded-for
+ * - ../blog/20240602-virtual-router-proxmox-skullsaints-onyx.md#Heading
+ *   -> /blog/virtual-router-proxmox-skullsaints-onyx#Heading
  */
 export function resolveMarkdownEntryUrl(href, sourceFilePath) {
   const target = resolveContentTarget(href, sourceFilePath);

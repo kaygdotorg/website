@@ -17,6 +17,14 @@
  * - Markdown links: [text](./path/to/file.ext) or [text](path/to/file.ext)
  * - Markdown embeds: ![alt](./path/to/file.ext) or ![alt](path/to/file.ext)
  *
+ * Frontmatter is treated differently from markdown body content:
+ * - frontmatter: only asset-like values are considered
+ * - body markdown: any local relative asset link/embed is considered
+ *
+ * This split is intentional. Frontmatter often contains human-readable labels
+ * that look path-ish ("Twitter/X", emails, short identifiers), so the detector
+ * there must stay stricter than the markdown body parser.
+ *
  * This approach:
  * - Automatically handles ANY file format (.bttpreset, .cr3, etc.)
  * - Only copies files that are actually referenced
@@ -106,6 +114,8 @@ function isRelativeAssetPath(value) {
 /**
  * Frontmatter fields can contain labels such as "Twitter/X" or email
  * addresses, so use a stricter detector there than in markdown body content.
+ * Frontmatter is therefore asset-discovery-only, not a markdown page-link
+ * surface.
  */
 function isFrontmatterRelativeAssetPath(value) {
   if (!isRelativeAssetPath(value)) return false;

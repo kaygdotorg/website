@@ -11,6 +11,8 @@
  *   -> [text](/blog/placement-rules-ceph-s3)
  * - [text](20250729-placement-rules-ceph-s3.md)
  *   -> [text](/blog/placement-rules-ceph-s3)
+ * - [text](../notes/20240713-x-forwarded-for.md)
+ *   -> [text](/notes/x-forwarded-for)
  *
  * The important behavioral choice is that successful markdown-entry rewrites
  * always become absolute site URLs. Relative slug rewrites were the root cause
