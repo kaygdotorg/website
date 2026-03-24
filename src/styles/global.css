@@ -2529,22 +2529,25 @@ a[data-internal-link="true"]:hover {
   background: inherit;
 }
 
-/* Language label — a compact Maple Mono pill with slightly heavier weight so
- * the tiny label remains legible without needing extra ornaments. The fill
- * color matches the "work" pill in the latest screenshot, which lines up with
- * the Catppuccin Mauve token from the tmux config (`#cba6f7`). */
+/* Language label — a compact Maple Mono pill with stronger weight and explicit
+ * centering so the tiny label still reads crisply once it is reduced to badge
+ * scale. The fill color matches the "work" pill in the latest screenshot,
+ * which lines up with the Catppuccin Mauve token from the tmux config
+ * (`#cba6f7`). */
 .code-block-lang {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   justify-self: start;
   max-width: 100%;
   padding: 0.26rem 0.65rem;
   border-radius: 999px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   font-style: italic;
   text-transform: lowercase;
   letter-spacing: 0.04em;
+  text-align: center;
   color: #1e1e2e;
   background-color: #cba6f7 !important;
   background-image: none !important;
@@ -2592,12 +2595,14 @@ a[data-internal-link="true"]:hover {
   }
 }
 
-/* Copied state is intentionally more explicit than the idle icon so code-block
- * copy still gives clear confirmation even if the user dismisses the toast. */
+/* Copied state now stays in the same mauve family as the language chip and
+ * code-block chrome. The earlier green accent was readable, but it fought the
+ * surrounding Catppuccin/purple palette and made the copied state feel like a
+ * separate component instead of a refinement of the same block. */
 .code-block-copy.copied {
-  color: #a6e3a1;
-  background: rgba(166, 227, 161, 0.14);
-  border-color: rgba(166, 227, 161, 0.32);
+  color: #f5ebff;
+  background: rgba(203, 166, 247, 0.24);
+  border-color: rgba(203, 166, 247, 0.42);
 }
 
 [data-theme="light"] .code-block-copy {
@@ -2614,14 +2619,15 @@ a[data-internal-link="true"]:hover {
 }
 
 [data-theme="light"] .code-block-copy.copied {
-  color: #047857;
-  background: rgba(16, 185, 129, 0.12);
-  border-color: rgba(5, 150, 105, 0.22);
+  color: #6b21a8;
+  background: rgba(203, 166, 247, 0.22);
+  border-color: rgba(168, 85, 247, 0.24);
 }
 
-/* Copy reaction: use a restrained surface lift only. Avoiding moving overlays,
- * `filter`, and `backdrop-filter` here keeps Safari from flashing a black bar
- * near the bottom edge while still giving copied blocks a visible response. */
+/* Copy reaction: use a restrained mauve surface lift only. Avoiding moving
+ * overlays, `filter`, and `backdrop-filter` here keeps Safari from flashing a
+ * black bar near the bottom edge while still giving copied blocks a visible
+ * response that matches the rest of the block chrome. */
 .md-card-body .md-card-content pre.code-block-copy-active {
   animation: code-block-copy-surface 1.5s ease;
 }
@@ -2630,18 +2636,18 @@ a[data-internal-link="true"]:hover {
   0%,
   100% {
     box-shadow:
-      inset 0 0 0 0 rgba(110, 231, 183, 0),
-      0 0 0 0 rgba(110, 231, 183, 0);
+      inset 0 0 0 0 rgba(203, 166, 247, 0),
+      0 0 0 0 rgba(203, 166, 247, 0);
   }
   30% {
     box-shadow:
-      inset 0 0 0 1px rgba(110, 231, 183, 0.1),
-      0 10px 30px -24px rgba(110, 231, 183, 0.14);
+      inset 0 0 0 1px rgba(203, 166, 247, 0.12),
+      0 10px 30px -24px rgba(203, 166, 247, 0.18);
   }
   55% {
     box-shadow:
-      inset 0 0 0 1px rgba(110, 231, 183, 0.14),
-      0 14px 36px -24px rgba(110, 231, 183, 0.18);
+      inset 0 0 0 1px rgba(203, 166, 247, 0.18),
+      0 14px 36px -24px rgba(203, 166, 247, 0.22);
   }
 }
 
