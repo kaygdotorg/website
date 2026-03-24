@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "src/content/blog/20250911-switching-between-safari-profile-windows.md",
+                "file": "src/content/blog/20260323-sudo-save-with-vim.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "20250911-switching-between-safari-profile-windows"
+              "title": "20260323-sudo-save-with-vim"
             }
           }
         ],
@@ -68,7 +68,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "nuts",
+                "query": "august",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -79,8 +79,7 @@
               "title": "Search"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -100,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "src/content/blog/20250911-switching-between-safari-profile-windows.md",
+                "file": "src/content/blog/20260323-sudo-save-with-vim.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -110,7 +109,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for 20250911-switching-between-safari-profile-windows"
+              "title": "Backlinks for 20260323-sudo-save-with-vim"
             }
           },
           {
@@ -190,6 +189,37 @@
   },
   "active": "16d2621a745ea6db",
   "lastOpenFiles": [
+    "src/content/notes/index.md",
+    "src/content/blog/20240124-august-in-the-water-articles-read.md",
+    "src/content/blog/20260323-sudo-save-with-vim.md",
+    "src/content/blog/20240212-move-wordpress-quartz.md",
+    "src/content/blog/20230910-mds-failing-respond-cache-pressure.md",
+    "src/content/blog/20260204-ios-shortcuts-message-type.md",
+    "src/content/blog/20250105-google-workspace-calendar-iphone.md",
+    "src/content/blog/20241110-lmp-version-bluetooth-macos.md",
+    "src/content/blog/20241108-ceph-pg-scaling.md",
+    "src/content/blog/20240809-bridge-mtu-proxmox.md",
+    "src/content/blog/20240713-x-forwarded-for.md",
+    "src/content/blog/20240707-static-mac-address-linux-bridge-proxmox.md",
+    "src/content/blog/20240604-rid-fwbr-interfaces-proxmox.md",
+    "src/content/blog/20240517-evpn-vxlan-proxmox-sdn.md",
+    "src/content/blog/20240512-migrating-vms-encrypted-proxmox.md",
+    "src/content/blog/20240428-hidden-folders-finder.md",
+    "src/content/blog/20240426-deloads-hypertrophy-training.md",
+    "src/content/blog/20240422-key-spam-macos.md",
+    "src/content/notes/20240422-sbi-cashback-card.md",
+    "src/content/notes/20240422-save-up-expenses.md",
+    "src/content/blog/20240306-enlarge-disk-proxmox-vm.md",
+    "src/content/blog/20240214-osd-max-scrubs.md",
+    "src/content/blog/20240206-querying-ceph-config.md",
+    "src/content/notes/20240211-comments.md",
+    "src/content/notes/20240125-ceph.md",
+    "src/content/blog/20260323-sudo-save-with-vim/cover-image.png",
+    "src/content/notes/20260323-sudo-save-with-vim/CleanShot 2026-03-23 at 17.30.04@2x.png",
+    "src/content/blog/20260323-sudo-save-with-vim/saving-file-with-vim-sucessds.mp4",
+    "src/content/blog/20260323-sudo-save-with-vim",
+    "src/content/blog/20260323-sudo-save-with-vim/saving-file-with-vim-fails.mp4",
+    "src/content/blog/20250911-switching-between-safari-profile-windows.md",
     "dist/pagefind/index/en_e84bb79.pf_index",
     "dist/pagefind/index/en_a8cebbd.pf_index",
     "dist/pagefind/index/en_9b6c125.pf_index",
@@ -197,10 +227,6 @@
     "dist/pagefind/index/en_621efee.pf_index",
     "dist/pagefind/fragment/en_f8b74dc.pf_fragment",
     "dist/pagefind/fragment/en_f927f4a.pf_fragment",
-    "dist/pagefind/fragment/en_f80da71.pf_fragment",
-    "dist/pagefind/fragment/en_f33c4ca.pf_fragment",
-    "dist/pagefind/fragment/en_f1f1ccd.pf_fragment",
-    "dist/pagefind/fragment/en_edcfe23.pf_fragment",
     "dist/_astro/workspace.tA0ta2hv_Z1of8Sn.webp",
     "dist/_astro/workspace.tA0ta2hv_Z19GEGW.webp",
     "dist/_astro/wordpress-unavailable-different-domain.CQZXe66m_Zdx2tG.webp",
@@ -208,33 +234,6 @@
     "dist/_astro/virtual-router-poc.BNsTW9IZ_wu03p.webp",
     "dist/_astro/virtual-router-poc.BNsTW9IZ_KwTma.webp",
     "dist/_astro/virtual-router-openwrt-interfaces-overview.COSz3e_W_Z15xJer.webp",
-    "dist/_astro/virtual-router-openwrt-interfaces-overview.COSz3e_W_12Ym5.webp",
-    "dist/_astro/virtual-router-openwrt-configuration.gjlLRuzk_Z1egqAQ.webp",
-    "dist/_astro/virtual-router-openwrt-configuration.gjlLRuzk_1rkJ9Q.webp",
-    "node_modules/d3-selection/README.md",
-    "node_modules/d3-quadtree/README.md",
-    "node_modules/d3-force/README.md",
-    "node_modules/d3-timer/README.md",
-    "node_modules/d3-dispatch/README.md",
-    "src/content/blog/20240909-persistent-audio-playback-tab-groups-safari.md",
-    "src/content/blog/20250911-switching-between-safari-profile-windows.md",
-    "src/content/blog/20250430-safari-audio-stuttering-youtube.md",
-    "src/content/blog/20250111-things-to-do-after-proxmox-install.md",
-    "src/content/notes/20260204-ios-shortcuts-message-type.md",
-    "src/content/home/index.md",
-    "src/content/blog/20240713-forwarded-ip-cloudflare.md",
-    "node_modules/@fontsource/mrs-saint-delafield/README.md",
-    "node_modules/@fontsource/mrs-saint-delafield/CHANGELOG.md",
-    "node_modules/@fontsource/outfit/README.md",
-    "node_modules/@fontsource/outfit/CHANGELOG.md",
-    "node_modules/@fontsource/sn-pro/README.md",
-    "node_modules/@fontsource/sn-pro/CHANGELOG.md",
-    "node_modules/@fontsource/source-serif-4/README.md",
-    "node_modules/@fontsource/source-serif-4/CHANGELOG.md",
-    "node_modules/@fontsource/sora/README.md",
-    "node_modules/@fontsource/sora/CHANGELOG.md",
-    "node_modules/@fontsource/space-grotesk/README.md",
-    "node_modules/@fontsource/space-grotesk/CHANGELOG.md",
-    "src/content/blog/20240713-make-proxmox-console-work-load-balancer.md"
+    "dist/_astro/virtual-router-openwrt-interfaces-overview.COSz3e_W_12Ym5.webp"
   ]
 }
