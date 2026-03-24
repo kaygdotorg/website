@@ -13,7 +13,6 @@
  *
  * Each collection corresponds to a content type:
  * - blog: Long-form articles
- * - notes: Short technical notes (Digital Garden style)
  * - talks: Presentation slides and talk content
  * - now: "What I'm doing now" updates
  * - uses: Tools and setup documentation
@@ -93,7 +92,7 @@ const pageSchema = z
   .passthrough();
 
 /**
- * Schema for content posts (blog, notes, talks, now, uses)
+ * Schema for content posts (blog, talks, now, uses)
  * These have richer metadata including tags, cover images, and excerpts.
  */
 const postSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
@@ -222,12 +221,11 @@ const createCollection = (folder: string, schema: any) =>
   });
 
 // -----------------------------------------------------------------------------
-// Post Collections (blog, notes, talks, now, uses)
+// Post Collections (blog, talks, now, uses)
 // These have dates, tags, and full content features
 // -----------------------------------------------------------------------------
 
 const blog = createCollection("blog", postSchema);
-const notes = createCollection("notes", postSchema);
 const talks = createCollection("talks", postSchema);
 const now = createCollection("now", postSchema);
 const uses = createCollection("uses", postSchema);
@@ -437,7 +435,6 @@ const photography = createCollection("photography", photographySchema);
 export const collections = {
   // Post collections
   blog,
-  notes,
   talks,
   now,
   uses,

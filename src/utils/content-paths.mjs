@@ -40,7 +40,8 @@
  * Published output:
  * - Markdown entry links become absolute page URLs like /blog/post-slug
  * - Relative assets become copied public URLs like /blog/post-slug/file.png
- * - Cross-collection links preserve the target collection in the final URL
+ * - Legacy notes links now resolve to /blog so older authored paths continue
+ *   to work after the notes-to-blog merge
  */
 
 import fs from "fs";
@@ -60,6 +61,13 @@ export const CONTENT_COLLECTIONS = [
   "photography",
   "home",
 ];
+
+// Legacy collection aliases keep old authored paths working after structural
+// moves. A markdown link such as ../notes/post.md should now land on /blog/post
+// even if the notes source folder is removed.
+const ROUTE_COLLECTION_ALIASES = {
+  notes: "blog",
+};
 
 const slugCache = new Map();
 
@@ -253,7 +261,7 @@ export function resolveContentTarget(href, sourceFilePath) {
  * relative directory bugs such as /blog/post/other-post when the intended
  * target is /blog/other-post. The same rule also keeps cross-collection links
  * stable, for example:
- * - ../notes/20240713-x-forwarded-for.md -> /notes/x-forwarded-for
+ * - ../notes/20240713-x-forwarded-for.md -> /blog/x-forwarded-for
  * - ../blog/20240602-virtual-router-proxmox-skullsaints-onyx.md#Heading
  *   -> /blog/virtual-router-proxmox-skullsaints-onyx#Heading
  */
@@ -271,12 +279,13 @@ export function resolveMarkdownEntryUrl(href, sourceFilePath) {
   const explicitSlug = getEntrySlugFromFile(target.targetFilePath);
   const derivedSlug = stripDatePrefix(path.basename(target.targetFilePath, ".md"));
   const slug = explicitSlug || derivedSlug;
+  const routedCollection = ROUTE_COLLECTION_ALIASES[target.collection] || target.collection;
 
-  if (target.collection === "home") {
+  if (routedCollection === "home") {
     return `/${slug}${target.suffix}`;
   }
 
-  return `/${target.collection}/${slug}${target.suffix}`;
+  return `/${routedCollection}/${slug}${target.suffix}`;
 }
 
 /**

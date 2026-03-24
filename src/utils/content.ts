@@ -179,7 +179,7 @@ export function getUrlSlug(entry: ContentEntry): string {
  * - Link to previous entry (older, if exists)
  * - Link to next entry (newer, if exists)
  *
- * @param basePath - Base URL path (e.g., "/blog", "/notes")
+ * @param basePath - Base URL path (e.g., "/blog", "/talks")
  * @param label - Display label for the index link (e.g., "All Writing")
  * @param entries - All entries in the collection, sorted by date (newest first)
  * @param current - The current entry being viewed
@@ -271,11 +271,6 @@ export const CONTENT_COLLECTIONS = {
   blog: {
     label: "All Writing",
     basePath: "/blog",
-    hasTags: true,
-  },
-  notes: {
-    label: "All Notes",
-    basePath: "/notes",
     hasTags: true,
   },
   talks: {
@@ -420,7 +415,7 @@ async function loadLinkIndex(): Promise<LinkIndex | null> {
  * @returns Array of backlinks with source path, title, and collection
  *
  * @example
- * const backlinks = await getTrueBacklinks("/notes/my-note");
+ * const backlinks = await getTrueBacklinks("/blog/my-post");
  * // Returns: [{ source: "/blog/post-a", title: "Post A", collection: "blog" }]
  */
 export async function getTrueBacklinks(currentPath: string): Promise<TrueBacklink[]> {

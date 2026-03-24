@@ -18,12 +18,14 @@ const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, "..");
 
 // Content collections to process
-const COLLECTIONS = ["blog", "notes", "talks", "uses", "changelog", "now", "about", "home"];
+// The page manifest only tracks active routed collections. Legacy /notes URLs
+// are now served by redirect pages into /blog and should not appear as primary
+// preview targets.
+const COLLECTIONS = ["blog", "talks", "uses", "changelog", "now", "about", "home"];
 
 // Map collection folders to URL paths
 const COLLECTION_URL_MAP = {
   blog: "/blog",
-  notes: "/notes",
   talks: "/talks",
   uses: "/uses", 
   changelog: "/changelog",

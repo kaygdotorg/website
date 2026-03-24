@@ -31,12 +31,14 @@ const ROOT = path.resolve(__dirname, "..");
 // =============================================================================
 
 // Content collections to process (all markdown collections)
-const COLLECTIONS = ["blog", "notes", "talks", "uses", "now", "changelog", "about", "homelab"];
+// The notes collection was merged into blog. Keep resolving old ../notes/*.md
+// authoring patterns via src/utils/content-paths.mjs, but only index active
+// routed collections here so backlinks point at /blog URLs directly.
+const COLLECTIONS = ["blog", "talks", "uses", "now", "changelog", "about", "homelab"];
 
 // Map collection folders to URL paths
 const COLLECTION_URL_MAP = {
   blog: "/blog",
-  notes: "/notes",
   talks: "/talks",
   uses: "/uses",
   now: "/now",
@@ -154,7 +156,8 @@ function normalizeLink(href, sourceCollection, sourceFilePath) {
     }
   }
 
-  // Handle relative paths pointing to other collections (../notes/file)
+  // Handle relative paths pointing to other collections (../notes/file).
+  // Legacy notes links are normalized earlier by resolveMarkdownEntryUrl().
   if (path.startsWith("../")) {
     // Clean up relative prefixes
     const cleaned = path.replace(/^(\.\.\/)+/, "");

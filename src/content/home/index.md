@@ -37,9 +37,6 @@ nav-links:
   - href: /photography
     label: Photography
     visible: false # Shown only in mobile menu
-  - href: /notes
-    label: Notes
-    visible: false # Shown only in mobile menu
   - href: /talks
     label: Talks
     visible: false # Shown only in mobile menu
@@ -89,11 +86,8 @@ card-photos:
     label: Talks
     href: /talks
     date: Jan 2026
-  - src: https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&q=80
-    label: Notes
-    href: /notes
-    date: Jan 2026
-
+  # The legacy Notes collection now redirects to /blog, so the homepage should
+  # no longer advertise it as a separate destination in the hero card strip.
 bento-cards:
   - id: talks
     title: Public Speaking
@@ -107,19 +101,6 @@ bento-cards:
     summary: Long-form thoughts on infrastructure, software design, and digital life.
     href: /blog
     image: https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80
-  - id: notes
-    title: Digital Garden
-    category: Notes
-    summary: A collection of interconnected fragments, ideas, and less polished thoughts.
-    href: /notes
-    # Replaces the magic string "obsidian-graph" with explicit display configuration.
-    # The layoutVariant: graph flag tells the template to render the canvas animation
-    # instead of a static image. No special string matching required.
-    image: obsidian-graph
-    layout-variant: graph
-    # titleInMeta moves the title to the category row, matching previous hardcoded
-    # behavior for the notes card. Content now controls layout, not template logic.
-    title-in-meta: true
   - id: now
     title: What I'm doing
     category: Now
