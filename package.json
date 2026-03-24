@@ -14,8 +14,8 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.1",
     "@pagefind/default-ui": "^1.4.0",
-    "@tailwindcss/vite": "^4.2.1",
-    "astro": "^6.0.5",
+    "@tailwindcss/vite": "^4.2.2",
+    "astro": "^6.0.8",
     "daisyui": "^5.5.19",
     "dotenv": "^17.3.1",
     "gray-matter": "^4.0.3",
@@ -23,7 +23,7 @@
     "hast-util-to-string": "^3.0.1",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
-    "tailwindcss": "^4.2.1",
+    "tailwindcss": "^4.2.2",
     "turndown": "^7.2.2"
   },
   "devDependencies": {

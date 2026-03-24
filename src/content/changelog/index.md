@@ -2,8 +2,21 @@
 title: Changelog
 date: 2026-01-22 00:00:00
 description: A log of notable changes, updates, and improvements to this website.
-last-edited: 2026-03-17 18:00:00
+last-edited: 2026-03-24 06:50:00
 ---
+
+## 2026-03-24 Tuesday
+
+- **Dependency Refresh**
+  - Upgraded Astro from `6.0.5` to `6.0.8`
+  - Upgraded Tailwind CSS from `4.2.1` to `4.2.2`
+  - Upgraded `@tailwindcss/vite` from `4.2.1` to `4.2.2`
+  - `@astrojs/sitemap` was already current and did not need a version bump
+
+- **Transitive Security Fix**
+  - Ran `npm audit fix` after the direct dependency refresh
+  - This lifted Astro's transitive `h3` dependency from `1.15.5` to `1.15.10`
+  - Removes the remaining high-severity advisory without changing site code or configuration
 
 ## 2026-03-17 Monday
 
