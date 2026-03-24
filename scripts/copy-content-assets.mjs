@@ -144,18 +144,32 @@ function extractRelativePaths(value, paths = new Set()) {
 }
 
 /**
+ * Remove fenced code blocks and inline code spans before scanning markdown for
+ * asset links. Changelog/docs pages often mention example syntax such as
+ * `![alt](video.mp4)`, and those examples should not be treated as real files
+ * to copy into public/.
+ */
+function stripCodeExamples(markdown) {
+  return markdown
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/`[^`\n]+`/g, '');
+}
+
+/**
  * Extract asset references from markdown body.
- * Finds both links and embeds written in either supported relative form.
+ * Finds both links and embeds written in either supported relative form while
+ * intentionally ignoring code examples that document the syntax itself.
  */
 function extractMarkdownAssets(content) {
   const paths = new Set();
+  const searchableContent = stripCodeExamples(content);
   
   // Match markdown links and embeds: [text](./path) or ![alt](./path)
   // Also handles angle bracket syntax: [text](<./path with spaces>)
   const linkRegex = /!?\[([^\]]*)\]\(<?([^)>\s]+)>?\)/g;
   let match;
   
-  while ((match = linkRegex.exec(content)) !== null) {
+  while ((match = linkRegex.exec(searchableContent)) !== null) {
     const href = getPathname(match[2]);
     if (isRelativeAssetPath(href)) {
       paths.add(href);
