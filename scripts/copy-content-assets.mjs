@@ -13,9 +13,9 @@
  * DISCOVERY METHOD:
  * -----------------
  * Instead of using an extension whitelist, this script scans markdown files for:
- * - Frontmatter values containing relative paths (./path/to/file.ext)
- * - Markdown links: [text](./path/to/file.ext)
- * - Markdown embeds: ![alt](./path/to/file.ext)
+ * - Frontmatter values containing local relative paths
+ * - Markdown links: [text](./path/to/file.ext) or [text](path/to/file.ext)
+ * - Markdown embeds: ![alt](./path/to/file.ext) or ![alt](path/to/file.ext)
  *
  * This approach:
  * - Automatically handles ANY file format (.bttpreset, .cr3, etc.)
@@ -50,15 +50,78 @@ let copiedCount = 0;
 let skippedCount = 0;
 let discoveredAssets = new Set();
 
+// Frontmatter is much noisier than markdown body text, so only treat values as
+// asset paths when they end in a known asset-like extension.
+const FRONTMATTER_ASSET_EXTENSIONS = /\.(jpe?g|png|gif|webp|svg|avif|heic|bmp|tiff?|mp4|webm|mov|avi|mkv|m4v|pdf|docx?|xlsx?|pptx?|txt|csv|rtf|mp3|wav|flac|ogg|m4a|aac|bttpreset|cr3|arw|nef|dng)$/i;
+
+/**
+ * Strip query/hash suffixes because asset discovery only cares about the
+ * underlying filesystem path.
+ */
+function getPathname(value) {
+  const queryIndex = value.indexOf('?');
+  const hashIndex = value.indexOf('#');
+  const suffixStart =
+    queryIndex === -1
+      ? hashIndex
+      : hashIndex === -1
+        ? queryIndex
+        : Math.min(queryIndex, hashIndex);
+
+  return suffixStart === -1 ? value : value.slice(0, suffixStart);
+}
+
+/**
+ * Determine whether a raw markdown/frontmatter value looks like a local asset
+ * reference rather than arbitrary prose.
+ *
+ * This intentionally supports both dot-relative and bare-relative CommonMark
+ * paths because Obsidian commonly creates the bare form.
+ */
+function isRelativeAssetPath(value) {
+  if (typeof value !== 'string' || !value.trim()) return false;
+
+  const href = getPathname(value.trim());
+  if (!href || href.endsWith('.md')) return false;
+  if (
+    href.startsWith('/') ||
+    href.startsWith('#') ||
+    href.startsWith('mailto:') ||
+    href.startsWith('tel:') ||
+    /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(href)
+  ) {
+    return false;
+  }
+
+  // Frontmatter is noisy, so keep detection strict: only accept obviously
+  // path-like values or bare filenames with an extension.
+  return (
+    href.startsWith('./') ||
+    href.startsWith('../') ||
+    href.includes('/') ||
+    /[^/]+\.[A-Za-z0-9]+$/.test(href)
+  );
+}
+
+/**
+ * Frontmatter fields can contain labels such as "Twitter/X" or email
+ * addresses, so use a stricter detector there than in markdown body content.
+ */
+function isFrontmatterRelativeAssetPath(value) {
+  if (!isRelativeAssetPath(value)) return false;
+  const href = getPathname(value.trim());
+  return FRONTMATTER_ASSET_EXTENSIONS.test(href);
+}
+
 /**
  * Extract relative paths from a value (string, array, or object).
- * Looks for paths starting with ./ which indicate local assets.
+ * Looks for local asset references without mistaking arbitrary prose strings
+ * for files.
  */
 function extractRelativePaths(value, paths = new Set()) {
   if (typeof value === 'string') {
-    // Match relative paths like ./image.jpg or ./folder/file.ext
-    if (value.startsWith('./') && !value.endsWith('.md')) {
-      paths.add(value);
+    if (isFrontmatterRelativeAssetPath(value)) {
+      paths.add(getPathname(value));
     }
   } else if (Array.isArray(value)) {
     value.forEach(item => extractRelativePaths(item, paths));
@@ -70,7 +133,7 @@ function extractRelativePaths(value, paths = new Set()) {
 
 /**
  * Extract asset references from markdown body.
- * Finds both links [text](./path) and embeds ![alt](./path).
+ * Finds both links and embeds written in either supported relative form.
  */
 function extractMarkdownAssets(content) {
   const paths = new Set();
@@ -81,9 +144,8 @@ function extractMarkdownAssets(content) {
   let match;
   
   while ((match = linkRegex.exec(content)) !== null) {
-    const href = match[2];
-    // Only capture relative paths that aren't markdown files
-    if (href.startsWith('./') && !href.endsWith('.md')) {
+    const href = getPathname(match[2]);
+    if (isRelativeAssetPath(href)) {
       paths.add(href);
     }
   }
@@ -112,7 +174,7 @@ function stripDatePrefix(name) {
  * 
  * @param {string} collection - The collection name (e.g., 'uses')
  * @param {string} slug - The entry slug from frontmatter or derived from filename
- * @param {string} relativePath - The relative path from markdown (e.g., './20240402-uses/image.jpg')
+ * @param {string} relativePath - The relative path from markdown/frontmatter
  */
 function getPublicPath(collection, slug, relativePath) {
   // Extract just the filename from the relative path
