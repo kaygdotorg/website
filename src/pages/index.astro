@@ -953,17 +953,12 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       grid-column: span 2;
     }
 
-    /* Row 2: Now (full width after removing the legacy Notes card) */
-    .bento-now {
-      grid-column: span 6;
-    }
-
-    /* Row 3: Photography (full width) */
+    /* Row 2: Photography (full width) */
     .bento-photography {
       grid-column: span 6;
     }
 
-    /* Row 4: Uses (33%) | Homelab (67%) */
+    /* Row 3: Uses (33%) | Homelab (67%) */
     .bento-uses {
       grid-column: span 2;
     }
@@ -971,9 +966,14 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       grid-column: span 4;
     }
 
-    /* Row 5: About (full width after folding contact into the profile page) */
+    /* Row 4: About (50%) | Now (50%)
+       The card order in src/content/home/index.md intentionally places these
+       two profile-oriented destinations together at the bottom of the grid. */
+    .bento-now {
+      grid-column: span 3;
+    }
     .bento-about {
-      grid-column: span 6;
+      grid-column: span 3;
     }
 
     /* Mobile: Switch to 1-column linear layout */

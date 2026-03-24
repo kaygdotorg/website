@@ -99,15 +99,6 @@ bento-cards:
     summary: Long-form thoughts on infrastructure, software design, and digital life.
     href: /blog
     image: https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&q=80
-  - id: now
-    title: What I'm doing
-    category: Now
-    summary: Current projects, books, and focus areas in my life right now.
-    href: /now
-    image: https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80
-    # showPulse adds the animated pulsing dot indicator next to the category.
-    # Previously hardcoded for card.id === "now", now content-driven.
-    show-pulse: true
   - id: photography
     title: Moments Captured
     category: Photography
@@ -135,6 +126,17 @@ bento-cards:
     summary: More about my journey, philosophy, and how best to get in touch.
     href: /about
     image: ./assets/hero-picture.jpeg
+  - id: now
+    title: What I'm doing
+    category: Now
+    summary: Current projects, books, and focus areas in my life right now.
+    href: /now
+    image: https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80
+    # Keep Now next to About in the final desktop row so both profile-style
+    # cards share the same visual weight after retiring standalone Notes/Contact.
+    # showPulse adds the animated pulsing dot indicator next to the category.
+    # Previously hardcoded for card.id === "now", now content-driven.
+    show-pulse: true
 
 # Resume lives in public/ so the homepage hero links to the stable root path
 # instead of a content-relative asset that the markdown pipeline would warn on.
