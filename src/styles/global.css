@@ -2531,9 +2531,11 @@ a[data-internal-link="true"]:hover {
 
 /* Language label — a compact Maple Mono pill with stronger weight and explicit
  * centering so the tiny label still reads crisply once it is reduced to badge
- * scale. The fill color matches the "work" pill in the latest screenshot,
- * which lines up with the Catppuccin Mauve token from the tmux config
- * (`#cba6f7`). */
+ * scale. Keep the label italic, but opt into Maple Mono's designed italic
+ * alternates and disable synthetic slanting so the chip shows the font's more
+ * calligraphic cursive forms instead of a generic browser-leaned italic. The
+ * fill color matches the "work" pill in the latest screenshot, which lines up
+ * with the Catppuccin Mauve token from the tmux config (`#cba6f7`). */
 .code-block-lang {
   display: inline-flex;
   align-items: center;
@@ -2556,6 +2558,16 @@ a[data-internal-link="true"]:hover {
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
     0 8px 18px -14px rgba(203, 166, 247, 0.4);
   font-family: var(--font-mono), ui-monospace, monospace;
+  font-synthesis: none;
+  font-feature-settings:
+    "cv31" 1,
+    "cv33" 1,
+    "cv35" 1,
+    "cv36" 1,
+    "cv37" 1,
+    "cv38" 1,
+    "cv41" 1,
+    "cv43" 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
