@@ -1102,9 +1102,13 @@ html[data-theme="light"] body {
   margin: 0;
 }
 
-/* TOC Floating Card Styling - creates depth and separation */
+/* TOC Floating Card Styling - creates depth and separation.
+ * Vertical margin (1.5rem top & bottom) keeps the card evenly spaced
+ * between the two .md-section-divider <hr> elements that bracket it.
+ * Both dividers use margin:0, so the card's own margin is the sole
+ * source of the gap — keep top and bottom equal for symmetry. */
 .md-card-toc {
-  margin: 0 1rem 1.5rem 1rem;
+  margin: 1.5rem 1rem;
   /* Horizontal margin to prevent touching parent edges */
   width: calc(100% - 2rem);
   /* Account for horizontal margins */
@@ -1121,7 +1125,7 @@ html[data-theme="light"] body {
 /* On larger screens, center the ToC with auto margins */
 @media (min-width: 768px) {
   .md-card-toc {
-    margin: 0 auto 1.5rem auto;
+    margin: 1.5rem auto;
     width: 100%;
   }
 }
