@@ -1,0 +1,32 @@
+---
+/**
+ * =============================================================================
+ * LEGACY CONTACT PAGE REDIRECT (/contact)
+ * =============================================================================
+ *
+ * Contact details now live on the About page so the site only maintains one
+ * profile destination. Keep /contact working as a static redirect to the
+ * stable Contact heading on /about.
+ *
+ * The page is intentionally plain HTML so it works with the static dist/
+ * output even when served by a generic file server.
+ */
+const destination = "/about#contact";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting to /about#contact</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={destination} />
+    <meta http-equiv="refresh" content={`0;url=${destination}`} />
+  </head>
+  <body>
+    <p>Redirecting to <a href={destination}>{destination}</a>.</p>
+    <script is:inline>
+      window.location.replace("/about#contact");
+    </script>
+  </body>
+</html>

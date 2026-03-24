@@ -13,7 +13,9 @@ last edited: 2026-03-24 11:59:18
 
 If you've made it here, welcome! I am a devops / linux guy / storage engineer by profession, hobbyist bodybuilder and a full-time admirer of pretty apps. As a result of such admiration, I am currently trying out my hand with learning SwiftUI since vibe-coding is on a high right now.  
 
-If you'd like to take a look at my professional background, [here you go](./resumepdf).
+<!-- Resume is served from public/ at the site root, so this link must stay
+root-relative instead of looking like a content-local asset path. -->
+If you'd like to take a look at my professional background, [here you go](/resume.pdf).
 ## Contact
 
 I am usually either `kayg` or `kaygdotorg` in most places. Here are a few that I remember: 

@@ -56,7 +56,6 @@ export const CONTENT_COLLECTIONS = [
   "talks",
   "changelog",
   "about",
-  "contact",
   "homelab",
   "photography",
   "home",

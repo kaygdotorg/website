@@ -971,12 +971,9 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       grid-column: span 4;
     }
 
-    /* Row 5: About (50%) | Contact (50%) */
+    /* Row 5: About (full width after folding contact into the profile page) */
     .bento-about {
-      grid-column: span 3;
-    }
-    .bento-contact {
-      grid-column: span 3;
+      grid-column: span 6;
     }
 
     /* Mobile: Switch to 1-column linear layout */
@@ -993,8 +990,7 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       .bento-photography,
       .bento-uses,
       .bento-homelab,
-      .bento-about,
-      .bento-contact {
+      .bento-about {
         grid-column: span 1;
       }
     }
@@ -1166,11 +1162,6 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       --bento-text: #2d3436;
       --color-accent: #6b7280;
     }
-    .bento-contact {
-      background: #fdf0f7;
-      --bento-text: #2d3436;
-      --color-accent: #6b7280;
-    }
 
     /* Dark Mode - Muted Pastel Backgrounds */
     :root[data-theme="dark"] .bento-talks {
@@ -1207,11 +1198,6 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       background: #2d2025;
       --bento-text: #ffffff;
       --color-accent: #fca5a5;
-    }
-    :root[data-theme="dark"] .bento-contact {
-      background: #2a2030;
-      --bento-text: #ffffff;
-      --color-accent: #f9a8d4;
     }
 
     /* Photography Specific Layout */

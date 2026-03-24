@@ -26,8 +26,6 @@ nav-links:
     visible: false # Home is accessed via logo, not nav
   - href: /about
     label: About
-  - href: /contact
-    label: Contact
   - href: /blog
     label: Writing
   - href: /now
@@ -134,17 +132,13 @@ bento-cards:
   - id: about
     title: About Me
     category: Profile
-    summary: More about my journey, philosophy, and the things that drive me forward.
+    summary: More about my journey, philosophy, and how best to get in touch.
     href: /about
     image: ./assets/hero-picture.jpeg
-  - id: contact
-    title: Say Hello
-    category: Contact
-    summary: I'm always open to interesting conversations and collaborations. Reach out via email.
-    href: /contact
-    image: https://images.unsplash.com/photo-1523966211575-eb4a01e7dd51?w=800&q=80
 
-resume-url: ./resume.pdf
+# Resume lives in public/ so the homepage hero links to the stable root path
+# instead of a content-relative asset that the markdown pipeline would warn on.
+resume-url: /resume.pdf
 
 work-experience:
   - role: Support Engineer

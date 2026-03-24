@@ -290,27 +290,6 @@
         "title": "FOSS United Talk - Migrating VMs between Proxmox Nodes backed by ZFS Native Encryption",
         "collection": "talks"
       }
-    ],
-    "/photography": [
-      {
-        "source": "/about",
-        "title": "About",
-        "collection": "about"
-      }
-    ],
-    "/blog": [
-      {
-        "source": "/about",
-        "title": "About",
-        "collection": "about"
-      }
-    ],
-    "/now": [
-      {
-        "source": "/about",
-        "title": "About",
-        "collection": "about"
-      }
     ]
   },
   "graph": {
@@ -852,20 +831,12 @@
       {
         "source": "/blog/switching-between-safari-profile-windows",
         "target": "/blog/safari-audio-stuttering-youtube"
-      },
-      {
-        "source": "/about",
-        "target": "/blog"
-      },
-      {
-        "source": "/about",
-        "target": "/now"
       }
     ]
   },
   "meta": {
-    "generatedAt": "2026-03-24T06:09:56.083Z",
+    "generatedAt": "2026-03-24T06:36:59.469Z",
     "totalPages": 80,
-    "totalLinks": 36
+    "totalLinks": 34
   }
 }

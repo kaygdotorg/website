@@ -9,7 +9,6 @@
  *
  * SUPPORTED PAGES:
  * - /about    → About me page
- * - /contact  → Contact information
  * - /homelab  → Homelab documentation
  *
  * NOTE: /changelog has custom styling and remains a separate file.
@@ -39,7 +38,9 @@ import { getCollection, render } from "astro:content";
  * @see src/pages/changelog.astro
  */
 export async function getStaticPaths() {
-  const staticPages = ["about", "contact", "homelab"];
+  // /contact now redirects to /about#contact, so only true markdown-backed
+  // static pages remain in this shared route.
+  const staticPages = ["about", "homelab"];
 
   return staticPages.map((page) => ({
     params: { page },
@@ -54,7 +55,7 @@ export async function getStaticPaths() {
  * Get the page parameter from the URL.
  * TypeScript needs help here since the type depends on getStaticPaths.
  */
-const { page } = Astro.params as { page: "about" | "contact" | "homelab" };
+const { page } = Astro.params as { page: "about" | "homelab" };
 
 /**
  * Fetch the collection for this page.

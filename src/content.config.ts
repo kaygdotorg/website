@@ -16,7 +16,7 @@
  * - talks: Presentation slides and talk content
  * - now: "What I'm doing now" updates
  * - uses: Tools and setup documentation
- * - home/about/contact/homelab/changelog: Static pages
+ * - home/about/homelab/changelog: Static pages
  * - photography: Gallery page + photo entries (combined)
  *
  * FILE NAMING CONVENTION:
@@ -66,7 +66,7 @@ const CONTENT_BASE = join(__dirname, "content");
 // =============================================================================
 
 /**
- * Schema for static pages (about, contact, homelab, etc.)
+ * Schema for static pages (about, homelab, changelog, etc.)
  * These pages have minimal frontmatter requirements.
  *
  * .passthrough() allows additional fields in frontmatter without validation,
@@ -231,7 +231,7 @@ const now = createCollection("now", postSchema);
 const uses = createCollection("uses", postSchema);
 
 // -----------------------------------------------------------------------------
-// Page Collections (home, about, contact, homelab, changelog)
+// Page Collections (home, about, homelab, changelog)
 // These are simpler static pages
 // -----------------------------------------------------------------------------
 
@@ -383,7 +383,6 @@ const home = defineCollection({
   schema: homeSchema,
 });
 const about = createCollection("about", pageSchema);
-const contact = createCollection("contact", pageSchema);
 const homelab = createCollection("homelab", pageSchema);
 const changelog = createCollection("changelog", pageSchema);
 
@@ -441,7 +440,6 @@ export const collections = {
   // Page collections
   home,
   about,
-  contact,
   homelab,
   changelog,
   // Photography (includes both page metadata and photo entries)
