@@ -26,17 +26,16 @@ nav-links:
     visible: false # Home is accessed via logo, not nav
   - href: /about
     label: About
-  - href: /blog
-    label: Writing
   - href: /now
     label: Now
-  - href: /uses
-    label: Uses
-  - href: /photography
-    label: Photography
-    visible: false # Shown only in mobile menu
   - href: /talks
     label: Talks
+  - href: /uses
+    label: Uses
+  - href: /blog
+    label: Writing
+  - href: /photography
+    label: Photography
     visible: false # Shown only in mobile menu
 
 # =============================================================================
