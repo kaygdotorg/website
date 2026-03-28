@@ -934,6 +934,9 @@ const githubUrl = entry?.filePath
      * Skips blocks that have already been enhanced (data-code-enhanced) to
      * avoid duplicates on View Transition re-initializations.
      */
+    /** Maximum visible lines before a code block is collapsed. */
+    const CODE_COLLAPSE_LINES = 25;
+
     function initCodeBlockCopy() {
       const content = document.getElementById("markdown-content");
       if (!content) return;
@@ -946,6 +949,10 @@ const githubUrl = entry?.filePath
         // Detect language from Shiki's data-language attribute
         const lang = pre.getAttribute("data-language") || "";
 
+        // Count lines in the code block
+        const codeEl = pre.querySelector("code");
+        const lineCount = codeEl ? codeEl.textContent.split("\n").length : 0;
+
         // Create header bar
         const header = document.createElement("div");
         header.className = "code-block-header";
@@ -956,7 +963,11 @@ const githubUrl = entry?.filePath
         langLabel.textContent = lang || "text";
         header.appendChild(langLabel);
 
-        // Copy button (right side)
+        // Right side: button group
+        const btnGroup = document.createElement("div");
+        btnGroup.className = "code-block-actions";
+
+        // Copy button (left in the pair)
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "code-block-copy";
@@ -975,16 +986,289 @@ const githubUrl = entry?.filePath
             showToast("Copied to clipboard!");
           }
 
-          // Mobile Safari can leave the button in a pressed/focused visual
-          // state after tap. Blur it explicitly once the copy action finishes
-          // so the control returns to its resting appearance immediately.
           btn.blur();
         });
-        header.appendChild(btn);
+        btnGroup.appendChild(btn);
+
+        // Wrap toggle — only active if content overflows horizontally
+        const wrapBtn = document.createElement("button");
+        wrapBtn.type = "button";
+        wrapBtn.className = "code-block-copy code-wrap-toggle";
+        wrapBtn.setAttribute("aria-label", "Toggle line wrap");
+        wrapBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h15a3 3 0 1 1 0 6h-4"/><polyline points="13 16 11 18 13 20"/><path d="M3 18h4"/></svg>`;
+
+        // Check if any line overflows and disable if not needed
+        const hasOverflow = () => pre.scrollWidth > pre.clientWidth;
+        if (!hasOverflow()) {
+          wrapBtn.disabled = true;
+          wrapBtn.style.opacity = "0.25";
+          wrapBtn.style.cursor = "default";
+        }
+
+        wrapBtn.addEventListener("click", () => {
+          if (wrapBtn.disabled) return;
+          const code = pre.querySelector("code");
+          if (!code) return;
+          const isWrapped = code.style.whiteSpace === "pre-wrap";
+          code.style.whiteSpace = isWrapped ? "" : "pre-wrap";
+          code.style.wordBreak = isWrapped ? "" : "break-all";
+          wrapBtn.classList.toggle("active", !isWrapped);
+          wrapBtn.blur();
+        });
+        btnGroup.appendChild(wrapBtn);
+
+        // Fullscreen button (right of copy, matching zoomed-in view order)
+        const fsBtn = document.createElement("button");
+        fsBtn.type = "button";
+        fsBtn.className = "code-block-copy";
+        fsBtn.setAttribute("aria-label", "View code fullscreen");
+        fsBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`;
+        fsBtn.addEventListener("click", () => openCodeFullscreen(pre));
+        btnGroup.appendChild(fsBtn);
+
+        header.appendChild(btnGroup);
 
         // Insert header before the code block content
         pre.insertBefore(header, pre.firstChild);
+
+        // Collapse long code blocks with a toggle button and smooth transition.
+        // Max-height is controlled entirely via inline styles so the CSS
+        // transition always animates between two known pixel values.
+        if (lineCount > CODE_COLLAPSE_LINES) {
+          const COLLAPSED_HEIGHT = 640; // ~25 lines at typical line-height
+
+          pre.classList.add("code-collapsible", "code-collapsed");
+          pre.style.maxHeight = COLLAPSED_HEIGHT + "px";
+
+          // Fade overlay — dims the bottom lines toward the background color
+          const fadeContainer = document.createElement("div");
+          fadeContainer.className = "code-collapse-fade";
+          pre.appendChild(fadeContainer);
+
+          const downSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+          const upSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg>`;
+
+          const toggleBtn = document.createElement("button");
+          toggleBtn.type = "button";
+          toggleBtn.className = "code-expand-caret";
+          toggleBtn.setAttribute("aria-label", "Expand code block");
+          toggleBtn.innerHTML = downSvg;
+
+          toggleBtn.addEventListener("click", () => {
+            const isCollapsed = pre.classList.contains("code-collapsed");
+
+            if (isCollapsed) {
+              // Expand: measure full height without transition, then animate.
+              // Use two rAF frames to guarantee the browser paints the
+              // start state before the end state is applied.
+              pre.style.transition = "none";
+              pre.style.maxHeight = "none";
+              const fullHeight = pre.scrollHeight;
+              pre.style.maxHeight = COLLAPSED_HEIGHT + "px";
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  pre.style.transition = "";
+                  pre.style.maxHeight = fullHeight + "px";
+                  pre.classList.remove("code-collapsed");
+                  fadeContainer.style.display = "none";
+                  toggleBtn.innerHTML = upSvg;
+                  toggleBtn.setAttribute("aria-label", "Collapse code block");
+                  const onEnd = () => {
+                    pre.style.maxHeight = "none";
+                    pre.removeEventListener("transitionend", onEnd);
+                  };
+                  pre.addEventListener("transitionend", onEnd);
+                });
+              });
+            } else {
+              // Collapse: same two-frame approach for consistency.
+              pre.style.transition = "none";
+              pre.style.maxHeight = pre.scrollHeight + "px";
+              requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                  pre.style.transition = "";
+                  pre.style.maxHeight = COLLAPSED_HEIGHT + "px";
+                  pre.classList.add("code-collapsed");
+                  fadeContainer.style.display = "";
+                  toggleBtn.innerHTML = downSvg;
+                  toggleBtn.setAttribute("aria-label", "Expand code block");
+                });
+              });
+            }
+          });
+          pre.appendChild(toggleBtn);
+        }
       });
+    }
+
+    /**
+     * Open a code block in fullscreen overlay with line numbers.
+     * Clones the code content so the original is untouched.
+     */
+    function openCodeFullscreen(pre) {
+      const overlay = document.getElementById("code-fullscreen-overlay");
+      const body = document.getElementById("code-fullscreen-body");
+      if (!overlay || !body) return;
+
+      const codeEl = pre.querySelector("code");
+      if (!codeEl) return;
+
+      const lang = pre.getAttribute("data-language") || "text";
+
+      // Build line-numbered code
+      const lines = codeEl.innerHTML.split("\n");
+      // Remove trailing empty line (Shiki often adds one)
+      if (lines.length > 0 && lines[lines.length - 1].trim() === "") lines.pop();
+
+      const table = document.createElement("table");
+      table.className = "code-fullscreen-table";
+      const tbody = document.createElement("tbody");
+
+      lines.forEach((lineHtml, i) => {
+        const tr = document.createElement("tr");
+
+        const lineNum = document.createElement("td");
+        lineNum.className = "code-line-number";
+        lineNum.textContent = String(i + 1);
+
+        const lineContent = document.createElement("td");
+        lineContent.className = "code-line-content";
+        lineContent.innerHTML = lineHtml || "\n";
+
+        tr.appendChild(lineNum);
+        tr.appendChild(lineContent);
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+
+      // Wrap in a pre for proper font and color inheritance.
+      // Copy the full inline style so Shiki's CSS custom properties
+      // (--shiki-dark, --shiki-dark-bg) are available for the dark-mode
+      // override rule. The dark-mode CSS uses !important on the class
+      // selector which beats the inline background-color.
+      const wrapper = document.createElement("pre");
+      wrapper.className = pre.className;
+      wrapper.style.cssText = pre.style.cssText;
+      wrapper.classList.remove("code-collapsed", "code-collapsible");
+      wrapper.appendChild(table);
+
+      // Build header into the static container (outside scrolling area)
+      const headerContainer = document.getElementById("code-fullscreen-header");
+      const card = overlay.querySelector(".code-fullscreen-card");
+      if (headerContainer) {
+        headerContainer.innerHTML = "";
+        // Apply Shiki background to the entire card so rubber-band
+        // overscroll reveals matching background, not a gap.
+        const bgColor = getComputedStyle(pre).backgroundColor;
+        headerContainer.style.backgroundColor = bgColor;
+        if (card) card.style.backgroundColor = bgColor;
+
+        const langSpan = document.createElement("span");
+        langSpan.className = "code-block-lang";
+        langSpan.textContent = lang;
+        headerContainer.appendChild(langSpan);
+
+        const actionGroup = document.createElement("div");
+        actionGroup.className = "code-block-actions";
+
+        // Copy button
+        const fsCopyBtn = document.createElement("button");
+        fsCopyBtn.type = "button";
+        fsCopyBtn.className = "code-block-copy";
+        fsCopyBtn.setAttribute("aria-label", "Copy code to clipboard");
+        fsCopyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+        fsCopyBtn.addEventListener("click", async () => {
+          const text = codeEl.textContent || "";
+          const copied = await copyTextToClipboard(text);
+          if (copied) {
+            animateCodeBlockCopy(wrapper);
+            fsCopyBtn.classList.add("copied");
+            window.setTimeout(() => fsCopyBtn.classList.remove("copied"), TOAST_DURATION_MS);
+            showToast("Copied to clipboard!");
+          }
+          fsCopyBtn.blur();
+        });
+        actionGroup.appendChild(fsCopyBtn);
+
+        // Wrap toggle for fullscreen
+        const fsWrapBtn = document.createElement("button");
+        fsWrapBtn.type = "button";
+        fsWrapBtn.className = "code-block-copy code-wrap-toggle";
+        fsWrapBtn.setAttribute("aria-label", "Toggle line wrap");
+        fsWrapBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h15a3 3 0 1 1 0 6h-4"/><polyline points="13 16 11 18 13 20"/><path d="M3 18h4"/></svg>`;
+
+        // Check overflow after the wrapper is in the DOM
+        requestAnimationFrame(() => {
+          const hasOverflow = wrapper.scrollWidth > wrapper.clientWidth;
+          if (!hasOverflow) {
+            fsWrapBtn.disabled = true;
+            fsWrapBtn.style.opacity = "0.25";
+            fsWrapBtn.style.cursor = "default";
+          }
+        });
+
+        fsWrapBtn.addEventListener("click", () => {
+          if (fsWrapBtn.disabled) return;
+          const table = wrapper.querySelector(".code-fullscreen-table");
+          if (!table) return;
+          const cells = table.querySelectorAll(".code-line-content");
+          const isWrapped = cells[0]?.style.whiteSpace === "pre-wrap";
+          cells.forEach((cell) => {
+            cell.style.whiteSpace = isWrapped ? "" : "pre-wrap";
+            cell.style.wordBreak = isWrapped ? "" : "break-all";
+          });
+          fsWrapBtn.classList.toggle("active", !isWrapped);
+          fsWrapBtn.blur();
+        });
+        actionGroup.appendChild(fsWrapBtn);
+
+        // Close button
+        const fsCloseBtn = document.createElement("button");
+        fsCloseBtn.type = "button";
+        fsCloseBtn.className = "code-block-copy";
+        fsCloseBtn.setAttribute("aria-label", "Close fullscreen");
+        fsCloseBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+        fsCloseBtn.addEventListener("click", closeCodeFullscreen);
+        actionGroup.appendChild(fsCloseBtn);
+
+        headerContainer.appendChild(langSpan);
+        headerContainer.appendChild(actionGroup);
+      }
+
+      body.innerHTML = "";
+      body.appendChild(wrapper);
+
+      // Show overlay and hide reading progress indicator
+      overlay.classList.add("active");
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      const progressBtn = document.querySelector(".scroll-progress-btn");
+      if (progressBtn) progressBtn.style.display = "none";
+
+      // Close on backdrop click
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeCodeFullscreen();
+      });
+
+      // Close on Escape
+      const escHandler = (e) => {
+        if (e.key === "Escape") {
+          closeCodeFullscreen();
+          document.removeEventListener("keydown", escHandler);
+        }
+      };
+      document.addEventListener("keydown", escHandler);
+    }
+
+    function closeCodeFullscreen() {
+      const overlay = document.getElementById("code-fullscreen-overlay");
+      if (!overlay) return;
+      overlay.classList.remove("active");
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      const progressBtn = document.querySelector(".scroll-progress-btn");
+      if (progressBtn) progressBtn.style.display = "";
     }
 
     /**
