@@ -2098,48 +2098,57 @@ html[data-theme="light"] body {
   z-index: 1;
 }
 
-/* Internal links - pill-style with document icon (like mymind.com) */
+/* Internal links - understated inline pill that sits flush with body text.
+ * Uses a subtle border and muted tones instead of neon gradients so it
+ * reads as a navigational hint rather than a call-to-action. */
 .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]) {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.15rem 0.65rem 0.15rem 0.5rem;
-  background: rgba(20, 15, 28, 0.5);
+  gap: 0.3rem;
+  padding: 0.05rem 0.55rem 0.05rem 0.4rem;
+  background: rgba(245, 194, 231, 0.06);
+  border: 1px solid rgba(245, 194, 231, 0.15);
   border-radius: 9999px;
   font-weight: 500;
-  font-size: 0.85em;
-  border: 1px solid transparent;
-  background-image: linear-gradient(rgba(20, 15, 28, 0.8), rgba(20, 15, 28, 0.8)),
-    linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  vertical-align: middle;
-  margin: -2px 1px;
-  transition: all 0.2s ease;
+  font-size: 0.9em;
+  color: #f5c2e7;
+  vertical-align: baseline;
+  margin: 0 1px;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  text-decoration: none;
 }
 
 .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"])::before {
   content: "";
   display: inline-block;
-  width: 1.1em;
-  height: 1.1em;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ec4899' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3E%3C/svg%3E");
+  width: 0.9em;
+  height: 0.9em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f5c2e7' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3E%3C/svg%3E");
   background-size: contain;
   background-repeat: no-repeat;
   flex-shrink: 0;
+  opacity: 0.6;
 }
 
 [data-theme="light"] .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]) {
-  background-image: linear-gradient(#fdf2f8, #fdf2f8),
-    linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
-  color: var(--color-accent-600);
+  background: rgba(136, 57, 239, 0.05);
+  border-color: rgba(136, 57, 239, 0.15);
+  color: #8839ef;
 }
 
-/* Hover: subtle magnification only, no color/gradient change */
+[data-theme="light"] .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"])::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%238839ef' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'/%3E%3C/svg%3E");
+}
+
+/* Hover: gentle tint */
 .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]):hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(236, 72, 153, 0.15);
+  background: rgba(245, 194, 231, 0.12);
+  border-color: rgba(245, 194, 231, 0.3);
+}
+
+[data-theme="light"] .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"]):hover {
+  background: rgba(136, 57, 239, 0.1);
+  border-color: rgba(136, 57, 239, 0.25);
 }
 
 /* -------------------------------------------------------------------------
@@ -2148,97 +2157,80 @@ html[data-theme="light"] body {
  * Matches the neon gradient pill aesthetic with type-specific colors
  * ------------------------------------------------------------------------- */
 
-/* Image links - green gradient with image icon */
-.md-card-body .md-card-content a[data-asset-type="image"] {
-  background-image: linear-gradient(rgba(20, 15, 28, 0.8), rgba(20, 15, 28, 0.8)),
-    linear-gradient(135deg, #10b981, #34d399, #6ee7b7);
-}
+/* Asset-type link overrides — each type gets its own muted colour
+ * and icon, but shares the same compact pill structure as internal links. */
 
+/* Image links */
+.md-card-body .md-card-content a[data-asset-type="image"] {
+  color: #94e2d5;
+  border-color: rgba(148, 226, 213, 0.2);
+  background: rgba(148, 226, 213, 0.08);
+}
 .md-card-body .md-card-content a[data-asset-type="image"]::before,
 .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"])[data-asset-type="image"]::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2310b981' stroke-width='2.5'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394e2d5' stroke-width='2'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21'/%3E%3C/svg%3E");
 }
-
-/* Hover: subtle magnification only, no color/gradient change */
 .md-card-body .md-card-content a[data-asset-type="image"]:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.18);
+  background: rgba(148, 226, 213, 0.15);
+  border-color: rgba(148, 226, 213, 0.35);
   cursor: zoom-in;
 }
-
 [data-theme="light"] .md-card-body .md-card-content a[data-asset-type="image"] {
-  background-image: linear-gradient(#ecfdf5, #ecfdf5),
-    linear-gradient(135deg, #10b981, #34d399, #6ee7b7);
-  color: #059669;
+  color: #059669; border-color: rgba(5, 150, 105, 0.18); background: rgba(5, 150, 105, 0.06);
 }
 
-/* Video links - amber gradient with video icon */
+/* Video links */
 .md-card-body .md-card-content a[data-asset-type="video"] {
-  background-image: linear-gradient(rgba(20, 15, 28, 0.8), rgba(20, 15, 28, 0.8)),
-    linear-gradient(135deg, #f59e0b, #fbbf24, #fcd34d);
+  color: #f9e2af;
+  border-color: rgba(249, 226, 175, 0.2);
+  background: rgba(249, 226, 175, 0.08);
 }
-
 .md-card-body .md-card-content a[data-asset-type="video"]::before,
 .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"])[data-asset-type="video"]::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f59e0b' stroke-width='2.5'%3E%3Cpath d='m22 8-6 4 6 4V8Z'/%3E%3Crect width='14' height='12' x='2' y='6' rx='2' ry='2'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f9e2af' stroke-width='2'%3E%3Cpath d='m22 8-6 4 6 4V8Z'/%3E%3Crect width='14' height='12' x='2' y='6' rx='2' ry='2'/%3E%3C/svg%3E");
 }
-
-/* Hover: subtle magnification only, no color/gradient change */
 .md-card-body .md-card-content a[data-asset-type="video"]:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.18);
+  background: rgba(249, 226, 175, 0.15);
+  border-color: rgba(249, 226, 175, 0.35);
 }
-
 [data-theme="light"] .md-card-body .md-card-content a[data-asset-type="video"] {
-  background-image: linear-gradient(#fffbeb, #fffbeb),
-    linear-gradient(135deg, #f59e0b, #fbbf24, #fcd34d);
-  color: #d97706;
+  color: #d97706; border-color: rgba(217, 119, 6, 0.18); background: rgba(217, 119, 6, 0.06);
 }
 
-/* Document links - red gradient with file icon */
+/* Document links */
 .md-card-body .md-card-content a[data-asset-type="document"] {
-  background-image: linear-gradient(rgba(20, 15, 28, 0.8), rgba(20, 15, 28, 0.8)),
-    linear-gradient(135deg, #ef4444, #f87171, #fca5a5);
+  color: #f38ba8;
+  border-color: rgba(243, 139, 168, 0.2);
+  background: rgba(243, 139, 168, 0.08);
 }
-
 .md-card-body .md-card-content a[data-asset-type="document"]::before,
 .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"])[data-asset-type="document"]::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23ef4444' stroke-width='2.5'%3E%3Cpath d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' x2='8' y1='13' y2='13'/%3E%3Cline x1='16' x2='8' y1='17' y2='17'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f38ba8' stroke-width='2'%3E%3Cpath d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3Cline x1='16' x2='8' y1='13' y2='13'/%3E%3Cline x1='16' x2='8' y1='17' y2='17'/%3E%3C/svg%3E");
 }
-
-/* Hover: subtle magnification only, no color/gradient change */
 .md-card-body .md-card-content a[data-asset-type="document"]:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.18);
+  background: rgba(243, 139, 168, 0.15);
+  border-color: rgba(243, 139, 168, 0.35);
 }
-
 [data-theme="light"] .md-card-body .md-card-content a[data-asset-type="document"] {
-  background-image: linear-gradient(#fef2f2, #fef2f2),
-    linear-gradient(135deg, #ef4444, #f87171, #fca5a5);
-  color: #dc2626;
+  color: #dc2626; border-color: rgba(220, 38, 38, 0.18); background: rgba(220, 38, 38, 0.06);
 }
 
-/* Audio links - cyan gradient with music icon */
+/* Audio links */
 .md-card-body .md-card-content a[data-asset-type="audio"] {
-  background-image: linear-gradient(rgba(20, 15, 28, 0.8), rgba(20, 15, 28, 0.8)),
-    linear-gradient(135deg, #06b6d4, #22d3ee, #67e8f9);
+  color: #89dceb;
+  border-color: rgba(137, 220, 235, 0.2);
+  background: rgba(137, 220, 235, 0.08);
 }
-
 .md-card-body .md-card-content a[data-asset-type="audio"]::before,
 .md-card-body .md-card-content a:not([href^="http"]):not([href^="mailto:"]):not([href^="#"])[data-asset-type="audio"]::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2306b6d4' stroke-width='2.5'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2389dceb' stroke-width='2'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E");
 }
-
-/* Hover: subtle magnification only, no color/gradient change */
 .md-card-body .md-card-content a[data-asset-type="audio"]:hover {
-  transform: translateY(-1px) scale(1.02);
-  box-shadow: 0 6px 16px rgba(6, 182, 212, 0.18);
+  background: rgba(137, 220, 235, 0.15);
+  border-color: rgba(137, 220, 235, 0.35);
 }
-
 [data-theme="light"] .md-card-body .md-card-content a[data-asset-type="audio"] {
-  background-image: linear-gradient(#ecfeff, #ecfeff),
-    linear-gradient(135deg, #06b6d4, #22d3ee, #67e8f9);
-  color: #0891b2;
+  color: #0891b2; border-color: rgba(8, 145, 178, 0.18); background: rgba(8, 145, 178, 0.06);
 }
 
 /* -------------------------------------------------------------------------
@@ -2488,7 +2480,8 @@ a[data-internal-link="true"]:hover {
  * catppuccin-mocha values in --shiki-dark / --shiki-dark-bg CSS variables.
  * This rule activates the dark values when [data-theme="dark"]. */
 [data-theme="dark"] .astro-code,
-[data-theme="dark"] .astro-code code span {
+[data-theme="dark"] .astro-code code span,
+[data-theme="dark"] .astro-code .code-line-content span {
   color: var(--shiki-dark) !important;
   background-color: var(--shiki-dark-bg) !important;
 }
@@ -2509,7 +2502,13 @@ a[data-internal-link="true"]:hover {
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   position: relative;
+}
+
+.md-card-body .md-card-content pre::-webkit-scrollbar {
+  display: none;
 }
 
 [data-theme="light"] .md-card-body .md-card-content pre {
@@ -2521,10 +2520,10 @@ a[data-internal-link="true"]:hover {
  * while horizontally scrolling long lines. Keeping the header in normal flow
  * avoids the first line of code being clipped behind the controls. */
 .code-block-header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  column-gap: 0.75rem;
+  justify-content: space-between;
+  gap: 0.75rem;
   position: sticky;
   top: 0;
   left: 0;
@@ -2547,7 +2546,6 @@ a[data-internal-link="true"]:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  justify-self: start;
   max-width: 100%;
   padding: 0.26rem 0.65rem;
   border-radius: 999px;
@@ -2585,8 +2583,7 @@ a[data-internal-link="true"]:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  justify-self: end;
-  padding: 0.3rem;
+  padding: 0.45rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   background: rgba(24, 24, 37, 0.72);
@@ -2646,7 +2643,14 @@ a[data-internal-link="true"]:hover {
  * The effect still avoids moving overlays, `filter`, and `backdrop-filter`,
  * which keeps Safari from flashing a black bar near the bottom edge during
  * clipboard feedback. */
-.md-card-body .md-card-content pre.code-block-copy-active {
+.md-card-body .md-card-content pre.code-block-copy-active,
+.code-fullscreen-body pre.code-block-copy-active {
+  animation: code-block-copy-surface 1.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Let the card itself glow in fullscreen since the pre's box-shadow
+ * gets clipped by the card's overflow: hidden. */
+.code-fullscreen-card:has(pre.code-block-copy-active) {
   animation: code-block-copy-surface 1.5s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
@@ -2681,6 +2685,263 @@ a[data-internal-link="true"]:hover {
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.6;
+}
+
+/* ---------- Code block action buttons (right side of header) ---------- */
+.code-block-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-self: end;
+}
+
+/* Wrap toggle active state — matches the copied accent style */
+.code-wrap-toggle.active {
+  color: #cba6f7;
+  border-color: rgba(203, 166, 247, 0.4);
+  background: rgba(203, 166, 247, 0.15);
+}
+
+[data-theme="light"] .code-wrap-toggle.active {
+  color: #7c3aed;
+  border-color: rgba(124, 58, 237, 0.3);
+  background: rgba(124, 58, 237, 0.1);
+}
+
+/* Fullscreen header actions match inline spacing */
+.code-fullscreen-header .code-block-actions {
+  gap: 0.5rem;
+}
+
+/* ---------- Collapsed code blocks (>25 lines) ---------- */
+/* Line height is 1.6 at 0.875rem ≈ 1.4rem per line. 25 lines ≈ 35rem.
+ * Add space for the header bar (~2.5rem) and top padding.
+ * max-height transitions for smooth expand/collapse animation. */
+/* Collapsible code blocks — max-height is controlled entirely via
+ * inline styles (set by JS) so the transition animates between two
+ * known pixel values. The class just enables the transition. */
+.md-card-body .md-card-content pre.code-collapsible {
+  transition: max-height 0.65s cubic-bezier(0.33, 1, 0.68, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Fade-out gradient at the bottom of collapsed blocks. */
+.code-collapse-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 5rem;
+  background: linear-gradient(to bottom, transparent 0%, var(--shiki-dark-bg, #1e1e2e) 100%);
+  pointer-events: none;
+  z-index: 2;
+  border-radius: 0 0 1rem 1rem;
+}
+
+[data-theme="light"] .code-collapse-fade {
+  background: linear-gradient(to bottom, transparent, var(--code-bg-light, #eff1f5));
+}
+
+/* Toggle caret — sits at the bottom center of code blocks.
+ * Bounces when collapsed (expand hint), static when expanded (collapse). */
+.code-expand-caret {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 0.35rem;
+  color: rgba(205, 214, 244, 0.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  backdrop-filter: blur(8px);
+}
+
+/* Only bounce when the block is collapsed */
+.code-collapsed .code-expand-caret {
+  animation: caret-bounce 2s ease-in-out infinite;
+}
+
+/* When expanded, pin caret to flow at the bottom (not absolute) */
+pre:not(.code-collapsed) .code-expand-caret {
+  position: relative;
+  bottom: auto;
+  left: auto;
+  transform: none;
+  margin: 0.75rem auto 0;
+}
+
+[data-theme="light"] .code-expand-caret {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+@keyframes caret-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-5px); }
+}
+
+@media (hover: hover) {
+  .code-expand-caret:hover {
+    background: rgba(244, 114, 182, 0.2);
+    border-color: rgba(244, 114, 182, 0.4);
+    color: #f472b6;
+  }
+}
+
+/* ---------- Code fullscreen overlay ----------
+ * Reuses the same visual language as the image zoom overlay:
+ * dimmed+blurred backdrop, centered content, z-index above navbar.
+ * The code block inside keeps its article styling (border, radius,
+ * background) so short snippets look natural rather than being
+ * stretched to fill the screen. */
+.code-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0) !important;
+  backdrop-filter: blur(0.01px);
+  -webkit-backdrop-filter: blur(0.01px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    background 0.4s ease,
+    backdrop-filter 0.4s ease,
+    opacity 0.4s ease;
+}
+
+.code-fullscreen-overlay.active {
+  background: rgba(0, 0, 0, 0.82) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* The card that holds the code — styled like the article code blocks */
+/* Card frame — clips content to rounded corners. Scrolling happens
+ * inside the body, not on the card, so corners stay rounded. */
+.code-fullscreen-card {
+  display: flex;
+  flex-direction: column;
+  max-width: min(90vw, 900px);
+  max-height: 85vh;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 1rem;
+  transform: scale(0.95) translateY(10px);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.code-fullscreen-overlay.active .code-fullscreen-card {
+  transform: scale(1) translateY(0);
+}
+
+
+/* Static header — sits above the scrolling body, never moves */
+.code-fullscreen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  flex-shrink: 0;
+}
+
+/* Scrollable code body — scrolls inside the fixed-size card so the
+ * card's border-radius always clips the corners cleanly.
+ * overscroll-behavior: contain prevents elastic bounce that would
+ * visually detach the header from the body. */
+.code-fullscreen-body {
+  overflow: auto;
+  overscroll-behavior: none;
+  flex: 1;
+  min-height: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.code-fullscreen-body::-webkit-scrollbar {
+  display: none;
+}
+
+/* The pre inside keeps its Shiki background and colors — it IS the card
+ * visually. Reset layout overrides but keep the background. */
+.code-fullscreen-body pre {
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 1.1rem 1.5rem 1.25rem !important;
+  max-height: none !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+}
+
+/* Line-numbered table */
+.code-fullscreen-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+/* Line numbers — not selectable so copy doesn't include them */
+.code-line-number {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  text-align: right;
+  padding-right: 1.25rem;
+  padding-left: 0.5rem;
+  color: rgba(205, 214, 244, 0.25);
+  white-space: nowrap;
+  vertical-align: top;
+  width: 1%;
+}
+
+[data-theme="light"] .code-line-number {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+.code-line-content {
+  white-space: pre;
+  padding-right: 1rem;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 640px) {
+  .code-fullscreen-card {
+    max-width: 94vw;
+    max-height: 80vh;
+    border-radius: 1rem;
+  }
+
+  .code-fullscreen-table {
+    font-size: 0.8rem;
+  }
+
+  .code-line-number {
+    padding-right: 0.75rem;
+    padding-left: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-expand-caret {
+    animation: none !important;
+  }
 }
 
 /* Light mode fallback for non-Shiki code blocks (e.g. plain <pre> without
@@ -3218,7 +3479,7 @@ a[data-internal-link="true"]:hover {
   box-shadow:
     0 14px 34px -22px rgba(17, 17, 27, 0.78),
     0 10px 24px -20px rgba(180, 190, 254, 0.38);
-  z-index: 100;
+  z-index: 10000;
   opacity: 0;
   transition:
     transform 0.22s ease,
@@ -3383,6 +3644,7 @@ a[data-internal-link="true"]:hover {
 .scroll-progress-btn.hidden-permanently {
   display: none !important;
 }
+
 
 .scroll-progress-btn:hover {
   transform: scale(1.1);
