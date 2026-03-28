@@ -1950,12 +1950,15 @@ html[data-theme="light"] body {
   /* Indicate clickable for lightbox */
 }
 
-/* Featured image specific margin override */
+/* Featured image specific margin override.
+ * cursor: default overrides .md-unified-card img { cursor: zoom-in }
+ * because the cover image is not zoomable via lightbox. */
 .md-card-featured-image img {
   margin: 0;
   border-radius: 1.25rem 1.25rem 0 0;
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: default;
 }
 
 .md-unified-card img:hover,
