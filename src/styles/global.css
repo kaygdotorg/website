@@ -2822,10 +2822,11 @@ pre:not(.code-collapsed) .code-expand-caret {
     opacity 0.4s ease;
 }
 
+/* Darker dim and heavier blur for stronger separation from page content */
 .code-fullscreen-overlay.active {
-  background: rgba(0, 0, 0, 0.82) !important;
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  background: rgba(0, 0, 0, 0.9) !important;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
   opacity: 1;
   pointer-events: auto;
 }
