@@ -2105,7 +2105,8 @@ html[data-theme="light"] body {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.05rem 0.55rem 0.05rem 0.4rem;
+  /* Minimal vertical padding so the pill sits flush with body text line-height */
+  padding: 0.02rem 0.55rem 0.02rem 0.4rem;
   background: rgba(245, 194, 231, 0.06);
   border: 1px solid rgba(245, 194, 231, 0.15);
   border-radius: 9999px;
