@@ -3,5 +3,6 @@
   "vimMode": true,
   "alwaysUpdateLinks": true,
   "showUnsupportedFiles": true,
-  "newLinkFormat": "relative"
+  "newLinkFormat": "relative",
+  "showInlineTitle": false
 }
