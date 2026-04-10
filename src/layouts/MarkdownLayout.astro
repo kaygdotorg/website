@@ -692,7 +692,11 @@ const githubUrl = entry?.filePath
       });
     }
 
-    // Initialize videos for autoplay (like Ghost)
+    // Initialize videos for autoplay (like Ghost).
+    // After a View Transition (astro:page-load), video elements may be
+    // in a stale decode state. Calling load() forces the browser to
+    // re-fetch and decode the source, fixing NS_ERROR_UNEXPECTED errors
+    // in Firefox and similar decode failures in other browsers.
     function initVideoAutoplay() {
       const content = document.getElementById("markdown-content");
       if (!content) return;
@@ -703,6 +707,8 @@ const githubUrl = entry?.filePath
         video.loop = true;
         video.playsInline = true;
         video.autoplay = true;
+        // Force re-load to clear stale decode state from view transitions
+        video.load();
         video.play().catch(() => {
           // Autoplay blocked, ignore
         });
