@@ -27,3 +27,14 @@ When I'm not debugging cluster issues, you'll find me:
 This site is built with [Astro](https://astro.build), styled with Tailwind CSS, and deployed on my homelab. The content is written in Obsidian and synced to the site automatically.
 
 Feel free to explore my [blog](/blog) or see what I'm working on [now](/now).
+
+## Contact
+
+I am usually either `kayg` or `kaygdotorg` in most places. If you want to reach me, these are the best options:
+
+- **Email**: [mail@kayg.org](mailto:mail@kayg.org)
+- **GitHub**: [@kayg04](https://github.com/kaygdotorg)
+- **LinkedIn**: [K Gopal Krishna](https://www.linkedin.com/in/k-gopal-krishna-7546b92a2/)
+- **Mastodon**: [@kayg](https://mas.to/@kayg)
+- **Telegram**: [@kaygdotorg](https://t.me/kaygdotorg)
+- **X / Twitter**: [@kaygdotorg](https://x.com/kaygdotorg)
