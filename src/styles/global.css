@@ -4173,15 +4173,13 @@ kbd,
 
 /* Ensure images in markdown/prose are zoomable by default */
 .prose img,
-.md-card-body img,
-.photo-item img {
+.md-card-body img {
   cursor: zoom-in;
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
 .prose img:hover,
-.md-card-body img:hover,
-.photo-item img:hover {
+.md-card-body img:hover {
   transform: scale(1.01);
 }
 
@@ -5645,9 +5643,10 @@ html.theme-transitioning *::after {
    Photography Gallery Styles
    ======================================== */
 
+/* ---------- Gallery grid ---------- */
 .photo-gallery {
   display: grid;
-  gap: 1rem;
+  gap: 2.5rem 1.5rem;
 }
 
 @media (min-width: 640px) {
@@ -5662,27 +5661,94 @@ html.theme-transitioning *::after {
   }
 }
 
-.photo-item {
+/* ---------- Card deck container ---------- */
+/* Each entry is a positioned container. The cover sits on top; deck cards
+   are stacked behind and fan out on hover via CSS transforms. */
+.photo-deck {
   position: relative;
-  overflow: hidden;
-  border-radius: 1rem;
-  cursor: pointer;
   aspect-ratio: 4/3;
+  cursor: pointer;
+  /* Extra padding around the deck so fanned cards don't clip */
+  padding: 1rem;
 }
 
-.photo-item img {
+/* ---------- Individual cards ---------- */
+.photo-deck-card {
+  position: absolute;
+  inset: 1rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+              opacity 0.4s ease,
+              box-shadow 0.4s ease;
+  will-change: transform;
+}
+
+.photo-deck-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Ken Burns hover effect */
-.photo-item:hover img {
-  transform: scale(1.1);
+/* Back cards: hidden behind cover at rest */
+.photo-deck-card:not(.photo-deck-cover) {
+  opacity: 0;
+  z-index: 0;
 }
 
-.photo-item::after {
+/* Cover card: always visible, on top */
+.photo-deck-cover {
+  z-index: 5;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.4s ease;
+}
+
+/* ---------- Hover: fan out back cards ---------- */
+/* Deck of 2 (cover + 1): single card peeks right */
+.photo-deck.has-deck:hover .photo-deck-card[data-deck-index="0"] {
+  opacity: 1;
+  transform: translateX(12%) rotate(6deg) scale(0.92);
+  z-index: 1;
+}
+
+/* Deck of 3 (cover + 2): fan left and right */
+.photo-deck[data-deck-size="2"]:hover .photo-deck-card[data-deck-index="0"],
+.photo-deck[data-deck-size="3"]:hover .photo-deck-card[data-deck-index="0"],
+.photo-deck[data-deck-size="4"]:hover .photo-deck-card[data-deck-index="0"] {
+  transform: translateX(-14%) rotate(-5deg) scale(0.92);
+}
+
+.photo-deck[data-deck-size="2"]:hover .photo-deck-card[data-deck-index="1"],
+.photo-deck[data-deck-size="3"]:hover .photo-deck-card[data-deck-index="1"],
+.photo-deck[data-deck-size="4"]:hover .photo-deck-card[data-deck-index="1"] {
+  opacity: 1;
+  transform: translateX(14%) rotate(5deg) scale(0.92);
+  z-index: 1;
+}
+
+/* Deck of 4+ (cover + 3-4): wider fan */
+.photo-deck[data-deck-size="3"]:hover .photo-deck-card[data-deck-index="2"],
+.photo-deck[data-deck-size="4"]:hover .photo-deck-card[data-deck-index="2"] {
+  opacity: 0.85;
+  transform: translateX(-22%) rotate(-10deg) scale(0.85);
+  z-index: 0;
+}
+
+.photo-deck[data-deck-size="4"]:hover .photo-deck-card[data-deck-index="3"] {
+  opacity: 0.85;
+  transform: translateX(22%) rotate(10deg) scale(0.85);
+  z-index: 0;
+}
+
+/* Lift the cover slightly on hover */
+.photo-deck.has-deck:hover .photo-deck-cover {
+  transform: translateY(-4%) scale(1.02);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Cover overlay (title, location) ---------- */
+.photo-deck-cover::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -5690,10 +5756,9 @@ html.theme-transitioning *::after {
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
-  /* Allow clicks to pass through to the img */
 }
 
-.photo-item:hover::after {
+.photo-deck:hover .photo-deck-cover::after {
   opacity: 1;
 }
 
@@ -5707,12 +5772,11 @@ html.theme-transitioning *::after {
   transform: translateY(20px);
   opacity: 0;
   transition: transform 0.3s ease, opacity 0.3s ease;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
-  /* Allow clicks to pass through to the img */
 }
 
-.photo-item:hover .photo-overlay {
+.photo-deck:hover .photo-overlay {
   transform: translateY(0);
   opacity: 1;
 }
@@ -5907,8 +5971,12 @@ html.theme-transitioning *::after {
     transform: translateY(-4px);
   }
 
-  .photo-item:hover img {
-    transform: scale(1.02);
+  .photo-deck-card {
+    transition: none !important;
+  }
+  .photo-deck.has-deck:hover .photo-deck-card:not(.photo-deck-cover) {
+    opacity: 0 !important;
+    transform: none !important;
   }
 }
 

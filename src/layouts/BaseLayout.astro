@@ -1266,7 +1266,7 @@ import Font from "astro/components/Font.astro";
           
           // Get the current src (may be optimized WebP)
           const currentSrc = img.getAttribute("src") || "";
-          const photoItem = img.closest ? img.closest(".photo-item") : null;
+          const photoItem = img.closest ? (img.closest(".photo-deck-card") || img.closest(".photo-item")) : null;
           
           // Priority for full-size image source:
           // 1. data-original-src attribute (explicitly set)
@@ -1318,13 +1318,17 @@ import Font from "astro/components/Font.astro";
           if (!fullSrc) {
             fullSrc = currentSrc;
           }
+          // For deck cards, fall back to the cover card for metadata
+          const metaSource = photoItem?.classList.contains("photo-deck-cover")
+            ? photoItem
+            : photoItem?.closest(".photo-deck")?.querySelector(".photo-deck-cover") || photoItem;
           const alt =
-            photoItem?.getAttribute("data-alt") || img.getAttribute("alt");
+            metaSource?.getAttribute("data-alt") || img.getAttribute("alt");
 
-          // Get description and metadata from photo-item data attributes
-          const description = photoItem?.getAttribute("data-description") || "";
-          const location = photoItem?.getAttribute("data-location") || "";
-          const camera = photoItem?.getAttribute("data-camera") || "";
+          // Get description and metadata from the cover card's data attributes
+          const description = metaSource?.getAttribute("data-description") || "";
+          const location = metaSource?.getAttribute("data-location") || "";
+          const camera = metaSource?.getAttribute("data-camera") || "";
 
           if (fullSrc) {
             zoomedImg.src = fullSrc;
@@ -1377,7 +1381,7 @@ import Font from "astro/components/Font.astro";
         // FIND ALL ZOOMABLE IMAGES
         // ---------------------------------------------------------------------
         const allImages = document.querySelectorAll(
-          ".prose img, .md-card-body img, .photo-item img, .uses-carousel-slide img",
+          ".prose img, .md-card-body img, .photo-deck-card img, .uses-carousel-slide img",
         );
 
         // Exit early if no overlay exists
@@ -1401,15 +1405,23 @@ import Font from "astro/components/Font.astro";
 
             const state = (window as any).__galleryState;
 
-            // Check if this is part of a photo gallery
-            const photoItem = img.closest(".photo-item");
-            const isGallery = !!photoItem;
+            // Check if this is part of a photo deck gallery
+            const deckCard = img.closest(".photo-deck-card");
+            const isGallery = !!deckCard;
 
             if (isGallery) {
-              // Collect all visible gallery images
-              const allGalleryImages = Array.from(
-                document.querySelectorAll(".photo-item:not(.hidden) img"),
-              ) as HTMLElement[];
+              // Collect all images from all visible decks, ordered by deck
+              // then by card position (cover last within each deck so it
+              // shows first — cover is the last DOM child but index 0 here).
+              const allGalleryImages: HTMLElement[] = [];
+              document.querySelectorAll(".photo-deck:not(.hidden)").forEach((deck) => {
+                // Cover image first, then deck extras in order
+                const cover = deck.querySelector(".photo-deck-cover img") as HTMLElement;
+                if (cover) allGalleryImages.push(cover);
+                deck.querySelectorAll(".photo-deck-card:not(.photo-deck-cover) img").forEach((di) => {
+                  allGalleryImages.push(di as HTMLElement);
+                });
+              });
               state.images = allGalleryImages;
               state.currentIndex = allGalleryImages.indexOf(img as HTMLElement);
               state.isGalleryMode = true;

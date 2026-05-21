@@ -413,8 +413,12 @@ const photographySchema = z
     thumb: z.string().optional(),
     alt: z.string().optional(),
     category: z.string().optional(),
+    tags: z.array(z.string()).nullable().optional(),
     location: z.string().optional(),
     camera: z.string().optional(),
+
+    /** Extra images for the card-deck fan-out on hover (max 4 shown) */
+    deck: z.array(z.string()).optional(),
 
     // Page-specific fields
     "display-in-progress": z.boolean().optional(),

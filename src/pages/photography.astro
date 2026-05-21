@@ -29,6 +29,7 @@
  * - camera: Camera/equipment used (optional)
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
+import TagFilter from "../components/TagFilter.astro";
 import { getCollection } from "astro:content";
 
 // =============================================================================
@@ -77,17 +78,25 @@ const photos = await Promise.all(
     // which keeps photo list generation lighter during builds.
     const bodyText = photo.body?.trim() || "";
 
+    // Build the card deck: cover + up to 4 extras from the deck array.
+    // If more than 4 extras exist, pick 4 at random.
+    const rawDeck: string[] = (photo.data.deck as string[]) || [];
+    const extras = rawDeck.length <= 4
+      ? rawDeck
+      : rawDeck.sort(() => Math.random() - 0.5).slice(0, 4);
+
     return {
       src: photo.data.src,
-      thumb: photo.data.thumb || photo.data.src, // Fallback to full-res if no thumb
+      thumb: photo.data.thumb || photo.data.src,
       alt: photo.data.alt,
       title: photo.data.title || photo.data.alt,
-      category: photo.data.category,
+      tags: Array.isArray(photo.data.tags) ? photo.data.tags : [],
       location: photo.data.location,
       date: photo.data.date,
       camera: photo.data.camera,
-      id: photo.id, // Use entry.id instead of slug (Astro 5 compatibility)
-      description: bodyText, // Body content as description
+      id: photo.id,
+      description: bodyText,
+      deck: extras,
     };
   })
 );
@@ -104,9 +113,16 @@ photos.sort((a, b) => {
 });
 
 /**
- * Extract unique categories for filter buttons.
+ * Calculate tag frequency for the tag filter (same pattern as blog.astro).
  */
-const categories = [...new Set(photos.map((p) => p.category))];
+const tagMap = new Map<string, number>();
+photos.forEach((photo) => {
+  photo.tags.forEach((tag: string) => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  });
+});
+const tagCounts = Array.from(tagMap, ([tag, count]) => ({ tag, count }))
+  .sort((a, b) => b.count - a.count);
 
 /**
  * Check if page should display "in progress" indicator.
@@ -133,59 +149,72 @@ const isInProgress = entry.data["display-in-progress"] === true;
     </header>
 
     {/* =========================================================================
-        CATEGORY FILTER
-        Buttons for filtering photos by category. "All" shows everything.
+        TAG FILTER
+        Reuses the same TagFilter component as /blog for consistency.
         ========================================================================= */}
-    <div class="flex flex-wrap gap-2 mb-8 animate-fade-up stagger-1">
-      <button
-        class="filter-btn active px-4 py-2 rounded-full text-sm transition-all"
-        data-category="all"
-      >
-        All
-      </button>
-      {categories.map((category) => (
-        <button
-          class="filter-btn px-4 py-2 rounded-full text-sm transition-all"
-          data-category={category}
-        >
-          {category}
-        </button>
-      ))}
-    </div>
+    <TagFilter
+      tags={tagCounts}
+      totalCount={photos.length}
+      cardSelector=".photo-deck"
+    />
 
     {/* =========================================================================
         PHOTO GALLERY
         Grid of photos with overlay information on hover.
         ========================================================================= */}
     <div class="photo-gallery animate-fade-up stagger-2">
-      {photos.map((photo, index) => (
-        <div
-          class="photo-item frosted-card"
-          data-category={photo.category}
-          data-src={photo.src}
-          data-alt={photo.alt}
-          data-description={photo.description}
-          data-location={photo.location}
-          data-camera={photo.camera}
-          style={`animation-delay: ${index * 0.1}s`}
-        >
-          <img
-            src={photo.thumb}
-            alt={photo.alt}
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="photo-overlay">
-            <p class="font-medium text-lg">{photo.alt}</p>
-            {photo.description && (
-              <p class="text-sm opacity-90 mt-1 line-clamp-2">{photo.description}</p>
-            )}
-            <p class="text-sm opacity-70 mt-1">
-              {photo.location} · {photo.category}
-            </p>
+      {photos.map((photo, index) => {
+        const hasDeck = photo.deck.length > 0;
+        const deckSize = photo.deck.length; // 0-4
+
+        return (
+          <div
+            class={`photo-deck ${hasDeck ? "has-deck" : ""}`}
+            data-tags={JSON.stringify(photo.tags)}
+            data-deck-size={deckSize}
+            style={`animation-delay: ${index * 0.1}s`}
+          >
+            {/* Back cards (rendered first so they sit behind the cover) */}
+            {photo.deck.map((deckSrc, di) => (
+              <div class="photo-deck-card" data-deck-index={di}>
+                <img
+                  src={deckSrc}
+                  alt={`${photo.alt} (${di + 2})`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            ))}
+
+            {/* Cover card — always on top */}
+            <div
+              class="photo-deck-card photo-deck-cover"
+              data-src={photo.src}
+              data-alt={photo.alt}
+              data-description={photo.description}
+              data-location={photo.location}
+              data-camera={photo.camera}
+            >
+              <img
+                src={photo.thumb}
+                alt={photo.alt}
+                loading="lazy"
+                decoding="async"
+              />
+              <div class="photo-overlay">
+                <p class="font-medium text-lg">{photo.alt}</p>
+                {photo.description && (
+                  <p class="text-sm opacity-90 mt-1 line-clamp-2">{photo.description}</p>
+                )}
+                <p class="text-sm opacity-70 mt-1">
+                  {photo.location}
+                  {photo.tags.length > 0 && ` · ${photo.tags.map(t => `#${t}`).join(" ")}`}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
 
     {/* =========================================================================
@@ -202,96 +231,10 @@ const isInProgress = entry.data["display-in-progress"] === true;
     )}
   </section>
 
-  {/* ===========================================================================
-      STYLES
-      Filter button styling with dark/light mode support.
-      =========================================================================== */}
+  {/* Hidden class for filtered-out photos */}
   <style>
-    /* Filter button base styles */
-    .filter-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--fallback-bc, #f8f4fc);
-      opacity: 0.7;
-    }
-
-    /* Filter button hover and active states */
-    .filter-btn:hover,
-    .filter-btn.active {
-      background: rgba(244, 114, 182, 0.15);
-      border-color: rgba(244, 114, 182, 0.3);
-      color: var(--color-accent-500, #ec4899);
-      opacity: 1;
-    }
-
-    /* Light mode overrides */
-    [data-theme="light"] .filter-btn {
-      background: rgba(0, 0, 0, 0.03);
-      border-color: rgba(0, 0, 0, 0.1);
-      color: #1a1225;
-    }
-
-    [data-theme="light"] .filter-btn:hover,
-    [data-theme="light"] .filter-btn.active {
-      background: rgba(236, 72, 153, 0.1);
-      border-color: rgba(236, 72, 153, 0.3);
-      color: var(--color-accent-600, #db2777);
-      opacity: 1;
-    }
-
-    /* Hidden class for filtered-out photos */
-    .photo-item.hidden {
+    .photo-deck.hidden {
       display: none;
     }
   </style>
-
-  {/* ===========================================================================
-      FILTER SCRIPT
-      Handles category filter button interactions.
-      =========================================================================== */}
-  <script>
-    /**
-     * Initialize photography gallery filter functionality.
-     * Uses event delegation and tracks initialization state to prevent
-     * duplicate listeners on view transitions.
-     */
-    function initPhotographyFilters() {
-      const filterBtns = document.querySelectorAll(".filter-btn");
-      const photoItems = document.querySelectorAll(".photo-item");
-
-      filterBtns.forEach((btn) => {
-        // Skip if already initialized (prevents duplicate listeners)
-        if ((btn as any).__filterInitialized) return;
-        (btn as any).__filterInitialized = true;
-
-        btn.addEventListener("click", () => {
-          // Update active state on buttons
-          filterBtns.forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-
-          // Get selected category
-          const category = btn.getAttribute("data-category");
-
-          // Show/hide photos based on category
-          photoItems.forEach((item) => {
-            const matches =
-              category === "all" ||
-              item.getAttribute("data-category") === category;
-
-            if (matches) {
-              item.classList.remove("hidden");
-            } else {
-              item.classList.add("hidden");
-            }
-          });
-        });
-      });
-    }
-
-    // Initialize on first load
-    initPhotographyFilters();
-
-    // Re-initialize after view transitions (Astro's page navigation)
-    document.addEventListener("astro:page-load", initPhotographyFilters);
-  </script>
 </BaseLayout>

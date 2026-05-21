@@ -2,7 +2,9 @@
 src: https://images.unsplash.com/photo-1444464666168-49d633b86797?w=1200&q=80
 thumb: https://images.unsplash.com/photo-1444464666168-49d633b86797?w=600&q=80
 alt: Bird in flight over ocean
-category: Nature
+tags:
+  - nature
+  - wildlife
 location: California Coast
 date: 2024-01-08
 ---
