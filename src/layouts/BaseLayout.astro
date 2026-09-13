@@ -99,6 +99,7 @@ const resolvedOgImage =
 
 import { ClientRouter } from "astro:transitions";
 import Font from "astro/components/Font.astro";
+import GrainBackground from "../components/GrainBackground.astro";
 ---
 
 <!doctype html>
@@ -256,15 +257,8 @@ import Font from "astro/components/Font.astro";
     <!-- Skip to main content link for keyboard/screen reader users -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Animated Film Grain Background -->
-    <div class="animated-gradient-bg" aria-hidden="true" transition:persist>
-      <!-- Soft color flares (like light leaks) -->
-      <div class="film-flare"></div>
-      <!-- Subtle color tint -->
-      <div class="film-tint"></div>
-      <!-- Vignette darkening at edges -->
-      <div class="film-vignette"></div>
-    </div>
+    <!-- Persistent still-frame shader with a lightweight CSS fallback. -->
+    <GrainBackground />
 
     <!-- Global Image Zoom Overlay with Gallery Navigation -->
     <div id="zoom-overlay" class="zoom-overlay" aria-hidden="true">

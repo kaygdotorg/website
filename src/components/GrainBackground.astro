@@ -1,0 +1,154 @@
+---
+/**
+ * A persistent Paper Grain Gradient, rendered as a still frame. The decorative
+ * shader loads during idle time and redraws only for resizing or theme changes;
+ * it does not add a continuous animation loop to article pages.
+ */
+---
+
+<grain-background aria-hidden="true" transition:persist="grain-background"></grain-background>
+
+<style>
+  grain-background {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    /* Also visible before the module loads, with JS disabled, or without WebGL. */
+    background: radial-gradient(ellipse at 0% 0%, #382237, transparent 70%),
+      radial-gradient(ellipse at 100% 100%, #493124, transparent 70%), #100e16;
+  }
+
+  :global([data-theme="light"]) grain-background {
+    background: radial-gradient(ellipse at 0% 0%, #e8dce9, transparent 70%),
+      radial-gradient(ellipse at 100% 100%, #f0d8bd, transparent 70%), #faf7f2;
+  }
+
+  /* Paper injects its default canvas CSS into <head>, which Astro replaces on
+     navigation. Own the sizing here so a persisted, resolution-capped canvas
+     continues covering the viewport after a page swap or resize. */
+  grain-background :global(canvas) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    contain: strict;
+  }
+
+  @media print {
+    grain-background { display: none; }
+  }
+</style>
+
+<script>
+  import type { ShaderMount } from "@paper-design/shaders";
+
+  class GrainBackground extends HTMLElement {
+    private mount?: ShaderMount;
+    private observer?: MutationObserver;
+    private initializing = false;
+    private idle?: number;
+    private timer?: ReturnType<typeof setTimeout>;
+
+    connectedCallback() {
+      if (this.mount || this.initializing || this.idle !== undefined || this.timer !== undefined) return;
+      const start = () => {
+        this.idle = undefined;
+        this.timer = undefined;
+        void this.initialize();
+      };
+      // Keep shader download/compilation off the initial synchronous page path.
+      if ("requestIdleCallback" in window) {
+        this.idle = window.requestIdleCallback(start, { timeout: 1500 });
+      } else {
+        this.timer = setTimeout(start, 250);
+      }
+    }
+
+    private async initialize() {
+      if (!this.isConnected || this.mount || this.initializing) return;
+      this.initializing = true;
+      try {
+        const { ShaderMount, grainGradientFragmentShader, GrainGradientShapes,
+          getShaderColorFromString, getShaderNoiseTexture } = await import("../scripts/grain-shader");
+        const noise = getShaderNoiseTexture();
+        if (noise) await noise.decode();
+        if (!this.isConnected) return;
+
+        const palette = () => {
+          const light = document.documentElement.dataset.theme === "light";
+          return {
+            u_colorBack: getShaderColorFromString(light ? "#faf7f2" : "#100e16"),
+            u_colors: (light
+              ? ["#e5d4e9", "#efd3af", "#f7e8dd"]
+              : ["#51334f", "#795035", "#29253f"]
+            ).map(getShaderColorFromString),
+          };
+        };
+
+        this.mount = new ShaderMount(this, grainGradientFragmentShader, {
+          ...palette(), u_colorsCount: 3, u_softness: 0.85, u_intensity: 0.2,
+          u_noise: 0.08, u_shape: GrainGradientShapes.corners,
+          ...(noise ? { u_noiseTexture: noise } : {}),
+          // Contain keeps the coloured corners visible on narrow phone screens.
+          u_fit: 1, u_scale: 1, u_rotation: 0, u_offsetX: 0, u_offsetY: 0,
+          u_originX: 0.5, u_originY: 0.5, u_worldWidth: 0, u_worldHeight: 0,
+        }, { alpha: false, antialias: false, powerPreference: "low-power" },
+        // speed=0 stops Paper's loop (including for reduced-motion users).
+        // Cap the backing canvas at ~1MP instead of the library's 4K default.
+        0, 12000, 1, 1_048_576);
+
+        // Mobile GPU pressure can evict a context after successful startup.
+        // Remove the opaque canvas so the fallback remains visible; do not
+        // repeatedly allocate new contexts while the device is under pressure.
+        this.mount.canvasElement.addEventListener("webglcontextlost", () => {
+          this.observer?.disconnect();
+          this.mount?.dispose();
+          this.mount = undefined;
+          this.querySelector("canvas")?.remove();
+        }, { once: true });
+
+        this.observer = new MutationObserver(() => this.mount?.setUniforms(palette()));
+        this.observer.observe(document.documentElement, {
+          attributes: true, attributeFilter: ["data-theme"],
+        });
+      } catch (error) {
+        this.mount?.dispose();
+        this.mount = undefined;
+        this.querySelector("canvas")?.remove();
+        console.warn("Grain background unavailable; using CSS fallback.", error);
+      } finally {
+        this.initializing = false;
+      }
+    }
+
+    disconnectedCallback() {
+      // Astro briefly moves persisted elements while swapping pages. Only tear
+      // down when truly removed, avoiding a new WebGL context per navigation.
+      queueMicrotask(() => {
+        if (this.isConnected) return;
+        if (this.idle !== undefined) window.cancelIdleCallback(this.idle);
+        if (this.timer !== undefined) clearTimeout(this.timer);
+        this.idle = undefined;
+        this.timer = undefined;
+        this.observer?.disconnect();
+        this.mount?.dispose();
+        this.mount = undefined;
+      });
+    }
+  }
+
+  if (!customElements.get("grain-background")) {
+    customElements.define("grain-background", GrainBackground);
+  }
+
+  // Custom element constructors cannot be replaced. Reload on script updates
+  // during development so palette/lifecycle edits do not retain an old class.
+  if (import.meta.hot) {
+    import.meta.hot.accept(() => import.meta.hot?.invalidate());
+  }
+</script>
