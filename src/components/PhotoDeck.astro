@@ -25,7 +25,7 @@ function settings(data: Props["photos"][number]["data"]) {
   <div class="deck-heading">
     <h2>{title}</h2>
   </div>
-  <div class="deck-stage" role="group" aria-label="Photographs. Swipe horizontally or use arrow keys to browse.">
+  <div class="deck-stage" role="group" aria-label={photos.length > 1 ? "Photographs. Swipe horizontally or use arrow keys to browse." : "Photograph. Select to show details."}>
     {photos.map((photo, index) => {
       const src = photo.data.thumb || photo.data.src!;
       const name = photo.data.title || photo.data.alt || "Untitled photograph";
@@ -38,7 +38,8 @@ function settings(data: Props["photos"][number]["data"]) {
       </button>;
     })}
   </div>
-  <p class="deck-prompt">Swipe to explore · select a photograph for its details</p>
+  {/* Single-photo entries have no additional frames to swipe through. */}
+  <p class="deck-prompt">{photos.length > 1 ? "Swipe to explore · select a photograph for its details" : "Select the photograph for its details"}</p>
   {/* The glass card expands in document flow. Its details are inert while
       closed, and each photo owns a distinct panel with its own metadata. */}
   <div class="details-expansion" inert>
