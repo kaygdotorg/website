@@ -6,10 +6,17 @@
  */
 ---
 
-<grain-background aria-hidden="true" transition:persist="grain-background"></grain-background>
+<grain-background
+  aria-hidden="true"
+  transition:persist="grain-background"
+></grain-background>
 
 <style>
   grain-background {
+    /* Preserve the live element, but capture it with the page's root snapshot.
+       Astro's separate named snapshot would cover the content during a swap.
+       Override its generated scope rule without disabling DOM persistence. */
+    view-transition-name: none !important;
     display: block;
     position: fixed;
     inset: 0;
@@ -37,6 +44,16 @@
     height: 100%;
     z-index: 0;
     contain: strict;
+    opacity: 0;
+    transition: opacity 160ms ease-out;
+  }
+
+  grain-background :global(canvas[data-grain-ready]) {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    grain-background :global(canvas) { transition: none; }
   }
 
   @media print {
@@ -53,6 +70,15 @@
     private initializing = false;
     private idle?: number;
     private timer?: ReturnType<typeof setTimeout>;
+    private revealObserver?: ResizeObserver;
+    private revealFrame?: number;
+
+    private cancelReveal() {
+      this.revealObserver?.disconnect();
+      this.revealObserver = undefined;
+      if (this.revealFrame !== undefined) cancelAnimationFrame(this.revealFrame);
+      this.revealFrame = undefined;
+    }
 
     connectedCallback() {
       if (this.mount || this.initializing || this.idle !== undefined || this.timer !== undefined) return;
@@ -97,7 +123,16 @@
           // Contain keeps the coloured corners visible on narrow phone screens.
           u_fit: 1, u_scale: 1, u_rotation: 0, u_offsetX: 0, u_offsetY: 0,
           u_originX: 0.5, u_originY: 0.5, u_worldWidth: 0, u_worldHeight: 0,
-        }, { alpha: false, antialias: false, powerPreference: "low-power" },
+        }, {
+          alpha: false,
+          antialias: false,
+          powerPreference: "low-power",
+          // A speed of zero renders only on setup, resize, or uniform changes.
+          // Retain that frame when Astro reparents the persistent canvas or the
+          // browser rebuilds its compositor layers; the WebGL default permits
+          // discarding the drawing buffer after it has been presented.
+          preserveDrawingBuffer: true,
+        },
         // speed=0 stops Paper's loop (including for reduced-motion users).
         // Cap the backing canvas at ~1MP instead of the library's 4K default.
         0, 12000, 1, 1_048_576);
@@ -106,17 +141,41 @@
         // Remove the opaque canvas so the fallback remains visible; do not
         // repeatedly allocate new contexts while the device is under pressure.
         this.mount.canvasElement.addEventListener("webglcontextlost", () => {
+          this.cancelReveal();
           this.observer?.disconnect();
           this.mount?.dispose();
           this.mount = undefined;
           this.querySelector("canvas")?.remove();
         }, { once: true });
 
+        // The mount inserts an opaque canvas before its ResizeObserver performs
+        // the first correctly sized draw. Keep that canvas transparent until a
+        // non-zero layout exists, then redraw once immediately before revealing
+        // it. This makes the late idle-loaded shader replace its CSS fallback
+        // smoothly without exposing the canvas's initial drawing buffer.
+        const mounted = this.mount;
+        const canvas = mounted.canvasElement;
+        this.revealObserver = new ResizeObserver(() => {
+          const bounds = this.getBoundingClientRect();
+          if (bounds.width === 0 || bounds.height === 0) return;
+
+          this.revealObserver?.disconnect();
+          this.revealObserver = undefined;
+          this.revealFrame = requestAnimationFrame(() => {
+            this.revealFrame = undefined;
+            if (!this.isConnected || this.mount !== mounted) return;
+            mounted.setFrame(mounted.getCurrentFrame());
+            canvas.dataset.grainReady = "";
+          });
+        });
+        this.revealObserver.observe(this);
+
         this.observer = new MutationObserver(() => this.mount?.setUniforms(palette()));
         this.observer.observe(document.documentElement, {
           attributes: true, attributeFilter: ["data-theme"],
         });
       } catch (error) {
+        this.cancelReveal();
         this.mount?.dispose();
         this.mount = undefined;
         this.querySelector("canvas")?.remove();
@@ -135,6 +194,7 @@
         if (this.timer !== undefined) clearTimeout(this.timer);
         this.idle = undefined;
         this.timer = undefined;
+        this.cancelReveal();
         this.observer?.disconnect();
         this.mount?.dispose();
         this.mount = undefined;

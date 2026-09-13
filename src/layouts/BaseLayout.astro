@@ -44,14 +44,16 @@ const allNavLinks =
     { href: "/talks", label: "Talks" },
   ];
 
-// Helper to map social labels to icon names
+// Helper to map social labels to icon names. Brand marks use their canonical
+// icon key so the footer stays correct if content changes from "Twitter/X" to
+// simply "X".
 const getIconName = (label: string) => {
-  const lower = label.toLowerCase();
+  const lower = label.trim().toLowerCase();
   if (lower.includes("github")) return "github";
-  if (lower.includes("twitter") || lower.includes("x")) return "twitter";
   if (lower.includes("linkedin")) return "linkedin";
   if (lower.includes("mastodon")) return "mastodon";
   if (lower.includes("telegram")) return "telegram";
+  if (/\b(?:twitter|x)\b/.test(lower)) return "x";
   return "link"; // Fallback icon
 };
 
@@ -739,21 +741,43 @@ import GrainBackground from "../components/GrainBackground.astro";
       initThemeToggle();
 
       /**
+       * Astro replaces the current <html> attributes from the fetched document
+       * during a View Transition. The fetched HTML has no client-selected
+       * data-theme, so preserve the active value before that replacement. This
+       * also keeps persistent theme-aware elements from briefly observing a
+       * missing theme and rendering their opposite palette into the transition.
+       */
+      document.addEventListener("astro:before-swap", (event) => {
+        const activeTheme = document.documentElement.getAttribute("data-theme");
+        const nextDocument = (event as Event & { newDocument: Document })
+          .newDocument;
+
+        if (activeTheme) {
+          nextDocument.documentElement.setAttribute("data-theme", activeTheme);
+        }
+      });
+
+      /**
        * Restore theme from localStorage after View Transitions navigation.
        * View Transitions may reset the theme attribute, so we reapply it.
        */
       function restoreTheme() {
         const savedTheme = localStorage.getItem("theme");
+        let resolvedTheme: string;
         if (savedTheme) {
-          document.documentElement.setAttribute("data-theme", savedTheme);
+          resolvedTheme = savedTheme;
         } else {
           const prefersDark = window.matchMedia(
             "(prefers-color-scheme: dark)",
           ).matches;
-          document.documentElement.setAttribute(
-            "data-theme",
-            prefersDark ? "dark" : "light",
-          );
+          resolvedTheme = prefersDark ? "dark" : "light";
+        }
+
+        // The before-swap handler normally carried this value forward. Avoid
+        // a redundant mutation because shader backgrounds redraw on changes to
+        // this attribute, even when the value itself did not change.
+        if (document.documentElement.getAttribute("data-theme") !== resolvedTheme) {
+          document.documentElement.setAttribute("data-theme", resolvedTheme);
         }
 
         // Restore theme-color meta for Safari
