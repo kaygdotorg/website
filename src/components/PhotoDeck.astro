@@ -45,9 +45,9 @@ function settings(data: Props["photos"][number]["data"]) {
     <div class="details-clip"><div class="details-inner">
       {photos.map((photo,index) => <section id={`photo-detail-${deckIndex}-${index}`} data-detail-index={index} hidden aria-labelledby={`photo-title-${deckIndex}-${index}`}>
         <div class="detail-title-row"><h3 id={`photo-title-${deckIndex}-${index}`}>{photo.data.title || photo.data.alt || "Untitled photograph"}</h3>{photo.data.demo && <span class="demo-label">Sample photo</span>}</div>
+        <dl class="photo-settings">{settings(photo.data).map(([label,value]) => <div><dt>{label}</dt><dd><button type="button" class="setting-value" data-copy-value={value || "Not recorded"} aria-label={`Copy ${label}: ${value || "Not recorded"}`}>{value || "Not recorded"}</button></dd></div>)}</dl>
         {photo.body?.trim() && <p class="photo-description">{photo.body.trim()}</p>}
         {(photo.data.location || photo.data.date) && <p class="photo-description">{[photo.data.location,photo.data.date?.toLocaleDateString("en-GB",{month:"short",year:"numeric",timeZone:"UTC"})].filter(Boolean).join(" · ")}</p>}
-        <dl class="photo-settings">{settings(photo.data).map(([label,value]) => <div><dt>{label}</dt><dd><button type="button" class="setting-value" data-copy-value={value || "Not recorded"} aria-label={`Copy ${label}: ${value || "Not recorded"}`}>{value || "Not recorded"}</button></dd></div>)}</dl>
         {photo.data.demo && <p class="sample-note">Demo image from Unsplash, not my photograph. Capture settings are not supplied.</p>}
       </section>)}
     </div></div>
@@ -56,13 +56,20 @@ function settings(data: Props["photos"][number]["data"]) {
 </photo-deck>
 
 <style>
-  photo-deck { display:block; isolation:isolate; padding:28px 36px; border:1px solid rgba(255,255,255,.16); border-radius:30px; background:rgba(62,51,65,.46); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 60px rgba(0,0,0,.12); }
+  /* The denser tint lets a much smaller blur keep the frosted appearance. The
+     reduced kernel is especially useful while the details region changes size. */
+  photo-deck { display:block; isolation:isolate; padding:28px 36px; border:1px solid rgba(255,255,255,.16); border-radius:30px; background:rgba(62,51,65,.62); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 60px rgba(0,0,0,.12); }
   .deck-heading { display:flex; justify-content:space-between; align-items:center; gap:20px; }
-  .print-label,.photo-settings dt,.sample-note,.demo-label { font-family:var(--font-ui,sans-serif); }
-  h2 { font-family:var(--font-ui,sans-serif); font-size:25px; font-weight:400; color:#f5efef; margin:0; }
+  .print-label,h2,h3 { font-family:var(--font-body,sans-serif); }
+  .photo-settings dt,.sample-note,.demo-label { font-family:var(--font-ui,sans-serif); }
+  h2 { font-size:25px; font-weight:500; color:#f5efef; margin:0; }
   .deck-stage { position:relative; width:100%; aspect-ratio:1.85; margin-top:20px; touch-action:pan-y pinch-zoom; user-select:none; }
-  .photo-print { position:absolute; display:block; width:56%; top:50%; left:50%; padding:10px 10px 0; border:1px solid rgba(0,0,0,.1); border-radius:6px; background:#f3eee6; color:#29272a; box-shadow:0 8px 14px rgba(0,0,0,.14),0 20px 35px rgba(0,0,0,.21); transform:translate(calc(-50% + var(--spread)*29%),-50%) rotate(calc(var(--spread)*9deg)); z-index:calc(3 + var(--order)); cursor:pointer; transition:transform 280ms cubic-bezier(.22,1,.36,1),opacity 200ms ease,width 280ms cubic-bezier(.22,1,.36,1); }
+  /* Every print keeps the largest selected width. Scale ratios reproduce the
+     previous visual sizes without recalculating layout while the fan moves. */
+  .photo-print { position:absolute; display:block; width:70%; top:50%; left:50%; padding:10px 10px 0; border:1px solid rgba(0,0,0,.1); border-radius:6px; background:#f3eee6; color:#29272a; box-shadow:0 8px 14px rgba(0,0,0,.14),0 20px 35px rgba(0,0,0,.21); transform:translate(calc(-50% + var(--spread)*23.2%),-50%) rotate(calc(var(--spread)*9deg)) scale(.8); z-index:calc(3 + var(--order)); cursor:pointer; will-change:transform; transition:transform 260ms cubic-bezier(.22,1,.36,1),opacity 180ms ease; }
   .print-image { display:block; aspect-ratio:3/2; background:#e8e1d5; overflow:hidden; }
+  /* Drag feedback moves the already-rasterized prints without resizing them. */
+  .photo-print { translate:var(--drag-x,0px) 0; }
   .print-image img { display:block; width:100%; height:100%; object-fit:contain; }
   .print-label { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:38px; font-size:11px; text-align:left; }
   .print-label span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -71,18 +78,19 @@ function settings(data: Props["photos"][number]["data"]) {
   button:focus-visible { outline:none; }
   .photo-print:focus-visible .print-label, .setting-value:focus-visible { text-decoration:underline; text-underline-offset:3px; }
   .photo-print:focus-visible { z-index:12; }
-  photo-deck[data-open="true"] .photo-print { width:43%; opacity:.55; transform:translate(calc(-50% + var(--side)*68%),-50%) rotate(calc(var(--side)*8deg)) scale(.9); }
-  photo-deck[data-open="true"] .photo-print[data-selected="true"] { width:70%; opacity:1; z-index:10; transform:translate(-50%,-50%); }
+  photo-deck[data-open="true"] .photo-print { opacity:.55; transform:translate(calc(-50% + var(--side)*41.72%),-50%) rotate(calc(var(--side)*8deg)) scale(.553); }
+  photo-deck[data-open="true"] .photo-print[data-selected="true"] { opacity:1; z-index:10; transform:translate(-50%,-50%) scale(1); }
   photo-deck[data-open="true"] .photo-print:focus-visible { z-index:12; }
   .deck-prompt { text-align:center; color:#d3c7d0; font-size:12px; margin:20px 0 0; }
   .deck-prompt span { margin-left:8px; }
   photo-deck[data-open="true"] .deck-prompt { display:none; }
-  .details-expansion { display:grid; grid-template-rows:0fr; opacity:0; transition:grid-template-rows 280ms cubic-bezier(.22,1,.36,1),opacity 200ms ease; }
-  photo-deck[data-open="true"] .details-expansion { grid-template-rows:1fr; opacity:1; }
-  .details-clip { min-height:0; overflow:hidden; }
+  /* JS measures one concrete end height. Containment limits each height step to
+     this disclosure and clips its contents without scaling or stretching text. */
+  .details-expansion { height:0; opacity:0; overflow:hidden; contain:layout paint; }
+  .details-clip { min-height:0; }
   .details-inner { padding-top:28px; }
   .detail-title-row { display:flex; justify-content:space-between; align-items:baseline; gap:16px; }
-  h3 { font-family:var(--font-ui,sans-serif); font-size:clamp(25px,4vw,34px); font-weight:400; letter-spacing:-.02em; color:#faf6f1; margin:0; }
+  h3 { font-size:clamp(25px,4vw,34px); font-weight:500; letter-spacing:-.02em; color:#faf6f1; margin:0; }
   .demo-label { font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:#cabecb; white-space:nowrap; }
   .photo-description { color:#c9c0ca; font-size:15px; line-height:1.65; margin:12px 0 0; max-width:60ch; }
   /* One quiet inset surface; each label/value pair reads along one line.
@@ -93,7 +101,7 @@ function settings(data: Props["photos"][number]["data"]) {
   .photo-settings dd { min-width:0; margin:0; text-align:right; }
   .setting-value { display:block; min-height:44px; padding:10px 0; background:none; border:0; color:#f5edf5; font-family:var(--font-mono,monospace); font-size:12px; line-height:1.7; cursor:pointer; overflow-wrap:anywhere; text-align:right; text-decoration:underline; text-decoration-color:transparent; text-underline-offset:4px; transition:color 150ms ease,text-decoration-color 150ms ease; }
   .sample-note { color:#bcb0c0; font-size:11px; line-height:1.65; margin:18px 0 0; }
-  :global([data-theme="light"]) photo-deck { background:rgba(255,252,248,.5); border-color:rgba(73,53,63,.16); box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 60px rgba(57,38,47,.08); }
+  :global([data-theme="light"]) photo-deck { background:rgba(255,252,248,.68); border-color:rgba(73,53,63,.16); box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 60px rgba(57,38,47,.08); }
   :global([data-theme="light"]) :is(h2,h3) { color:#30272e; }
   :global([data-theme="light"]) :is(.deck-prompt,.demo-label,.photo-description,.photo-settings dt,.sample-note) { color:#6e5c6b; }
   :global([data-theme="light"]) .photo-settings { background:rgba(77,55,68,.055); box-shadow:inset 0 1px 3px rgba(57,38,47,.04); }
@@ -103,16 +111,16 @@ function settings(data: Props["photos"][number]["data"]) {
     photo-deck { padding:22px 18px; border-radius:24px; }
     .deck-heading { gap:12px; } h2 { font-size:21px; }
     .deck-stage { aspect-ratio:1.25; margin-top:12px; }
-    .photo-print { width:65%; padding:6px 6px 0; transform:translate(calc(-50% + var(--spread)*21%),-50%) rotate(calc(var(--spread)*8deg)); }
+    .photo-print { width:86%; padding:6px 6px 0; transform:translate(calc(-50% + var(--spread)*15.87%),-50%) rotate(calc(var(--spread)*8deg)) scale(.756); }
     .print-label { font-size:9px; min-height:30px; gap:5px; }
-    photo-deck[data-open="true"] .photo-print { width:45%; transform:translate(calc(-50% + var(--side)*61%),-50%) rotate(calc(var(--side)*7deg)) scale(.9); }
-    photo-deck[data-open="true"] .photo-print[data-selected="true"] { width:86%; transform:translate(-50%,-50%); }
+    photo-deck[data-open="true"] .photo-print { transform:translate(calc(-50% + var(--side)*31.92%),-50%) rotate(calc(var(--side)*7deg)) scale(.471); }
+    photo-deck[data-open="true"] .photo-print[data-selected="true"] { transform:translate(-50%,-50%) scale(1); }
     .deck-prompt { font-size:11px; margin-top:4px; }
     .details-inner { padding-top:16px; }
     .detail-title-row { display:block; } .demo-label { display:block; margin-top:8px; }
     .photo-settings { grid-template-columns:1fr; padding:10px 14px; gap:0; }
   }
-  @media(prefers-reduced-motion:reduce) { .photo-print,.details-expansion { transition:none; } }
+  @media(prefers-reduced-motion:reduce) { .photo-print { transition:none; } }
 </style>
 
 <script>
@@ -126,10 +134,16 @@ function settings(data: Props["photos"][number]["data"]) {
     private wheelAmount = 0;
     private wheelLocked = false;
     private suppressClickUntil = 0;
+    private detailsAnimation?: Animation;
     connectedCallback() {
       if (this.controller) return;
       this.controller = new AbortController();
       const signal = this.controller.signal;
+      // A custom element can be disconnected and reinserted during navigation.
+      // Normalize the disclosure after a cancelled animation on reconnection.
+      const details = this.querySelector<HTMLElement>(".details-expansion")!;
+      details.style.height = this.selected >= 0 ? "auto" : "0px";
+      details.style.opacity = this.selected >= 0 ? "1" : "0";
       this.addEventListener("click", event => {
         if (performance.now() < this.suppressClickUntil) { event.preventDefault(); return; }
         const button = (event.target as Element).closest<HTMLButtonElement>("button");
@@ -160,16 +174,16 @@ function settings(data: Props["photos"][number]["data"]) {
         }
       }, {signal});
       const stage = this.querySelector<HTMLElement>(".deck-stage")!;
-      // Horizontal trackpad/shift-wheel gestures advance once per burst, so
-      // momentum cannot skip the whole deck. Vertical page scrolling is free.
+      // A short fixed cooldown limits momentum without waiting for the wheel
+      // stream to stop: continuous horizontal input can cycle indefinitely.
       stage.addEventListener("wheel", event => {
         const delta = event.shiftKey && !event.deltaX ? event.deltaY : event.deltaX;
         if (!delta || (!event.shiftKey && Math.abs(event.deltaX) <= Math.abs(event.deltaY))) return;
         if (this.querySelectorAll("[data-photo-index]").length < 2) return;
         event.preventDefault();
+        if (this.wheelLocked) return;
         clearTimeout(this.wheelTimer);
         this.wheelTimer = setTimeout(() => { this.wheelAmount = 0; this.wheelLocked = false; }, 180);
-        if (this.wheelLocked) return;
         this.wheelAmount += delta * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? stage.clientWidth : 1);
         if (Math.abs(this.wheelAmount) >= 36) { this.advance(this.wheelAmount > 0 ? 1 : -1); this.wheelLocked = true; }
       }, {signal, passive:false});
@@ -185,6 +199,7 @@ function settings(data: Props["photos"][number]["data"]) {
         if (!pointer.horizontal && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
           pointer.horizontal = true; stage.setPointerCapture(event.pointerId);
         }
+        if (pointer.horizontal) stage.style.setProperty("--drag-x", `${Math.max(-100,Math.min(100,dx*.5))}px`);
       }, {signal});
       stage.addEventListener("pointerup", event => {
         if (!pointer || pointer.id !== event.pointerId) return;
@@ -194,15 +209,16 @@ function settings(data: Props["photos"][number]["data"]) {
           if (Math.abs(dx) >= 28) this.advance(dx < 0 ? 1 : -1);
         }
         if (stage.hasPointerCapture(event.pointerId)) stage.releasePointerCapture(event.pointerId);
+        stage.style.removeProperty("--drag-x");
         pointer = undefined;
       }, {signal});
-      stage.addEventListener("pointercancel", () => { pointer = undefined; }, {signal});
+      stage.addEventListener("pointercancel", () => { pointer = undefined; stage.style.removeProperty("--drag-x"); }, {signal});
       // A mouse can leave before horizontal capture and release elsewhere.
       // Discard that unfinished gesture so the next swipe can start normally.
       stage.addEventListener("pointerleave", event => {
         if (pointer?.id === event.pointerId && !stage.hasPointerCapture(event.pointerId)) pointer = undefined;
       }, {signal});
-      stage.addEventListener("lostpointercapture", () => { pointer = undefined; }, {signal});
+      stage.addEventListener("lostpointercapture", () => { pointer = undefined; stage.style.removeProperty("--drag-x"); }, {signal});
     }
     private advance(direction:number) {
       const prints = [...this.querySelectorAll<HTMLButtonElement>("[data-photo-index]")];
@@ -218,21 +234,69 @@ function settings(data: Props["photos"][number]["data"]) {
     private select(index: number) {
       const prints = [...this.querySelectorAll<HTMLButtonElement>("[data-photo-index]")];
       if (!prints[index]) return;
+      // Measure before replacing the visible panel so differently sized details
+      // transition from the frame that is actually on screen.
+      const details = this.querySelector<HTMLElement>(".details-expansion")!;
+      const renderedDetails = {
+        height:details.getBoundingClientRect().height,
+        opacity:Number.parseFloat(getComputedStyle(details).opacity) || 0,
+      };
       this.selected = index; this.dataset.open = "true";
-      this.querySelector<HTMLElement>(".details-expansion")!.inert = false;
+      details.inert = false;
       prints.forEach((print,i) => { print.dataset.selected = String(i === index); print.setAttribute("aria-expanded",String(i === index)); print.style.setProperty("--side",String(i < index ? -1 : i > index ? 1 : 0)); });
       this.querySelectorAll<HTMLElement>("[data-detail-index]").forEach(panel => { panel.hidden = Number(panel.dataset.detailIndex) !== index; });
+      this.animateDetails(true,renderedDetails);
       this.querySelector("[data-announcement]")!.textContent = `${prints[index].getAttribute("aria-label")?.replace(/^Select /, "")}. Details expanded.`;
     }
     private collapse() {
       const previous = this.selected; this.dataset.open = "false";
       this.querySelector<HTMLElement>(".details-expansion")!.inert = true;
       this.querySelectorAll("[data-photo-index]").forEach(print => { print.setAttribute("aria-expanded","false"); print.removeAttribute("data-selected"); });
+      this.animateDetails(false);
       this.querySelector<HTMLButtonElement>(`[data-photo-index="${previous}"]`)?.focus({preventScroll:true});
       this.querySelector("[data-announcement]")!.textContent = "Photo details collapsed."; this.selected = -1;
     }
+    private animateDetails(expanded: boolean, rendered?: {height:number; opacity:number}) {
+      const details = this.querySelector<HTMLElement>(".details-expansion")!;
+      // Capture the currently rendered frame before cancelling so a rapid
+      // reversal continues from the user's visible state instead of jumping.
+      const currentHeight = rendered?.height ?? details.getBoundingClientRect().height;
+      const currentOpacity = rendered?.opacity ?? (Number.parseFloat(getComputedStyle(details).opacity) || 0);
+      this.detailsAnimation?.cancel();
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        details.style.height = expanded ? "auto" : "0px";
+        details.style.opacity = expanded ? "1" : "0";
+        return;
+      }
+      details.style.height = `${currentHeight}px`;
+      details.style.opacity = String(currentOpacity);
+      // Read the unconstrained content rather than the animated wrapper: an
+      // explicit current height can otherwise become scrollHeight's lower bound.
+      const targetHeight = expanded ? details.querySelector<HTMLElement>(".details-clip")!.scrollHeight : 0;
+      const animation = details.animate(
+        [
+          {height:`${currentHeight}px`,opacity:currentOpacity},
+          {height:`${targetHeight}px`,opacity:expanded ? 1 : 0},
+        ],
+        {duration:190,easing:"cubic-bezier(.22,1,.36,1)"},
+      );
+      this.detailsAnimation = animation;
+      animation.finished.then(() => {
+        if (this.detailsAnimation !== animation) return;
+        details.style.height = expanded ? "auto" : "0px";
+        details.style.opacity = expanded ? "1" : "0";
+        this.detailsAnimation = undefined;
+      }, () => {});
+    }
     disconnectedCallback() {
       this.controller?.abort(); this.controller = undefined;
+      this.querySelector<HTMLElement>(".deck-stage")?.style.removeProperty("--drag-x");
+      this.detailsAnimation?.cancel(); this.detailsAnimation = undefined;
+      const details = this.querySelector<HTMLElement>(".details-expansion");
+      if (details) {
+        details.style.height = this.selected >= 0 ? "auto" : "0px";
+        details.style.opacity = this.selected >= 0 ? "1" : "0";
+      }
       clearTimeout(this.wheelTimer); this.wheelAmount = 0; this.wheelLocked = false;
     }
   }
