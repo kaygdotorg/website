@@ -91,13 +91,13 @@ function settings(data: Props["photos"][number]["data"]) {
   h3 { font-size:clamp(25px,4vw,34px); font-weight:500; letter-spacing:-.02em; color:#faf6f1; margin:0; }
   .demo-label { font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:#cabecb; white-space:nowrap; }
   .photo-description { color:#c9c0ca; font-size:15px; line-height:1.65; margin:12px 0 0; max-width:60ch; }
-  /* One quiet inset surface; each label/value pair reads along one line.
+  /* Readable 15px metadata in one quiet inset surface; each pair reads along one line.
      Values inherit the same mono font token as article code and can be copied. */
   .photo-settings { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; margin:24px 0 0; padding:12px 18px; border-radius:16px; background:rgba(15,12,20,.23); box-shadow:inset 0 1px 3px rgba(0,0,0,.08); }
   .photo-settings > div { display:flex; justify-content:space-between; align-items:baseline; min-width:0; gap:12px; }
-  .photo-settings dt { font-family:var(--font-ui,sans-serif); font-size:12px; color:#c6b9cc; white-space:nowrap; }
+  .photo-settings dt { font-family:var(--font-ui,sans-serif); font-size:15px; color:#c6b9cc; white-space:nowrap; }
   .photo-settings dd { min-width:0; margin:0; text-align:right; }
-  .setting-value { display:block; min-height:44px; padding:10px 0; background:none; border:0; color:#f5edf5; font-family:var(--font-mono,monospace); font-size:12px; line-height:1.7; cursor:pointer; overflow-wrap:anywhere; text-align:right; text-decoration:underline; text-decoration-color:transparent; text-underline-offset:4px; transition:color 150ms ease,text-decoration-color 150ms ease; }
+  .setting-value { display:block; min-height:44px; padding:10px 0; background:none; border:0; color:#f5edf5; font-family:var(--font-mono,monospace); font-size:15px; line-height:1.7; cursor:pointer; overflow-wrap:anywhere; text-align:right; text-decoration:underline; text-decoration-color:transparent; text-underline-offset:4px; transition:color 150ms ease,text-decoration-color 150ms ease; }
   .sample-note { color:#bcb0c0; font-size:11px; line-height:1.65; margin:18px 0 0; }
   :global([data-theme="light"]) photo-deck { background:rgba(255,252,248,.68); border-color:rgba(73,53,63,.16); box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 60px rgba(57,38,47,.08); }
   :global([data-theme="light"]) :is(h2,h3) { color:#30272e; }
