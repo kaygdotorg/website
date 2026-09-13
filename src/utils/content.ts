@@ -32,7 +32,8 @@ export type ContentEntry = {
   body?: string;
   data: {
     title: string;
-    slug?: string;
+    /** Raw callers may supply a YAML-parsed Date before schema normalization. */
+    slug?: string | Date;
     date?: Date;
     draft?: boolean;
     [key: string]: unknown;
@@ -344,9 +345,9 @@ export async function getPublishedEntries(
  * if (!indexEntry) throw new Error("Blog index not found");
  */
 export async function getIndexEntry(
-  collectionName: string
+  collectionName: ContentCollection
 ): Promise<ContentEntry | null> {
-  const entries = await getCollection(collectionName as any);
+  const entries = await getCollection(collectionName);
   const indexEntry = entries.find((e) => e.id === "index");
   return indexEntry ?? null;
 }

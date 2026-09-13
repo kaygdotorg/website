@@ -40,7 +40,8 @@
  * @see https://docs.astro.build/en/reference/content-loader-reference/
  */
 
-import { defineCollection, z } from "astro:content";
+import { defineCollection, type SchemaContext } from "astro:content";
+import { z } from "astro/zod";
 import { glob } from "astro/loaders";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -95,7 +96,7 @@ const pageSchema = z
  * Schema for content posts (blog, talks, now, uses)
  * These have richer metadata including tags, cover images, and excerpts.
  */
-const postSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
+const postSchema = ({ image }: SchemaContext) =>
   z.object({
     /** Post title (required) */
     title: z.string(),
@@ -250,7 +251,7 @@ const uses = createCollection("uses", postSchema);
  * NOTE: The schema is a function that receives { image } from Astro.
  * This is required for the image() helper to work in content collections.
  */
-const homeSchema = ({ image }: { image: () => z.ZodObject<any> }) =>
+const homeSchema = ({ image }: SchemaContext) =>
   z
     .object({
       title: z.string(),

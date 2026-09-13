@@ -9,25 +9,31 @@
     "build:search": "astro build && pagefind --site dist --output-path public/pagefind",
     "preview": "astro preview",
     "astro": "astro",
-    "sync": "node scripts/sync-obsidian.mjs"
+    "sync": "node scripts/sync-obsidian.mjs",
+    "check": "astro sync && tsc --noEmit"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.1",
-    "@pagefind/default-ui": "^1.4.0",
+    "@astrojs/sitemap": "^3.7.4",
+    "@pagefind/default-ui": "^1.5.2",
     "@paper-design/shaders": "0.0.80",
-    "@tailwindcss/vite": "^4.2.2",
-    "astro": "^6.0.8",
-    "daisyui": "^5.5.19",
-    "dotenv": "^17.3.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.2",
+    "daisyui": "^5.7.37",
+    "dotenv": "^17.4.2",
     "gray-matter": "^4.0.3",
     "hast-util-from-html": "^2.0.3",
     "hast-util-to-string": "^3.0.1",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-slug": "^6.0.0",
-    "tailwindcss": "^4.2.2",
-    "turndown": "^7.2.2"
+    "tailwindcss": "^4.3.3",
+    "turndown": "^7.2.4",
+    "@astrojs/markdown-remark": "^7.3.1"
   },
   "devDependencies": {
-    "pagefind": "^1.4.0"
+    "pagefind": "^1.5.2",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=22.12.0"
   }
 }

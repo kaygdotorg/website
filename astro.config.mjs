@@ -3,7 +3,7 @@
  * ASTRO CONFIGURATION
  * =============================================================================
  *
- * Configuration file for the Astro 6 site.
+ * Configuration file for the Astro 7 site.
  *
  * KEY FEATURES CONFIGURED:
  * - Site URL for sitemap and canonical URLs
@@ -17,6 +17,7 @@
 
 // @ts-check
 import { defineConfig, fontProviders } from "astro/config";
+import { unified } from "@astrojs/markdown-remark";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import rehypeSlug from "rehype-slug";
@@ -34,6 +35,8 @@ import { IMAGE_QUALITY } from "./src/config/images.ts";
 // =============================================================================
 
 export default defineConfig({
+  // Astro 7 defaults to JSX whitespace rules. Preserve existing inline spacing.
+  compressHTML: true,
   // ---------------------------------------------------------------------------
   // SITE URL
   // ---------------------------------------------------------------------------
@@ -47,13 +50,20 @@ export default defineConfig({
   // Global settings for Astro's image processing pipeline.
   // Quality constant defined in src/config/images.ts for consistency.
   image: {
-    quality: IMAGE_QUALITY,
+    service: {
+      entrypoint: "astro/assets/services/sharp",
+      config: {
+        jpeg: { quality: IMAGE_QUALITY },
+        webp: { quality: IMAGE_QUALITY },
+        avif: { quality: IMAGE_QUALITY },
+      },
+    },
   },
 
   // ---------------------------------------------------------------------------
   // FONTS
   // ---------------------------------------------------------------------------
-  // Astro 6 Fonts API — replaces manual @fontsource CSS imports.
+  // Astro Fonts API — replaces manual @fontsource CSS imports.
   // Fonts are downloaded, cached locally, and served from the site itself
   // (no third-party requests). Preload links and fallbacks are automatic.
   //
@@ -124,7 +134,7 @@ export default defineConfig({
       // Tailwind CSS v4 uses a Vite plugin instead of PostCSS
       tailwindcss(),
     ],
-    // Vite 7 blocks unrecognized hostnames by default (DNS rebinding protection).
+    // Vite blocks unrecognized hostnames by default (DNS rebinding protection).
     // Allow all hosts so the site is accessible via Tailscale MagicDNS ("code")
     // and other network names in both dev and preview modes.
     server: {
@@ -149,6 +159,7 @@ export default defineConfig({
   // ---------------------------------------------------------------------------
   // Remark and Rehype plugins for transforming markdown.
   markdown: {
+    // Retain the custom remark/rehype asset, link, and video transforms on v7.
     // Shiki syntax highlighting — dual Catppuccin themes that adapt to
     // light/dark mode. Astro renders both themes' inline styles and uses
     // CSS variables to toggle between them based on [data-theme].
@@ -160,52 +171,54 @@ export default defineConfig({
         light: "catppuccin-latte",
       },
     },
-    // Remark plugins (run on markdown AST, before HTML conversion)
-    remarkPlugins: [
-      // Transform .md links to correct URL slugs (strips date prefix and .md extension)
-      remarkMdLinks,
-    ],
-    // Rehype plugins (run on HTML AST, after conversion)
-    rehypePlugins: [
-      // Add id attributes to headings for anchor links
-      rehypeSlug,
-
-      // Transform relative asset links (images, videos, docs) for proper handling
-      rehypeAssetLinks,
-
-      // Convert video embeds (using image syntax) to proper <video> elements
-      rehypeVideoEmbeds,
-
-      // Add data-original-src to embedded images for lightbox access to originals
-      rehypeImageOriginals,
-
-      // Mark internal page links for preview feature
-      rehypeInternalLinks,
-
-      // Add clickable anchor links to headings
-      [
-        rehypeAutolinkHeadings,
-        {
-          // Append the link after the heading text (not before)
-          behavior: "append",
-
-          // Accessible label for the icon-only anchor link
-          properties: {
-            ariaLabel: "Copy link to section",
-          },
-
-          // Custom link icon (Lucide link icon)
-          content: fromHtml(
-            `<span class="heading-link">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-              </svg>
-            </span>`,
-            { fragment: true }
-          ).children,
-        },
+    processor: unified({
+      // Remark plugins (run on markdown AST, before HTML conversion)
+      remarkPlugins: [
+        // Transform .md links to correct URL slugs (strips date prefix and .md extension)
+        remarkMdLinks,
       ],
-    ],
+      // Rehype plugins (run on HTML AST, after conversion)
+      rehypePlugins: [
+        // Add id attributes to headings for anchor links
+        rehypeSlug,
+
+        // Transform relative asset links (images, videos, docs) for proper handling
+        rehypeAssetLinks,
+
+        // Convert video embeds (using image syntax) to proper <video> elements
+        rehypeVideoEmbeds,
+
+        // Add data-original-src to embedded images for lightbox access to originals
+        rehypeImageOriginals,
+
+        // Mark internal page links for preview feature
+        rehypeInternalLinks,
+
+        // Add clickable anchor links to headings
+        [
+          rehypeAutolinkHeadings,
+          {
+            // Append the link after the heading text (not before)
+            behavior: "append",
+
+            // Accessible label for the icon-only anchor link
+            properties: {
+              ariaLabel: "Copy link to section",
+            },
+
+            // Custom link icon (Lucide link icon)
+            content: fromHtml(
+              `<span class="heading-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+              </span>`,
+              { fragment: true }
+            ).children,
+          },
+        ],
+      ],
+    }),
   },
 });
