@@ -416,6 +416,37 @@ const photographySchema = z
     location: z.string().optional(),
     camera: z.string().optional(),
 
+    // Capture fields for a single-photo card. Missing EXIF stays unknown.
+    demo: z.boolean().optional().default(false),
+    lens: z.string().optional(),
+    aperture: z.string().optional(),
+    shutterSpeed: z.string().optional(),
+    iso: z.union([z.string(), z.number()]).optional(),
+    focalLength: z.string().optional(),
+    width: z.number().positive().optional(),
+    height: z.number().positive().optional(),
+
+    // One Markdown file can hold a deck. Settings belong to each image rather
+    // than the deck; the legacy top-level src form still represents one photo.
+    photos: z.array(z.object({
+      src: z.string(),
+      thumb: z.string().optional(),
+      alt: z.string(),
+      title: z.string(),
+      description: z.string().optional(),
+      location: z.string().optional(),
+      date: z.coerce.date().optional(),
+      camera: z.string().optional(),
+      lens: z.string().optional(),
+      aperture: z.string().optional(),
+      shutterSpeed: z.string().optional(),
+      iso: z.union([z.string(), z.number()]).optional(),
+      focalLength: z.string().optional(),
+      width: z.number().positive().optional(),
+      height: z.number().positive().optional(),
+      demo: z.boolean().optional(),
+    })).min(1).optional(),
+
     // Page-specific fields
     "display-in-progress": z.boolean().optional(),
   })

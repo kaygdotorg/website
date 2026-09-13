@@ -1,297 +1,44 @@
 ---
-/**
- * =============================================================================
- * PHOTOGRAPHY GALLERY PAGE (/photography)
- * =============================================================================
- *
- * Displays photos from the 'photography' content collection in a filterable gallery.
- *
- * ARCHITECTURE:
- * - Page metadata comes from photography/index.md
- * - Photos come from photography/*.md (each photo is a markdown file with metadata)
- * - Categories are extracted from photo metadata for filtering
- *
- * FEATURES:
- * - Category filter buttons
- * - Responsive photo grid
- * - Photo overlay with title and location
- * - Empty state when no photos exist
- * - Supports "in-progress" display mode
- *
- * PHOTO METADATA (in frontmatter):
- * - src: Full-resolution image path/URL
- * - thumb: Thumbnail image (optional, falls back to src)
- * - alt: Alt text for accessibility
- * - title: Photo title (optional)
- * - category: Category for filtering
- * - location: Where the photo was taken (optional)
- * - date: When the photo was taken (optional)
- * - camera: Camera/equipment used (optional)
- */
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PhotoDeck from "../components/PhotoDeck.astro";
 import { getCollection } from "astro:content";
 
-// =============================================================================
-// DATA FETCHING
-// =============================================================================
-
-/**
- * Get all entries from the photography collection.
- * This includes both the index.md (page metadata) and photo entries.
- */
-const allEntries = await getCollection("photography");
-
-/**
- * Get page metadata from photography/index.md.
- * This provides the page title, description, and display settings.
- */
-const entry = allEntries.find((e) => e.id === "index");
-
-if (!entry) {
-  throw new Error(
-    "Missing photography/index.md - This file provides the page title and description."
-  );
-}
-
-/**
- * Get photo entries (everything except index.md).
- * Photos are identified by having a 'src' field in frontmatter.
- */
-const photoEntries = allEntries.filter(
-  (e) => e.id !== "index" && e.data.src
-);
-
-// =============================================================================
-// DATA TRANSFORMATION
-// =============================================================================
-
-/**
- * Transform photo entries into display format.
- * Normalizes the data structure for consistent template rendering.
- * Extracts body content as description for hover/zoom display.
- */
-const photos = await Promise.all(
-  photoEntries.map(async (photo) => {
-    // Use raw markdown body directly for photo descriptions.
-    // We avoid render() here because this page only needs plain text metadata,
-    // which keeps photo list generation lighter during builds.
-    const bodyText = photo.body?.trim() || "";
-
-    return {
-      src: photo.data.src,
-      thumb: photo.data.thumb || photo.data.src, // Fallback to full-res if no thumb
-      alt: photo.data.alt,
-      title: photo.data.title || photo.data.alt,
-      category: photo.data.category,
-      location: photo.data.location,
-      date: photo.data.date,
-      camera: photo.data.camera,
-      id: photo.id, // Use entry.id instead of slug (Astro 5 compatibility)
-      description: bodyText, // Body content as description
-    };
-  })
-);
-
-/**
- * Sort photos by date (newest first).
- * Photos without dates are sorted to the end.
- */
-photos.sort((a, b) => {
-  if (a.date && b.date) return b.date.getTime() - a.date.getTime();
-  if (a.date) return -1;
-  if (b.date) return 1;
-  return 0;
-});
-
-/**
- * Extract unique categories for filter buttons.
- */
-const categories = [...new Set(photos.map((p) => p.category))];
-
-/**
- * Check if page should display "in progress" indicator.
- */
-const isInProgress = entry.data["display-in-progress"] === true;
+// One Markdown entry is one glass card. A photos array creates its deck;
+// the original src format remains a single photograph with the same fields.
+const entries = await getCollection("photography");
+const page = entries.find(p => p.id === "index");
+const cards = entries.filter(p => p.id !== "index" && (p.data.src || p.data.photos?.length) && !p.data.draft);
+const groups = cards.map(card => card.data.photos
+  ? card.data.photos.map(photo => ({data: {...photo, demo: photo.demo ?? card.data.demo, series: card.data.title}, body: photo.description}))
+  : [{data: card.data, body: card.body}]);
+const photos = groups.flat();
 ---
 
-<BaseLayout
-  title={entry.data.title}
-  description={entry.data.description}
-  displayInProgress={isInProgress}
->
-  <section class="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-24">
-    {/* =========================================================================
-        PAGE HEADER
-        ========================================================================= */}
-    <header class="mb-12 max-w-2xl animate-fade-up">
-      <h1 class="font-display text-4xl md:text-5xl mb-4 gradient-text">
-        {entry.data.title}
-      </h1>
-      <p class="text-base-content/70 text-lg leading-relaxed">
-        {entry.data.description}
-      </p>
+<BaseLayout title={page?.data.title || "Photography"} description={page?.data.description}>
+  <section class="photography-page" aria-labelledby="photography-title">
+    <header>
+      <p class="eyebrow">Through the viewfinder</p>
+      <h1 id="photography-title">Photography<span>.</span></h1>
+      <p class="intro-copy">A few frames worth looking at a little longer.</p>
     </header>
-
-    {/* =========================================================================
-        CATEGORY FILTER
-        Buttons for filtering photos by category. "All" shows everything.
-        ========================================================================= */}
-    <div class="flex flex-wrap gap-2 mb-8 animate-fade-up stagger-1">
-      <button
-        class="filter-btn active px-4 py-2 rounded-full text-sm transition-all"
-        data-category="all"
-      >
-        All
-      </button>
-      {categories.map((category) => (
-        <button
-          class="filter-btn px-4 py-2 rounded-full text-sm transition-all"
-          data-category={category}
-        >
-          {category}
-        </button>
-      ))}
+    <div class="decks">
+      {groups.map((items, index) => <PhotoDeck photos={items} index={index} />)}
     </div>
-
-    {/* =========================================================================
-        PHOTO GALLERY
-        Grid of photos with overlay information on hover.
-        ========================================================================= */}
-    <div class="photo-gallery animate-fade-up stagger-2">
-      {photos.map((photo, index) => (
-        <div
-          class="photo-item frosted-card"
-          data-category={photo.category}
-          data-src={photo.src}
-          data-alt={photo.alt}
-          data-description={photo.description}
-          data-location={photo.location}
-          data-camera={photo.camera}
-          style={`animation-delay: ${index * 0.1}s`}
-        >
-          <img
-            src={photo.thumb}
-            alt={photo.alt}
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="photo-overlay">
-            <p class="font-medium text-lg">{photo.alt}</p>
-            {photo.description && (
-              <p class="text-sm opacity-90 mt-1 line-clamp-2">{photo.description}</p>
-            )}
-            <p class="text-sm opacity-70 mt-1">
-              {photo.location} · {photo.category}
-            </p>
-          </div>
-        </div>
-      ))}
-    </div>
-
-    {/* =========================================================================
-        EMPTY STATE
-        Shown when no photos exist in the collection.
-        ========================================================================= */}
-    {photos.length === 0 && (
-      <div class="mt-16 p-6 rounded-2xl frosted-card animate-fade-up stagger-3">
-        <p class="text-base-content/70 text-sm text-center">
-          No photos yet. Add markdown files to <code>content/photography/</code> to
-          populate the gallery.
-        </p>
-      </div>
-    )}
+    {photos.length === 0 && <p>The first photographs are on their way.</p>}
+    {photos.length > 0 && photos.every(p => p.data.demo) && <p class="gallery-note">A layout preview with sample images. Original photographs coming soon.</p>}
   </section>
-
-  {/* ===========================================================================
-      STYLES
-      Filter button styling with dark/light mode support.
-      =========================================================================== */}
-  <style>
-    /* Filter button base styles */
-    .filter-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--fallback-bc, #f8f4fc);
-      opacity: 0.7;
-    }
-
-    /* Filter button hover and active states */
-    .filter-btn:hover,
-    .filter-btn.active {
-      background: rgba(244, 114, 182, 0.15);
-      border-color: rgba(244, 114, 182, 0.3);
-      color: var(--color-accent-500, #ec4899);
-      opacity: 1;
-    }
-
-    /* Light mode overrides */
-    [data-theme="light"] .filter-btn {
-      background: rgba(0, 0, 0, 0.03);
-      border-color: rgba(0, 0, 0, 0.1);
-      color: #1a1225;
-    }
-
-    [data-theme="light"] .filter-btn:hover,
-    [data-theme="light"] .filter-btn.active {
-      background: rgba(236, 72, 153, 0.1);
-      border-color: rgba(236, 72, 153, 0.3);
-      color: var(--color-accent-600, #db2777);
-      opacity: 1;
-    }
-
-    /* Hidden class for filtered-out photos */
-    .photo-item.hidden {
-      display: none;
-    }
-  </style>
-
-  {/* ===========================================================================
-      FILTER SCRIPT
-      Handles category filter button interactions.
-      =========================================================================== */}
-  <script>
-    /**
-     * Initialize photography gallery filter functionality.
-     * Uses event delegation and tracks initialization state to prevent
-     * duplicate listeners on view transitions.
-     */
-    function initPhotographyFilters() {
-      const filterBtns = document.querySelectorAll(".filter-btn");
-      const photoItems = document.querySelectorAll(".photo-item");
-
-      filterBtns.forEach((btn) => {
-        // Skip if already initialized (prevents duplicate listeners)
-        if ((btn as any).__filterInitialized) return;
-        (btn as any).__filterInitialized = true;
-
-        btn.addEventListener("click", () => {
-          // Update active state on buttons
-          filterBtns.forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-
-          // Get selected category
-          const category = btn.getAttribute("data-category");
-
-          // Show/hide photos based on category
-          photoItems.forEach((item) => {
-            const matches =
-              category === "all" ||
-              item.getAttribute("data-category") === category;
-
-            if (matches) {
-              item.classList.remove("hidden");
-            } else {
-              item.classList.add("hidden");
-            }
-          });
-        });
-      });
-    }
-
-    // Initialize on first load
-    initPhotographyFilters();
-
-    // Re-initialize after view transitions (Astro's page navigation)
-    document.addEventListener("astro:page-load", initPhotographyFilters);
-  </script>
 </BaseLayout>
+
+<style>
+  .photography-page { max-width: 1100px; margin: 0 auto; padding: 80px 28px 60px; }
+  header { margin-bottom: 44px; }
+  .eyebrow { font-family: var(--font-ui,sans-serif); text-transform: uppercase; letter-spacing: .16em; font-size: 11px; color: #c7b8bd; margin: 0 0 16px; }
+  h1 { font-family: var(--font-heading,Georgia,serif); font-size: clamp(48px,7vw,78px); line-height: 1.1; letter-spacing: -.04em; margin: 0; color: #faf6f1; }
+  h1 span { color: #d69bba; }
+  .intro-copy { font-size: 18px; color: #c5bac8; margin: 18px 0 0; }
+  .decks { display: grid; gap: 36px; }
+  .gallery-note { color: #bfb2c3; font-family: var(--font-ui,sans-serif); text-align: center; font-size: 12px; margin: 26px 0 0; }
+  :global([data-theme="light"]) h1 { color: #30262d; }
+  :global([data-theme="light"]) :is(.eyebrow,.intro-copy,.gallery-note) { color: #6a5767; }
+  @media(max-width:600px) { .photography-page { padding: 56px 18px 40px; } header { margin-bottom: 30px; } .intro-copy { font-size: 16px; line-height: 1.6; max-width: 28ch; } }
+</style>

@@ -1,0 +1,190 @@
+---
+interface Photograph {
+  body?: string;
+  data: {
+    src?: string; thumb?: string; title?: string; alt?: string; series?: string;
+    demo?: boolean; camera?: string; lens?: string; aperture?: string;
+    shutterSpeed?: string; iso?: string | number; focalLength?: string;
+    width?: number; height?: number; location?: string; date?: Date;
+  };
+}
+interface Props { photos: Photograph[]; index: number; }
+const { photos, index: deckIndex } = Astro.props;
+const title = photos[0].data.series || photos[0].data.title || "Untitled photograph";
+const demo = photos.every(p => p.data.demo);
+function variant(src: string, width: number) {
+  // Only the demo CDN supports these transforms. Never guess local upload URLs.
+  if (!src.startsWith("https://images.unsplash.com/")) return src;
+  const url = new URL(src); url.searchParams.set("w", String(width)); url.searchParams.set("auto", "format"); return url.toString();
+}
+function settings(data: Props["photos"][number]["data"]) {
+  return [["Camera",data.camera],["Lens",data.lens],["Aperture",data.aperture],["Shutter",data.shutterSpeed],["ISO",data.iso?.toString()],["Focal length",data.focalLength]];
+}
+---
+
+<photo-deck data-open="false">
+  <div class="deck-heading">
+    <div><p class="kicker">{demo ? "Layout preview" : "Selected photographs"}</p><h2>{title}</h2></div>
+    <span class="frame-count">{String(photos.length).padStart(2,"0")} {photos.length === 1 ? "frame" : "frames"}</span>
+  </div>
+  <div class="deck-stage" role="group" aria-label="Photographs">
+    {photos.map((photo, index) => {
+      const src = photo.data.thumb || photo.data.src!;
+      const name = photo.data.title || photo.data.alt || "Untitled photograph";
+      const spread = photos.length === 1 ? 0 : (index / (photos.length - 1) - .5) * 2;
+      // All first-deck images contribute to the visible fan; later decks defer
+      // their images. Responsive sources keep that initial fan appropriately sized.
+      return <button type="button" class="photo-print" data-photo-index={index} aria-label={`Select ${name}`} aria-expanded="false" aria-controls={`photo-detail-${deckIndex}-${index}`} style={`--spread:${spread};--order:${index}`}>
+        <span class="print-image"><img src={variant(src,960)} srcset={src.startsWith("https://images.unsplash.com/") ? [480,800,1200,1600].map(w => `${variant(src,w)} ${w}w`).join(", ") : undefined} sizes="(max-width:600px) 78vw, (max-width:1100px) 65vw, 700px" width={photo.data.width || 1500} height={photo.data.height || 1000} alt={photo.data.alt || name} loading={deckIndex === 0 ? "eager" : "lazy"} decoding="async" /></span>
+        <span class="print-label"><span>{name}</span><span>{String(index+1).padStart(2,"0")}</span></span>
+      </button>;
+    })}
+  </div>
+  <p class="deck-prompt">Select a photograph to unfold its details <span aria-hidden="true">↗</span></p>
+  {/* The glass card expands in document flow. Its details are inert while
+      closed, and each photo owns a distinct panel with its own metadata. */}
+  <div class="details-expansion" inert>
+    <div class="details-clip"><div class="details-inner">
+      <div class="selection-controls">
+        <div class="photo-selectors" role="group" aria-label="Choose a photograph">
+          {photos.map((photo,index) => <button type="button" data-select-index={index} aria-pressed="false" aria-label={`Select ${photo.data.title || photo.data.alt || "Untitled photograph"}`}>{String(index+1).padStart(2,"0")}</button>)}
+        </div>
+        <button type="button" class="collapse-button" data-collapse aria-label="Close details"><span class="collapse-label">Close details</span> <span aria-hidden="true">↑</span></button>
+      </div>
+      {photos.map((photo,index) => <section id={`photo-detail-${deckIndex}-${index}`} data-detail-index={index} hidden aria-labelledby={`photo-title-${deckIndex}-${index}`}>
+        <div class="detail-title-row"><h3 id={`photo-title-${deckIndex}-${index}`}>{photo.data.title || photo.data.alt || "Untitled photograph"}</h3>{photo.data.demo && <span class="demo-label">Sample photo</span>}</div>
+        {photo.body?.trim() && <p class="photo-description">{photo.body.trim()}</p>}
+        {(photo.data.location || photo.data.date) && <p class="photo-description">{[photo.data.location,photo.data.date?.toLocaleDateString("en-GB",{month:"short",year:"numeric",timeZone:"UTC"})].filter(Boolean).join(" · ")}</p>}
+        <dl class="photo-settings">{settings(photo.data).map(([label,value]) => <div><dt>{label}</dt><dd class:list={{missing:!value}}>{value || "Not recorded"}</dd></div>)}</dl>
+        {photo.data.demo && <p class="sample-note">Demo image from Unsplash, not my photograph. Capture settings are not supplied.</p>}
+      </section>)}
+    </div></div>
+  </div>
+  <span class="sr-only" data-announcement aria-live="polite"></span>
+</photo-deck>
+
+<style>
+  photo-deck { display:block; isolation:isolate; padding:28px 36px; border:1px solid rgba(255,255,255,.16); border-radius:30px; background:rgba(62,51,65,.46); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 60px rgba(0,0,0,.12); }
+  .deck-heading { display:flex; justify-content:space-between; align-items:center; gap:20px; }
+  .kicker,.frame-count,.print-label,.photo-settings dt,.sample-note,.demo-label { font-family:var(--font-ui,sans-serif); }
+  .kicker { margin:0 0 5px; text-transform:uppercase; font-size:10px; letter-spacing:.16em; color:#cbbdc7; }
+  h2 { font-family:var(--font-heading,Georgia,serif); font-size:25px; font-weight:400; color:#f5efef; margin:0; }
+  .frame-count { font-size:12px; color:#c5bcc8; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .deck-stage { position:relative; width:100%; aspect-ratio:1.85; margin-top:20px; }
+  .photo-print { position:absolute; display:block; width:56%; top:50%; left:50%; padding:10px 10px 0; border:1px solid rgba(0,0,0,.1); border-radius:6px; background:#f3eee6; color:#29272a; box-shadow:0 8px 14px rgba(0,0,0,.14),0 20px 35px rgba(0,0,0,.21); transform:translate(calc(-50% + var(--spread)*29%),-50%) rotate(calc(var(--spread)*9deg)); z-index:calc(3 + var(--order)); cursor:pointer; transition:transform 280ms cubic-bezier(.22,1,.36,1),opacity 200ms ease,width 280ms cubic-bezier(.22,1,.36,1); }
+  .print-image { display:block; aspect-ratio:3/2; background:#e8e1d5; overflow:hidden; }
+  .print-image img { display:block; width:100%; height:100%; object-fit:contain; }
+  .print-label { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:38px; font-size:11px; text-align:left; }
+  .print-label span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .print-label span:last-child { color:#7a7067; font-size:10px; }
+  button:focus-visible { outline:3px solid #eec89e; outline-offset:5px; }
+  .photo-print:focus-visible { z-index:12; }
+  photo-deck[data-open="true"] .photo-print { width:43%; opacity:.55; transform:translate(calc(-50% + var(--side)*68%),-50%) rotate(calc(var(--side)*8deg)) scale(.9); }
+  photo-deck[data-open="true"] .photo-print[data-selected="true"] { width:70%; opacity:1; z-index:10; transform:translate(-50%,-50%); }
+  photo-deck[data-open="true"] .photo-print:focus-visible { z-index:12; }
+  .deck-prompt { text-align:center; color:#d3c7d0; font-size:12px; margin:20px 0 0; }
+  .deck-prompt span { margin-left:8px; }
+  photo-deck[data-open="true"] .deck-prompt { display:none; }
+  .details-expansion { display:grid; grid-template-rows:0fr; opacity:0; transition:grid-template-rows 280ms cubic-bezier(.22,1,.36,1),opacity 200ms ease; }
+  photo-deck[data-open="true"] .details-expansion { grid-template-rows:1fr; opacity:1; }
+  .details-clip { min-height:0; overflow:hidden; }
+  .details-inner { padding-top:28px; }
+  .selection-controls { display:flex; justify-content:space-between; gap:16px; align-items:center; margin-bottom:26px; }
+  .photo-selectors { display:flex; flex-wrap:wrap; gap:6px; }
+  .photo-selectors button,.collapse-button { min-width:44px; min-height:44px; border:1px solid transparent; border-radius:10px; background:transparent; color:#cfc5d0; font-family:var(--font-ui,sans-serif); font-size:12px; cursor:pointer; }
+  .photo-selectors button[aria-pressed="true"] { color:#fff9f5; background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.18); }
+  .collapse-button { padding:0 10px; white-space:nowrap; }
+  .collapse-button span { margin-left:7px; }
+  .detail-title-row { display:flex; justify-content:space-between; align-items:baseline; gap:16px; }
+  h3 { font-family:var(--font-heading,Georgia,serif); font-size:clamp(25px,4vw,34px); font-weight:400; letter-spacing:-.02em; color:#faf6f1; margin:0; }
+  .demo-label { font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:#cabecb; white-space:nowrap; }
+  .photo-description { color:#c9c0ca; font-size:15px; line-height:1.65; margin:12px 0 0; max-width:60ch; }
+  .photo-settings { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px 20px; margin:26px 0 0; padding:24px 0; border-top:1px solid rgba(255,255,255,.13); border-bottom:1px solid rgba(255,255,255,.13); }
+  .photo-settings dt { font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:#b9adbd; margin-bottom:7px; }
+  .photo-settings dd { font-family:var(--font-mono,monospace); font-size:13px; color:#f5edf5; margin:0; overflow-wrap:anywhere; }
+  .photo-settings dd.missing { color:#c4b8c6; font-family:var(--font-ui,sans-serif); }
+  .sample-note { color:#bcb0c0; font-size:11px; line-height:1.65; margin:18px 0 0; }
+  :global([data-theme="light"]) photo-deck { background:rgba(255,252,248,.5); border-color:rgba(73,53,63,.16); box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 60px rgba(57,38,47,.08); }
+  :global([data-theme="light"]) :is(h2,h3) { color:#30272e; }
+  :global([data-theme="light"]) :is(.kicker,.frame-count,.deck-prompt,.demo-label,.photo-description,.photo-settings dt,.sample-note) { color:#6e5c6b; }
+  :global([data-theme="light"]) .photo-settings { border-color:rgba(73,53,63,.16); }
+  :global([data-theme="light"]) .photo-settings dd { color:#3f3340; }
+  :global([data-theme="light"]) :is(.photo-selectors button,.collapse-button) { color:#574454; }
+  :global([data-theme="light"]) .photo-selectors button[aria-pressed="true"] { background:rgba(73,53,63,.08); border-color:rgba(73,53,63,.18); color:#30222b; }
+  :global([data-theme="light"]) button:focus-visible { outline-color:#8c436c; }
+  @media(hover:hover) and (pointer:fine) { .photo-print:hover { z-index:11; } .collapse-button:hover { background:rgba(128,128,128,.12); } }
+  @media(max-width:600px) {
+    photo-deck { padding:22px 18px; border-radius:24px; }
+    .deck-heading { gap:12px; } h2 { font-size:21px; } .frame-count { font-size:10px; }
+    .deck-stage { aspect-ratio:1.25; margin-top:12px; }
+    .photo-print { width:65%; padding:6px 6px 0; transform:translate(calc(-50% + var(--spread)*21%),-50%) rotate(calc(var(--spread)*8deg)); }
+    .print-label { font-size:9px; min-height:30px; gap:5px; }
+    photo-deck[data-open="true"] .photo-print { width:45%; transform:translate(calc(-50% + var(--side)*61%),-50%) rotate(calc(var(--side)*7deg)) scale(.9); }
+    photo-deck[data-open="true"] .photo-print[data-selected="true"] { width:86%; transform:translate(-50%,-50%); }
+    .deck-prompt { font-size:11px; margin-top:4px; }
+    .details-inner { padding-top:4px; } .selection-controls { margin-bottom:20px; }
+    .detail-title-row { display:block; } .demo-label { display:block; margin-top:8px; }
+    .photo-settings { grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 12px; }
+  }
+  @media(prefers-reduced-motion:reduce) { .photo-print,.details-expansion { transition:none; } }
+  /* Keep three 44px selectors on one row even at 320px. The icon-only
+     collapse button retains its accessible name and full touch target. */
+  @media(max-width:380px) { .collapse-label { display:none; } .collapse-button span { margin-left:0; } .photo-selectors { flex-shrink:0; } }
+</style>
+
+<script>
+  // Element-owned listeners are cleaned up on Astro swaps. Selection never
+  // reorders the DOM, preserving reading and keyboard order across the fan.
+  class PhotoDeck extends HTMLElement {
+    private controller?: AbortController;
+    private selected = -1;
+    connectedCallback() {
+      if (this.controller) return;
+      this.controller = new AbortController();
+      const signal = this.controller.signal;
+      this.addEventListener("click", event => {
+        const button = (event.target as Element).closest<HTMLButtonElement>("button");
+        if (!button) return;
+        if (button.hasAttribute("data-collapse")) { this.collapse(); return; }
+        const raw = button.dataset.photoIndex ?? button.dataset.selectIndex;
+        if (raw !== undefined) {
+          const index = Number(raw);
+          // The expanded image button is a disclosure: a second activation
+          // closes it, while the numbered selectors keep their selection.
+          if (button.dataset.photoIndex !== undefined && this.selected === index) this.collapse();
+          else this.select(index);
+        }
+      }, {signal});
+      this.addEventListener("keydown", event => {
+        if (event.key === "Escape" && this.selected >= 0) { event.preventDefault(); this.collapse(); }
+        if ((event.key === "ArrowLeft" || event.key === "ArrowRight") && (event.target as Element).matches("[data-photo-index],[data-select-index]")) {
+          event.preventDefault();
+          const prints = [...this.querySelectorAll<HTMLButtonElement>("[data-photo-index]")];
+          const target = event.target as HTMLElement;
+          const current = Number(target.dataset.photoIndex ?? target.dataset.selectIndex);
+          const next = (current + (event.key === "ArrowRight" ? 1 : -1) + prints.length) % prints.length;
+          this.select(next); prints[next]?.focus({preventScroll:true});
+        }
+      }, {signal});
+    }
+    private select(index: number) {
+      const prints = [...this.querySelectorAll<HTMLButtonElement>("[data-photo-index]")];
+      if (!prints[index]) return;
+      this.selected = index; this.dataset.open = "true";
+      this.querySelector<HTMLElement>(".details-expansion")!.inert = false;
+      prints.forEach((print,i) => { print.dataset.selected = String(i === index); print.setAttribute("aria-expanded",String(i === index)); print.style.setProperty("--side",String(i < index ? -1 : i > index ? 1 : 0)); });
+      this.querySelectorAll<HTMLElement>("[data-detail-index]").forEach(panel => { panel.hidden = Number(panel.dataset.detailIndex) !== index; });
+      this.querySelectorAll<HTMLElement>("[data-select-index]").forEach(button => button.setAttribute("aria-pressed",String(Number(button.dataset.selectIndex) === index)));
+      this.querySelector("[data-announcement]")!.textContent = `${prints[index].getAttribute("aria-label")?.replace(/^Select /, "")}. Details expanded.`;
+    }
+    private collapse() {
+      const previous = this.selected; this.dataset.open = "false";
+      this.querySelector<HTMLElement>(".details-expansion")!.inert = true;
+      this.querySelectorAll("[data-photo-index]").forEach(print => { print.setAttribute("aria-expanded","false"); print.removeAttribute("data-selected"); });
+      this.querySelector<HTMLButtonElement>(`[data-photo-index="${previous}"]`)?.focus({preventScroll:true});
+      this.querySelector("[data-announcement]")!.textContent = "Photo details collapsed."; this.selected = -1;
+    }
+    disconnectedCallback() { this.controller?.abort(); this.controller = undefined; }
+  }
+  if (!customElements.get("photo-deck")) customElements.define("photo-deck",PhotoDeck);
+</script>
