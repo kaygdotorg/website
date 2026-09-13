@@ -47,6 +47,11 @@ const latestTalk = talksEntries.sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 )[0];
 
+// Keep the Apps card as the initial focal point without coupling that behavior
+// to its position in the content file. Both the server-rendered card positions
+// and the client-side shuffle initializer use this stable destination.
+const defaultHeroCardHref = "/apps";
+
 // Create a map of slug -> lastUpdated date
 const pageLastUpdated = new Map<string, Date>();
 if (latestNow) {
@@ -131,6 +136,17 @@ const cardPhotos = rawCardPhotos?.map((card: any) => {
   };
 });
 
+// Place the default card in the fan's frontmost center slot for the initial
+// HTML response. This avoids a visible reorder when the client script starts.
+const defaultHeroCardIndex =
+  cardPhotos?.findIndex((card: any) => card.href === defaultHeroCardHref) ?? -1;
+const frontmostHeroCardPosition = Math.floor((cardPhotos?.length ?? 1) / 2);
+const initialHeroCardOffset =
+  defaultHeroCardIndex >= 0 && cardPhotos?.length
+    ? (defaultHeroCardIndex - frontmostHeroCardPosition + cardPhotos.length) %
+      cardPhotos.length
+    : 0;
+
 // Normalize work-experience nested keys (kebab-case) into camelCase
 // expected by the Timeline component.
 const workExperience = rawWorkExperience?.map((item: any) => ({
@@ -202,16 +218,20 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
         {
           cardPhotos && cardPhotos.length > 0 && (
             <div class="hero-cards-section" id="hero-photo-section">
-              <div class="card-hand" id="card-hand">
+              <div
+                class="card-hand"
+                id="card-hand"
+                data-default-href={defaultHeroCardHref}
+              >
                 <div class="card-hand-inner" id="card-hand-inner">
                   {cardPhotos.map((item: any, index: number) => (
                     <a
                       href={item.href}
                       class="card-in-hand"
                       data-index={index}
-                      data-position={index}
+                      data-position={(index - initialHeroCardOffset + cardPhotos.length) % cardPhotos.length}
                     >
-                      <!-- Card photo images - First image loads eagerly for LCP, others lazy -->
+                      <!-- The default frontmost image loads eagerly; background cards remain lazy. -->
                       <div class="card-in-hand-image">
                         {/* Local photos use variants sized for roughly 140–200px cards. */}
                         {typeof item.src === "string" ? (
@@ -219,8 +239,8 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                             src={item.src}
                             alt={item.label}
                             draggable="false"
-                            loading={index === 0 ? "eager" : "lazy"}
-                            fetchpriority={index === 0 ? "high" : "auto"}
+                            loading={item.href === defaultHeroCardHref ? "eager" : "lazy"}
+                            fetchpriority={item.href === defaultHeroCardHref ? "high" : "auto"}
                             decoding="async"
                           />
                         ) : item.src.format === "gif" ? (
@@ -228,8 +248,8 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                             src={item.src.src}
                             alt={item.label}
                             draggable="false"
-                            loading={index === 0 ? "eager" : "lazy"}
-                            fetchpriority={index === 0 ? "high" : "auto"}
+                            loading={item.href === defaultHeroCardHref ? "eager" : "lazy"}
+                            fetchpriority={item.href === defaultHeroCardHref ? "high" : "auto"}
                             decoding="async"
                           />
                         ) : (
@@ -240,7 +260,8 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                             width={240}
                             widths={[160, 240, 320, 480, 640]}
                             sizes="(max-width: 640px) 140px, 200px"
-                            loading={index === 0 ? "eager" : "lazy"}
+                            loading={item.href === defaultHeroCardHref ? "eager" : "lazy"}
+                            fetchpriority={item.href === defaultHeroCardHref ? "high" : "auto"}
                             decoding="async"
                           />
                         )}
@@ -587,7 +608,17 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
 
     if (cardHand && cards.length > 0) {
       const numCards = cards.length;
-      let currentOffset = 0;
+      // Resolve the default by href so content reordering does not silently
+      // change which destination appears at the front of the deck.
+      const defaultCardHref = cardHand.dataset.defaultHref;
+      const defaultCardIndex = Array.from(cards).findIndex(
+        (card) => card.getAttribute("href") === defaultCardHref,
+      );
+      const frontmostPosition = Math.floor(numCards / 2);
+      let currentOffset =
+        defaultCardIndex >= 0
+          ? (defaultCardIndex - frontmostPosition + numCards) % numCards
+          : 0;
       let isDragging = false;
       let hasMoved = false;
       let startX = 0;

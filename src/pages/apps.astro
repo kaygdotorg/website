@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+// A lightweight destination for the homepage Apps card. App entries can be
+// added here once their names, descriptions, and links are ready.
+---
+
+<BaseLayout title="Apps" description="Apps and small software projects.">
+  <section class="apps-page" aria-labelledby="apps-title">
+    <h1 id="apps-title" class="font-display">Apps</h1>
+    <p class="intro">Apps and small software projects.</p>
+    <div class="apps-empty">
+      <p>More soon.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .apps-page { max-width:1100px; margin:0 auto; padding:80px 28px 60px; }
+  h1 { font-size:clamp(36px,5vw,48px); line-height:1.1; letter-spacing:-.025em; margin:0; }
+  .intro { margin:18px 0 36px; font-size:18px; opacity:.75; }
+  .apps-empty { padding:28px; border:1px solid color-mix(in srgb,currentColor 12%,transparent); border-radius:24px; background:color-mix(in srgb,currentColor 4%,transparent); }
+  .apps-empty p { margin:0; opacity:.7; }
+  @media(max-width:600px) { .apps-page { padding:56px 18px 40px; } .intro { font-size:16px; } }
+</style>

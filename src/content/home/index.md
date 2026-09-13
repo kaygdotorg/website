@@ -83,6 +83,12 @@ card-photos:
     label: Talks
     href: /talks
     date: Jan 2026
+  # Apps is the deck's default front card. The homepage code finds it by href,
+  # so editors can reorder this list without changing the initial selection.
+  - src: ./assets/apps-card.svg
+    label: Apps
+    href: /apps
+    date: Sep 2026
   # The legacy Notes collection now redirects to /blog, so the homepage should
   # no longer advertise it as a separate destination in the hero card strip.
 bento-cards:

@@ -4501,58 +4501,91 @@ kbd,
   }
 }
 
-/* Fan positions - 4 cards held like playing cards */
+/*
+ * Fan positions for the six homepage destinations. Position 3 is the visual
+ * center and highest layer, matching the frontmost slot selected by the server
+ * and shuffle script. Explicit slots keep transforms predictable while cards
+ * rotate through the deck and provide complete styling for every destination.
+ */
 .card-in-hand[data-position="0"] {
-  z-index: 3;
-  --card-rotate: -12deg;
-  --card-x: -35px;
+  z-index: 1;
+  --card-rotate: -16deg;
+  --card-x: -52px;
   --card-y: 0px;
   --card-base-y: 0px;
 }
 
 .card-in-hand[data-position="1"] {
-  z-index: 4;
-  --card-rotate: -4deg;
-  --card-x: -12px;
-  --card-y: -6px;
-  --card-base-y: -6px;
+  z-index: 2;
+  --card-rotate: -10deg;
+  --card-x: -34px;
+  --card-y: -4px;
+  --card-base-y: -4px;
 }
 
 .card-in-hand[data-position="2"] {
-  z-index: 4;
-  --card-rotate: 4deg;
-  --card-x: 12px;
-  --card-y: -6px;
-  --card-base-y: -6px;
+  z-index: 3;
+  --card-rotate: -5deg;
+  --card-x: -17px;
+  --card-y: -8px;
+  --card-base-y: -8px;
 }
 
 .card-in-hand[data-position="3"] {
+  z-index: 6;
+  --card-rotate: 0deg;
+  --card-x: 0px;
+  --card-y: -12px;
+  --card-base-y: -12px;
+}
+
+.card-in-hand[data-position="4"] {
+  z-index: 3;
+  --card-rotate: 7deg;
+  --card-x: 26px;
+  --card-y: -7px;
+  --card-base-y: -7px;
+}
+
+.card-in-hand[data-position="5"] {
   z-index: 2;
-  --card-rotate: 12deg;
-  --card-x: 35px;
+  --card-rotate: 15deg;
+  --card-x: 52px;
   --card-y: 0px;
   --card-base-y: 0px;
 }
 
 @media (min-width: 768px) {
   .card-in-hand[data-position="0"] {
-    --card-x: -50px;
+    --card-x: -78px;
   }
 
   .card-in-hand[data-position="1"] {
-    --card-x: -17px;
-    --card-y: -8px;
-    --card-base-y: -8px;
+    --card-x: -52px;
+    --card-y: -6px;
+    --card-base-y: -6px;
   }
 
   .card-in-hand[data-position="2"] {
-    --card-x: 17px;
-    --card-y: -8px;
-    --card-base-y: -8px;
+    --card-x: -25px;
+    --card-y: -11px;
+    --card-base-y: -11px;
   }
 
   .card-in-hand[data-position="3"] {
-    --card-x: 50px;
+    --card-x: 0px;
+    --card-y: -16px;
+    --card-base-y: -16px;
+  }
+
+  .card-in-hand[data-position="4"] {
+    --card-x: 38px;
+    --card-y: -10px;
+    --card-base-y: -10px;
+  }
+
+  .card-in-hand[data-position="5"] {
+    --card-x: 78px;
   }
 }
 
