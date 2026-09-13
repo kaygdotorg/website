@@ -156,6 +156,7 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
           {
             profileImage && (
               <div class="hero-profile">
+                {/* Local portrait: 96px mobile / 128px desktop, with dense-screen variants. */}
                 {typeof profileImage === "string" ? (
                   <img
                     src={profileImage}
@@ -177,6 +178,9 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                     src={profileImage}
                     alt={`${name || "Profile"} photo`}
                     class="hero-profile-img"
+                    width={128}
+                    widths={[96, 128, 192, 256, 384]}
+                    sizes="(max-width: 768px) 96px, 128px"
                     loading="eager"
                     decoding="async"
                   />
@@ -209,6 +213,7 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                     >
                       <!-- Card photo images - First image loads eagerly for LCP, others lazy -->
                       <div class="card-in-hand-image">
+                        {/* Local photos use variants sized for roughly 140–200px cards. */}
                         {typeof item.src === "string" ? (
                           <img
                             src={item.src}
@@ -232,6 +237,9 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                             src={item.src}
                             alt={item.label}
                             draggable="false"
+                            width={240}
+                            widths={[160, 240, 320, 480, 640]}
+                            sizes="(max-width: 640px) 140px, 200px"
                             loading={index === 0 ? "eager" : "lazy"}
                             decoding="async"
                           />
@@ -266,7 +274,7 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
 
         <div class="bento-grid">
           {
-            bentoCards?.map((card: any, cardIndex: number) => (
+            bentoCards?.map((card: any) => (
               <a href={card.href} class={`bento-card bento-${card.id}`}>
                 {/* 1. Image / Visual (Top) */}
                 <div class="bento-visual-container">
@@ -282,6 +290,7 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                       <div class="photo-stack">
                         {cardPhotos?.slice(0, 4).map((photo: any) => (
                           <div class="photo-stack-item">
+                            {/* Local stack tiles reach about 40vw mobile / 225px desktop. */}
                             {typeof photo.src === "string" ? (
                               <img
                                 src={photo.src}
@@ -300,6 +309,9 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                               <Image
                                 src={photo.src}
                                 alt="Capture"
+                                width={320}
+                                widths={[160, 240, 320, 480, 640]}
+                                sizes="(max-width: 640px) 40vw, 225px"
                                 loading="lazy"
                                 decoding="async"
                               />
@@ -310,29 +322,30 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                     </div>
                   ) : (
                     <div class="bento-image-wrapper">
-                      {/* Bento card images - GIFs preserved, others optimized */}
-                      {/* First 3 cards are above-the-fold: use eager loading + fetchpriority for LCP */}
+                      {/* Bento images are below the hero; keep every variant lazy at default priority. */}
+                      {/* Local cards retain variants up to 1600px for dense desktop screens. */}
                       {typeof card.image === "string" ? (
                         <img
                           src={card.image}
                           alt={card.title}
-                          loading={cardIndex < 3 ? "eager" : "lazy"}
-                          fetchpriority={cardIndex < 3 ? "high" : "auto"}
+                          loading="lazy"
                           decoding="async"
                         />
                       ) : card.image.format === "gif" ? (
                         <img
                           src={card.image.src}
                           alt={card.title}
-                          loading={cardIndex < 3 ? "eager" : "lazy"}
-                          fetchpriority={cardIndex < 3 ? "high" : "auto"}
+                          loading="lazy"
                           decoding="async"
                         />
                       ) : (
                         <Image
                           src={card.image}
                           alt={card.title}
-                          loading={cardIndex < 3 ? "eager" : "lazy"}
+                          width={800}
+                          widths={[320, 480, 640, 800, 1200, 1600]}
+                          sizes="(max-width: 640px) 90vw, (max-width: 1400px) 60vw, 800px"
+                          loading="lazy"
                           decoding="async"
                         />
                       )}
