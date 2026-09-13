@@ -17,7 +17,6 @@ const photos = groups.flat();
 <BaseLayout title={page?.data.title || "Photography"} description={page?.data.description}>
   <section class="photography-page" aria-labelledby="photography-title">
     <header>
-      <p class="eyebrow">Through the viewfinder</p>
       <h1 id="photography-title">Photography<span>.</span></h1>
       <p class="intro-copy">A few frames worth looking at a little longer.</p>
     </header>
@@ -32,13 +31,12 @@ const photos = groups.flat();
 <style>
   .photography-page { max-width: 1100px; margin: 0 auto; padding: 80px 28px 60px; }
   header { margin-bottom: 44px; }
-  .eyebrow { font-family: var(--font-ui,sans-serif); text-transform: uppercase; letter-spacing: .16em; font-size: 11px; color: #c7b8bd; margin: 0 0 16px; }
-  h1 { font-family: var(--font-heading,Georgia,serif); font-size: clamp(48px,7vw,78px); line-height: 1.1; letter-spacing: -.04em; margin: 0; color: #faf6f1; }
+  h1 { font-family: var(--font-ui,sans-serif); font-size: clamp(36px,5vw,56px); line-height: 1.1; letter-spacing: -.04em; margin: 0; color: #faf6f1; }
   h1 span { color: #d69bba; }
   .intro-copy { font-size: 18px; color: #c5bac8; margin: 18px 0 0; }
   .decks { display: grid; gap: 36px; }
   .gallery-note { color: #bfb2c3; font-family: var(--font-ui,sans-serif); text-align: center; font-size: 12px; margin: 26px 0 0; }
   :global([data-theme="light"]) h1 { color: #30262d; }
-  :global([data-theme="light"]) :is(.eyebrow,.intro-copy,.gallery-note) { color: #6a5767; }
+  :global([data-theme="light"]) :is(.intro-copy,.gallery-note) { color: #6a5767; }
   @media(max-width:600px) { .photography-page { padding: 56px 18px 40px; } header { margin-bottom: 30px; } .intro-copy { font-size: 16px; line-height: 1.6; max-width: 28ch; } }
 </style>

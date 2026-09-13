@@ -11,7 +11,6 @@ interface Photograph {
 interface Props { photos: Photograph[]; index: number; }
 const { photos, index: deckIndex } = Astro.props;
 const title = photos[0].data.series || photos[0].data.title || "Untitled photograph";
-const demo = photos.every(p => p.data.demo);
 function variant(src: string, width: number) {
   // Only the demo CDN supports these transforms. Never guess local upload URLs.
   if (!src.startsWith("https://images.unsplash.com/")) return src;
@@ -24,10 +23,9 @@ function settings(data: Props["photos"][number]["data"]) {
 
 <photo-deck data-open="false">
   <div class="deck-heading">
-    <div><p class="kicker">{demo ? "Layout preview" : "Selected photographs"}</p><h2>{title}</h2></div>
-    <span class="frame-count">{String(photos.length).padStart(2,"0")} {photos.length === 1 ? "frame" : "frames"}</span>
+    <h2>{title}</h2>
   </div>
-  <div class="deck-stage" role="group" aria-label="Photographs">
+  <div class="deck-stage" role="group" aria-label="Photographs. Swipe horizontally or use arrow keys to browse.">
     {photos.map((photo, index) => {
       const src = photo.data.thumb || photo.data.src!;
       const name = photo.data.title || photo.data.alt || "Untitled photograph";
@@ -35,27 +33,21 @@ function settings(data: Props["photos"][number]["data"]) {
       // All first-deck images contribute to the visible fan; later decks defer
       // their images. Responsive sources keep that initial fan appropriately sized.
       return <button type="button" class="photo-print" data-photo-index={index} aria-label={`Select ${name}`} aria-expanded="false" aria-controls={`photo-detail-${deckIndex}-${index}`} style={`--spread:${spread};--order:${index}`}>
-        <span class="print-image"><img src={variant(src,960)} srcset={src.startsWith("https://images.unsplash.com/") ? [480,800,1200,1600].map(w => `${variant(src,w)} ${w}w`).join(", ") : undefined} sizes="(max-width:600px) 78vw, (max-width:1100px) 65vw, 700px" width={photo.data.width || 1500} height={photo.data.height || 1000} alt={photo.data.alt || name} loading={deckIndex === 0 ? "eager" : "lazy"} decoding="async" /></span>
+        <span class="print-image"><img src={variant(src,960)} srcset={src.startsWith("https://images.unsplash.com/") ? [480,800,1200,1600].map(w => `${variant(src,w)} ${w}w`).join(", ") : undefined} sizes="(max-width:600px) 78vw, (max-width:1100px) 65vw, 700px" width={photo.data.width || 1500} height={photo.data.height || 1000} alt={photo.data.alt || name} loading={deckIndex === 0 ? "eager" : "lazy"} decoding="async" draggable="false" /></span>
         <span class="print-label"><span>{name}</span><span>{String(index+1).padStart(2,"0")}</span></span>
       </button>;
     })}
   </div>
-  <p class="deck-prompt">Select a photograph to unfold its details <span aria-hidden="true">↗</span></p>
+  <p class="deck-prompt">Swipe to explore · select a photograph for its details</p>
   {/* The glass card expands in document flow. Its details are inert while
       closed, and each photo owns a distinct panel with its own metadata. */}
   <div class="details-expansion" inert>
     <div class="details-clip"><div class="details-inner">
-      <div class="selection-controls">
-        <div class="photo-selectors" role="group" aria-label="Choose a photograph">
-          {photos.map((photo,index) => <button type="button" data-select-index={index} aria-pressed="false" aria-label={`Select ${photo.data.title || photo.data.alt || "Untitled photograph"}`}>{String(index+1).padStart(2,"0")}</button>)}
-        </div>
-        <button type="button" class="collapse-button" data-collapse aria-label="Close details"><span class="collapse-label">Close details</span> <span aria-hidden="true">↑</span></button>
-      </div>
       {photos.map((photo,index) => <section id={`photo-detail-${deckIndex}-${index}`} data-detail-index={index} hidden aria-labelledby={`photo-title-${deckIndex}-${index}`}>
         <div class="detail-title-row"><h3 id={`photo-title-${deckIndex}-${index}`}>{photo.data.title || photo.data.alt || "Untitled photograph"}</h3>{photo.data.demo && <span class="demo-label">Sample photo</span>}</div>
         {photo.body?.trim() && <p class="photo-description">{photo.body.trim()}</p>}
         {(photo.data.location || photo.data.date) && <p class="photo-description">{[photo.data.location,photo.data.date?.toLocaleDateString("en-GB",{month:"short",year:"numeric",timeZone:"UTC"})].filter(Boolean).join(" · ")}</p>}
-        <dl class="photo-settings">{settings(photo.data).map(([label,value]) => <div><dt>{label}</dt><dd class:list={{missing:!value}}>{value || "Not recorded"}</dd></div>)}</dl>
+        <dl class="photo-settings">{settings(photo.data).map(([label,value]) => <div><dt>{label}</dt><dd><button type="button" class="setting-value" data-copy-value={value || "Not recorded"} aria-label={`Copy ${label}: ${value || "Not recorded"}`}>{value || "Not recorded"}</button></dd></div>)}</dl>
         {photo.data.demo && <p class="sample-note">Demo image from Unsplash, not my photograph. Capture settings are not supplied.</p>}
       </section>)}
     </div></div>
@@ -66,18 +58,18 @@ function settings(data: Props["photos"][number]["data"]) {
 <style>
   photo-deck { display:block; isolation:isolate; padding:28px 36px; border:1px solid rgba(255,255,255,.16); border-radius:30px; background:rgba(62,51,65,.46); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 18px 60px rgba(0,0,0,.12); }
   .deck-heading { display:flex; justify-content:space-between; align-items:center; gap:20px; }
-  .kicker,.frame-count,.print-label,.photo-settings dt,.sample-note,.demo-label { font-family:var(--font-ui,sans-serif); }
-  .kicker { margin:0 0 5px; text-transform:uppercase; font-size:10px; letter-spacing:.16em; color:#cbbdc7; }
-  h2 { font-family:var(--font-heading,Georgia,serif); font-size:25px; font-weight:400; color:#f5efef; margin:0; }
-  .frame-count { font-size:12px; color:#c5bcc8; white-space:nowrap; font-variant-numeric:tabular-nums; }
-  .deck-stage { position:relative; width:100%; aspect-ratio:1.85; margin-top:20px; }
+  .print-label,.photo-settings dt,.sample-note,.demo-label { font-family:var(--font-ui,sans-serif); }
+  h2 { font-family:var(--font-ui,sans-serif); font-size:25px; font-weight:400; color:#f5efef; margin:0; }
+  .deck-stage { position:relative; width:100%; aspect-ratio:1.85; margin-top:20px; touch-action:pan-y pinch-zoom; user-select:none; }
   .photo-print { position:absolute; display:block; width:56%; top:50%; left:50%; padding:10px 10px 0; border:1px solid rgba(0,0,0,.1); border-radius:6px; background:#f3eee6; color:#29272a; box-shadow:0 8px 14px rgba(0,0,0,.14),0 20px 35px rgba(0,0,0,.21); transform:translate(calc(-50% + var(--spread)*29%),-50%) rotate(calc(var(--spread)*9deg)); z-index:calc(3 + var(--order)); cursor:pointer; transition:transform 280ms cubic-bezier(.22,1,.36,1),opacity 200ms ease,width 280ms cubic-bezier(.22,1,.36,1); }
   .print-image { display:block; aspect-ratio:3/2; background:#e8e1d5; overflow:hidden; }
   .print-image img { display:block; width:100%; height:100%; object-fit:contain; }
   .print-label { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:38px; font-size:11px; text-align:left; }
   .print-label span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .print-label span:last-child { color:#7a7067; font-size:10px; }
-  button:focus-visible { outline:3px solid #eec89e; outline-offset:5px; }
+  /* Keyboard focus uses the caption instead of a ring around the photo. */
+  button:focus-visible { outline:none; }
+  .photo-print:focus-visible .print-label, .setting-value:focus-visible { text-decoration:underline; text-underline-offset:3px; }
   .photo-print:focus-visible { z-index:12; }
   photo-deck[data-open="true"] .photo-print { width:43%; opacity:.55; transform:translate(calc(-50% + var(--side)*68%),-50%) rotate(calc(var(--side)*8deg)) scale(.9); }
   photo-deck[data-open="true"] .photo-print[data-selected="true"] { width:70%; opacity:1; z-index:10; transform:translate(-50%,-50%); }
@@ -89,83 +81,139 @@ function settings(data: Props["photos"][number]["data"]) {
   photo-deck[data-open="true"] .details-expansion { grid-template-rows:1fr; opacity:1; }
   .details-clip { min-height:0; overflow:hidden; }
   .details-inner { padding-top:28px; }
-  .selection-controls { display:flex; justify-content:space-between; gap:16px; align-items:center; margin-bottom:26px; }
-  .photo-selectors { display:flex; flex-wrap:wrap; gap:6px; }
-  .photo-selectors button,.collapse-button { min-width:44px; min-height:44px; border:1px solid transparent; border-radius:10px; background:transparent; color:#cfc5d0; font-family:var(--font-ui,sans-serif); font-size:12px; cursor:pointer; }
-  .photo-selectors button[aria-pressed="true"] { color:#fff9f5; background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.18); }
-  .collapse-button { padding:0 10px; white-space:nowrap; }
-  .collapse-button span { margin-left:7px; }
   .detail-title-row { display:flex; justify-content:space-between; align-items:baseline; gap:16px; }
-  h3 { font-family:var(--font-heading,Georgia,serif); font-size:clamp(25px,4vw,34px); font-weight:400; letter-spacing:-.02em; color:#faf6f1; margin:0; }
+  h3 { font-family:var(--font-ui,sans-serif); font-size:clamp(25px,4vw,34px); font-weight:400; letter-spacing:-.02em; color:#faf6f1; margin:0; }
   .demo-label { font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:#cabecb; white-space:nowrap; }
   .photo-description { color:#c9c0ca; font-size:15px; line-height:1.65; margin:12px 0 0; max-width:60ch; }
-  .photo-settings { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px 20px; margin:26px 0 0; padding:24px 0; border-top:1px solid rgba(255,255,255,.13); border-bottom:1px solid rgba(255,255,255,.13); }
-  .photo-settings dt { font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:#b9adbd; margin-bottom:7px; }
-  .photo-settings dd { font-family:var(--font-mono,monospace); font-size:13px; color:#f5edf5; margin:0; overflow-wrap:anywhere; }
-  .photo-settings dd.missing { color:#c4b8c6; font-family:var(--font-ui,sans-serif); }
+  /* One quiet inset surface; each label/value pair reads along one line.
+     Values inherit the same mono font token as article code and can be copied. */
+  .photo-settings { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; margin:24px 0 0; padding:12px 18px; border-radius:16px; background:rgba(15,12,20,.23); box-shadow:inset 0 1px 3px rgba(0,0,0,.08); }
+  .photo-settings > div { display:flex; justify-content:space-between; align-items:baseline; min-width:0; gap:12px; }
+  .photo-settings dt { font-family:var(--font-ui,sans-serif); font-size:12px; color:#c6b9cc; white-space:nowrap; }
+  .photo-settings dd { min-width:0; margin:0; text-align:right; }
+  .setting-value { display:block; min-height:44px; padding:10px 0; background:none; border:0; color:#f5edf5; font-family:var(--font-mono,monospace); font-size:12px; line-height:1.7; cursor:pointer; overflow-wrap:anywhere; text-align:right; text-decoration:underline; text-decoration-color:transparent; text-underline-offset:4px; transition:color 150ms ease,text-decoration-color 150ms ease; }
   .sample-note { color:#bcb0c0; font-size:11px; line-height:1.65; margin:18px 0 0; }
   :global([data-theme="light"]) photo-deck { background:rgba(255,252,248,.5); border-color:rgba(73,53,63,.16); box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 60px rgba(57,38,47,.08); }
   :global([data-theme="light"]) :is(h2,h3) { color:#30272e; }
-  :global([data-theme="light"]) :is(.kicker,.frame-count,.deck-prompt,.demo-label,.photo-description,.photo-settings dt,.sample-note) { color:#6e5c6b; }
-  :global([data-theme="light"]) .photo-settings { border-color:rgba(73,53,63,.16); }
-  :global([data-theme="light"]) .photo-settings dd { color:#3f3340; }
-  :global([data-theme="light"]) :is(.photo-selectors button,.collapse-button) { color:#574454; }
-  :global([data-theme="light"]) .photo-selectors button[aria-pressed="true"] { background:rgba(73,53,63,.08); border-color:rgba(73,53,63,.18); color:#30222b; }
-  :global([data-theme="light"]) button:focus-visible { outline-color:#8c436c; }
-  @media(hover:hover) and (pointer:fine) { .photo-print:hover { z-index:11; } .collapse-button:hover { background:rgba(128,128,128,.12); } }
+  :global([data-theme="light"]) :is(.deck-prompt,.demo-label,.photo-description,.photo-settings dt,.sample-note) { color:#6e5c6b; }
+  :global([data-theme="light"]) .photo-settings { background:rgba(77,55,68,.055); box-shadow:inset 0 1px 3px rgba(57,38,47,.04); }
+  :global([data-theme="light"]) .setting-value { color:#3f3340; }
+  @media(hover:hover) and (pointer:fine) { photo-deck[data-open="false"] .photo-print:hover { z-index:11; } .setting-value:hover { text-decoration-color:currentColor; } }
   @media(max-width:600px) {
     photo-deck { padding:22px 18px; border-radius:24px; }
-    .deck-heading { gap:12px; } h2 { font-size:21px; } .frame-count { font-size:10px; }
+    .deck-heading { gap:12px; } h2 { font-size:21px; }
     .deck-stage { aspect-ratio:1.25; margin-top:12px; }
     .photo-print { width:65%; padding:6px 6px 0; transform:translate(calc(-50% + var(--spread)*21%),-50%) rotate(calc(var(--spread)*8deg)); }
     .print-label { font-size:9px; min-height:30px; gap:5px; }
     photo-deck[data-open="true"] .photo-print { width:45%; transform:translate(calc(-50% + var(--side)*61%),-50%) rotate(calc(var(--side)*7deg)) scale(.9); }
     photo-deck[data-open="true"] .photo-print[data-selected="true"] { width:86%; transform:translate(-50%,-50%); }
     .deck-prompt { font-size:11px; margin-top:4px; }
-    .details-inner { padding-top:4px; } .selection-controls { margin-bottom:20px; }
+    .details-inner { padding-top:16px; }
     .detail-title-row { display:block; } .demo-label { display:block; margin-top:8px; }
-    .photo-settings { grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 12px; }
+    .photo-settings { grid-template-columns:1fr; padding:10px 14px; gap:0; }
   }
   @media(prefers-reduced-motion:reduce) { .photo-print,.details-expansion { transition:none; } }
-  /* Keep three 44px selectors on one row even at 320px. The icon-only
-     collapse button retains its accessible name and full touch target. */
-  @media(max-width:380px) { .collapse-label { display:none; } .collapse-button span { margin-left:0; } .photo-selectors { flex-shrink:0; } }
 </style>
 
 <script>
+  import { copyTextWithFeedback } from "../scripts/copy-feedback";
   // Element-owned listeners are cleaned up on Astro swaps. Selection never
   // reorders the DOM, preserving reading and keyboard order across the fan.
   class PhotoDeck extends HTMLElement {
     private controller?: AbortController;
     private selected = -1;
+    private wheelTimer?: ReturnType<typeof setTimeout>;
+    private wheelAmount = 0;
+    private wheelLocked = false;
+    private suppressClickUntil = 0;
     connectedCallback() {
       if (this.controller) return;
       this.controller = new AbortController();
       const signal = this.controller.signal;
       this.addEventListener("click", event => {
+        if (performance.now() < this.suppressClickUntil) { event.preventDefault(); return; }
         const button = (event.target as Element).closest<HTMLButtonElement>("button");
         if (!button) return;
-        if (button.hasAttribute("data-collapse")) { this.collapse(); return; }
-        const raw = button.dataset.photoIndex ?? button.dataset.selectIndex;
+        if (button.dataset.copyValue !== undefined) {
+          void copyTextWithFeedback(button.dataset.copyValue).then(copied => {
+            if (this.isConnected) this.querySelector("[data-announcement]")!.textContent = copied ? "Value copied to clipboard." : "Could not copy value. Try again.";
+          });
+          return;
+        }
+        const raw = button.dataset.photoIndex;
         if (raw !== undefined) {
           const index = Number(raw);
-          // The expanded image button is a disclosure: a second activation
-          // closes it, while the numbered selectors keep their selection.
+          // Retain direct selection and keyboard disclosure without a toolbar.
           if (button.dataset.photoIndex !== undefined && this.selected === index) this.collapse();
           else this.select(index);
         }
       }, {signal});
       this.addEventListener("keydown", event => {
         if (event.key === "Escape" && this.selected >= 0) { event.preventDefault(); this.collapse(); }
-        if ((event.key === "ArrowLeft" || event.key === "ArrowRight") && (event.target as Element).matches("[data-photo-index],[data-select-index]")) {
+        if ((event.key === "ArrowLeft" || event.key === "ArrowRight") && (event.target as Element).matches("[data-photo-index]")) {
           event.preventDefault();
           const prints = [...this.querySelectorAll<HTMLButtonElement>("[data-photo-index]")];
           const target = event.target as HTMLElement;
-          const current = Number(target.dataset.photoIndex ?? target.dataset.selectIndex);
+          const current = Number(target.dataset.photoIndex);
           const next = (current + (event.key === "ArrowRight" ? 1 : -1) + prints.length) % prints.length;
           this.select(next); prints[next]?.focus({preventScroll:true});
         }
       }, {signal});
+      const stage = this.querySelector<HTMLElement>(".deck-stage")!;
+      // Horizontal trackpad/shift-wheel gestures advance once per burst, so
+      // momentum cannot skip the whole deck. Vertical page scrolling is free.
+      stage.addEventListener("wheel", event => {
+        const delta = event.shiftKey && !event.deltaX ? event.deltaY : event.deltaX;
+        if (!delta || (!event.shiftKey && Math.abs(event.deltaX) <= Math.abs(event.deltaY))) return;
+        if (this.querySelectorAll("[data-photo-index]").length < 2) return;
+        event.preventDefault();
+        clearTimeout(this.wheelTimer);
+        this.wheelTimer = setTimeout(() => { this.wheelAmount = 0; this.wheelLocked = false; }, 180);
+        if (this.wheelLocked) return;
+        this.wheelAmount += delta * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? stage.clientWidth : 1);
+        if (Math.abs(this.wheelAmount) >= 36) { this.advance(this.wheelAmount > 0 ? 1 : -1); this.wheelLocked = true; }
+      }, {signal, passive:false});
+      let pointer: {id:number; x:number; y:number; horizontal:boolean} | undefined;
+      stage.addEventListener("pointerdown", event => {
+        if (!event.isPrimary || event.button !== 0 || pointer) return;
+        pointer = {id:event.pointerId,x:event.clientX,y:event.clientY,horizontal:false};
+      }, {signal});
+      stage.addEventListener("pointermove", event => {
+        if (!pointer || pointer.id !== event.pointerId) return;
+        const dx = event.clientX-pointer.x, dy = event.clientY-pointer.y;
+        if (!pointer.horizontal && Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { pointer = undefined; return; }
+        if (!pointer.horizontal && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+          pointer.horizontal = true; stage.setPointerCapture(event.pointerId);
+        }
+      }, {signal});
+      stage.addEventListener("pointerup", event => {
+        if (!pointer || pointer.id !== event.pointerId) return;
+        const dx = event.clientX-pointer.x;
+        if (pointer.horizontal) {
+          this.suppressClickUntil = performance.now()+350;
+          if (Math.abs(dx) >= 28) this.advance(dx < 0 ? 1 : -1);
+        }
+        if (stage.hasPointerCapture(event.pointerId)) stage.releasePointerCapture(event.pointerId);
+        pointer = undefined;
+      }, {signal});
+      stage.addEventListener("pointercancel", () => { pointer = undefined; }, {signal});
+      // A mouse can leave before horizontal capture and release elsewhere.
+      // Discard that unfinished gesture so the next swipe can start normally.
+      stage.addEventListener("pointerleave", event => {
+        if (pointer?.id === event.pointerId && !stage.hasPointerCapture(event.pointerId)) pointer = undefined;
+      }, {signal});
+      stage.addEventListener("lostpointercapture", () => { pointer = undefined; }, {signal});
+    }
+    private advance(direction:number) {
+      const prints = [...this.querySelectorAll<HTMLButtonElement>("[data-photo-index]")];
+      const count = prints.length;
+      if (count < 2) return;
+      const current = this.selected < 0 ? count-1 : this.selected;
+      const next = (current+direction+count)%count;
+      this.select(next);
+      // Keep existing focus within the deck aligned with its centered photo,
+      // without taking focus from another part of the page during scrolling.
+      if (prints.some(print => print === document.activeElement)) prints[next].focus({preventScroll:true});
     }
     private select(index: number) {
       const prints = [...this.querySelectorAll<HTMLButtonElement>("[data-photo-index]")];
@@ -174,7 +222,6 @@ function settings(data: Props["photos"][number]["data"]) {
       this.querySelector<HTMLElement>(".details-expansion")!.inert = false;
       prints.forEach((print,i) => { print.dataset.selected = String(i === index); print.setAttribute("aria-expanded",String(i === index)); print.style.setProperty("--side",String(i < index ? -1 : i > index ? 1 : 0)); });
       this.querySelectorAll<HTMLElement>("[data-detail-index]").forEach(panel => { panel.hidden = Number(panel.dataset.detailIndex) !== index; });
-      this.querySelectorAll<HTMLElement>("[data-select-index]").forEach(button => button.setAttribute("aria-pressed",String(Number(button.dataset.selectIndex) === index)));
       this.querySelector("[data-announcement]")!.textContent = `${prints[index].getAttribute("aria-label")?.replace(/^Select /, "")}. Details expanded.`;
     }
     private collapse() {
@@ -184,7 +231,10 @@ function settings(data: Props["photos"][number]["data"]) {
       this.querySelector<HTMLButtonElement>(`[data-photo-index="${previous}"]`)?.focus({preventScroll:true});
       this.querySelector("[data-announcement]")!.textContent = "Photo details collapsed."; this.selected = -1;
     }
-    disconnectedCallback() { this.controller?.abort(); this.controller = undefined; }
+    disconnectedCallback() {
+      this.controller?.abort(); this.controller = undefined;
+      clearTimeout(this.wheelTimer); this.wheelAmount = 0; this.wheelLocked = false;
+    }
   }
   if (!customElements.get("photo-deck")) customElements.define("photo-deck",PhotoDeck);
 </script>

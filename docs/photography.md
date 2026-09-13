@@ -33,6 +33,11 @@ original work. Images are not uploaded or published automatically by this UI.
 Local files in `public/photography/` are served as supplied, so provide appropriately
 sized previews. Only the existing Unsplash samples use generated CDN width URLs.
 
-Select a print with click, Enter, or Space. Arrow keys move between photographs;
-Escape or Close details collapses the card and returns focus to the print.
+Select a print with click, Enter, or Space. Horizontal trackpad scrolling,
+Shift+wheel, touch/mouse swipes, and arrow keys move between photographs and show
+the centered photo's details. Vertical gestures keep scrolling the page. One
+wheel burst advances one frame so trackpad momentum cannot skip the whole deck.
+Escape or activating the selected print again collapses the card.
+Each capture value copies on activation and uses the same toast treatment as
+heading-link copy. Keys use the UI font; every value uses the site mono font.
 The component owns its listeners and removes them during Astro navigation.

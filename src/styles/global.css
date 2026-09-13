@@ -146,8 +146,8 @@ html[data-theme="dark"] body {
 
 .skip-link:focus {
   top: 0;
-  outline: 2px solid white;
-  outline-offset: 2px;
+  outline: none;
+  text-decoration: underline;
 }
 
 /* Light mode background */
@@ -5150,87 +5150,33 @@ html.theme-transitioning *::after {
    Accessibility: Focus Indicators
    ======================================== */
 
-/*
- * Global :focus-visible baseline.
- *
- * Provides a consistent 2px pink accent ring for keyboard-only focus
- * (mouse clicks won't trigger it). The fallback #f472b6 matches the
- * site's accent-400 design token. Component-specific overrides below
- * add border-radius to match each element's shape.
- *
- * Covered elements:
- * - Pagefind search input (needs !important to override its own reset)
- * - Sidebar TOC scroll items (4px radius, matches pill shape)
- * - Tag filter pills (full-round, matches .tag-pill shape)
- * - Markdown prev/next navigation links (8px radius)
- * - Homepage card hand (larger 3px ring, defined separately below)
- */
+/* Ring-free keyboard focus: use text decoration or a surface change.
+ * Keep decorative borders and shadows separate from focus feedback. */
+:focus { outline: none !important; }
 :focus-visible {
-  outline: 2px solid var(--color-accent-400, #f472b6);
-  outline-offset: 2px;
+  outline: none !important;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
-
-.pagefind-ui__search-input:focus-visible {
-  outline: 2px solid var(--color-accent-400, #f472b6) !important;
-  outline-offset: 2px;
-}
-
-.toc-scroll-item:focus-visible {
-  outline: 2px solid var(--color-accent-400, #f472b6);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-.tag-pill:focus-visible {
-  outline: 2px solid var(--color-accent-400, #f472b6);
-  outline-offset: 2px;
-  border-radius: 9999px;
-}
-
-.md-nav-link:focus-visible {
-  outline: 2px solid var(--color-accent-400, #f472b6);
-  outline-offset: 2px;
-  border-radius: 8px;
-}
-
-/* Focus ring for cards */
-.card-in-hand:focus-visible {
-  outline: 3px solid var(--color-accent-500, #ec4899);
-  outline-offset: 4px;
-  z-index: 20 !important;
-}
-
-/* Focus for navigation links */
+button:focus-visible,
+a:has(svg):focus-visible,
 .glass-pill a:focus-visible,
-.glass-pill button:focus-visible {
-  outline: 2px solid var(--color-accent-500, #ec4899);
-  outline-offset: 2px;
-  border-radius: 9999px;
-}
-
-/* Focus for timeline entries */
-.timeline-entry:focus-visible .timeline-card {
-  outline: 2px solid var(--color-accent-500, #ec4899);
-  outline-offset: 4px;
-}
-
-/* Focus for page cards */
-.page-card-arrow:focus-visible {
-  outline: 2px solid var(--color-accent-500, #ec4899);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* Focus for scroll progress button */
-.scroll-progress-btn:focus-visible {
-  outline: 3px solid var(--color-accent-500, #ec4899);
-  outline-offset: 3px;
-}
-
-/* Page indicator dots focus */
+.tag-pill:focus-visible,
 .page-indicator-dot:focus-visible {
-  outline: 2px solid var(--color-accent-500, #ec4899);
-  outline-offset: 2px;
+  background-color: color-mix(in srgb, var(--color-accent-400, #f472b6) 20%, transparent);
+}
+.pagefind-ui__search-input:focus-visible,
+[data-theme="light"] .pagefind-ui__search-input:focus-visible {
+  background-color: color-mix(in srgb, var(--color-accent-400, #f472b6) 10%, transparent) !important;
+  box-shadow: none !important;
+  text-decoration: none;
+}
+.card-in-hand:focus-visible { z-index: 20 !important; }
+.heading-link:focus-visible { opacity: 1 !important; }
+a:focus-visible img { filter: brightness(.8); }
+.timeline-entry:focus-visible .timeline-card {
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 /* ========================================
