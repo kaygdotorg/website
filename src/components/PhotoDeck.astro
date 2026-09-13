@@ -68,8 +68,6 @@ function settings(data: Props["photos"][number]["data"]) {
      previous visual sizes without recalculating layout while the fan moves. */
   .photo-print { position:absolute; display:block; width:70%; top:50%; left:50%; padding:10px 10px 0; border:1px solid rgba(0,0,0,.1); border-radius:6px; background:#f3eee6; color:#29272a; box-shadow:0 8px 14px rgba(0,0,0,.14),0 20px 35px rgba(0,0,0,.21); transform:translate(calc(-50% + var(--spread)*23.2%),-50%) rotate(calc(var(--spread)*9deg)) scale(.8); z-index:calc(3 + var(--order)); cursor:pointer; will-change:transform; transition:transform 260ms cubic-bezier(.22,1,.36,1),opacity 180ms ease; }
   .print-image { display:block; aspect-ratio:3/2; background:#e8e1d5; overflow:hidden; }
-  /* Drag feedback moves the already-rasterized prints without resizing them. */
-  .photo-print { translate:var(--drag-x,0px) 0; }
   .print-image img { display:block; width:100%; height:100%; object-fit:contain; }
   .print-label { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:38px; font-size:11px; text-align:left; }
   .print-label span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -199,26 +197,25 @@ function settings(data: Props["photos"][number]["data"]) {
         if (!pointer.horizontal && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
           pointer.horizontal = true; stage.setPointerCapture(event.pointerId);
         }
-        if (pointer.horizontal) stage.style.setProperty("--drag-x", `${Math.max(-100,Math.min(100,dx*.5))}px`);
       }, {signal});
       stage.addEventListener("pointerup", event => {
         if (!pointer || pointer.id !== event.pointerId) return;
         const dx = event.clientX-pointer.x;
         if (pointer.horizontal) {
           this.suppressClickUntil = performance.now()+350;
-          if (Math.abs(dx) >= 28) this.advance(dx < 0 ? 1 : -1);
+          // Match the homepage: keep the fan anchored, shuffle on release.
+          if (Math.abs(dx) > 50) this.advance(dx < 0 ? 1 : -1);
         }
         if (stage.hasPointerCapture(event.pointerId)) stage.releasePointerCapture(event.pointerId);
-        stage.style.removeProperty("--drag-x");
         pointer = undefined;
       }, {signal});
-      stage.addEventListener("pointercancel", () => { pointer = undefined; stage.style.removeProperty("--drag-x"); }, {signal});
+      stage.addEventListener("pointercancel", () => { pointer = undefined; }, {signal});
       // A mouse can leave before horizontal capture and release elsewhere.
       // Discard that unfinished gesture so the next swipe can start normally.
       stage.addEventListener("pointerleave", event => {
         if (pointer?.id === event.pointerId && !stage.hasPointerCapture(event.pointerId)) pointer = undefined;
       }, {signal});
-      stage.addEventListener("lostpointercapture", () => { pointer = undefined; stage.style.removeProperty("--drag-x"); }, {signal});
+      stage.addEventListener("lostpointercapture", () => { pointer = undefined; }, {signal});
     }
     private advance(direction:number) {
       const prints = [...this.querySelectorAll<HTMLButtonElement>("[data-photo-index]")];
@@ -290,7 +287,6 @@ function settings(data: Props["photos"][number]["data"]) {
     }
     disconnectedCallback() {
       this.controller?.abort(); this.controller = undefined;
-      this.querySelector<HTMLElement>(".deck-stage")?.style.removeProperty("--drag-x");
       this.detailsAnimation?.cancel(); this.detailsAnimation = undefined;
       const details = this.querySelector<HTMLElement>(".details-expansion");
       if (details) {

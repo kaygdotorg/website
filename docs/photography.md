@@ -37,7 +37,9 @@ Select a print with click, Enter, or Space. Horizontal trackpad scrolling,
 Shift+wheel, touch/mouse swipes, and arrow keys move between photographs and show
 the centered photo's details. Vertical gestures keep scrolling the page. Continuous
 horizontal input cycles through the deck with a short cooldown between frames.
-Escape or activating the selected print again collapses the card.
+Like the homepage fan, dragging more than 50 px shuffles on release; the stack
+stays anchored while dragging. Escape or activating the selected print again
+collapses the card.
 Each capture value copies on activation and uses the same toast treatment as
 heading-link copy. Keys use the UI font; every value uses the site mono font.
 The component owns its listeners and removes them during Astro navigation.
