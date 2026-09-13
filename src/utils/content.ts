@@ -393,11 +393,10 @@ async function loadLinkIndex(): Promise<LinkIndex | null> {
     // Use dynamic import for fs to work in both Node and browser contexts
     const { readFileSync } = await import("node:fs");
     const { join } = await import("node:path");
-    const { fileURLToPath } = await import("node:url");
-
-    // Get the project root (two levels up from src/utils/)
-    const __dirname = fileURLToPath(new URL(".", import.meta.url));
-    const publicPath = join(__dirname, "../../public/link-index.json");
+    // npm runs Astro from the project root in both dev and production builds.
+    // import.meta.url points into dist after bundling, so resolving relative to
+    // this module silently lost all production backlinks and graph data.
+    const publicPath = join(process.cwd(), "public/link-index.json");
 
     const content = readFileSync(publicPath, "utf-8");
     linkIndexCache = JSON.parse(content);

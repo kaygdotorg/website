@@ -66,6 +66,9 @@
 
     // Hover
     hoverScale: 1.4,
+
+    // Dragging
+    dragThreshold: 4,
   };
 
   // =============================================================================
@@ -100,25 +103,43 @@
       this.draggedNode = null;
       this.dragStartX = 0;
       this.dragStartY = 0;
+      this.didDrag = false;
 
       // Ambient motion state
       this.time = Math.random() * 1000; // Random start offset
-      this.isAnimating = true;
+      this.isAnimating = false;
+      this.isDestroyed = false;
+      this.animationFrameId = null;
+      this.isDocumentVisible = !document.hidden;
+      // IntersectionObserver updates this after the first layout pass. Keeping
+      // the initial value true lets the graph render once before that callback.
+      this.isInViewport = true;
+      this.visibilityObserver = null;
 
       // Bind methods
       this.render = this.render.bind(this);
       this.handleMouseMove = this.handleMouseMove.bind(this);
       this.handleMouseDown = this.handleMouseDown.bind(this);
       this.handleMouseUp = this.handleMouseUp.bind(this);
+      this.handleMouseLeave = this.handleMouseLeave.bind(this);
       this.handleClick = this.handleClick.bind(this);
       this.handleResize = this.handleResize.bind(this);
       this.handleWheel = this.handleWheel.bind(this);
+      this.handleTouchMove = this.handleTouchMove.bind(this);
       this.animate = this.animate.bind(this);
       this.handleLightboxClick = this.handleLightboxClick.bind(this);
       this.handleLightboxMouseMove = this.handleLightboxMouseMove.bind(this);
       this.handleLightboxMouseDown = this.handleLightboxMouseDown.bind(this);
       this.handleLightboxMouseUp = this.handleLightboxMouseUp.bind(this);
+      this.handleLightboxMouseLeave = this.handleLightboxMouseLeave.bind(this);
       this.handleLightboxWheel = this.handleLightboxWheel.bind(this);
+      this.handleLightboxTouchMove = this.handleLightboxTouchMove.bind(this);
+      this.handleLightboxOverlayClick = this.handleLightboxOverlayClick.bind(this);
+
+      this.lightboxCloseTimeout = null;
+      this.lightboxOpenFrameId = null;
+      this.previousBodyOverflow = "";
+      this.bodyOverflowLocked = false;
 
       this.init();
     }
@@ -131,6 +152,7 @@
       this.setupSimulation();
       this.setupEvents();
       this.createExpandButton();
+      this.setupVisibilityObserver();
       this.startAmbientMotion();
     }
 
@@ -226,11 +248,14 @@
     }
 
     openLightbox() {
-      if (this.isExpanded) return;
+      if (this.isDestroyed || this.isExpanded) return;
       this.isExpanded = true;
+      this.previousBodyOverflow = document.body.style.overflow;
+      this.bodyOverflowLocked = true;
 
       // Create lightbox overlay
-      this.lightbox = document.createElement("div");
+      const lightbox = document.createElement("div");
+      this.lightbox = lightbox;
       this.lightbox.className = "graph-lightbox";
       
       // Create close button
@@ -240,6 +265,7 @@
         <path d="M18 6L6 18M6 6l12 12"/>
       </svg>`;
       closeBtn.addEventListener("click", () => this.closeLightbox());
+      this.lightboxCloseButton = closeBtn;
       
       // Create canvas for lightbox
       this.lightboxCanvas = document.createElement("canvas");
@@ -258,28 +284,25 @@
       this.lightboxCanvas.addEventListener("mousemove", this.handleLightboxMouseMove);
       this.lightboxCanvas.addEventListener("mousedown", this.handleLightboxMouseDown);
       this.lightboxCanvas.addEventListener("mouseup", this.handleLightboxMouseUp);
-      this.lightboxCanvas.addEventListener("mouseleave", () => {
-        this.lightboxHoveredNode = null;
-        if (this.isDragging) {
-          this.isDragging = false;
-          this.draggedNode = null;
-        }
-      });
+      this.lightboxCanvas.addEventListener("mouseleave", this.handleLightboxMouseLeave);
       this.lightboxCanvas.addEventListener("wheel", this.handleLightboxWheel, { passive: false });
-      this.lightbox.addEventListener("click", (e) => {
-        if (e.target === this.lightbox) this.closeLightbox();
-      });
+      this.lightboxCanvas.addEventListener("click", this.handleLightboxClick);
+      this.lightbox.addEventListener("click", this.handleLightboxOverlayClick);
       
       // Touch events for mobile
-      this.lightboxCanvas.addEventListener("touchmove", (e) => {
-        e.preventDefault();
-        this.scatterNodes(3);
-      }, { passive: false });
+      this.lightboxCanvas.addEventListener("touchmove", this.handleLightboxTouchMove, { passive: false });
 
       // Animate in
-      requestAnimationFrame(() => {
-        this.lightbox.classList.add("active");
+      this.lightboxOpenFrameId = window.requestAnimationFrame(() => {
+        this.lightboxOpenFrameId = null;
+        if (this.lightbox === lightbox) {
+          lightbox.classList.add("active");
+        }
       });
+
+      // The original graph may be offscreen while its lightbox is open. The
+      // lightbox itself keeps the animation alive until it is closed.
+      this.updateAnimationState();
     }
 
     setupLightboxCanvas() {
@@ -301,28 +324,91 @@
     }
 
     closeLightbox() {
-      if (!this.isExpanded) return;
+      if (!this.isExpanded || !this.lightbox) return;
+      if (this.lightboxCloseTimeout !== null) return;
       
-      this.lightbox.classList.remove("active");
+      const lightbox = this.lightbox;
+      if (this.lightboxOpenFrameId !== null) {
+        window.cancelAnimationFrame(this.lightboxOpenFrameId);
+        this.lightboxOpenFrameId = null;
+      }
+      lightbox.classList.remove("active");
       
-      setTimeout(() => {
-        if (this.lightbox) {
-          this.lightbox.remove();
+      this.lightboxCloseTimeout = window.setTimeout(() => {
+        this.lightboxCloseTimeout = null;
+        if (this.lightbox === lightbox) {
+          lightbox.remove();
           this.lightbox = null;
           this.lightboxCanvas = null;
           this.lightboxCtx = null;
+          this.lightboxCloseButton = null;
         }
         this.isExpanded = false;
-        document.body.style.overflow = "";
+        if (this.bodyOverflowLocked) {
+          document.body.style.overflow = this.previousBodyOverflow;
+          this.bodyOverflowLocked = false;
+        }
+        this.updateAnimationState();
       }, 200);
     }
 
     startAmbientMotion() {
-      this.animate();
+      this.updateAnimationState();
+    }
+
+    setupVisibilityObserver() {
+      if (typeof window.IntersectionObserver !== "function") return;
+
+      this.visibilityObserver = new window.IntersectionObserver((entries) => {
+        const entry = entries[0];
+        if (!entry || this.isDestroyed) return;
+
+        // Some test/browser shims omit intersectionRatio. isIntersecting is
+        // the authoritative signal in that case.
+        this.isInViewport = entry.isIntersecting !== false &&
+          (entry.intersectionRatio === undefined || entry.intersectionRatio > 0);
+        this.updateAnimationState();
+      });
+      this.visibilityObserver.observe(this.container);
+    }
+
+    shouldAnimate() {
+      return !this.isDestroyed &&
+        this.isDocumentVisible &&
+        (this.isInViewport || this.isExpanded);
+    }
+
+    updateAnimationState() {
+      if (this.shouldAnimate()) {
+        this.resumeAnimation();
+      } else {
+        this.pauseAnimation();
+      }
+    }
+
+    setDocumentVisibility(isVisible) {
+      this.isDocumentVisible = isVisible;
+      this.updateAnimationState();
+    }
+
+    resumeAnimation() {
+      if (this.isDestroyed || this.animationFrameId !== null) return;
+
+      this.isAnimating = true;
+      this.animationFrameId = window.requestAnimationFrame(this.animate);
+    }
+
+    pauseAnimation() {
+      this.isAnimating = false;
+      if (this.animationFrameId !== null) {
+        window.cancelAnimationFrame(this.animationFrameId);
+        this.animationFrameId = null;
+      }
     }
 
     animate() {
-      if (!this.isAnimating) return;
+      this.animationFrameId = null;
+      if (!this.isAnimating || !this.shouldAnimate()) return;
 
       this.time += 1;
 
@@ -358,7 +444,11 @@
         this.renderLightbox();
       }
 
-      requestAnimationFrame(this.animate);
+      if (this.shouldAnimate()) {
+        this.animationFrameId = window.requestAnimationFrame(this.animate);
+      } else {
+        this.isAnimating = false;
+      }
     }
 
     applyForces(alpha) {
@@ -604,20 +694,12 @@
       this.canvas.addEventListener("mousemove", this.handleMouseMove);
       this.canvas.addEventListener("mousedown", this.handleMouseDown);
       this.canvas.addEventListener("mouseup", this.handleMouseUp);
-      this.canvas.addEventListener("mouseleave", () => {
-        this.hoveredNode = null;
-        if (this.isDragging) {
-          this.isDragging = false;
-          this.draggedNode = null;
-        }
-      });
+      this.canvas.addEventListener("mouseleave", this.handleMouseLeave);
       this.canvas.addEventListener("wheel", this.handleWheel, { passive: false });
+      this.canvas.addEventListener("click", this.handleClick);
       
       // Touch events for mobile swipe scatter
-      this.canvas.addEventListener("touchmove", (e) => {
-        e.preventDefault();
-        this.scatterNodes(2);
-      }, { passive: false });
+      this.canvas.addEventListener("touchmove", this.handleTouchMove, { passive: false });
 
       window.addEventListener("resize", this.handleResize);
       
@@ -628,6 +710,19 @@
         }
       };
       document.addEventListener("keydown", this.escHandler);
+    }
+
+    handleMouseLeave() {
+      this.hoveredNode = null;
+      if (this.isDragging) {
+        this.isDragging = false;
+        this.draggedNode = null;
+      }
+    }
+
+    handleTouchMove(e) {
+      e.preventDefault();
+      this.scatterNodes(2);
     }
 
     scatterNodes(intensity = 2) {
@@ -646,6 +741,7 @@
     }
 
     handleMouseDown(e) {
+      this.didDrag = false;
       if (this.hoveredNode) {
         this.isDragging = true;
         this.draggedNode = this.hoveredNode;
@@ -671,6 +767,8 @@
 
       // Handle dragging
       if (this.isDragging && this.draggedNode) {
+        const distance = Math.hypot(x - this.dragStartX, y - this.dragStartY);
+        this.didDrag = this.didDrag || distance >= CONFIG.dragThreshold;
         this.draggedNode.x = x;
         this.draggedNode.y = y;
         this.draggedNode.vx = 0;
@@ -700,6 +798,13 @@
     }
 
     handleClick(e) {
+      // Browser click fires after mouseup. Consume the click generated by a
+      // real drag so releasing a node never navigates to it.
+      if (this.didDrag) {
+        this.didDrag = false;
+        return;
+      }
+
       // Don't navigate if we just finished dragging
       if (this.isDragging) return;
       
@@ -737,6 +842,8 @@
 
       // Handle dragging in lightbox
       if (this.isDragging && this.draggedNode) {
+        const distance = Math.hypot(x - this.dragStartX, y - this.dragStartY);
+        this.didDrag = this.didDrag || distance >= CONFIG.dragThreshold;
         this.draggedNode.x = x;
         this.draggedNode.y = y;
         this.draggedNode.vx = 0;
@@ -766,9 +873,16 @@
     }
 
     handleLightboxMouseDown(e) {
+      this.didDrag = false;
       if (this.lightboxHoveredNode) {
         this.isDragging = true;
         this.draggedNode = this.lightboxHoveredNode;
+        const rect = this.lightboxCanvas.getBoundingClientRect();
+        const screenX = e.clientX - rect.left;
+        const screenY = e.clientY - rect.top;
+        const start = this.screenToGraphCoords(screenX, screenY);
+        this.dragStartX = start.x;
+        this.dragStartY = start.y;
         this.lightboxCanvas.style.cursor = "grabbing";
       }
     }
@@ -781,13 +895,36 @@
       }
     }
 
+    handleLightboxMouseLeave() {
+      this.lightboxHoveredNode = null;
+      if (this.isDragging) {
+        this.isDragging = false;
+        this.draggedNode = null;
+      }
+    }
+
     handleLightboxWheel(e) {
       e.preventDefault();
       const intensity = Math.min(Math.abs(e.deltaY) + Math.abs(e.deltaX), 100) / 30;
       this.scatterNodes(intensity);
     }
 
+    handleLightboxTouchMove(e) {
+      e.preventDefault();
+      this.scatterNodes(3);
+    }
+
+    handleLightboxOverlayClick(e) {
+      if (e.target === this.lightbox) this.closeLightbox();
+    }
+
     handleLightboxClick(e) {
+      // Consume the click that follows a drag, matching the main canvas.
+      if (this.didDrag) {
+        this.didDrag = false;
+        return;
+      }
+
       // Don't navigate if we just finished dragging
       if (this.isDragging) return;
       
@@ -802,16 +939,58 @@
     }
 
     destroy() {
-      this.isAnimating = false;
+      if (this.isDestroyed) return;
+
+      this.isDestroyed = true;
+      this.pauseAnimation();
+
       this.canvas.removeEventListener("mousemove", this.handleMouseMove);
+      this.canvas.removeEventListener("mousedown", this.handleMouseDown);
+      this.canvas.removeEventListener("mouseup", this.handleMouseUp);
+      this.canvas.removeEventListener("mouseleave", this.handleMouseLeave);
+      this.canvas.removeEventListener("wheel", this.handleWheel);
       this.canvas.removeEventListener("click", this.handleClick);
+      this.canvas.removeEventListener("touchmove", this.handleTouchMove);
       window.removeEventListener("resize", this.handleResize);
       document.removeEventListener("keydown", this.escHandler);
+
+      if (this.visibilityObserver) {
+        this.visibilityObserver.disconnect();
+        this.visibilityObserver = null;
+      }
+
       if (this.expandBtn) {
         this.expandBtn.remove();
+        this.expandBtn = null;
       }
+
+      if (this.lightboxOpenFrameId !== null) {
+        window.cancelAnimationFrame(this.lightboxOpenFrameId);
+        this.lightboxOpenFrameId = null;
+      }
+
+      if (this.lightboxCloseTimeout !== null) {
+        window.clearTimeout(this.lightboxCloseTimeout);
+        this.lightboxCloseTimeout = null;
+      }
+
       if (this.lightbox) {
         this.lightbox.remove();
+        this.lightbox = null;
+      }
+      this.lightboxCloseButton = null;
+      this.lightboxCanvas = null;
+      this.lightboxCtx = null;
+      this.isExpanded = false;
+      if (this.bodyOverflowLocked) {
+        document.body.style.overflow = this.previousBodyOverflow;
+        this.bodyOverflowLocked = false;
+      }
+
+      // Clear the back-reference so a future page-load can safely initialize
+      // a container that survived a transition or was reused by the browser.
+      if (this.container._graph === this) {
+        this.container._graph = null;
       }
     }
   }
@@ -820,23 +999,75 @@
   // INITIALIZATION
   // =============================================================================
 
-  function initGraphs() {
-    // Initialize both main and sidebar graph containers
-    const containers = document.querySelectorAll(".md-graph-container, .md-graph-container-sidebar");
-    containers.forEach((container) => {
-      if (!container._graph) {
-        container._graph = new LocalGraph(container);
+  // Astro can evaluate page scripts again after a view transition. Store one
+  // controller on window so those evaluations reuse the existing listeners
+  // and graph registry instead of creating another RAF/bootstrap tree.
+  const CONTROLLER_KEY = "__localGraphController";
+  const existingController = window[CONTROLLER_KEY];
+  if (existingController && existingController.initGraphs) {
+    existingController.initGraphs();
+    return;
+  }
+
+  const controller = {
+    graphs: new Set(),
+
+    cleanupStaleGraphs() {
+      for (const graph of this.graphs) {
+        if (!document.documentElement.contains(graph.container)) {
+          graph.destroy();
+          this.graphs.delete(graph);
+        }
       }
-    });
-  }
+    },
 
-  // Initialize on DOM ready
+    initGraphs() {
+      this.cleanupStaleGraphs();
+
+      // Initialize both main and sidebar graph containers. A container may
+      // already hold a graph when another script evaluation reaches this page.
+      const containers = document.querySelectorAll(".md-graph-container, .md-graph-container-sidebar");
+      containers.forEach((container) => {
+        if (container._graph && !container._graph.isDestroyed) {
+          this.graphs.add(container._graph);
+          return;
+        }
+
+        const graph = new LocalGraph(container);
+        container._graph = graph;
+        this.graphs.add(graph);
+      });
+    },
+
+    destroyGraphs() {
+      // Graphs belong to the outgoing document. Destroying them before Astro
+      // swaps the DOM releases RAF callbacks, observers, and global handlers.
+      for (const graph of this.graphs) {
+        graph.destroy();
+      }
+      this.graphs.clear();
+    },
+
+    handleVisibilityChange() {
+      const isVisible = !document.hidden;
+      for (const graph of this.graphs) {
+        graph.setDocumentVisibility(isVisible);
+      }
+    },
+  };
+
+  window[CONTROLLER_KEY] = controller;
+
+  // Register this small global set once. The controller intentionally survives
+  // page swaps while every LocalGraph instance is replaced with its document.
+  document.addEventListener("astro:before-swap", () => controller.destroyGraphs());
+  document.addEventListener("astro:page-load", () => controller.initGraphs());
+  document.addEventListener("visibilitychange", () => controller.handleVisibilityChange());
+
+  // Initialize on DOM ready.
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initGraphs);
+    document.addEventListener("DOMContentLoaded", () => controller.initGraphs(), { once: true });
   } else {
-    initGraphs();
+    controller.initGraphs();
   }
-
-  // Re-initialize on Astro page transitions
-  document.addEventListener("astro:page-load", initGraphs);
 })();

@@ -525,12 +525,17 @@ const githubUrl = entry?.filePath
 
       let lastIndex = -1;
       const tocItems = [];
+      let scrollTimeout = 0;
+      let disposed = false;
 
       function scrollTocToIndex(index) {
         if (!tocItems[index]) return;
         
         // Wait for DOM to update (especially for active item size change)
-        setTimeout(() => {
+        scrollTimeout = window.setTimeout(() => {
+          scrollTimeout = 0;
+          if (disposed) return;
+
           const item = tocItems[index];
           // Use offsetTop which gives position relative to offsetParent
           const itemTop = item.offsetTop;
@@ -602,6 +607,18 @@ const githubUrl = entry?.filePath
       });
 
       headings.forEach(h => observer.observe(h));
+
+      // Disconnect the observer and delayed mini-ToC scroll when the route is
+      // replaced. This prevents old headings from retaining the page alive
+      // after an Astro View Transition.
+      return () => {
+        disposed = true;
+        observer.disconnect();
+        if (scrollTimeout) {
+          window.clearTimeout(scrollTimeout);
+          scrollTimeout = 0;
+        }
+      };
     }
 
     // Scroll Progress Button Logic
@@ -624,6 +641,8 @@ const githubUrl = entry?.filePath
 
       // Track current scroll direction
       let shouldScrollDown = true;
+      let frame = 0;
+      let disposed = false;
 
       function updateScrollProgress() {
         const scrollTop = window.scrollY;
@@ -648,7 +667,7 @@ const githubUrl = entry?.filePath
       }
 
       // Handle click
-      btn.addEventListener("click", (e) => {
+      function handleClick(e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -662,15 +681,39 @@ const githubUrl = entry?.filePath
           // Scroll to top
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
-      });
+      }
+
+      btn.addEventListener("click", handleClick);
+
+      // Scroll events can arrive more often than the browser can paint. Read
+      // scroll state and update the ring at most once per animation frame.
+      function scheduleScrollProgressUpdate() {
+        if (disposed || frame) return;
+        frame = window.requestAnimationFrame(() => {
+          frame = 0;
+          if (!disposed) updateScrollProgress();
+        });
+      }
 
       // Listen for scroll
-      window.addEventListener("scroll", updateScrollProgress, {
+      window.addEventListener("scroll", scheduleScrollProgressUpdate, {
         passive: true,
       });
 
       // Initial update
       updateScrollProgress();
+
+      // Remove page-specific handlers before Astro swaps in the next route.
+      return () => {
+        disposed = true;
+        btn.removeEventListener("click", handleClick);
+        window.removeEventListener("scroll", scheduleScrollProgressUpdate);
+        if (frame) {
+          window.cancelAnimationFrame(frame);
+          frame = 0;
+        }
+        btn.classList.add("hidden");
+      };
     }
 
     // Last edited toggle (tap to show full date)
@@ -693,26 +736,79 @@ const githubUrl = entry?.filePath
     }
 
     // Initialize videos for autoplay (like Ghost).
-    // After a View Transition (astro:page-load), video elements may be
-    // in a stale decode state. Calling load() forces the browser to
-    // re-fetch and decode the source, fixing NS_ERROR_UNEXPECTED errors
-    // in Firefox and similar decode failures in other browsers.
+    // After a View Transition (astro:page-load), a newly inserted video may
+    // be in a stale decode state. Reload each element once, then let an
+    // IntersectionObserver start and stop playback as it enters or leaves
+    // the viewport. This keeps route re-initialization from repeatedly
+    // rebuilding every video's media pipeline or calling play() for videos
+    // the reader cannot see.
     function initVideoAutoplay() {
       const content = document.getElementById("markdown-content");
       if (!content) return;
 
-      const videos = content.querySelectorAll("video");
+      const videos = Array.from(content.querySelectorAll("video"));
+      if (!videos.length) return;
+
+      let disposed = false;
+      const playVideo = (video) => {
+        // Force a reload only when the video first becomes visible. Keeping
+        // this out of the initializer means offscreen videos do not start a
+        // media pipeline during a route transition.
+        if (video.dataset.markdownVideoLoaded !== "true") {
+          video.dataset.markdownVideoLoaded = "true";
+          video.load();
+        }
+
+        video.play().catch(() => {
+          // Autoplay blocked, ignore.
+        });
+      };
+
+      const observer = typeof IntersectionObserver === "function"
+        ? new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              const video = entry.target;
+              if (!(video instanceof HTMLVideoElement) || disposed) return;
+
+              if (entry.isIntersecting) {
+                playVideo(video);
+              } else {
+                video.pause();
+              }
+            });
+          }, {
+            // Start a little before the video enters view to avoid a visible
+            // delay without eagerly playing videos far down the article.
+            rootMargin: "200px 0px",
+            threshold: 0.01,
+          })
+        : null;
+
       videos.forEach((video) => {
         video.muted = true;
         video.loop = true;
         video.playsInline = true;
-        video.autoplay = true;
-        // Force re-load to clear stale decode state from view transitions
-        video.load();
-        video.play().catch(() => {
-          // Autoplay blocked, ignore
-        });
+
+        if (observer) {
+          // Let the observer own playback. Clearing autoplay before observe()
+          // prevents load() or parser state from resuming an offscreen video
+          // before the first visibility callback runs.
+          video.autoplay = false;
+          video.pause();
+          observer.observe(video);
+        } else {
+          // Older browsers without IntersectionObserver retain the previous
+          // autoplay behavior as a safe compatibility fallback.
+          video.autoplay = true;
+          playVideo(video);
+        }
       });
+
+      return () => {
+        disposed = true;
+        observer?.disconnect();
+        videos.forEach((video) => video.pause());
+      };
     }
 
     // Sidebar mode morphing - gradual fade based on scroll position
@@ -735,7 +831,12 @@ const githubUrl = entry?.filePath
         return Math.min(Math.max(val, min), max);
       }
 
+      let frame = 0;
+      let disposed = false;
+
       function updateOpacity() {
+        if (disposed) return;
+
         const linearTocRect = linearToc.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
         
@@ -801,9 +902,31 @@ const githubUrl = entry?.filePath
         }
       }
 
-      window.addEventListener('scroll', updateOpacity, { passive: true });
-      window.addEventListener('resize', updateOpacity, { passive: true });
+      // Coalesce high-frequency scroll events so geometry is read and styles
+      // are written once per paint instead of once per event.
+      function scheduleOpacityUpdate() {
+        if (disposed || frame) return;
+        frame = window.requestAnimationFrame(() => {
+          frame = 0;
+          updateOpacity();
+        });
+      }
+
+      window.addEventListener('scroll', scheduleOpacityUpdate, { passive: true });
+      window.addEventListener('resize', scheduleOpacityUpdate, { passive: true });
       updateOpacity();
+
+      // Remove global listeners and any queued frame before the route is
+      // replaced so old sidebar elements cannot keep receiving updates.
+      return () => {
+        disposed = true;
+        window.removeEventListener('scroll', scheduleOpacityUpdate);
+        window.removeEventListener('resize', scheduleOpacityUpdate);
+        if (frame) {
+          window.cancelAnimationFrame(frame);
+          frame = 0;
+        }
+      };
     }
 
     /**
@@ -1295,9 +1418,11 @@ const githubUrl = entry?.filePath
       if (!slides.length) return;
 
       let frame = 0;
+      let disposed = false;
 
       function updateActiveSlide() {
         frame = 0;
+        if (disposed) return;
 
         const carouselRect = carousel.getBoundingClientRect();
         const carouselCenter = carouselRect.left + carouselRect.width / 2;
@@ -1322,7 +1447,7 @@ const githubUrl = entry?.filePath
       }
 
       function scheduleActiveSlideUpdate() {
-        if (frame) return;
+        if (disposed || frame) return;
         frame = window.requestAnimationFrame(updateActiveSlide);
       }
 
@@ -1331,27 +1456,74 @@ const githubUrl = entry?.filePath
       });
       window.addEventListener("resize", scheduleActiveSlideUpdate);
       scheduleActiveSlideUpdate();
+
+      // Cancel the pending measurement and detach global listeners when a
+      // View Transition replaces the carousel.
+      return () => {
+        disposed = true;
+        carousel.removeEventListener("scroll", scheduleActiveSlideUpdate);
+        window.removeEventListener("resize", scheduleActiveSlideUpdate);
+        if (frame) {
+          window.cancelAnimationFrame(frame);
+          frame = 0;
+        }
+      };
+    }
+
+    /**
+     * MarkdownLayout is mounted again for every Astro View Transition. Keep
+     * the current page's global listeners and observers together so the next
+     * route can dispose them before installing its own handlers.
+     */
+    function cleanupMarkdownFeatures() {
+      const state = window.__markdownLayoutState;
+      if (!state) return;
+
+      const cleanup = state.cleanup;
+      state.cleanup = null;
+      state.initializedContent = null;
+      if (typeof cleanup === "function") cleanup();
     }
 
     // Initialize all markdown features
     function initMarkdownFeatures() {
+      const state = window.__markdownLayoutState;
+      const content = document.getElementById("markdown-content");
+
+      // DOMContentLoaded and astro:page-load can both fire for the initial
+      // document. Avoid rebuilding the same page twice in that case.
+      if (state?.initializedContent === content && state.cleanup) return;
+
+      cleanupMarkdownFeatures();
+      if (!content || !state) return;
+
+      const cleanups = [];
+      const addCleanup = (cleanup) => {
+        if (typeof cleanup === "function") cleanups.push(cleanup);
+      };
+
       wrapHeadingText();
       generateTOC();
-      initSidebarTocWindow();
+      addCleanup(initSidebarTocWindow());
       initCallouts();
-      initScrollProgress();
+      addCleanup(initScrollProgress());
       initLastEditedToggle();
-      initVideoAutoplay();
-      initSidebarMorphing();
+      addCleanup(initVideoAutoplay());
+      addCleanup(initSidebarMorphing());
       initCodeBlockCopy();
-      initUsesCarousel();
+      addCleanup(initUsesCarousel());
+      initSectionHeadingClipboard();
 
       // Initialize Clipboard Links
-      const content = document.getElementById("markdown-content");
-      if (content && !content.dataset.clipboardInitialized) {
+      if (!content.dataset.clipboardInitialized) {
         initHeadingClipboard(content);
         content.dataset.clipboardInitialized = "true";
       }
+
+      state.initializedContent = content;
+      state.cleanup = () => {
+        cleanups.forEach((cleanup) => cleanup());
+      };
     }
 
     // Transform Obsidian-style [!TYPE] or standard **Type:** markers into floating cards
@@ -1482,10 +1654,6 @@ const githubUrl = entry?.filePath
       content.addEventListener("click", handleHeadingInteraction);
     }
 
-    // Initialize on load and on page transitions
-    document.addEventListener("DOMContentLoaded", initMarkdownFeatures);
-    document.addEventListener("astro:page-load", initMarkdownFeatures);
-
     // Initialize section heading copy-link functionality (ToC, Backlinks, Local Graph, Comments)
     function initSectionHeadingClipboard() {
       const sectionHeadings = document.querySelectorAll('.section-heading');
@@ -1536,10 +1704,6 @@ const githubUrl = entry?.filePath
         }, { passive: false });
       });
     }
-    
-    document.addEventListener("DOMContentLoaded", initSectionHeadingClipboard);
-    document.addEventListener("astro:page-load", initSectionHeadingClipboard);
-
     /**
      * Show a toast notification near the bottom of the screen.
      *
@@ -1582,6 +1746,36 @@ const githubUrl = entry?.filePath
       window.toggleCard = toggleCard;
     }
     window.showToast = showToast;
+
+    /**
+     * Register one durable lifecycle bridge for this inline script. Astro's
+     * ClientRouter keeps document listeners alive across View Transitions, so
+     * the bridge always invokes the latest initializer and tears down the
+     * previous route before wiring the next one.
+     */
+    window.__markdownLayoutState = window.__markdownLayoutState || {
+      cleanup: null,
+      initializedContent: null,
+      listenersInitialized: false,
+      run: null,
+    };
+    window.__markdownLayoutState.run = initMarkdownFeatures;
+
+    if (!window.__markdownLayoutState.listenersInitialized) {
+      const runCurrentMarkdownFeatures = () => {
+        const state = window.__markdownLayoutState;
+        if (state && typeof state.run === "function") state.run();
+      };
+
+      document.addEventListener("DOMContentLoaded", runCurrentMarkdownFeatures);
+      document.addEventListener("astro:page-load", runCurrentMarkdownFeatures);
+      document.addEventListener("astro:before-swap", cleanupMarkdownFeatures);
+      window.__markdownLayoutState.listenersInitialized = true;
+    }
+
+    // A script introduced after the initial document load will miss
+    // DOMContentLoaded, so initialize it immediately in that case.
+    if (document.readyState !== "loading") initMarkdownFeatures();
   </script>
 
   <!-- Remark42 Comments Scripts (only loaded if comments container exists) -->
@@ -1667,5 +1861,6 @@ const githubUrl = entry?.filePath
   </script>
 
   <!-- Local Graph Visualization Script -->
-  <script src="/scripts/graph.js" defer></script>
+  <!-- Pages with no connected graph do not need the graph renderer download. -->
+  {graphData.nodes.length > 1 && <script src="/scripts/graph.js" defer></script>}
 </BaseLayout>
