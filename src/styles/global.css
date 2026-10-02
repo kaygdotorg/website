@@ -165,7 +165,7 @@ html[data-theme="light"] body {
 }
 
 /* The decorative background is scoped in GrainBackground.astro.
-   Its still-frame shader replaces the former perpetual flare/tint animations. */
+   Its resolution-capped shader replaces the former flare/tint animations. */
 
 /* ========================================
    Frosted Card (non-grainy default)

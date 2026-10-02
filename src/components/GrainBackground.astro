@@ -1,8 +1,8 @@
 ---
 /**
- * A persistent Paper Grain Gradient, rendered as a still frame. The decorative
- * shader loads during idle time and redraws only for resizing or theme changes;
- * it does not add a continuous animation loop to article pages.
+ * A persistent Paper Grain Gradient with a slow, resolution-capped drift.
+ * It loads during idle time and draws at about 30 times a second. Hidden tabs
+ * and reduced-motion users retain a still frame instead of running the loop.
  */
 ---
 
@@ -72,6 +72,40 @@
     private timer?: ReturnType<typeof setTimeout>;
     private revealObserver?: ResizeObserver;
     private revealFrame?: number;
+    private motionFrame?: number;
+    private motionListeners?: AbortController;
+    private reducedMotion?: MediaQueryList;
+
+    private stopMotion() {
+      if (this.motionFrame !== undefined) cancelAnimationFrame(this.motionFrame);
+      this.motionFrame = undefined;
+    }
+
+    private syncMotion = () => {
+      this.stopMotion();
+      const mounted = this.mount;
+      if (!mounted || !this.isConnected || document.hidden || this.reducedMotion?.matches ||
+          !mounted.canvasElement.hasAttribute("data-grain-ready")) return;
+
+      // Paper's native speed loop renders at the display's refresh rate. Keep
+      // that loop stopped and advance its millisecond frame clock ourselves:
+      // slow decorative drift needs only 30 draws/sec, even on a 120Hz display.
+      // Restart the elapsed-time clock on resume so hidden time never jumps.
+      let lastDraw = performance.now();
+      const tick = (now: number) => {
+        this.motionFrame = undefined;
+        if (this.mount !== mounted || !this.isConnected || document.hidden || this.reducedMotion?.matches) return;
+        const elapsed = now - lastDraw;
+        // Allow sub-millisecond display-clock jitter so two 60Hz ticks do not
+        // accidentally miss the threshold and reduce the cadence to 20fps.
+        if (elapsed >= 1000 / 30 - 1) {
+          mounted.setFrame(mounted.getCurrentFrame() + Math.min(elapsed, 100) * 0.08);
+          lastDraw = now;
+        }
+        this.motionFrame = requestAnimationFrame(tick);
+      };
+      this.motionFrame = requestAnimationFrame(tick);
+    };
 
     private cancelReveal() {
       this.revealObserver?.disconnect();
@@ -81,7 +115,10 @@
     }
 
     connectedCallback() {
-      if (this.mount || this.initializing || this.idle !== undefined || this.timer !== undefined) return;
+      // A persisted element may reconnect after a tick observed its temporary
+      // removal. Restart from the retained frame instead of remaining frozen.
+      if (this.mount) { this.syncMotion(); return; }
+      if (this.initializing || this.idle !== undefined || this.timer !== undefined) return;
       const start = () => {
         this.idle = undefined;
         this.timer = undefined;
@@ -133,7 +170,7 @@
           // discarding the drawing buffer after it has been presented.
           preserveDrawingBuffer: true,
         },
-        // speed=0 stops Paper's loop (including for reduced-motion users).
+        // speed=0 stops Paper's uncapped loop; syncMotion owns the draw budget.
         // Cap the backing canvas at ~1MP instead of the library's 4K default.
         0, 12000, 1, 1_048_576);
 
@@ -142,6 +179,8 @@
         // repeatedly allocate new contexts while the device is under pressure.
         this.mount.canvasElement.addEventListener("webglcontextlost", () => {
           this.cancelReveal();
+          this.stopMotion();
+          this.motionListeners?.abort();
           this.observer?.disconnect();
           this.mount?.dispose();
           this.mount = undefined;
@@ -166,9 +205,16 @@
             if (!this.isConnected || this.mount !== mounted) return;
             mounted.setFrame(mounted.getCurrentFrame());
             canvas.dataset.grainReady = "";
+            this.syncMotion();
           });
         });
         this.revealObserver.observe(this);
+
+        this.reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+        this.motionListeners = new AbortController();
+        const signal = this.motionListeners.signal;
+        document.addEventListener("visibilitychange", this.syncMotion, { signal });
+        this.reducedMotion.addEventListener("change", this.syncMotion, { signal });
 
         this.observer = new MutationObserver(() => this.mount?.setUniforms(palette()));
         this.observer.observe(document.documentElement, {
@@ -176,6 +222,8 @@
         });
       } catch (error) {
         this.cancelReveal();
+        this.stopMotion();
+        this.motionListeners?.abort();
         this.mount?.dispose();
         this.mount = undefined;
         this.querySelector("canvas")?.remove();
@@ -195,6 +243,8 @@
         this.idle = undefined;
         this.timer = undefined;
         this.cancelReveal();
+        this.stopMotion();
+        this.motionListeners?.abort();
         this.observer?.disconnect();
         this.mount?.dispose();
         this.mount = undefined;
