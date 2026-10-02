@@ -11,6 +11,7 @@ or output in `dist/`: the build recreates those files.
 | Homepage deck cards | `card-photos` in that same file |
 | Homepage Apps graphic | `src/content/home/assets/apps-card.svg` |
 | Apps page title, introduction and body | `src/content/apps/index.md` |
+| Public guide for language-model tools | `public/llms.txt` |
 | About or homelab | `src/content/about/index.md`, `src/content/homelab/index.md` |
 | Writing | `src/content/blog/` |
 | Talks, Now, Uses | Matching folder under `src/content/` |
@@ -21,6 +22,11 @@ or output in `dist/`: the build recreates those files.
 Markdown begins with YAML between `---` lines. Those fields supply titles,
 dates, images and other metadata. Everything below is the page body.
 `src/content.config.ts` defines which fields each collection accepts.
+
+`public/llms.txt` is a manually curated, plain-text Markdown overview following
+the llms.txt proposal. Keep its section links and preview/placeholder notes in
+sync with the site. It is served directly at `/llms.txt` and linked from the
+HTML head; it does not grant crawler access or replace `robots.txt`.
 
 ## Add an article
 

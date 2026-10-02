@@ -1,0 +1,31 @@
+# K Gopal Krishna's Public Repertoire
+
+> The personal website of K Gopal Krishna, also known as kayg or kaygdotorg. Infrastructure engineering, Linux, storage, self-hosting, software, cinema, and photography.
+
+This is a personal website. Writing expresses the author's views and may describe tools or configurations as they existed at publication time. Check article dates when using technical instructions.
+
+The links below point to public HTML pages. Photography currently includes clearly labelled sample images for a layout preview; those images are not the author's original photographs. The Apps page is currently a placeholder.
+
+## About and contact
+
+- [Home](https://kayg.org/): Profile, section overview, and work experience.
+- [About](https://kayg.org/about): Background, interests, resume link, and contact information.
+- [Contact](https://kayg.org/about#contact): Email and public social profiles.
+
+## Writing and projects
+
+- [Writing](https://kayg.org/blog): Articles about infrastructure, Linux, storage, software, and cinema.
+- [Talks](https://kayg.org/talks): Presentations and technical talks.
+- [Homelab](https://kayg.org/homelab): Self-hosting and infrastructure notes.
+- [Apps](https://kayg.org/apps): Apps and small software projects; currently a placeholder.
+
+## Personal updates
+
+- [Now](https://kayg.org/now): Dated updates about current interests and activities.
+- [Uses](https://kayg.org/uses): Hardware, software, and setup notes.
+- [Photography](https://kayg.org/photography): Photography gallery; current sample cards preview the layout.
+
+## Optional
+
+- [Changelog](https://kayg.org/changelog): Website changes.
+- [Sitemap](https://kayg.org/sitemap-index.xml): Index of generated sitemaps for discovering published pages.
