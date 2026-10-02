@@ -65,3 +65,10 @@ and theme-color fallbacks match the shader base in both themes. Safari can
 extend a solid colour into its native bars instead of the live canvas; these
 changes do not promise animated browser chrome. Check on an actual iPhone
 with expanded/collapsed controls, overscroll, and landscape orientation.
+
+iOS also receives a CSS edge blend: the live shader transitions to the root
+colour over at most 96px at the top and bottom of the fixed viewport. Safari
+can show a solid extension behind its native controls; overscan alone did not
+remove that seam on the user's phone. The blend avoids the abrupt grain edge
+without a scroll handler, canvas snapshots, or additional shader draws. This
+is visual continuity with the native solid tint, not animated browser chrome.

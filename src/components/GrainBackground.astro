@@ -41,6 +41,28 @@
       radial-gradient(ellipse at 100% 100%, #f0d8bd, transparent 70%), #faf7f2;
   }
 
+  /* Safari can show a solid extension instead of the live canvas behind its
+     native controls, despite viewport-fit=cover and overscan. Blend into that
+     colour Safari extends there instead of exposing a hard grain cutoff.
+     This overlay follows the fixed viewport edges while the shader retains
+     its stable large-viewport dimensions; no scroll listeners or redraws. */
+  @supports (-webkit-touch-callout: none) {
+    grain-background::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      --grain-edge: #100e16;
+      background: linear-gradient(to bottom,
+        var(--grain-edge) 0%, transparent min(96px, 18%),
+        transparent max(calc(100% - 96px), 82%), var(--grain-edge) 100%);
+    }
+
+    :global([data-theme="light"]) grain-background::after {
+      --grain-edge: #faf7f2;
+    }
+  }
+
   /* Paper injects its default canvas CSS into <head>, which Astro replaces on
      navigation. Own the sizing here so a persisted, resolution-capped canvas
      continues covering the viewport after a page swap or resize. */
