@@ -19,7 +19,15 @@
     view-transition-name: none !important;
     display: block;
     position: fixed;
-    inset: 0;
+    /* Use the largest viewport so Safari's collapsing toolbar does not resize
+       the shader and shift its projection while scrolling. Overscan the top
+       cutout as well; avoid safe-area-inset-bottom here because it can change
+       with the toolbar. Chrome may still use a solid colour extension. */
+    top: calc(-1 * env(safe-area-inset-top, 0px));
+    left: 0;
+    right: 0;
+    height: calc(100vh + env(safe-area-inset-top, 0px));
+    height: calc(100lvh + env(safe-area-inset-top, 0px));
     z-index: 0;
     overflow: hidden;
     pointer-events: none;

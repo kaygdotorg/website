@@ -120,12 +120,12 @@ import OffscreenGlass from "../components/OffscreenGlass.astro";
     />
     <meta
       name="theme-color"
-      content="#faf8fc"
+      content="#faf7f2"
       media="(prefers-color-scheme: light)"
     />
     <meta
       name="theme-color"
-      content="#0d0910"
+      content="#100e16"
       media="(prefers-color-scheme: dark)"
     />
     <meta name="description" content={description} />
@@ -251,7 +251,8 @@ import OffscreenGlass from "../components/OffscreenGlass.astro";
           );
         }
 
-        // Set initial theme color for both meta tags
+        // Match the shader base for browsers that still honour theme-color.
+        // Safari may derive its solid browser-bar extension from the root CSS.
         const currentTheme =
           document.documentElement.getAttribute("data-theme");
         const themeColorLight = document.querySelector(
@@ -260,7 +261,7 @@ import OffscreenGlass from "../components/OffscreenGlass.astro";
         const themeColorDark = document.querySelector(
           'meta[name="theme-color"][media*="dark"]',
         );
-        const bgColor = currentTheme === "dark" ? "#0d0910" : "#faf8fc";
+        const bgColor = currentTheme === "dark" ? "#100e16" : "#faf7f2";
         if (themeColorLight) themeColorLight.setAttribute("content", bgColor);
         if (themeColorDark) themeColorDark.setAttribute("content", bgColor);
       })();
@@ -270,7 +271,7 @@ import OffscreenGlass from "../components/OffscreenGlass.astro";
     <!-- Skip to main content link for keyboard/screen reader users -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Persistent still-frame shader with a lightweight CSS fallback. -->
+    <!-- Persistent drifting shader with a lightweight CSS fallback. -->
     <GrainBackground />
 
     <!-- Global Image Zoom Overlay with Gallery Navigation -->
@@ -691,7 +692,7 @@ import OffscreenGlass from "../components/OffscreenGlass.astro";
       // WHAT IT DOES:
       // 1. Toggles data-theme attribute between 'dark' and 'light'
       // 2. Persists preference to localStorage
-      // 3. Updates theme-color meta tags (for Safari address bar color)
+      // 3. Updates theme-color for browsers that support address-bar tinting
       // 4. Adds/removes theme-transitioning class for smooth CSS transitions
       //
       // CALLED BY:
@@ -711,10 +712,10 @@ import OffscreenGlass from "../components/OffscreenGlass.astro";
         html.setAttribute("data-theme", newTheme);
         localStorage.setItem("theme", newTheme);
 
-        // Update theme-color meta tags for Safari address bar
+        // Match root/shader fallback for browsers supporting theme-color
         // Both light and dark media queries get the same color since
         // we're overriding the preferred color scheme with user choice
-        const bgColor = newTheme === "dark" ? "#0d0910" : "#faf8fc";
+        const bgColor = newTheme === "dark" ? "#100e16" : "#faf7f2";
         const themeColorLight = document.querySelector(
           'meta[name="theme-color"][media*="light"]',
         );
@@ -791,7 +792,7 @@ import OffscreenGlass from "../components/OffscreenGlass.astro";
           document.documentElement.setAttribute("data-theme", resolvedTheme);
         }
 
-        // Restore theme-color meta for Safari
+        // Restore the shader fallback tint for theme-color-capable browsers
         const currentTheme =
           document.documentElement.getAttribute("data-theme");
         const themeColorMeta = document.querySelector(
@@ -800,7 +801,7 @@ import OffscreenGlass from "../components/OffscreenGlass.astro";
         if (themeColorMeta) {
           themeColorMeta.setAttribute(
             "content",
-            currentTheme === "dark" ? "#0d0910" : "#faf8fc",
+            currentTheme === "dark" ? "#100e16" : "#faf7f2",
           );
         }
       }

@@ -101,10 +101,11 @@
   --color-link-hover: #ff8acd;
 }
 
-/* Override DaisyUI dark theme - dark purple */
+/* Match the shader's base colour for overscroll and Safari's solid browser-bar
+   extension. Browser chrome cannot reliably reproduce an animated canvas. */
 html[data-theme="dark"],
 html[data-theme="dark"] body {
-  background-color: #0d0910 !important;
+  background-color: #100e16 !important;
 }
 
 [data-theme="dark"] {
@@ -156,7 +157,7 @@ html[data-theme="dark"] body {
 /* Light mode background */
 html[data-theme="light"],
 html[data-theme="light"] body {
-  background-color: #faf8fc !important;
+  background-color: #faf7f2 !important;
 }
 
 /* Improved text contrast - brighter text */

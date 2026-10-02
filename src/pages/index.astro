@@ -914,7 +914,8 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
     /* Hero Section - Full viewport, centered */
     .hero-section {
       min-height: 100vh;
-      min-height: 100dvh; /* Dynamic viewport height for mobile */
+      /* Keep content stable when mobile browser controls expand/collapse. */
+      min-height: 100svh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1528,7 +1529,13 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
 
       .hero-section {
         flex: 1;
-        padding: 1rem 0.5rem; /* Closer to edge */
+        padding: 1rem 0.5rem;
+        /* The background reaches the edges; the hero stays clear of cutouts. */
+        padding-top: max(1rem, env(safe-area-inset-top, 0px));
+        /* 100svh leaves room for the expanded bottom controls. Avoid their
+           changing bottom inset here, which would reflow the hero on scroll. */
+        padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
+        padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
       }
 
       .hero-card {

@@ -53,3 +53,15 @@ Paper's native full-refresh-rate loop remains disabled.
 Glass blur and the grain background remain rendering costs. Device profiling
 is still needed to establish frame-time and input-latency improvements; this
 audit does not claim an FPS or INP result.
+
+## Mobile browser viewport
+
+The decorative canvas uses `100lvh` plus safe-area overscan, so collapsing
+Safari controls do not resize its projection. The homepage hero uses `100svh`
+with top/side cutout padding to avoid content reflow as those controls move.
+The changing bottom safe-area inset is deliberately excluded from canvas
+height and hero padding; the small viewport already reserves toolbar space. Root
+and theme-color fallbacks match the shader base in both themes. Safari can
+extend a solid colour into its native bars instead of the live canvas; these
+changes do not promise animated browser chrome. Check on an actual iPhone
+with expanded/collapsed controls, overscroll, and landscape orientation.
