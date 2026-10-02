@@ -56,19 +56,34 @@ audit does not claim an FPS or INP result.
 
 ## Mobile browser viewport
 
-The decorative canvas uses `100lvh` plus safe-area overscan, so collapsing
-Safari controls do not resize its projection. The homepage hero uses `100svh`
-with top/side cutout padding to avoid content reflow as those controls move.
-The changing bottom safe-area inset is deliberately excluded from canvas
-height and hero padding; the small viewport already reserves toolbar space. Root
-and theme-color fallbacks match the shader base in both themes. Safari can
-extend a solid colour into its native bars instead of the live canvas; these
-changes do not promise animated browser chrome. Check on an actual iPhone
-with expanded/collapsed controls, overscroll, and landscape orientation.
+The hero uses `100svh` and top/side cutout padding so collapsing Safari
+controls do not reflow its content. Closed zoom and code overlays become
+invisible after their exit fades, avoiding unused full-screen compositing.
 
-iOS also receives a CSS edge blend: the live shader transitions to the root
-colour over at most 96px at the top and bottom of the fixed viewport. Safari
-can show a solid extension behind its native controls; overscan alone did not
-remove that seam on the user's phone. The blend avoids the abrupt grain edge
-without a scroll handler, canvas snapshots, or additional shader draws. This
-is visual continuity with the native solid tint, not animated browser chrome.
+The background uses an absolute document-height clipping surface
+on touch WebKit with Safari 26.4 or newer. A root scroll timeline translates
+the viewport-sized canvas by the scroll offset, avoiding a viewport-fixed
+canvas while retaining the existing 30fps, approximately 1MP shader budget.
+A body ResizeObserver and viewport resize listener update the scroll range;
+there is no JavaScript scroll handler. A stable 128px paint buffer covers
+obscured browser insets without resizing the shader with the toolbar.
+Older Safari and other browsers retain the fixed implementation. Safari
+26.4 introduced threaded scroll-driven animations, so older Safari does not
+receive this path merely because it accepts the CSS syntax.
+
+Verified against a production preview in the user's iPhone 18 Pro / iOS 27
+simulator: the gradient appears behind the bottom controls and follows the
+page while scrolling; page content appears beneath the status area after
+scrolling. The initial top status strip still uses a solid colour. Removing
+theme-color, using a root CSS gradient, and hiding fixed UI did not resolve
+that initial strip in the simulator. This improves bottom coverage but does
+not provide the requested full-screen background at the scroll origin.
+The earlier edge fade has been removed rather than claimed as coverage.
+
+WebKit [318137@main](https://github.com/WebKit/WebKit/commit/8b5cfad939f76e35a20fbc885759fb82914843d0)
+explicitly introduces a system background over the leading obscured inset
+on iOS 27 at the scroll origin. Its top extension scrolls with the document,
+which explains the initial strip and subsequent reveal in the simulator.
+Changing CSS viewport sizing cannot remove this native view. Do not spoof the
+initial scroll position: that would displace content and interfere with
+scroll restoration without granting control of Safari's status area.

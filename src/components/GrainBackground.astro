@@ -6,18 +6,41 @@
  */
 ---
 
-<grain-background
+<div
+  class="grain-background-surface"
   aria-hidden="true"
   transition:persist="grain-background"
-></grain-background>
+>
+  <grain-background></grain-background>
+</div>
 
 <style>
+  /* Keep the document-height scroll-linked layer out of normal flow. The
+     body owns the containing block; clipping the surface prevents the
+     counter-scrolling canvas from contributing a second scroll range. */
+  .grain-background-surface {
+    display: block;
+    position: absolute;
+    inset: 0;
+    overflow: clip;
+    /* Permit paint into the obscured browser insets without making the
+       counter-scrolling child enlarge the document's scrollable bounds. */
+    overflow-clip-margin: 128px;
+    view-transition-name: none !important;
+    pointer-events: none;
+    z-index: 0;
+  }
+
   grain-background {
     /* Preserve the live element, but capture it with the page's root snapshot.
        Astro's separate named snapshot would cover the content during a swap.
        Override its generated scope rule without disabling DOM persistence. */
     view-transition-name: none !important;
     display: block;
+    /* Non-supporting browsers retain the original viewport-fixed fallback.
+       The scroll-linked rule below switches this to document coordinates only
+       after the runtime has confirmed that the browser can animate on the
+       root scroll timeline. */
     position: fixed;
     /* Use the largest viewport so Safari's collapsing toolbar does not resize
        the shader and shift its projection while scrolling. Overscan the top
@@ -41,25 +64,41 @@
       radial-gradient(ellipse at 100% 100%, #f0d8bd, transparent 70%), #faf7f2;
   }
 
-  /* Safari can show a solid extension instead of the live canvas behind its
-     native controls, despite viewport-fit=cover and overscan. Blend into that
-     colour Safari extends there instead of exposing a hard grain cutoff.
-     This overlay follows the fixed viewport edges while the shader retains
-     its stable large-viewport dimensions; no scroll listeners or redraws. */
-  @supports (-webkit-touch-callout: none) {
-    grain-background::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      --grain-edge: #100e16;
-      background: linear-gradient(to bottom,
-        var(--grain-edge) 0%, transparent min(96px, 18%),
-        transparent max(calc(100% - 96px), 82%), var(--grain-edge) 100%);
+  /* A scroll-driven transform keeps the stable large-viewport canvas aligned
+     with the visual viewport as the document scrolls. CSS owns this transform
+     on the compositor; the WebGL loop below continues to spend the same draw
+     budget as the fixed fallback. */
+  @supports (animation-timeline: scroll(root block)) {
+    .grain-background-surface[data-scroll-linked] grain-background {
+      position: absolute;
+      /* Safari's obscured controls are not represented consistently by safe-area
+         variables. A stable paint buffer covers expanded and compact bottom
+         bars. iOS 27 still paints its own top inset at the scroll origin. */
+      top: -128px;
+      height: calc(100lvh + 256px);
+      animation-name: grain-background-counter-scroll;
+      animation-duration: 1ms;
+      animation-timing-function: linear;
+      animation-iteration-count: 1;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root block);
+      animation-range: 0% 100%;
     }
+  }
 
-    :global([data-theme="light"]) grain-background::after {
-      --grain-edge: #faf7f2;
+  @keyframes grain-background-counter-scroll {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(0, var(--grain-scroll-range, 0px), 0); }
+  }
+
+  /* The global reduced-motion rule shortens every animation. Counter-scrolling
+     is positional rather than decorative, so retain it for an accessible
+     still shader while disabling only the separate WebGL drift loop in JS. */
+  @media (prefers-reduced-motion: reduce) {
+    .grain-background-surface[data-scroll-linked] grain-background {
+      animation-duration: auto !important;
+      animation-iteration-count: 1 !important;
+      animation-play-state: running !important;
     }
   }
 
@@ -105,6 +144,77 @@
     private motionFrame?: number;
     private motionListeners?: AbortController;
     private reducedMotion?: MediaQueryList;
+    private scrollSurface?: HTMLElement;
+    private scrollRangeObserver?: ResizeObserver;
+    private scrollRangeFrame?: number;
+    private scrollRangeResize?: () => void;
+
+    private updateScrollRange = () => {
+      this.scrollRangeFrame = undefined;
+      const surface = this.scrollSurface;
+      if (!surface || !this.isConnected) return;
+
+      const root = document.scrollingElement ?? document.documentElement;
+      const range = Math.max(0, root.scrollHeight - root.clientHeight);
+      this.style.setProperty("--grain-scroll-range", `${range}px`);
+    };
+
+    private scheduleScrollRangeUpdate = () => {
+      if (this.scrollRangeFrame !== undefined) return;
+      this.scrollRangeFrame = requestAnimationFrame(this.updateScrollRange);
+    };
+
+    private disconnectScrollLink() {
+      if (this.scrollRangeFrame !== undefined) cancelAnimationFrame(this.scrollRangeFrame);
+      this.scrollRangeFrame = undefined;
+      this.scrollRangeObserver?.disconnect();
+      this.scrollRangeObserver = undefined;
+      if (this.scrollRangeResize) {
+        window.removeEventListener("resize", this.scrollRangeResize);
+        this.scrollRangeResize = undefined;
+      }
+      this.scrollSurface?.removeAttribute("data-scroll-linked");
+      this.scrollSurface = undefined;
+      this.style.removeProperty("--grain-scroll-range");
+    }
+
+    private connectScrollLink() {
+      const surface = this.parentElement;
+      if (!(surface instanceof HTMLElement)) return;
+      if (this.scrollSurface === surface && this.scrollRangeObserver) {
+        this.scheduleScrollRangeUpdate();
+        return;
+      }
+
+      this.disconnectScrollLink();
+      this.scrollSurface = surface;
+
+      // Keep the fixed fallback on browsers without a root scroll timeline.
+      // The attribute is deliberately runtime-owned so CSS cannot put a
+      // document-coordinate layer on a browser that cannot counter-scroll it.
+      const supportsScrollTimeline = typeof CSS !== "undefined" &&
+        CSS.supports("animation-timeline", "scroll(root block)");
+      // This workaround is for Safari's obscured iOS browser controls. Safari
+      // 26.4 introduced threaded scroll animations; earlier versions would add
+      // main-thread work during scrolling. Keep the original fixed path on
+      // desktop and unverified browser engines rather than changing them too.
+      const safariVersion = navigator.userAgent.match(/Version\/(\d+)\.(\d+)/);
+      const major = Number(safariVersion?.[1] ?? 0);
+      const minor = Number(safariVersion?.[2] ?? 0);
+      const threadedSafari = major > 26 || (major === 26 && minor >= 4);
+      const touchWebKit = CSS.supports("-webkit-touch-callout", "none");
+      if (!supportsScrollTimeline || !touchWebKit || !threadedSafari) return;
+
+      surface.setAttribute("data-scroll-linked", "");
+      const body = document.body;
+      if (!body) return;
+
+      this.scrollRangeObserver = new ResizeObserver(this.scheduleScrollRangeUpdate);
+      this.scrollRangeObserver.observe(body);
+      this.scrollRangeResize = this.scheduleScrollRangeUpdate;
+      window.addEventListener("resize", this.scrollRangeResize, { passive: true });
+      this.updateScrollRange();
+    }
 
     private stopMotion() {
       if (this.motionFrame !== undefined) cancelAnimationFrame(this.motionFrame);
@@ -147,6 +257,12 @@
     }
 
     connectedCallback() {
+      // Astro can reconnect the persistent subtree during a navigation. Rebind
+      // the body observer to the current document before checking the shader
+      // mount so positional counter-scrolling is restored independently of
+      // decorative motion state.
+      this.connectScrollLink();
+
       // A persisted element may reconnect after a tick observed its temporary
       // removal. Restart from the retained frame instead of remaining frozen.
       if (this.mount) { this.syncMotion(); return; }
@@ -277,6 +393,7 @@
         this.cancelReveal();
         this.stopMotion();
         this.motionListeners?.abort();
+        this.disconnectScrollLink();
         this.observer?.disconnect();
         this.mount?.dispose();
         this.mount = undefined;

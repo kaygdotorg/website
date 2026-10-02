@@ -101,6 +101,12 @@
   --color-link-hover: #ff8acd;
 }
 
+/* Anchor the document-height decorative surface without changing flow. Its
+   clipped scroll-linked canvas must not enlarge the root scroll range. */
+body {
+  position: relative;
+}
+
 /* Match the shader's base colour for overscroll and Safari's solid browser-bar
    extension. Browser chrome cannot reliably reproduce an animated canvas. */
 html[data-theme="dark"],
@@ -2707,15 +2713,20 @@ pre:not(.code-collapsed) .code-expand-caret {
   align-items: center;
   justify-content: center;
   opacity: 0;
+  /* Closed full-screen layers must not participate in browser compositing. */
+  visibility: hidden;
   pointer-events: none;
   transition:
     background 0.4s ease,
     backdrop-filter 0.4s ease,
-    opacity 0.4s ease;
+    opacity 0.4s ease,
+    visibility 0s linear 0.4s;
 }
 
 /* Darker dim and heavier blur for stronger separation from page content */
 .code-fullscreen-overlay.active {
+  visibility: visible;
+  transition-delay: 0s;
   background: rgba(0, 0, 0, 0.9) !important;
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
@@ -4065,14 +4076,19 @@ kbd,
   justify-content: center;
   cursor: zoom-out;
   opacity: 0;
+  /* Preserve the exit fade, then remove the unused full-screen layer. */
+  visibility: hidden;
   pointer-events: none;
   transition:
     background 0.4s ease,
     backdrop-filter 0.4s ease,
-    opacity 0.4s ease;
+    opacity 0.4s ease,
+    visibility 0s linear 0.4s;
 }
 
 .zoom-overlay.active {
+  visibility: visible;
+  transition-delay: 0s;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
