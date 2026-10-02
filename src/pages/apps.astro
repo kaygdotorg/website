@@ -1,16 +1,24 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-// A lightweight destination for the homepage Apps card. App entries can be
-// added here once their names, descriptions, and links are ready.
+import { getCollection, render } from "astro:content";
+
+// Keep the page shell in code while the editable title, description, and body
+// live in src/content/apps/index.md alongside the rest of the site's content.
+const entries = await getCollection("apps");
+const entry = entries.find((candidate) => candidate.id === "index");
+
+if (!entry) {
+  throw new Error("Missing apps/index.md - This file provides the page content.");
+}
+
+const { Content } = await render(entry);
 ---
 
-<BaseLayout title="Apps" description="Apps and small software projects.">
+<BaseLayout title={entry.data.title} description={entry.data.description}>
   <section class="apps-page" aria-labelledby="apps-title">
-    <h1 id="apps-title" class="font-display">Apps</h1>
-    <p class="intro">Apps and small software projects.</p>
-    <div class="apps-empty">
-      <p>More soon.</p>
-    </div>
+    <h1 id="apps-title" class="font-display">{entry.data.title}</h1>
+    <p class="intro">{entry.data.description}</p>
+    <div class="apps-empty"><Content /></div>
   </section>
 </BaseLayout>
 
@@ -19,6 +27,6 @@ import BaseLayout from "../layouts/BaseLayout.astro";
   h1 { font-size:clamp(36px,5vw,48px); line-height:1.1; letter-spacing:-.025em; margin:0; }
   .intro { margin:18px 0 36px; font-size:18px; opacity:.75; }
   .apps-empty { padding:28px; border:1px solid color-mix(in srgb,currentColor 12%,transparent); border-radius:24px; background:color-mix(in srgb,currentColor 4%,transparent); }
-  .apps-empty p { margin:0; opacity:.7; }
+  .apps-empty :global(p) { margin:0; opacity:.7; }
   @media(max-width:600px) { .apps-page { padding:56px 18px 40px; } .intro { font-size:16px; } }
 </style>

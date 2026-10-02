@@ -1,10 +1,12 @@
 # Personal Website
 
-Personal site built with Astro 5, content collections, and a custom UI layer.
+Personal site built with Astro 7, content collections, and a custom UI layer.
+
+For everyday edits, start with [the editing guide](docs/editing.md).
 
 ## Tech Stack
 
-- [Astro 5](https://astro.build)
+- [Astro 7](https://astro.build)
 - [Tailwind CSS v4](https://tailwindcss.com)
 - [DaisyUI](https://daisyui.com)
 - [Pagefind](https://pagefind.app) for on-site search
@@ -15,19 +17,19 @@ Personal site built with Astro 5, content collections, and a custom UI layer.
 src/
   content/                 # Collection content (markdown + local assets)
     blog/
-    notes/
     talks/
     now/
     uses/
     photography/
     home/
+    apps/
     about/
-    contact/
     homelab/
     changelog/
   content.config.ts        # Astro content collection schemas/loaders
   pages/
     index.astro
+    apps.astro
     blog.astro
     notes.astro
     talks.astro

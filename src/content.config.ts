@@ -1,9 +1,9 @@
 /**
  * =============================================================================
- * ASTRO 5 CONTENT COLLECTIONS CONFIGURATION
+ * ASTRO CONTENT COLLECTIONS CONFIGURATION
  * =============================================================================
  *
- * This file defines all content collections for the site using Astro 5's
+ * This file defines all content collections for the site using Astro's
  * Content Layer API with the built-in glob() loader.
  *
  * ARCHITECTURE OVERVIEW:
@@ -16,7 +16,7 @@
  * - talks: Presentation slides and talk content
  * - now: "What I'm doing now" updates
  * - uses: Tools and setup documentation
- * - home/about/homelab/changelog: Static pages
+ * - home/about/homelab/changelog/apps: Static pages
  * - photography: Gallery page + photo entries (combined)
  *
  * FILE NAMING CONVENTION:
@@ -29,7 +29,7 @@
  * - Generated ID: my-article-title
  * - URL: /blog/my-article-title
  *
- * ASTRO 5 CHANGES FROM v4:
+ * CONTENT LAYER CONVENTIONS:
  * ------------------------
  * - Config file location: src/content.config.ts (not src/content/config.ts)
  * - Uses glob() loader instead of type: 'content'
@@ -386,6 +386,7 @@ const home = defineCollection({
 const about = createCollection("about", pageSchema);
 const homelab = createCollection("homelab", pageSchema);
 const changelog = createCollection("changelog", pageSchema);
+const apps = createCollection("apps", pageSchema);
 
 // -----------------------------------------------------------------------------
 // Photography Collection
@@ -474,6 +475,7 @@ export const collections = {
   about,
   homelab,
   changelog,
+  apps,
   // Photography (includes both page metadata and photo entries)
   photography,
 };

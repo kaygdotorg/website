@@ -34,10 +34,11 @@ const ROOT = path.resolve(__dirname, "..");
 // The notes collection was merged into blog. Keep resolving old ../notes/*.md
 // authoring patterns via src/utils/content-paths.mjs, but only index active
 // routed collections here so backlinks point at /blog URLs directly.
-const COLLECTIONS = ["blog", "talks", "uses", "now", "changelog", "about", "homelab"];
+const COLLECTIONS = ["blog", "talks", "uses", "now", "changelog", "about", "homelab", "apps"];
 
 // Map collection folders to URL paths
 const COLLECTION_URL_MAP = {
+  apps: "/apps",
   blog: "/blog",
   talks: "/talks",
   uses: "/uses",

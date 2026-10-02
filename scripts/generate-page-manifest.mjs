@@ -21,10 +21,11 @@ const ROOT = path.resolve(__dirname, "..");
 // The page manifest only tracks active routed collections. Legacy /notes URLs
 // are now served by redirect pages into /blog and should not appear as primary
 // preview targets.
-const COLLECTIONS = ["blog", "talks", "uses", "changelog", "now", "about", "home"];
+const COLLECTIONS = ["blog", "talks", "uses", "changelog", "now", "about", "home", "apps"];
 
 // Map collection folders to URL paths
 const COLLECTION_URL_MAP = {
+  apps: "/apps",
   blog: "/blog",
   talks: "/talks",
   uses: "/uses", 

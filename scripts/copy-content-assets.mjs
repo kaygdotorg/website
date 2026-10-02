@@ -54,7 +54,7 @@ const PUBLIC_DIR = path.join(__dirname, '../public');
 // Collections to scan for referenced assets
 // Notes no longer ships as a first-class collection. Once content moved to
 // blog, asset discovery should follow the active content roots only.
-const COLLECTIONS = ['home', 'uses', 'blog', 'talks', 'now', 'photography', 'homelab', 'about', 'changelog'];
+const COLLECTIONS = ['home', 'apps', 'uses', 'blog', 'talks', 'now', 'photography', 'homelab', 'about', 'changelog'];
 
 let copiedCount = 0;
 let skippedCount = 0;

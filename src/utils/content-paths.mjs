@@ -49,6 +49,7 @@ import path from "path";
 
 // Content collections that map to routed pages or copied content assets.
 export const CONTENT_COLLECTIONS = [
+  "apps",
   "blog",
   "notes",
   "uses",

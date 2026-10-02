@@ -13,6 +13,9 @@ public/talks/
 public/now/
 public/photography/
 public/homelab/
+public/apps/
+# Homepage artwork copied from its source SVG during prebuild.
+public/apps-card.svg
 
 # dependencies
 node_modules/

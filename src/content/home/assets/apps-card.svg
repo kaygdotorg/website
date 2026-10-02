@@ -8,7 +8,11 @@
     <rect x="14" y="20" width="224" height="224" rx="52" fill="#000" opacity=".2"/>
     <rect width="224" height="224" rx="52" fill="url(#tile)"/>
     <g fill="none" stroke="#38263b" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
-      <path d="m82 78-34 34 34 34m60-68 34 34-34 34m-22-84-16 100"/>
+      <!-- Four rounded app tiles read as software/apps even at deck size. -->
+      <rect x="50" y="50" width="48" height="48" rx="10"/>
+      <rect x="126" y="50" width="48" height="48" rx="10"/>
+      <rect x="50" y="126" width="48" height="48" rx="10"/>
+      <rect x="126" y="126" width="48" height="48" rx="10"/>
     </g>
   </g>
 </svg>
