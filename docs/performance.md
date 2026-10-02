@@ -40,7 +40,7 @@ prebuilt `thumb`, or add collection `image()` metadata and imported assets befor
 relying on Astro optimization. A public-path string alone cannot be resized by
 Astro's static image service. Never advertise fake responsive widths for it.
 
-The grain background now drifts at 0.08 speed with about 30 draws per second,
+The grain background now drifts at 0.5 speed with about 30 draws per second,
 retaining its 1MP backing-canvas cap. It freezes when the tab is hidden or
 reduced motion is requested, and resumes without jumping after navigation.
 Paper's native full-refresh-rate loop remains disabled.
