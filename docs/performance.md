@@ -29,6 +29,11 @@ vertical scrolling. Navigation observers and comment fallback timers also clean
 up. Shared frosted cards and photo prints no longer reserve permanent transform
 layers, and homepage transitions target specific properties.
 
+Document-flow glass cards also suspend their backdrop blur beyond a 200px
+viewport buffer. One IntersectionObserver restores the existing blur before
+entry and disconnects during navigation. Fixed navigation and dialog glass are
+excluded; no visible blur strength or card layout changes.
+
 ## Remaining costs
 
 The deployment contains about 139 MB of original videos. Those files are kept

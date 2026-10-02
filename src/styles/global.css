@@ -190,6 +190,13 @@ html[data-theme="light"] body {
     0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
+/* OffscreenGlass observes only document-flow cards, with a viewport buffer.
+   Override both browser spellings without altering card geometry or tint. */
+[data-offscreen-blur] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 
 
 [data-theme="dark"] .frosted-card {
@@ -5226,6 +5233,12 @@ a:focus-visible img { filter: brightness(.8); }
    that support it, ensuring it survives the build process.
    ======================================== */
 @supports (backdrop-filter: blur(1px)) {
+  /* Keep the unprefixed override inside feature detection: the CSS compiler
+     otherwise retains only the WebKit spelling, which Chrome may not honor. */
+  [data-offscreen-blur] {
+    backdrop-filter: none !important;
+  }
+
   .glass-pill {
     backdrop-filter: blur(16px) saturate(180%);
   }

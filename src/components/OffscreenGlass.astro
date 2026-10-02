@@ -1,0 +1,36 @@
+---
+/** Suspend decorative card blur away from the viewport without hiding content
+ * or changing layout. A 200px buffer restores glass before it becomes visible. */
+---
+
+<script>
+  let observer: IntersectionObserver | undefined;
+  let cards: Element[] = [];
+
+  function cleanup() {
+    observer?.disconnect();
+    observer = undefined;
+    cards.forEach(card => card.removeAttribute("data-offscreen-blur"));
+    cards = [];
+  }
+
+  function initialize() {
+    cleanup();
+    if (!("IntersectionObserver" in window)) return;
+    // Observe document-flow surfaces only. Navigation, dialogs and popovers
+    // have their own visibility and must retain their existing glass styles.
+    cards = Array.from(document.querySelectorAll(
+      "main .frosted-card, main .frosted-card-homepage, main photo-deck",
+    ));
+    observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        entry.target.toggleAttribute("data-offscreen-blur", !entry.isIntersecting);
+      }
+    }, { rootMargin: "200px 0px" });
+    cards.forEach(card => observer!.observe(card));
+  }
+
+  initialize();
+  document.addEventListener("astro:before-swap", cleanup);
+  document.addEventListener("astro:page-load", initialize);
+</script>
