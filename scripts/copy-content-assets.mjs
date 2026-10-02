@@ -164,13 +164,16 @@ function extractMarkdownAssets(content) {
   const paths = new Set();
   const searchableContent = stripCodeExamples(content);
   
-  // Match markdown links and embeds: [text](./path) or ![alt](./path)
-  // Also handles angle bracket syntax: [text](<./path with spaces>)
-  const linkRegex = /!?\[([^\]]*)\]\(<?([^)>\s]+)>?\)/g;
+  // Match markdown links and embeds: [text](./path) or ![alt](./path).
+  // CommonMark permits angle brackets around destinations containing spaces,
+  // so keep that form separate from the unquoted destination. The latter
+  // intentionally stops at whitespace so an optional markdown title does not
+  // become part of the filesystem path.
+  const linkRegex = /!?\[[^\]]*\]\(\s*(?:<([^>]+)>|([^\s)]+))(?:\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))?\s*\)/g;
   let match;
   
   while ((match = linkRegex.exec(searchableContent)) !== null) {
-    const href = getPathname(match[2]);
+    const href = getPathname(match[1] ?? match[2]);
     if (isRelativeAssetPath(href)) {
       paths.add(href);
     }

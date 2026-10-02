@@ -453,6 +453,9 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
           scriptsLoaded: false,
           themeObserver: null,
           io: null,
+          fallbackTimer: null,
+          pageLoadListener: null,
+          beforeSwapListener: null,
         });
 
         function currentTheme() {
@@ -520,9 +523,21 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
 
         function initObserver() {
           const container = document.getElementById("remark42");
-          if (!container) return;
+          if (!container) {
+            state.io?.disconnect();
+            state.io = null;
+            if (state.fallbackTimer !== null) {
+              clearTimeout(state.fallbackTimer);
+              state.fallbackTimer = null;
+            }
+            return;
+          }
 
           if (state.io) state.io.disconnect();
+          if (state.fallbackTimer !== null) {
+            clearTimeout(state.fallbackTimer);
+            state.fallbackTimer = null;
+          }
           state.io = new IntersectionObserver(
             (entries) => {
               for (const entry of entries) {
@@ -533,6 +548,10 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
                   mountIfPossible();
                   state.io.disconnect();
                   state.io = null;
+                  if (state.fallbackTimer !== null) {
+                    clearTimeout(state.fallbackTimer);
+                    state.fallbackTimer = null;
+                  }
                 }
               }
             },
@@ -546,7 +565,11 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
 
           // Fallback: if already visible (or IO is flaky after swaps), try once
           // shortly after init.
-          setTimeout(() => {
+          state.fallbackTimer = setTimeout(() => {
+            state.fallbackTimer = null;
+            // A delayed callback from a previous view must not mount comments
+            // into a detached container after a View Transition.
+            if (!container.isConnected || document.getElementById("remark42") !== container) return;
             const rect = container.getBoundingClientRect();
             const vh = window.innerHeight || document.documentElement.clientHeight;
             if (rect.top < vh + 200) {
@@ -562,8 +585,23 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
           }, 300);
         }
 
-        // Re-init on View Transitions navigations.
-        document.addEventListener("astro:page-load", initObserver);
+        // Re-init on View Transitions navigations, while keeping one global
+        // listener and cancelling stale observers/timers between pages.
+        if (!state.pageLoadListener) {
+          state.pageLoadListener = initObserver;
+          document.addEventListener("astro:page-load", state.pageLoadListener);
+        }
+        if (!state.beforeSwapListener) {
+          state.beforeSwapListener = () => {
+            state.io?.disconnect();
+            state.io = null;
+            if (state.fallbackTimer !== null) {
+              clearTimeout(state.fallbackTimer);
+              state.fallbackTimer = null;
+            }
+          };
+          document.addEventListener("astro:before-swap", state.beforeSwapListener);
+        }
         initObserver();
       })();
     </script>
@@ -594,6 +632,9 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
     interface HomepageCleanup {
       navObserver?: IntersectionObserver;
       pageLoadListener?: () => void;
+      beforeSwapListener?: () => void;
+      cardCleanup?: () => void;
+      cardHand?: HTMLElement;
     }
 
     // Initialize or retrieve the cleanup registry
@@ -601,12 +642,30 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       (window as any).__homepageCleanup ||
       ((window as any).__homepageCleanup = {});
 
-    const cardHand = document.getElementById("card-hand");
-    const cards = document.querySelectorAll(
-      ".card-in-hand",
-    ) as NodeListOf<HTMLElement>;
+    function initCardHand() {
+      const cardHand = document.getElementById("card-hand");
+      const cards = cardHand?.querySelectorAll(
+        ".card-in-hand",
+      ) as NodeListOf<HTMLElement> | undefined;
 
-    if (cardHand && cards.length > 0) {
+      if (!cardHand || !cards?.length) {
+        cleanup.cardCleanup?.();
+        cleanup.cardCleanup = undefined;
+        cleanup.cardHand = undefined;
+        return;
+      }
+
+      // The initial script and the first `astro:page-load` can both observe
+      // the same DOM. Keep that harmless race from rebuilding the listeners.
+      if (cleanup.cardHand === cardHand && cleanup.cardCleanup) return;
+
+      // A page script can run again after a View Transition. Dispose of the
+      // previous hand first so detached cards cannot retain pointer listeners
+      // or wheel timers through the persistent document.
+      cleanup.cardCleanup?.();
+      cleanup.cardCleanup = undefined;
+      cleanup.cardHand = cardHand;
+
       const numCards = cards.length;
       // Resolve the default by href so content reordering does not silently
       // change which destination appears at the front of the deck.
@@ -619,112 +678,135 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
         defaultCardIndex >= 0
           ? (defaultCardIndex - frontmostPosition + numCards) % numCards
           : 0;
-      let isDragging = false;
+      let pointerId: number | undefined;
+      let horizontalDrag = false;
       let hasMoved = false;
       let startX = 0;
+      let startY = 0;
       let currentX = 0;
-      let dragThreshold = 50;
-      let tapThreshold = 10;
+      let currentY = 0;
+      let wheelTimeout: ReturnType<typeof setTimeout> | undefined;
+      let accumulatedDelta = 0;
+      const dragThreshold = 50;
+      const tapThreshold = 10;
+      const wheelThreshold = 50;
+      const controller = new AbortController();
+      const signal = controller.signal;
 
       function updateCardPositions() {
         cards.forEach((card, index) => {
-          let posIndex = (index - currentOffset + numCards) % numCards;
-          card.setAttribute("data-position", posIndex.toString());
+          const position = (index - currentOffset + numCards) % numCards;
+          card.setAttribute("data-position", position.toString());
         });
       }
 
-      function handleCardStart(e: MouseEvent | TouchEvent) {
-        isDragging = true;
+      // Pointer capture keeps the drag local to this deck. The previous
+      // document-level mouse/touch listeners ran for every pointer movement on
+      // the page and remained reachable after a View Transition.
+      function handlePointerDown(event: PointerEvent) {
+        if (!event.isPrimary || (event.pointerType === "mouse" && event.button !== 0) || pointerId !== undefined) return;
+        pointerId = event.pointerId;
+        horizontalDrag = false;
         hasMoved = false;
-        startX = "touches" in e ? e.touches[0].clientX : e.clientX;
+        startX = event.clientX;
+        startY = event.clientY;
         currentX = startX;
-        e.stopPropagation();
+        currentY = startY;
+        event.stopPropagation();
       }
 
-      function handleCardMove(e: MouseEvent | TouchEvent) {
-        if (!isDragging) return;
-        currentX = "touches" in e ? e.touches[0].clientX : e.clientX;
-
-        if (Math.abs(currentX - startX) > tapThreshold) {
-          hasMoved = true;
-        }
-      }
-
-      function handleCardEnd() {
-        if (!isDragging) return;
-        isDragging = false;
-
+      function handlePointerMove(event: PointerEvent) {
+        if (pointerId !== event.pointerId) return;
+        currentX = event.clientX;
+        currentY = event.clientY;
         const deltaX = currentX - startX;
+        const deltaY = currentY - startY;
+        if (!horizontalDrag && Math.abs(deltaY) > tapThreshold && Math.abs(deltaY) > Math.abs(deltaX)) {
+          // Release vertical gestures so the browser can keep scrolling the
+          // page instead of treating a swipe as a card shuffle.
+          resetPointer(event);
+          return;
+        }
+        if (!horizontalDrag && Math.abs(deltaX) > tapThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
+          horizontalDrag = true;
+          cardHand.setPointerCapture(event.pointerId);
+        }
+        if (horizontalDrag) hasMoved = true;
+      }
 
-        if (Math.abs(deltaX) > dragThreshold) {
-          if (deltaX < 0) {
-            currentOffset = (currentOffset + 1) % numCards;
-          } else {
-            currentOffset = (currentOffset - 1 + numCards) % numCards;
-          }
+      function resetPointer(event?: PointerEvent) {
+        if (event && pointerId !== event.pointerId) return;
+        if (pointerId !== undefined && cardHand.hasPointerCapture(pointerId)) {
+          cardHand.releasePointerCapture(pointerId);
+        }
+        pointerId = undefined;
+      }
+
+      function handlePointerUp(event: PointerEvent) {
+        if (pointerId !== event.pointerId) return;
+        const deltaX = currentX - startX;
+        if (horizontalDrag && Math.abs(deltaX) > dragThreshold) {
+          currentOffset = deltaX < 0
+            ? (currentOffset + 1) % numCards
+            : (currentOffset - 1 + numCards) % numCards;
           updateCardPositions();
         }
+        resetPointer(event);
       }
 
-      cards.forEach((card) => {
-        card.addEventListener("click", (e) => {
-          if (hasMoved) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-          hasMoved = false;
-        });
+      function handleClick(event: MouseEvent) {
+        const card = (event.target as Element).closest(".card-in-hand");
+        if (!card || !cardHand.contains(card)) return;
+        if (hasMoved) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        hasMoved = false;
+      }
 
-        card.addEventListener("mousedown", handleCardStart);
-        card.addEventListener("touchstart", handleCardStart, {
-          passive: false,
-        });
-      });
+      cardHand.addEventListener("pointerdown", handlePointerDown, { signal });
+      cardHand.addEventListener("pointermove", handlePointerMove, { signal });
+      cardHand.addEventListener("pointerup", handlePointerUp, { signal });
+      cardHand.addEventListener("pointercancel", resetPointer, { signal });
+      cardHand.addEventListener("lostpointercapture", resetPointer, { signal });
+      cardHand.addEventListener("pointerleave", (event) => {
+        if (pointerId === event.pointerId && !horizontalDrag) resetPointer(event);
+      }, { signal });
+      cardHand.addEventListener("click", handleClick, { signal });
 
-      cardHand.addEventListener("mousedown", handleCardStart);
-      cardHand.addEventListener("touchstart", handleCardStart, {
-        passive: false,
-      });
-
-      document.addEventListener("mousemove", handleCardMove);
-      document.addEventListener("mouseup", handleCardEnd);
-      document.addEventListener("touchmove", handleCardMove, { passive: true });
-      document.addEventListener("touchend", handleCardEnd);
-
-      // Horizontal scroll/wheel to shuffle cards
-      let wheelTimeout: ReturnType<typeof setTimeout> | null = null;
-      let accumulatedDelta = 0;
-      const wheelThreshold = 50;
-
-      cardHand.addEventListener(
-        "wheel",
-        (e: WheelEvent) => {
-          const delta =
-            Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-
-          e.stopPropagation();
-          accumulatedDelta += delta;
-
-          if (wheelTimeout) clearTimeout(wheelTimeout);
-
-          if (Math.abs(accumulatedDelta) > wheelThreshold) {
-            if (accumulatedDelta > 0) {
-              currentOffset = (currentOffset + 1) % numCards;
-            } else {
-              currentOffset = (currentOffset - 1 + numCards) % numCards;
-            }
-            updateCardPositions();
-            accumulatedDelta = 0;
-          }
-
-          wheelTimeout = setTimeout(() => {
-            accumulatedDelta = 0;
-          }, 150);
-        },
-        { passive: true },
-      );
+      // Horizontal scroll/wheel to shuffle cards.
+      cardHand.addEventListener("wheel", (event: WheelEvent) => {
+        const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY)
+          ? event.deltaX
+          : event.deltaY;
+        event.stopPropagation();
+        accumulatedDelta += delta;
+        if (wheelTimeout) clearTimeout(wheelTimeout);
+        if (Math.abs(accumulatedDelta) > wheelThreshold) {
+          currentOffset = accumulatedDelta > 0
+            ? (currentOffset + 1) % numCards
+            : (currentOffset - 1 + numCards) % numCards;
+          updateCardPositions();
+          accumulatedDelta = 0;
+        }
+        wheelTimeout = setTimeout(() => {
+          accumulatedDelta = 0;
+          wheelTimeout = undefined;
+        }, 150);
+      }, { signal, passive: true });
 
       updateCardPositions();
+
+      cleanup.cardCleanup = () => {
+        controller.abort();
+        if (wheelTimeout) clearTimeout(wheelTimeout);
+        if (pointerId !== undefined && cardHand.hasPointerCapture(pointerId)) {
+          cardHand.releasePointerCapture(pointerId);
+        }
+        pointerId = undefined;
+        horizontalDrag = false;
+        if (cleanup.cardHand === cardHand) cleanup.cardHand = undefined;
+      };
     }
 
     // =========================================================================
@@ -782,6 +864,7 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
     // =========================================================================
 
     // Run initializers on first load
+    initCardHand();
     initNavScrollObserver();
 
     // =========================================================================
@@ -795,12 +878,25 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
     // =========================================================================
     if (!cleanup.pageLoadListener) {
       cleanup.pageLoadListener = () => {
-        // Only run on homepage (check for hero section existence)
+        // Only run homepage behavior when its DOM exists. Card setup is
+        // repeated here because bundled page scripts are not guaranteed to
+        // execute again after every View Transition.
         if (document.getElementById("hero-section")) {
+          initCardHand();
           initNavScrollObserver();
         }
       };
       document.addEventListener("astro:page-load", cleanup.pageLoadListener);
+    }
+
+    if (!cleanup.beforeSwapListener) {
+      cleanup.beforeSwapListener = () => {
+        cleanup.cardCleanup?.();
+        cleanup.cardCleanup = undefined;
+        cleanup.navObserver?.disconnect();
+        cleanup.navObserver = undefined;
+      };
+      document.addEventListener("astro:before-swap", cleanup.beforeSwapListener);
     }
   </script>
 
@@ -916,6 +1012,12 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       color: var(--color-base-content, inherit);
       opacity: 0.6;
       margin-top: 1rem;
+    }
+
+    /* Let the browser keep vertical page scrolling native while the pointer
+       handler owns horizontal deck gestures. */
+    .card-hand {
+      touch-action: pan-y;
     }
 
     /* ============================================
@@ -1047,7 +1149,14 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       flex-direction: column;
       text-decoration: none;
       overflow: hidden;
-      transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      /* Limit interpolation to the properties this hover state changes. A
+         broad `all` transition makes the browser track layout properties on
+         every pointer movement even though this card only moves, repaints its
+         shadow, and changes its border. */
+      transition:
+        transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+        box-shadow 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+        border-color 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
       border: 1px solid rgba(255, 255, 255, 0.05);
       min-width: 0; /* Allow grid to control sizing */
     }
@@ -1159,7 +1268,7 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       right: 1.5rem;
       opacity: 0;
       transform: translateX(10px);
-      transition: all 0.3s ease;
+      transition: opacity 0.3s ease, transform 0.3s ease;
       color: var(--color-accent, #ec4899);
       z-index: 10;
     }
@@ -1303,7 +1412,7 @@ const workExperience = rawWorkExperience?.map((item: any) => ({
       border-radius: 1rem;
       overflow: hidden;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-      transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
       background: white;
     }
 

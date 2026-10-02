@@ -30,6 +30,7 @@
  * - Uses entry.id for URL construction (works with glob loader's generateId)
  * - Uses entry.body for excerpt extraction (still available with glob loader)
  */
+import { Image } from "astro:assets";
 import Icon from "./Icon.astro";
 import { formatDate, getCompactRelativeTime, toDate } from "../utils/dates";
 import { getExcerpt } from "../utils/markdown";
@@ -79,6 +80,43 @@ const {
 const coverImage = entry.data["cover-image"];
 
 /**
+ * Card thumbnails are small on desktop, but can span most of the card on
+ * mobile. Keep the responsive candidates intentionally tight so a list page
+ * does not download a full-resolution cover for a 128px slot.
+ */
+const thumbnailWidths = [128, 256, 512, 768];
+const thumbnailSizes = "(min-width: 768px) 128px, calc(100vw - 80px)";
+
+/**
+ * Unsplash supports responsive width parameters and content negotiation. Keep
+ * the original crop and attribution parameters, but remove a fixed `fm` or
+ * oversized `w` so the browser can select a small WebP/AVIF candidate.
+ */
+const isUnsplashUrl = (value: unknown): value is string =>
+  typeof value === "string" && /(?:^|\/\/)(?:images|source|plus)\.unsplash\.com\//i.test(value);
+
+const getUnsplashThumbnailUrl = (source: string, width: number): string => {
+  const url = new URL(source);
+  url.searchParams.set("w", String(width));
+  url.searchParams.set("auto", "format");
+  url.searchParams.set("q", "70");
+  url.searchParams.delete("fm");
+  return url.toString();
+};
+
+const unsplashSrcset = isUnsplashUrl(coverImage)
+  ? thumbnailWidths.map((width) => `${getUnsplashThumbnailUrl(coverImage, width)} ${width}w`).join(", ")
+  : undefined;
+
+// Keep the fallback candidate close to the card's largest useful size. The
+// responsive srcset still serves smaller candidates, while avoiding a full
+// source-width WebP for a thumbnail that never renders above 512px.
+const localCardWidth =
+  coverImage && typeof coverImage !== "string" && coverImage.format !== "gif"
+    ? Math.min(512, coverImage.width)
+    : undefined;
+
+/**
  * Get description from frontmatter, or extract from content body.
  * Falls back to undefined if neither is available.
  */
@@ -123,13 +161,38 @@ const updatedAgoText = showUpdatedBadge ? getCompactRelativeTime(lastEdited!) : 
           ======================================================================= */}
       {coverImage && (
         <div class="w-full md:w-32 h-24 md:h-20 rounded-lg overflow-hidden flex-shrink-0">
-          <img
-            src={typeof coverImage === "string" ? coverImage : coverImage.src}
-            alt={entry.data.title}
-            class="w-full h-full object-cover transition-transform group-hover:scale-105"
-            loading="lazy"
-            decoding="async"
-          />
+          {typeof coverImage === "string" ? (
+            <img
+              src={isUnsplashUrl(coverImage) ? getUnsplashThumbnailUrl(coverImage, 512) : coverImage}
+              srcset={unsplashSrcset}
+              sizes={unsplashSrcset ? thumbnailSizes : undefined}
+              alt={entry.data.title}
+              class="w-full h-full object-cover transition-transform group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : coverImage.format === "gif" ? (
+            <img
+              src={coverImage.src}
+              alt={entry.data.title}
+              class="w-full h-full object-cover transition-transform group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : (
+            <Image
+              src={coverImage}
+              width={localCardWidth}
+              alt={entry.data.title}
+              widths={thumbnailWidths}
+              sizes={thumbnailSizes}
+              format="webp"
+              quality={70}
+              class="w-full h-full object-cover transition-transform group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+            />
+          )}
         </div>
       )}
 

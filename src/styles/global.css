@@ -6,7 +6,7 @@
    - Playfair Display: 400/500/600 (editorial headings, drop caps, major titles)
    - Outfit: 400/500/600/700 (body text, paragraphs, long-form reading)
    - SN Pro: 500/600/700 (UI elements, navigation, buttons, labels, metadata)
-   - Maple Mono: 400, 600 (code blocks, monospace — round corners, ligatures)
+   - Maple Mono: 400/500/700 (code blocks, metadata, card labels)
    - Mrs Saint Delafield: 400 (nav logo accent, cursive flourishes)
    
    USAGE:
@@ -60,6 +60,9 @@
 
 @plugin "daisyui" {
   themes: light --default, dark --prefersdark;
+  /* The site renders custom components, not DaisyUI component classes.
+   * Keep its theme/reset utilities without shipping unused widget styles. */
+  include: rootcolor, svg, rootscrollgutter, properties, scrollbar, rootscrolllock;
 }
 
 @theme {
@@ -176,9 +179,8 @@ html[data-theme="light"] body {
   border: 1px solid rgba(255, 255, 255, 0.12);
   position: relative;
   overflow: hidden;
-  transform: translateZ(0);
-  /* Hardware acceleration */
-  will-change: transform;
+  /* Promote cards only when the browser needs to animate them, rather than
+     reserving a graphics layer for every entry in long lists. */
   contain: layout style;
 
   /* Subtle glow effect */
@@ -4480,7 +4482,7 @@ kbd,
 .card-in-hand-date {
   color: #555;
   font-size: 0.6rem;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 @media (min-width: 768px) {

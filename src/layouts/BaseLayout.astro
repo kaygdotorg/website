@@ -132,12 +132,20 @@ import GrainBackground from "../components/GrainBackground.astro";
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
-    <!-- Astro 6 Fonts API — injects @font-face declarations and preload links
-         for all fonts registered in astro.config.mjs. Fonts are self-hosted
-         from /_astro/fonts/ with no external CDN requests. -->
+    <!-- Astro Fonts API keeps font files self-hosted under /_astro/fonts/.
+         Only the above-fold body and navigation faces are preloaded. Heading,
+         code, and signature faces keep their @font-face rules but are fetched
+         on demand when those roles appear, which avoids competing with the
+         first viewport for bandwidth. -->
     <Font cssVariable="--font-heading" />
-    <Font cssVariable="--font-body" />
-    <Font cssVariable="--font-ui" />
+    <Font
+      cssVariable="--font-body"
+      preload={[{ weight: 400, style: "normal", subset: "latin" }]}
+    />
+    <Font
+      cssVariable="--font-ui"
+      preload={[{ weight: 600, style: "normal", subset: "latin" }]}
+    />
     <Font cssVariable="--font-mono" />
     <Font cssVariable="--font-cursive" />
 
@@ -1212,19 +1220,46 @@ import GrainBackground from "../components/GrainBackground.astro";
        * =========================================================================
        */
       function initImageZoom() {
+        // The manifest is only needed when a clicked optimized image has no
+        // explicit original source. Keep the request behind that interaction
+        // so pages without zoomable images, and clicks with known sources, do
+        // not download it at all.
+        function getImageManifest(): Promise<Record<string, string>> {
+          const win = window as any;
+          if (win.__imageManifest) return Promise.resolve(win.__imageManifest);
+          if (!win.__imageManifestPromise) {
+            win.__imageManifestPromise = fetch("/image-manifest.json")
+              .then((response) => (response.ok ? response.json() : {}))
+              .then((manifest: Record<string, string>) => {
+                win.__imageManifest = manifest;
+                return manifest;
+              })
+              .catch(() => ({}));
+          }
+          return win.__imageManifestPromise;
+        }
+
         // ---------------------------------------------------------------------
-        // FETCH MANIFEST - Needed for reverse lookup (optimized → original)
+        // FIND ALL ZOOMABLE IMAGES
         // ---------------------------------------------------------------------
-        // Fetch manifest early so it's ready when lightbox opens
-        if (!(window as any).__imageManifestPromise) {
-          (window as any).__imageManifestPromise = fetch("/image-manifest.json")
-            .then(r => r.ok ? r.json() : {})
-            .then((manifest: Record<string, string>) => {
-              // Store manifest for lightbox to use (original → optimized)
-              (window as any).__imageManifest = manifest;
-              return manifest;
-            })
-            .catch(() => ({}));
+        const allImages = document.querySelectorAll(
+          ".prose img, .md-card-body img, .photo-item img, .uses-carousel-slide img",
+        );
+        const imageLinks = document.querySelectorAll(
+          'a[data-lightbox="true"]',
+        );
+
+        // There is no zoom work to initialize on pages without matching
+        // content. In particular, do not create gallery state or global input
+        // listeners for a page that has no zoomable image or image link.
+        if (!allImages.length && !imageLinks.length) {
+          const staleGalleryState = (window as any).__galleryState;
+          if (staleGalleryState) {
+            staleGalleryState.images = [];
+            staleGalleryState.currentIndex = 0;
+            staleGalleryState.isGalleryMode = false;
+          }
+          return;
         }
         
         // ---------------------------------------------------------------------
@@ -1320,22 +1355,21 @@ import GrainBackground from "../components/GrainBackground.astro";
               // Get current page path to construct original URL
               const pagePath = window.location.pathname.replace(/\/$/, '');
               
-              // Wait for manifest if still loading
-              const manifestPromise = (window as any).__imageManifestPromise;
-              if (manifestPromise) {
-                try {
-                  const manifest = await manifestPromise;
-                  for (const [original] of Object.entries(manifest)) {
-                    // Check if this manifest entry's original path matches our page and filename
-                    if (original.startsWith(pagePath + '/') && 
-                        original.includes('/' + baseName + '.')) {
-                      fullSrc = original;
-                      break;
-                    }
+              // The reverse lookup is the one case where a lightbox click
+              // needs the manifest. Request it lazily instead of paying this
+              // cost on every page load.
+              try {
+                const manifest = await getImageManifest();
+                for (const [original] of Object.entries(manifest)) {
+                  // Check if this manifest entry's original path matches our page and filename
+                  if (original.startsWith(pagePath + '/') &&
+                      original.includes('/' + baseName + '.')) {
+                    fullSrc = original;
+                    break;
                   }
-                } catch (e) {
-                  // Manifest fetch failed, fallback to current src
                 }
+              } catch (e) {
+                // Manifest fetch failed, fallback to current src
               }
             }
           }
@@ -1399,13 +1433,6 @@ import GrainBackground from "../components/GrainBackground.astro";
           }
         }
 
-        // ---------------------------------------------------------------------
-        // FIND ALL ZOOMABLE IMAGES
-        // ---------------------------------------------------------------------
-        const allImages = document.querySelectorAll(
-          ".prose img, .md-card-body img, .photo-item img, .uses-carousel-slide img",
-        );
-
         // Exit early if no overlay exists
         const overlayCheck = document.getElementById("zoom-overlay");
         if (!overlayCheck) return;
@@ -1459,10 +1486,6 @@ import GrainBackground from "../components/GrainBackground.astro";
         // IMAGE LINK CLICK HANDLERS (for links to images that should open in lightbox)
         // These are <a> tags with data-lightbox="true" set by rehype-asset-links
         // ---------------------------------------------------------------------
-        const imageLinks = document.querySelectorAll(
-          'a[data-lightbox="true"]',
-        );
-
         imageLinks.forEach((link) => {
           if ((link as any).__lightboxInitialized) return;
           (link as any).__lightboxInitialized = true;
@@ -1809,6 +1832,32 @@ import GrainBackground from "../components/GrainBackground.astro";
        * @see /src/pages/image-manifest.json.ts - generates the manifest
        */
       function initImagePreview() {
+        const win = window as any;
+
+        // Abort the previous page's delegated listeners before checking the
+        // new page. View Transitions can navigate to a page with no image
+        // links, and the old controller still needs to be cleaned up there.
+        if (win.__imagePreviewCleanup) {
+          win.__imagePreviewCleanup();
+          win.__imagePreviewCleanup = null;
+        }
+        if (win.__imagePreviewController) {
+          win.__imagePreviewController.abort();
+          win.__imagePreviewController = null;
+        }
+
+        const imageLinks = document.querySelectorAll(
+          'a[data-asset-type="image"]',
+        );
+
+        // Avoid creating a tooltip, listeners, or a manifest request when the
+        // current page has no image links that can show a hover preview.
+        if (!imageLinks.length) {
+          const staleTooltip = document.getElementById("image-preview-tooltip");
+          staleTooltip?.classList.remove("visible", "loading");
+          return;
+        }
+
         // Create tooltip element if it doesn't exist
         let tooltip = document.getElementById("image-preview-tooltip") as HTMLDivElement;
         if (!tooltip) {
@@ -1822,21 +1871,34 @@ import GrainBackground from "../components/GrainBackground.astro";
         const imageCache = (window as any).__imagePreviewCache || new Map();
         (window as any).__imagePreviewCache = imageCache;
 
-        // Image manifest promise - cached in window for session reuse
-        // Fetched once on first hover, reused for all subsequent hovers
-        if (!(window as any).__imageManifestPromise) {
-          (window as any).__imageManifestPromise = fetch("/image-manifest.json")
-            .then(r => r.ok ? r.json() : {})
-            .then((manifest: Record<string, string>) => {
-              // Store manifest for lightbox to use
-              (window as any).__imageManifest = manifest;
-              return manifest;
-            })
-            .catch(() => ({})); // Fallback to empty manifest on error
+        // Resolve the shared manifest only after a real hover. The same
+        // promise is reused by the lightbox if it later needs reverse lookup.
+        function getImageManifest(): Promise<Record<string, string>> {
+          if (win.__imageManifest) return Promise.resolve(win.__imageManifest);
+          if (!win.__imageManifestPromise) {
+            win.__imageManifestPromise = fetch("/image-manifest.json")
+              .then((response) => (response.ok ? response.json() : {}))
+              .then((manifest: Record<string, string>) => {
+                win.__imageManifest = manifest;
+                return manifest;
+              })
+              .catch(() => ({}));
+          }
+          return win.__imageManifestPromise;
         }
 
         let hideTimeout: ReturnType<typeof setTimeout> | null = null;
         let currentLink: HTMLElement | null = null;
+        const controller = new AbortController();
+        win.__imagePreviewController = controller;
+        win.__imagePreviewCleanup = () => {
+          if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+          }
+          currentLink = null;
+          tooltip.classList.remove("visible", "loading");
+        };
 
         async function showPreview(link: HTMLAnchorElement, e: MouseEvent) {
           if (hideTimeout) {
@@ -1846,12 +1908,6 @@ import GrainBackground from "../components/GrainBackground.astro";
 
           currentLink = link;
           const originalHref = link.href;
-          
-          // Try to get optimized URL from manifest
-          const manifest = await (window as any).__imageManifestPromise;
-          const pathname = new URL(originalHref).pathname;
-          // Use optimized URL if available, otherwise fall back to original
-          const imageSrc = manifest[pathname] || originalHref;
 
           // Position tooltip above cursor
           const updatePosition = (clientX: number, clientY: number) => {
@@ -1875,6 +1931,21 @@ import GrainBackground from "../components/GrainBackground.astro";
             tooltip.style.top = `${top}px`;
           };
 
+          // Show feedback immediately while the lazy manifest request is in
+          // flight. A hover should not feel stalled for the network roundtrip.
+          tooltip.innerHTML = "";
+          tooltip.classList.add("loading", "visible");
+          updatePosition(e.clientX, e.clientY);
+
+          // Try to get optimized URL from manifest
+          const manifest = await getImageManifest();
+          if (currentLink !== link || !link.isConnected || controller.signal.aborted) {
+            return;
+          }
+          const pathname = new URL(originalHref).pathname;
+          // Use optimized URL if available, otherwise fall back to original
+          const imageSrc = manifest[pathname] || originalHref;
+
           // Check cache first (cache key is the resolved imageSrc)
           if (imageCache.has(imageSrc)) {
             const cachedImg = imageCache.get(imageSrc);
@@ -1885,11 +1956,6 @@ import GrainBackground from "../components/GrainBackground.astro";
             updatePosition(e.clientX, e.clientY);
             return;
           }
-
-          // Show loading state
-          tooltip.innerHTML = "";
-          tooltip.classList.add("loading", "visible");
-          updatePosition(e.clientX, e.clientY);
 
           // Load image (optimized version if available)
           const img = document.createElement("img");
@@ -1910,30 +1976,30 @@ import GrainBackground from "../components/GrainBackground.astro";
         }
 
         function hidePreview() {
+          // Invalidate an in-flight manifest/image load immediately. The
+          // delayed hide only gives the current tooltip a brief exit window.
+          currentLink = null;
+          if (hideTimeout) clearTimeout(hideTimeout);
           hideTimeout = setTimeout(() => {
             tooltip.classList.remove("visible", "loading");
-            currentLink = null;
+            hideTimeout = null;
           }, 100);
         }
 
         // Use event delegation for hover events
         // Use AbortController to properly manage event listeners across View Transitions
-        if ((window as any).__imagePreviewController) {
-          (window as any).__imagePreviewController.abort();
-        }
-        const controller = new AbortController();
-        (window as any).__imagePreviewController = controller;
-
         document.addEventListener("mouseover", (e) => {
           const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]') as HTMLAnchorElement;
-          if (link) {
+          const relatedTarget = e.relatedTarget as Node | null;
+          if (link && (!relatedTarget || !link.contains(relatedTarget))) {
             showPreview(link, e);
           }
         }, { signal: controller.signal });
 
         document.addEventListener("mouseout", (e) => {
           const link = (e.target as HTMLElement).closest('a[data-asset-type="image"]');
-          if (link) {
+          const relatedTarget = e.relatedTarget as Node | null;
+          if (link && (!relatedTarget || !link.contains(relatedTarget))) {
             hidePreview();
           }
         }, { signal: controller.signal });

@@ -65,7 +65,11 @@ export default defineConfig({
   // ---------------------------------------------------------------------------
   // Astro Fonts API — replaces manual @fontsource CSS imports.
   // Fonts are downloaded, cached locally, and served from the site itself
-  // (no third-party requests). Preload links and fallbacks are automatic.
+  // (no third-party requests). Keep each registration limited to the
+  // weight/style combinations that the UI actually renders. Astro merges
+  // registrations with the same family/provider/cssVariable, which lets us
+  // retain a real italic face where it is used without generating every
+  // italic weight for the whole family.
   //
   // The cssVariable names match the Tailwind @theme variables defined in
   // global.css (--font-heading, --font-body, etc.) so existing styles
@@ -83,6 +87,15 @@ export default defineConfig({
       name: "Playfair Display",
       cssVariable: "--font-heading",
       weights: [400, 500, 600],
+      styles: ["normal"],
+      subsets: ["latin"],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: "Playfair Display",
+      cssVariable: "--font-heading",
+      weights: [400],
+      styles: ["italic"],
       subsets: ["latin"],
     },
     {
@@ -90,6 +103,7 @@ export default defineConfig({
       name: "Outfit",
       cssVariable: "--font-body",
       weights: [400, 500, 600, 700],
+      styles: ["normal"],
       subsets: ["latin"],
     },
     {
@@ -97,14 +111,31 @@ export default defineConfig({
       name: "SN Pro",
       cssVariable: "--font-ui",
       weights: [500, 600, 700],
+      styles: ["normal"],
+      subsets: ["latin"],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: "SN Pro",
+      cssVariable: "--font-ui",
+      weights: [700],
+      styles: ["italic"],
       subsets: ["latin"],
     },
     {
       provider: fontProviders.fontsource(),
       name: "Maple Mono",
       cssVariable: "--font-mono",
-      weights: [400, 500, 600, 700],
-      styles: ["normal", "italic"],
+      weights: [400, 500, 700],
+      styles: ["normal"],
+      subsets: ["latin"],
+    },
+    {
+      provider: fontProviders.fontsource(),
+      name: "Maple Mono",
+      cssVariable: "--font-mono",
+      weights: [400],
+      styles: ["italic"],
       subsets: ["latin"],
     },
     {
@@ -112,6 +143,7 @@ export default defineConfig({
       name: "Mrs Saint Delafield",
       cssVariable: "--font-cursive",
       weights: [400],
+      styles: ["normal"],
       subsets: ["latin"],
     },
   ],
