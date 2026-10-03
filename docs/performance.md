@@ -50,6 +50,13 @@ retaining its 1MP backing-canvas cap. It freezes when the tab is hidden or
 reduced motion is requested, and resumes without jumping after navigation.
 Paper's native full-refresh-rate loop remains disabled.
 
+The initial background is a small WebP rendering of the shader's starting
+frame rather than a different CSS gradient. Dark/light and wide/portrait
+variants preserve the coloured grain during idle loading and context loss.
+Only the current theme/aspect image is selected by CSS. Regenerate the assets
+with `scripts/generate-grain-previews.mjs` when changing shader parameters;
+the preview is approximate at other aspect ratios and does not animate.
+
 Glass blur and the grain background remain rendering costs. Device profiling
 is still needed to establish frame-time and input-latency improvements; this
 audit does not claim an FPS or INP result.

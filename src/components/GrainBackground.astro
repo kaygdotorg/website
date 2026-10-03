@@ -54,14 +54,24 @@
     z-index: 0;
     overflow: hidden;
     pointer-events: none;
-    /* Also visible before the module loads, with JS disabled, or without WebGL. */
-    background: radial-gradient(ellipse at 0% 0%, #382237, transparent 70%),
-      radial-gradient(ellipse at 100% 100%, #493124, transparent 70%), #100e16;
+    /* Pre-render the same first shader frame while the idle-loaded WebGL module
+       starts, and retain it without JS or after context loss. Separate aspect
+       variants preserve the shader's contain projection on phones. Regenerate
+       these small previews when changing the palette, uniforms or start frame. */
+    background: #100e16 url("/backgrounds/grain-dark-wide.webp") center / 100% 100% no-repeat;
   }
 
   :global([data-theme="light"]) grain-background {
-    background: radial-gradient(ellipse at 0% 0%, #e8dce9, transparent 70%),
-      radial-gradient(ellipse at 100% 100%, #f0d8bd, transparent 70%), #faf7f2;
+    background: #faf7f2 url("/backgrounds/grain-light-wide.webp") center / 100% 100% no-repeat;
+  }
+
+  @media (max-aspect-ratio: 1/1) {
+    grain-background {
+      background-image: url("/backgrounds/grain-dark-portrait.webp");
+    }
+    :global([data-theme="light"]) grain-background {
+      background-image: url("/backgrounds/grain-light-portrait.webp");
+    }
   }
 
   /* A scroll-driven transform keeps the stable large-viewport canvas aligned
